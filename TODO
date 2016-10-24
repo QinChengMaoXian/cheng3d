@@ -3,8 +3,15 @@
 # WebGL20
 # For details: 
 #   StateObject
+#       renderState
+#           blend\depth\stencil\cullface
+#       rendererState
+#           clearColor\clearDepth\clearStencil
 #   Lighting
 #   Bounding box
+#   Bone/Joint
 #   Loader/ResourceManager
-#   Enhance camera
+#   Make camera to a real component
+#   Shader enhance
+#   Animation
 #   
