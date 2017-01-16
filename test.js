@@ -6,6 +6,8 @@ import {
 } from './ext.js'
 
 import test_diff from './resources/spnza_bricks_a_diff.jpg';
+import man_diff from './resources/VWS_B_Male2-2.jpg';
+import gltf_diff from './resources/Cesium_Man/Cesium_Man.jpg'
 
 import { 
     teapotPositions,
@@ -15,6 +17,112 @@ import {
     teapotTangents,
     teapotIndices,
 } from './teapot.js';
+
+let colorTexrure = createTexture2DFromImage(test_diff, true);
+let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
+
+let manTexture = createTexture2DFromImage(man_diff, true);
+let manShowingMaterial = new FullScreenTextureMaterial(manTexture);
+
+let loaderCallback = response => {
+    CGE.Logger.info(response);
+}
+
+let cgeLoader = new CGE.Loader();
+cgeLoader.loadUrl('./resources/avatar.dae').then(result => { 
+        CGE.Logger.info('load from CGE loader');
+        CGE.Logger.info(result);
+    });
+cgeLoader.loadUrls([
+    { 
+        url: './resources/Cesium_Man/Cesium_Man.gltf',
+    }, 
+    {
+        url: './resources/avatar.dae',
+    }], 
+    loaderCallback
+);
+
+let dae_doc = undefined;
+let loader_geo = undefined;
+let func = function(event, object) {
+    switch (event) {
+        case 'document':
+            dae_doc = object;
+            CGE.Logger.info(dae_doc);
+            break;
+
+        case 'entity':
+            CGE.Logger.info(object);
+            loader_geo = object;
+            let loadShowingTransform = new CGE.Transform(new CGE.Vector3(-20.0, -20.0, -0.1), undefined, new CGE.Vector3(50, 50, 50));
+            let loadShowingEntity = CGE.Entity.createRenderableEntity(loader_geo, manShowingMaterial, loadShowingTransform);
+            mainScene.addEntity(loadShowingEntity);
+            break;
+
+        case 'error':
+            CGE.Logger.error(object);
+            break;
+    
+        default:
+            break;
+    }
+}
+
+let collada = new CGE.ColladaLoader();
+collada.load('./resources/avatar.dae', func);
+
+
+//===========================================================
+
+let gltfJson = undefined;
+let gltfCallback = (event, object) => {
+    switch (event) {
+        case 'entity':
+            gltfJson = object[0];
+            CGE.Logger.info(gltfJson);
+            let loadShowingTransform = new CGE.Transform(new CGE.Vector3(20.0, 20.0, -0.1), undefined, new CGE.Vector3(50, 50, 50));
+            let gltfTexture = createTexture2DFromImage(gltf_diff, true);
+            let gltfMaterial = new FullScreenTextureMaterial(gltfTexture);
+            let loadShowingEntity = CGE.Entity.createRenderableEntity(gltfJson, gltfMaterial, loadShowingTransform);
+            mainScene.addEntity(loadShowingEntity);   
+            break;
+
+        case 'error':
+            CGE.Logger.error(object);
+            break;
+    
+        default:
+            break;
+    }
+}
+
+let gltfTest = new CGE.GltfLoader();
+gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
+
+let gltfBin = undefined;
+new Promise((resolve, reject) => {
+    let xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = () => {
+        if (xmlHttp.readyState == 4) {
+            if (xmlHttp.status == 200) {
+                resolve(xmlHttp);
+            } else {
+                reject(new Error(this.statusText));
+            }
+        }
+    }
+    xmlHttp.open('GET', './resources/Cesium_Man/Cesium_Man.bin', true);
+    xmlHttp.responseType = 'arraybuffer';
+    xmlHttp.send(null);
+}).then((json) => {
+    gltfBin = json.response;
+    CGE.Logger.info(json);
+}).catch((error) => {
+    CGE.Logger.info(error);
+});
+
+CGE.Logger.info('now start promise');
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -39,7 +147,7 @@ let attribs = [
     },
     {
         name: 'UV',
-        attribute: CGE.AttribType.UV0, 
+        attribute: CGE.AttribType.TEXCOORD0, 
         num: 2,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 3,
     },
@@ -63,7 +171,7 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 
 let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.AttribType.POSITION, 3, CGE.FLOAT, teapotPositions);
-teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.UV0, 2, CGE.FLOAT, teapotTexCoords);
+teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 2, CGE.FLOAT, teapotTexCoords);
 teapotGeometry.addSingleAttribute('Normal', CGE.AttribType.NORMAL, 3, CGE.FLOAT, teapotNormals);
 teapotGeometry.addSingleAttribute('Binormal', CGE.AttribType.BINORMAL, 3, CGE.FLOAT, teapotBinormals);
 teapotGeometry.addSingleAttribute('Tangent', CGE.AttribType.TANGENT, 3, CGE.FLOAT, teapotTangents);
@@ -78,14 +186,15 @@ renderer.clear(true, true);
 
 document.body.appendChild(renderer.getCanvas());
 
-let colorTexrure = createTexture2DFromImage(test_diff, true);
-let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
-let colorShowingTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(0.5, 0.5, 1));
+let colorShowingTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(50, 50, 1));
 let colorShowingEntity = CGE.Entity.createRenderableEntity(planeVertexGeometry, colorShowingMaterial, colorShowingTransform);
 
+let teapotTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(1, 1, 1));
+let teapotEntity = CGE.Entity.createRenderableEntity(teapotGeometry, colorShowingMaterial, teapotTransform);
+
 let camera = new CGE.Camera(window.innerWidth, window.innerHeight);
-camera.setPosition(new CGE.Vector3(100, 100, 100));
-camera.lookAt(new CGE.Vector3(0,0,0));
+camera.setPosition(new CGE.Vector3(100, -100, 100));
+camera.lookAt(new CGE.Vector3(0, 1, 50));
 camera.update();
 
 let cameraEntity = new CGE.Entity();
@@ -95,6 +204,7 @@ cameraEntity.addComponent(CGE.Component.CreateCameraComponent(camera));
 let mainScene = new CGE.Scene();
 mainScene.setMainCamera(cameraEntity);
 mainScene.addEntity(colorShowingEntity);
+mainScene.addEntity(teapotEntity);
 
 let render = function() {
     // renderTargetScene.update();
@@ -134,7 +244,11 @@ function loop() {
     if (noError) {
         animationframe(loop);
     }
-	render();
+	// render();
 };
 
-loop();
+setTimeout(render, 200);
+
+// loop();
+
+module.exports = CGE;

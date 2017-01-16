@@ -1,5 +1,6 @@
 import * as CGE from './rendererParameter.js';
 import { Texture } from './texture.js'
+import { Loader } from '../io/loader.js'
 
 export class Texture2D extends Texture {
     constructor() {

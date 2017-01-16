@@ -25,4 +25,9 @@ export { ComponentType } from './object/objectType.js';
 
 export { Scene } from './scene/scene.js';
 
+export { ColladaLoader } from './extensions/colladaLoader.js'
+export { GltfLoader } from './extensions/gltfLoader.js'
+
+export { Loader } from './io/loader.js'
+
 export { WebGLRenderer } from './renderer/webGLRenderer.js'

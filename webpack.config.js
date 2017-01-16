@@ -1,11 +1,18 @@
-'use strict';
-const webpack = require('webpack');
+// 'use strict';
+var path = require("path");
+
 module.exports = {
-  entry: './test.js',
-  output: {
-    	path: './dist',
-    	filename: 'root.bundle.js',
+  entry: {
+    app: ['./test.js'],
   },
+  output: {
+    path: path.resolve(__dirname, "build"),
+    publicPath: "/assets/",
+    filename: 'bundle.js',
+    library: 'CGE',
+    libraryTarget: 'umd',
+  },
+  devtool: 'source-map',
   module: {
 		loaders: [
 			{ 
@@ -29,6 +36,15 @@ module.exports = {
       }
 		]
 	},
+  // devServer: {
+  //   hot: true
+  // },
+  //plugins: [
+    // new webpack.DefinePlugin({
+    // 'process.env.NODE_ENV': '"development"'
+    // }),
+    // new webpack.HotModuleReplacementPlugin()
+  // ],
   resolve:{
     extensions:['','.js','.json']
   },

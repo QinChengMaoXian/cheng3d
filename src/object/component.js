@@ -44,6 +44,7 @@ export class Component extends CObject {
     }
 
     static CreateCameraComponent(camera) {
+        // TODO: Remove this;
         return new Component(camera, ComponentType.Camera);
     }
 

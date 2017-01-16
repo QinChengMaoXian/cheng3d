@@ -134,7 +134,7 @@ export class DeferredMaterial extends Material {
             shader.addAttribName(CGE.AttribType.POSITION, 'Position');
             shader.addAttribName(CGE.AttribType.NORMAL, 'Normal');
             shader.addAttribName(CGE.AttribType.TANGENT, 'Tangent');
-            shader.addAttribName(CGE.AttribType.UV0, 'UV');
+            shader.addAttribName(CGE.AttribType.TEXCOORD0, 'UV');
             shader.addTextureName(CGE.MapType.DIFFUSE, 'diffuseMap');
             shader.addTextureName(CGE.MapType.NORMAL, 'normalMap');
             shader.addTextureName(CGE.MapType.SPECULAR, 'specularMap');
@@ -174,33 +174,34 @@ export class FullScreenTextureMaterial extends Material {
 
     static getShader() {
         if (FullScreenTextureMaterialShader === undefined) {
-            let vertexShaderText = "#version 100\n\
-            attribute vec4 Position;\n\
-            attribute vec2 UV;\n\
-            varying vec2 o_uv; \n\
-            uniform mat4 WMatrix; \n\
-            void main()\n\
-            {\n\
-                o_uv = UV;\n\
-                gl_Position = WMatrix * Position;\n\
-            }";
+            let vertexShaderText = `#version 100
+            attribute vec4 Position;
+            attribute vec2 UV;
+            varying vec2 o_uv;
+            uniform mat4 MVPMatrix;
+            void main()
+            {
+                o_uv = UV; // vec2(UV.x, 1.0 - UV.y);
+                gl_Position = MVPMatrix * Position;
+            }`;
 
-            let fragmentShaderText = "#version 100\n\
-            precision mediump float;\n\
-            varying vec2 o_uv; \n\
-            uniform sampler2D diffuse;\n\
-            \n\
-            void main()\n\
-            {\n\
-                vec4 color = texture2D(diffuse, o_uv); \n\
-                gl_FragColor = vec4(color.xyz, 1.0);\n\
-            }";
+            let fragmentShaderText = `#version 100
+            precision mediump float;
+            varying vec2 o_uv;
+            uniform sampler2D diffuse;
+            
+            void main()
+            {
+                vec4 color = texture2D(diffuse, o_uv);
+                gl_FragColor = vec4(color.xyz, 1.0);
+            }`;
             let shader = new CGE.Shader();
+            if (!shader) return;
             shader.setShaderText(vertexShaderText, fragmentShaderText);
             shader.addAttribName(CGE.AttribType.POSITION, 'Position');
-            shader.addAttribName(CGE.AttribType.UV0, 'UV');
+            shader.addAttribName(CGE.AttribType.TEXCOORD0, 'UV');
             shader.addTextureName(CGE.MapType.DIFFUSE, 'diffuse');
-            shader.addMatrixName(CGE.MatrixType.WMatrix, 'WMatrix');
+            shader.addMatrixName(CGE.MatrixType.MVPMatrix, 'MVPMatrix');
             FullScreenTextureMaterialShader = shader
         }
         return FullScreenTextureMaterialShader;

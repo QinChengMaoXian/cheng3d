@@ -13,7 +13,7 @@ export class Scene extends CObject {
     }
 
     update() {
-        this._entities.forEach(function(entity){
+        this._entities.forEach((entity) => {
             entity.update();
         });
     }
@@ -28,7 +28,7 @@ export class Scene extends CObject {
 
     getRenderEntities() {
         let renderEntities = [];
-        this._entities.forEach(function(entity, id) {
+        this._entities.forEach((entity, id) => {
             if (entity.canBeRendering()) {
                 renderEntities.push(entity);
             }

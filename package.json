@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack -w",
-    "build": "webpack -d"
+    "build": "webpack -d",
+    "start-dev": "webpack-dev-server --hot --port 8000"
   },
   "keywords": [
     "webGL",

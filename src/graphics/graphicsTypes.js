@@ -8,6 +8,8 @@ export const AttribType = {
     TANGENT             : _g(),
     BINORMAL            : _g(),
     COLOR               : _g(),
+    JOINT               : _g(),
+    WEIGHT              : _g(),
     TEXCOORD0           : _g(),
     TEXCOORD1           : _g(),
     TEXCOORD2           : _g(),
