@@ -56,7 +56,7 @@ let func = function(event, object) {
             CGE.Logger.info(object);
             loader_geo = object;
             let loadShowingTransform = new CGE.Transform(new CGE.Vector3(-20.0, -20.0, -0.1), undefined, new CGE.Vector3(50, 50, 50));
-            let loadShowingEntity = CGE.Entity.createRenderableEntity(loader_geo, manShowingMaterial, loadShowingTransform);
+            let loadShowingEntity = CGE.Entity.createRenderableEntity(loader_geo, colorShowingMaterial, loadShowingTransform);
             mainScene.addEntity(loadShowingEntity);
             break;
 
@@ -84,7 +84,7 @@ let gltfCallback = (event, object) => {
             let loadShowingTransform = new CGE.Transform(new CGE.Vector3(20.0, 20.0, -0.1), undefined, new CGE.Vector3(50, 50, 50));
             let gltfTexture = createTexture2DFromImage(gltf_diff, true);
             let gltfMaterial = new FullScreenTextureMaterial(gltfTexture);
-            let loadShowingEntity = CGE.Entity.createRenderableEntity(gltfJson, gltfMaterial, loadShowingTransform);
+            let loadShowingEntity = CGE.Entity.createRenderableEntity(gltfJson, colorShowingMaterial, loadShowingTransform);
             mainScene.addEntity(loadShowingEntity);   
             break;
 
@@ -171,7 +171,9 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 
 let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.AttribType.POSITION, 3, CGE.FLOAT, teapotPositions);
-teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 2, CGE.FLOAT, teapotTexCoords);
+CGE.Logger.info(teapotPositions.length);
+teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 3, CGE.FLOAT, teapotTexCoords);
+CGE.Logger.info(teapotTexCoords.length);
 teapotGeometry.addSingleAttribute('Normal', CGE.AttribType.NORMAL, 3, CGE.FLOAT, teapotNormals);
 teapotGeometry.addSingleAttribute('Binormal', CGE.AttribType.BINORMAL, 3, CGE.FLOAT, teapotBinormals);
 teapotGeometry.addSingleAttribute('Tangent', CGE.AttribType.TANGENT, 3, CGE.FLOAT, teapotTangents);
