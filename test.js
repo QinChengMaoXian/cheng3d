@@ -173,7 +173,7 @@ let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.AttribType.POSITION, 3, CGE.FLOAT, teapotPositions);
 CGE.Logger.info(teapotPositions.length);
 teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 3, CGE.FLOAT, teapotTexCoords);
-CGE.Logger.info(teapotTexCoords.length);
+CGE.Logger.info(teapotTexCoords .length);
 teapotGeometry.addSingleAttribute('Normal', CGE.AttribType.NORMAL, 3, CGE.FLOAT, teapotNormals);
 teapotGeometry.addSingleAttribute('Binormal', CGE.AttribType.BINORMAL, 3, CGE.FLOAT, teapotBinormals);
 teapotGeometry.addSingleAttribute('Tangent', CGE.AttribType.TANGENT, 3, CGE.FLOAT, teapotTangents);
@@ -195,7 +195,7 @@ let teapotTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefin
 let teapotEntity = CGE.Entity.createRenderableEntity(teapotGeometry, colorShowingMaterial, teapotTransform);
 
 let camera = new CGE.Camera(window.innerWidth, window.innerHeight);
-camera.setPosition(new CGE.Vector3(100, -100, 100));
+camera.setPosition(new CGE.Vector3(-100, 100, 80));
 camera.lookAt(new CGE.Vector3(0, 1, 50));
 camera.update();
 
