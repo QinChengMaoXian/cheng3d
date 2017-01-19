@@ -1,5 +1,7 @@
 # cheng3d
-
-# Run 'npm install' first
-# Run 'npm run build' second
-# Then start any web server for './dist' folder
+#
+# Setup nodejs.
+#
+# Run 'npm install'
+# Run 'npm run start-dev'
+# Open url into brower '127.0.0.1:8000'
