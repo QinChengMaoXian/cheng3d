@@ -171,9 +171,7 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 
 let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.AttribType.POSITION, 3, CGE.FLOAT, teapotPositions);
-CGE.Logger.info(teapotPositions.length);
 teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 3, CGE.FLOAT, teapotTexCoords);
-CGE.Logger.info(teapotTexCoords .length);
 teapotGeometry.addSingleAttribute('Normal', CGE.AttribType.NORMAL, 3, CGE.FLOAT, teapotNormals);
 teapotGeometry.addSingleAttribute('Binormal', CGE.AttribType.BINORMAL, 3, CGE.FLOAT, teapotBinormals);
 teapotGeometry.addSingleAttribute('Tangent', CGE.AttribType.TANGENT, 3, CGE.FLOAT, teapotTangents);
