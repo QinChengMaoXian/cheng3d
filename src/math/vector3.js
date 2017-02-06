@@ -35,6 +35,13 @@ export class Vector3 {
         return this;
     }
 
+    mul(d) {
+        this.x *= d;
+        this.y *= d;
+        this.z *= d;
+        return this;
+    }
+
     dot(vec) {
         return this.x * vec.x + this.y * vec.y + this.z * vec.z;
     }
@@ -99,5 +106,9 @@ export class Vector3 {
         this.x = vec3.x;
         this.y = vec3.y;
         this.z = vec3.z;
+    }
+
+    equal(vec3) {
+        return this.x === vec3.x && this.y === vec3.y && this.z === vec3.z;
     }
 }

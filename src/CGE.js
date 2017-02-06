@@ -7,6 +7,7 @@ export { Matrix4 } from './math/matrix4.js';
 
 export { CObject } from './core/object.js';
 export { VersionObject } from './core/versionObject.js';
+export { Event } from './core/event.js';
 
 export * from './graphics/graphicsTypes.js';
 export * from './graphics/rendererParameter.js';

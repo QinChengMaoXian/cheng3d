@@ -1,5 +1,6 @@
 import { Vector3 } from '../math/vector3.js';
 import { Matrix4 } from '../math/matrix4.js';
+import { Quaternion } from '../math/quaternion.js';
 import { Transform } from './transform.js';
 
 export class Camera extends Transform {
@@ -25,10 +26,20 @@ export class Camera extends Transform {
             up: new Vector3(0, 0, 1),
             _projectionFunc: this._makePerspectiveMatrix,
         });
+        this._resetUp();
+    }
+
+    _resetUp() {
+        let forward = this.center.clone().sub(this._position).normalize();
+        let rightAxis = forward.cross(this.up.clone().normalize());
+        if (forward.equal(rightAxis)) 
+            return;
+        this.up = rightAxis.cross(forward);
     }
 
     update() {
         if (this._needsUpdate) {
+            // this._resetUp();
             this.lookAt(this.center);
             this.makeProjectionMatrix();
             this._needsUpdate = false;
@@ -116,5 +127,43 @@ export class Camera extends Transform {
         this.top = yCenter - halfHeight;
         this.bottom = yCenter + halfHeight;
         this.aspect = width / height;
+    }
+
+    forwardStep(delta) {
+        let dir = this.center.clone().sub(this._position).normalize().mul(delta);
+        this._addPosCenter(dir);
+    }
+
+    horizontalStep(delta) {
+        let dir = this.center.clone().sub(this._position).cross(this.up).normalize().mul(delta);
+        this._addPosCenter(dir);
+    }
+
+    _addPosCenter(dir) {
+        this._position.add(dir);
+        this.center.add(dir);
+        this.setNeedUpdateMatrix();
+    }
+
+    rotateView(axis, rad) {
+        let quat = new Quaternion();
+        quat.setAxisAngle(axis, -rad);
+        let temp = this.center.clone().sub(this._position)
+        let length = this.center.clone().sub(this._position).length();
+        let dir = temp.normalize();
+
+        dir.applyQuaternion(quat);
+        this.center = this._position.clone().add(dir.mul(length));
+        this.up.applyQuaternion(quat);
+        this.setNeedUpdateMatrix();
+    }
+
+    rotateViewFromForward(movementX, movementY) {
+        let forward = this.center.clone().sub(this._position).normalize();
+        let rightAxis = forward.cross(this.up.clone().normalize());
+
+        // TODO: Enhance there.
+        this.rotateView(new Vector3(0,0,1), movementX);
+        this.rotateView(rightAxis, movementY);
     }
 }

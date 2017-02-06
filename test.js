@@ -206,12 +206,17 @@ mainScene.setMainCamera(cameraEntity);
 mainScene.addEntity(colorShowingEntity);
 mainScene.addEntity(teapotEntity);
 
+let events = new Map();
+
 let render = function() {
     // renderTargetScene.update();
     // trans.forEach(function(transform){
     //     transform.applyMatrix4(testMat4);
     // });
     // renderer.renderScene(renderTargetScene, renderTarget);
+    events.forEach((event) => {
+        event.update();
+    });
     mainScene.update();
     renderer.renderScene(mainScene);
 };
@@ -232,6 +237,96 @@ window.onerror = function(event) {
     noError = false;
 }
 
+let _d = 0.5 
+
+let forward = CGE.Event.createFromFunc(() => {camera.forwardStep(_d);});
+let back = CGE.Event.createFromFunc(() => {camera.forwardStep(-_d);});
+let left = CGE.Event.createFromFunc(() => {camera.horizontalStep(-_d);});
+let right = CGE.Event.createFromFunc(() => {camera.horizontalStep(_d);});
+
+let turnLeft = CGE.Event.createFromFunc(() => {camera.rotateView(new CGE.Vector3(0,0,1), -0.02);});
+let turnRight = CGE.Event.createFromFunc(() => {camera.rotateView(new CGE.Vector3(0,0,1), 0.02);});
+
+window.onkeydown = function(event) {
+    CGE.Logger.info(event);
+    switch(event.which || event.keyCode) {
+        case 87:
+            events.set(forward.getId(), forward);
+            break;
+
+        case 65:
+            events.set(left.getId(), left);
+            break;
+
+        case 83:
+            events.set(back.getId(), back);
+            break;
+
+        case 68:
+            events.set(right.getId(), right);
+            break;
+
+        case 81:
+            events.set(turnLeft.getId(), turnLeft);
+            break;
+        
+        case 69:
+            events.set(turnRight.getId(), turnRight);
+            break;
+
+        default:
+            break;
+    }
+}
+
+window.onkeyup = function(event) {
+    switch(event.which || event.keyCode) {
+        case 87:
+            events.delete(forward.getId());
+            break;
+
+        case 65:
+            events.delete(left.getId());
+            break;
+
+        case 83:
+            events.delete(back.getId());
+            break;
+
+        case 68:
+            events.delete(right.getId());
+            break;
+
+        case 81:
+            events.delete(turnLeft.getId());
+            break;
+        
+        case 69:
+            events.delete(turnRight.getId());
+            break;
+
+        default:
+            break;
+    }
+}
+
+window.onmousemove = function(event) {
+    // CGE.Logger.info(event);
+    let del = 0.005;
+    let moveX = event.movementX * del;
+    let moveY = event.movementY * del;
+
+    camera.rotateViewFromForward(moveX, moveY);
+}
+
+window.onmousedown = function(event) {
+    CGE.Logger.info(event);
+}
+
+window.onmouseup = function(event) {
+    
+}
+
 function loop() {
     let animationframe = window.requestAnimationFrame
                         ||window.mozRequestAnimationFrame
@@ -244,11 +339,11 @@ function loop() {
     if (noError) {
         animationframe(loop);
     }
-	// render();
+    render();
 };
 
 setTimeout(render, 200);
 
-// loop();
+loop();
 
 module.exports = CGE;
