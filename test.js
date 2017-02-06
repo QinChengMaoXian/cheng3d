@@ -244,11 +244,11 @@ let back = CGE.Event.createFromFunc(() => {camera.forwardStep(-_d);});
 let left = CGE.Event.createFromFunc(() => {camera.horizontalStep(-_d);});
 let right = CGE.Event.createFromFunc(() => {camera.horizontalStep(_d);});
 
-let turnLeft = CGE.Event.createFromFunc(() => {camera.rotateView(new CGE.Vector3(0,0,1), -0.02);});
-let turnRight = CGE.Event.createFromFunc(() => {camera.rotateView(new CGE.Vector3(0,0,1), 0.02);});
+let verticalTop = CGE.Event.createFromFunc(() => {camera.verticalStep(_d);});
+let verticalDown = CGE.Event.createFromFunc(() => {camera.verticalStep(-_d);});
 
 window.onkeydown = function(event) {
-    CGE.Logger.info(event);
+    // CGE.Logger.info(event);
     switch(event.which || event.keyCode) {
         case 87:
             events.set(forward.getId(), forward);
@@ -267,11 +267,11 @@ window.onkeydown = function(event) {
             break;
 
         case 81:
-            events.set(turnLeft.getId(), turnLeft);
+            events.set(verticalTop.getId(), verticalTop);
             break;
         
         case 69:
-            events.set(turnRight.getId(), turnRight);
+            events.set(verticalDown.getId(), verticalDown);
             break;
 
         default:
@@ -298,11 +298,11 @@ window.onkeyup = function(event) {
             break;
 
         case 81:
-            events.delete(turnLeft.getId());
+            events.delete(verticalTop.getId());
             break;
         
         case 69:
-            events.delete(turnRight.getId());
+            events.delete(verticalDown.getId());
             break;
 
         default:
@@ -310,21 +310,24 @@ window.onkeyup = function(event) {
     }
 }
 
-window.onmousemove = function(event) {
-    // CGE.Logger.info(event);
-    let del = 0.005;
-    let moveX = event.movementX * del;
-    let moveY = event.movementY * del;
+let mouseDown = false;
 
-    camera.rotateViewFromForward(moveX, moveY);
+window.onmousemove = function(event) {
+    if (mouseDown) {
+        let del = 0.005;
+        let moveX = event.movementX * del;
+        let moveY = event.movementY * del;
+        camera.rotateViewFromForward(moveX, moveY);
+    }
 }
 
 window.onmousedown = function(event) {
-    CGE.Logger.info(event);
+    // CGE.Logger.info(event);
+    mouseDown = true;
 }
 
 window.onmouseup = function(event) {
-    
+    mouseDown = false;
 }
 
 function loop() {

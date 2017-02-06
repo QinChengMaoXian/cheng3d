@@ -39,8 +39,7 @@ export class Camera extends Transform {
 
     update() {
         if (this._needsUpdate) {
-            // this._resetUp();
-            this.lookAt(this.center);
+            this._updateMatrix();
             this.makeProjectionMatrix();
             this._needsUpdate = false;
         }
@@ -112,8 +111,13 @@ export class Camera extends Transform {
     lookAt(center) {
         if (center) {
             this.center.copy(center);
-            this._matrix.lookAt(this._position, center, this.up);
+            this._resetUp();
+            this.setNeedUpdateMatrix();
         }
+    }
+
+    _updateMatrix() {
+        this._matrix.lookAt(this._position, this.center, this.up);
     }
 
     resize(width, height) {
@@ -139,6 +143,12 @@ export class Camera extends Transform {
         this._addPosCenter(dir);
     }
 
+    verticalStep(delta) {
+        this.center.z += delta;
+        this._position.z += delta;
+        this.setNeedUpdateMatrix();
+    }
+
     _addPosCenter(dir) {
         this._position.add(dir);
         this.center.add(dir);
@@ -149,7 +159,7 @@ export class Camera extends Transform {
         let quat = new Quaternion();
         quat.setAxisAngle(axis, -rad);
         let temp = this.center.clone().sub(this._position)
-        let length = this.center.clone().sub(this._position).length();
+        let length = temp.length();
         let dir = temp.normalize();
 
         dir.applyQuaternion(quat);
