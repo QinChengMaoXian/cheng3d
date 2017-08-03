@@ -6,7 +6,7 @@ import { RenderTargetState } from './renderTargetState.js'
 export class RenderTarget extends VersionObject {
     constructor() {
         super();
-            Object.assign(this, {
+        Object.assign(this, {
             _textures: new Map(),
             _width: 64,
             _height: 64,

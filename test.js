@@ -18,7 +18,10 @@ import {
     teapotIndices,
 } from './teapot.js';
 
+CGE.dev = {};
+
 let colorTexrure = createTexture2DFromImage(test_diff, true);
+colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
 let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
 
 let manTexture = createTexture2DFromImage(man_diff, true);
@@ -125,9 +128,9 @@ new Promise((resolve, reject) => {
 CGE.Logger.info('now start promise');
 
 let vertexPositionData = new Float32Array([
-    -1.0, 1.0, 0.0,  0.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
-    1.0,  1.0, 0.0,  1.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
-    1.0, -1.0, 0.0,  1.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+    -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+    1.0,  1.0, 0.0,  5.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+    1.0, -1.0, 0.0,  5.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
     -1.0, -1.0, 0.0, 0.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
 ]);
 

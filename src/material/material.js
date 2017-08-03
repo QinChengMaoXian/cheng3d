@@ -5,6 +5,7 @@ export class Material extends CObject {
         super();
         Object.assign(this, {
             _shader: undefined,
+            _state: undefined,
         });
     }
 

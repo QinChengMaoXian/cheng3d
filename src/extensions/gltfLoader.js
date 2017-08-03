@@ -118,7 +118,7 @@ Object.assign(GltfLoader, {
                 if (attribute_in === undefined || attribute_in === null) {
                     return;
                 }
-
+                // CGE.Logger.info(attribute.data);
                 cge_geometry.addSingleAttribute(key, attribute_in, attribute.strideCount, attribute.componentType, attribute.data);
             });
 
