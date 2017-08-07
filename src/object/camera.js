@@ -34,7 +34,7 @@ export class Camera extends Transform {
         let rightAxis = forward.cross(this.up.clone().normalize());
         if (forward.equal(rightAxis)) 
             return;
-        this.up = rightAxis.cross(forward);
+        this.up = rightAxis.cross(forward).normalize();
     }
 
     update() {
@@ -155,7 +155,7 @@ export class Camera extends Transform {
         this.setNeedUpdateMatrix();
     }
 
-    rotateView(axis, rad) {
+    _rotateView(axis, rad) {
         let quat = new Quaternion();
         quat.setAxisAngle(axis, -rad);
         let temp = this.center.clone().sub(this._position)
@@ -164,16 +164,15 @@ export class Camera extends Transform {
 
         dir.applyQuaternion(quat);
         this.center = this._position.clone().add(dir.mul(length));
-        this.up.applyQuaternion(quat);
-        this.setNeedUpdateMatrix();
+        this.up.applyQuaternion(quat);   
     }
 
     rotateViewFromForward(movementX, movementY) {
+        // enhance this.
+        this._rotateView(new Vector3(0,0,1), movementX);
         let forward = this.center.clone().sub(this._position).normalize();
         let rightAxis = forward.cross(this.up.clone().normalize());
-
-        // TODO: Enhance there.
-        this.rotateView(new Vector3(0,0,1), movementX);
-        this.rotateView(rightAxis, movementY);
+        this._rotateView(rightAxis, movementY);
+        this.setNeedUpdateMatrix();
     }
 }

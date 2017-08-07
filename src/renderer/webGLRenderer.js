@@ -124,15 +124,15 @@ export const WebGLRenderer = function() {
 
     let self = this;
 
-    let initializedMap = new Map();
+    // let initializedMap = new Map();
     // glBuffer --->  Geometry
     // glProgram  ---> material & shader
     // glTexturexd  ----> texturexd
     // glFrame -----> renderTarget
 
-    this.getInitializedMap = function() {
-        return initializedMap;
-    };
+    // this.getInitializedMap = function() {
+    //     return initializedMap;
+    // };
 
     let renderCount = 0;
     let screenWidth = 0, 
@@ -173,43 +173,80 @@ export const WebGLRenderer = function() {
     };
 
     this.initGeometry = function(geometry) {
-        let glbuffer = initializedMap.get(geometry.id);
-        if (glbuffer !== undefined && glbuffer.getLocalVersion() === geometry.getUpdateVersion()) 
+        let glbuffer = geometry.getRenderObjectRef(this);
+        if (glbuffer && glbuffer.getLocalVersion() === geometry.getUpdateVersion()) {
             return glbuffer;
+        }
 
         glbuffer = new glBuffer();
         if (glbuffer.generateFromGeometry(_gl, geometry)) {
-            initializedMap.set(geometry.id, glbuffer);
+            geometry.setRenderObjectRef(this, glbuffer);
             return glbuffer;
         }
+
+        // let glbuffer = initializedMap.get(geometry.id);
+        // if (glbuffer !== undefined && glbuffer.getLocalVersion() === geometry.getUpdateVersion()) 
+        //     return glbuffer;
+
+        // glbuffer = new glBuffer();
+        // if (glbuffer.generateFromGeometry(_gl, geometry)) {
+        //     initializedMap.set(geometry.id, glbuffer);
+        //     return glbuffer;
+        // }
     };
 
     this.initShader = function(shader) {
-        let glprogram = initializedMap.get(shader.id);
-        if (glprogram !== undefined && glprogram.getLocalVersion() === shader.getUpdateVersion()) 
+        let glprogram = shader.getRenderObjectRef(this);
+        if (glprogram && glprogram.getLocalVersion() === shader.getUpdateVersion()) {
             return glprogram;
+        }
 
         glprogram = new glProgram();
         if (glprogram.generateFromShader(_gl, shader)) {
-            initializedMap.set(shader.id, glprogram);
+            shader.setRenderObjectRef(this, glprogram);
             return glprogram;
         }
+
+        // let glprogram = initializedMap.get(shader.id);
+        // if (glprogram !== undefined && glprogram.getLocalVersion() === shader.getUpdateVersion()) 
+        //     return glprogram;
+
+        // glprogram = new glProgram();
+        // if (glprogram.generateFromShader(_gl, shader)) {
+        //     initializedMap.set(shader.id, glprogram);
+        //     return glprogram;
+        // }
     };
 
-    this.initTexture2d = function(texture) {
-        let gltexture = initializedMap.get(texture.id);
-        if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) 
+    this.initTexture = function(texture) {
+        let gltexture = texture.getRenderObjectRef(this);
+        if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) {
             return gltexture;
+        }
+            
         if (texture instanceof Texture2D) {
             gltexture = new glTexture2D(_gl);
         } else if (texture instanceof TextureCube) {
             gltexture = new glTextureCube(_gl);
         }
-        
+
         if (gltexture.generateFromTexture(_gl, texture)) {
-            initializedMap.set(texture.id, gltexture);
+            texture.setRenderObjectRef(this, gltexture);
             return gltexture;
         }
+
+        // let gltexture = initializedMap.get(texture.id);
+        // if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) 
+        //     return gltexture;
+        // if (texture instanceof Texture2D) {
+        //     gltexture = new glTexture2D(_gl);
+        // } else if (texture instanceof TextureCube) {
+        //     gltexture = new glTextureCube(_gl);
+        // }
+        // if (gltexture.generateFromTexture(_gl, texture)) {
+        //     initializedMap.set(texture.id, gltexture);
+        //     return gltexture;
+        // }
     };
 
     let _glMeshManager = {
@@ -242,6 +279,8 @@ export const WebGLRenderer = function() {
         let geometry = entity.geometry;
         let shader = entity.material.getShader();
         let glmesh = _glMeshManager.getGLMesh(geometry.id, shader.id);
+
+        // TODO: What's the fxxk this?
         if (glmesh !== undefined
             && glmesh.getLocalVersion() === geometry.getUpdateVersion() 
             && glmesh.get2ndLocalVersion() === shader.getUpdateVersion()) {

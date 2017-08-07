@@ -5,6 +5,10 @@ import { Geometry } from '../graphics/geometry.js'
 import { Entity } from '../object/entity.js'
 import { Transform } from '../object/transform.js'
 import { Component } from '../object/component.js'
+import { AttribType } from '../graphics/graphicsTypes'
+import { FLOAT } from '../graphics/rendererParameter'
+
+import { Logger } from '../core/base'
 
 export class ColladaLoader {
     constructor() {
@@ -99,7 +103,7 @@ export class ColladaLoader {
                 count: count,
                 stride: parseInt(stride),
                 array: dataArray,
-                type: CGE.FLOAT, //todo:
+                type: FLOAT, //todo:
             }
         };
 
@@ -240,7 +244,7 @@ export class ColladaLoader {
             return undefined;
         }
 
-        let cge_geometry = new CGE.Geometry();
+        let cge_geometry = new Geometry();
 
         for (let i = 0; i < inputsLength; i++) {
             let srcDatas = srcDataMap[i];
@@ -250,7 +254,7 @@ export class ColladaLoader {
 
             let webgl_data = undefined;
             switch (data.type) {
-                case CGE.FLOAT:
+                case FLOAT:
                     webgl_data = new Float32Array(resultData);
                     break;
             
@@ -262,15 +266,15 @@ export class ColladaLoader {
             switch (semantic) {
                 case 'POSITION':
                 case 'VERTEX':
-                    attribute_in = CGE.AttribType.POSITION;
+                    attribute_in = AttribType.POSITION;
                     break;
 
                 case 'NORMAL':
-                    attribute_in = CGE.AttribType.NORMAL;
+                    attribute_in = AttribType.NORMAL;
                     break;
 
                 case 'TEXCOORD':
-                    attribute_in = CGE.AttribType.TEXCOORD0;
+                    attribute_in = AttribType.TEXCOORD0;
                     for (let j = 0; j < (webgl_data.length / data.stride); j++) {
                         let v = webgl_data[j * data.stride + 1];
                         webgl_data[j * data.stride + 1] = 1.0 - v;

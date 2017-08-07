@@ -15,17 +15,9 @@ module.exports = {
   devtool: 'source-map',
   module: {
 		loaders: [
-			{ 
-        test: /\.js$/, 
-        exclude: /node_modules/, 
-        loader: 'babel', 
-        query: {
-            presets: ['es2015'],
-        },
-      },
       {
         test: /\.(jpg|png|svg|ttf|eot)$/,
-        loader: 'file',
+        loader: 'file-loader',
         query: {
             name: 'img/[hash].[ext]',
         },
@@ -46,6 +38,6 @@ module.exports = {
     // new webpack.HotModuleReplacementPlugin()
   // ],
   resolve:{
-    extensions:['','.js','.json']
+    extensions:['ts','.js','.json']
   },
 };

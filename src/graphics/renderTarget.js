@@ -1,9 +1,9 @@
-import { VersionObject } from '../core/versionObject.js'
+import { GraphicsObject } from './graphicsObject.js'
 import { Texture2D } from './texture2D.js'
 import * as CGE from './rendererParameter.js'
 import { RenderTargetState } from './renderTargetState.js'
 
-export class RenderTarget extends VersionObject {
+export class RenderTarget extends GraphicsObject {
     constructor() {
         super();
         Object.assign(this, {

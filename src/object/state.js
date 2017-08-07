@@ -5,5 +5,4 @@ export class State extends CObject {
 
     }
 
-    
 }

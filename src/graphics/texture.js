@@ -1,7 +1,7 @@
 import * as CGE from './rendererParameter.js';
-import { VersionObject } from '../core/versionObject.js'
+import { GraphicsObject } from './graphicsObject.js'
 
-export class Texture extends VersionObject {
+export class Texture extends GraphicsObject {
     constructor() {
         super();
         Object.assign(this, {

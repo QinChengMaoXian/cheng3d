@@ -18,8 +18,6 @@ import {
     teapotIndices,
 } from './teapot.js';
 
-CGE.dev = {};
-
 let colorTexrure = createTexture2DFromImage(test_diff, true);
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
 let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
@@ -351,5 +349,3 @@ function loop() {
 setTimeout(render, 200);
 
 loop();
-
-module.exports = CGE;

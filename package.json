@@ -11,30 +11,18 @@
   },
   "keywords": [
     "webGL",
+    "webGL2",
     "cheng3d"
   ],
   "author": "QinChengMaoXian",
   "license": "LGPL-3.0",
   "devDependencies": {
-    "babel-core": "^6.13.2",
-    "babel-loader": "^6.2.5",
-    "css-loader": "^0.12.1",
-    "eslint": "^3.4.0",
-    "jsx": "^0.9.89",
-    "jsx-loader": "^0.13.2",
-    "jsx-webpack-loader": "^0.1.2",
-    "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1"
+    "css-loader": "^0.28.4",
+    "file-loader": "^0.11.2",
+    "ts-loader": "^2.3.2",
+    "typescript": "^2.4.2",
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.6.1"
   },
-  "dependencies": {
-    "babel-core": "*",
-    "babel-preset-es2015": "*",
-    "babel-preset-stage-0": "*",
-    "babel-preset-react": "*",
-    "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1",
-    "file-loader": "*",
-    "react": "*",
-    "react-dom": "*"
-  }
+  "dependencies": {}
 }

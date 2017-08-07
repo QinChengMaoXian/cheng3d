@@ -1,4 +1,4 @@
-export const VERSION = '03';
+export const VERSION = '04';
 
 export const Logger = {
     info: function(message) {
@@ -29,3 +29,4 @@ export const GetObjectCount = function() {
 }();
 
 export const GLMAT_EPSILON = 0.000001
+export const USE_MULTI_RENDERER = false

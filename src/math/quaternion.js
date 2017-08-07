@@ -1,5 +1,5 @@
 import { Vector4 } from './vector4.js'
-import { Vector3 } from './vector4.js'
+import { Vector3 } from './vector3.js'
 
 export class Quaternion extends Vector4 {
     constructor(x, y, z, w) {

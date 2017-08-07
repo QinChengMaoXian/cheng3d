@@ -1,7 +1,7 @@
 import * as CGE from './rendererParameter.js';
-import { VersionObject } from '../core/versionObject.js'
+import { GraphicsObject } from './graphicsObject.js'
 
-export class Shader extends VersionObject {
+export class Shader extends GraphicsObject {
     constructor() {
         super();
         Object.assign(this, {

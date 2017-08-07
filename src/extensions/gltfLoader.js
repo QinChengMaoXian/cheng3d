@@ -1,12 +1,18 @@
-import { Texture2D } from '../graphics/texture2D.js'
-import { TextureCube } from '../graphics/textureCube.js'
-import { Geometry } from '../graphics/geometry.js'
+import { Texture2D } from '../graphics/texture2D'
+import { TextureCube } from '../graphics/textureCube'
+import { Geometry } from '../graphics/geometry'
 
-import { Entity } from '../object/entity.js'
-import { Transform } from '../object/transform.js'
-import { Component } from '../object/component.js'
+import { Entity } from '../object/entity'
+import { Transform } from '../object/transform'
+import { Component } from '../object/component'
+import { AttribType } from '../graphics/graphicsTypes'
+import { FLOAT, POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN } from '../graphics/rendererParameter'
 
-import { Loader } from '../io/loader.js'
+import { Loader } from '../io/loader'
+
+import { Logger } from '../core/base'
+
+
 
 export class GltfLoader {
     constructor(url, callback) {
@@ -41,8 +47,8 @@ export class GltfLoader {
         });
         
         return Promise.all(Object.values(glTF.promising)).then(() => {
-            CGE.Logger.info('glTF.promising load complete');
-            CGE.Logger.info(glTF);
+            Logger.info('glTF.promising load complete');
+            Logger.info(glTF);
             return this._loadGltfJson(glTF);
         });
         // return glTF;
@@ -83,7 +89,7 @@ Object.assign(GltfLoader, {
         const accessors = glTF['accessors'];
         const geometries = [];
         const createGeometry = (primitive) => {
-            let cge_geometry = new CGE.Geometry();
+            let cge_geometry = new Geometry();
             const attributes = primitive.attributes;
             Object.keys(attributes).forEach(key => {
                 let attribute_in = undefined;
@@ -91,24 +97,24 @@ Object.assign(GltfLoader, {
                 const attribute = accessors[attributeId];
                 switch(key) {
                     case 'POSITION':
-                        attribute_in = CGE.AttribType.POSITION;
+                        attribute_in = AttribType.POSITION;
                         break;
 
                     case 'NORMAL':
-                        attribute_in = CGE.AttribType.NORMAL;
+                        attribute_in = AttribType.NORMAL;
                         break;
 
                     case 'TEXCOORD':
                     case 'TEXCOORD_0':
-                        attribute_in = CGE.AttribType.TEXCOORD0;
+                        attribute_in = AttribType.TEXCOORD0;
                         break;
 
                     case 'JOINT':
-                        attribute_in = CGE.AttribType.JOINT;
+                        attribute_in = AttribType.JOINT;
                         break;
 
                     case 'WEIGHT':
-                        attribute_in = CGE.AttribType.WEIGHT;
+                        attribute_in = AttribType.WEIGHT;
                         break;
                 
                     default:
@@ -118,32 +124,32 @@ Object.assign(GltfLoader, {
                 if (attribute_in === undefined || attribute_in === null) {
                     return;
                 }
-                // CGE.Logger.info(attribute.data);
+                // Logger.info(attribute.data);
                 cge_geometry.addSingleAttribute(key, attribute_in, attribute.strideCount, attribute.componentType, attribute.data);
             });
 
             let drawMode = undefined;
             switch (primitive.mode) {
                 case 0:
-                    drawMode = CGE.POINTS;
+                    drawMode = POINTS;
                     break;
                 case 1:
-                    drawMode = CGE.LINES;
+                    drawMode = LINES;
                     break;
                 case 2:
-                    drawMode = CGE.LINE_LOOP;
+                    drawMode = LINE_LOOP;
                     break;
                 case 3:
-                    drawMode = CGE.LINE_STRIP;
+                    drawMode = LINE_STRIP;
                     break;
                 case 4:
-                    drawMode = CGE.TRIANGLES;
+                    drawMode = TRIANGLES;
                     break;
                 case 5:
-                    drawMode = CGE.TRIANGLE_STRIP;
+                    drawMode = TRIANGLE_STRIP;
                     break;
                 case 6:
-                    drawMode = CGE.TRIANGLE_FAN;
+                    drawMode = TRIANGLE_FAN;
                     break;
             
                 default:

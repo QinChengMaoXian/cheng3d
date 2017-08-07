@@ -24,18 +24,18 @@ export class glMesh extends glObject {
     }
 
     _initGLObject(renderer, geometry, shader, images) {
-        let glBuffer = renderer.initGeometry(geometry);
-        if (!glBuffer) {
+        this._glBuffer = renderer.initGeometry(geometry);
+        if (!this._glBuffer) {
             return undefined;
         }
-        let glProgram = renderer.initShader(shader);
-        if (!glProgram) {
+        this._glProgram = renderer.initShader(shader);
+        if (!this._glProgram) {
             return undefined;
         }
 
         for (let i = 0; i < images.length; i++) {
             let image = images[i];
-            let glTexture = renderer.initTexture2d(image.map);
+            let glTexture = renderer.initTexture(image.map);
             if (glTexture !== undefined) {
                 this._textures.set(image.type, glTexture);
             } else {
@@ -43,9 +43,6 @@ export class glMesh extends glObject {
                 return undefined;
             }
         }
-
-        this._glBuffer = glBuffer;
-        this._glProgram = glProgram;
 
         return this;
     }

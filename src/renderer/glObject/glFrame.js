@@ -15,7 +15,7 @@ export class glFrame extends glObject {
     checkTextures(renderer, textureMap, depthStencilTexture) {
         let completed = true;
         textureMap.forEach(function(texture2d, location) {
-            let glTexture = renderer.initTexture2d(texture2d);
+            let glTexture = renderer.initTexture(texture2d);
             if (glTexture === undefined) {
                 completed = false;
             }
@@ -23,7 +23,7 @@ export class glFrame extends glObject {
         }.bind(this));
 
         if (depthStencilTexture) {
-            let glTexture = renderer.initTexture2d(depthStencilTexture);
+            let glTexture = renderer.initTexture(depthStencilTexture);
             if (glTexture !== undefined ) {
                 this._depthStencil = glTexture;
             }
