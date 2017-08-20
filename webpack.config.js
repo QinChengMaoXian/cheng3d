@@ -3,18 +3,20 @@ var path = require("path");
 
 module.exports = {
   entry: {
-    app: ['./test.js'],
+    app: ['./test.ts'],
   },
   output: {
     path: path.resolve(__dirname, "build"),
     publicPath: "/assets/",
     filename: 'bundle.js',
-    library: 'CGE',
-    libraryTarget: 'umd',
   },
   devtool: 'source-map',
   module: {
 		loaders: [
+      {
+        test: /\.(ts)$/,
+        loader: 'ts-loader'
+      },
       {
         test: /\.(jpg|png|svg|ttf|eot)$/,
         loader: 'file-loader',
@@ -22,10 +24,6 @@ module.exports = {
             name: 'img/[hash].[ext]',
         },
       },
-			{ 
-        test: /\.css$/, 
-        loader: "style!css" 
-      }
 		]
 	},
   // devServer: {
@@ -38,6 +36,6 @@ module.exports = {
     // new webpack.HotModuleReplacementPlugin()
   // ],
   resolve:{
-    extensions:['ts','.js','.json']
+    extensions:['.ts','.js','.json']
   },
 };
