@@ -2,8 +2,7 @@ import { GetObjectCount } from '../core/Base';
 
 export class ObjectBase {
     protected _id:number = GetObjectCount();
-    public name:string = '';
-
+    public name:string = ''
     constructor() {
         
     }

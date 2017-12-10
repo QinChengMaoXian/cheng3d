@@ -5,14 +5,14 @@ import { RenderTargetState } from './RenderTargetState'
 import { Vector4 } from "../math/Vector4";
 
 export class RenderTarget extends GraphicsObject {
-    _textures = new Map();
-    _width = 64;
-    _height = 64;
-    _isFollowScreen = false;
-    _depthStencilTexture = undefined;
-    _state = new RenderTargetState();
-    _needsUpdateSize = false;
-    _needsDepthStencil;
+    private _textures = new Map();
+    private _width = 64;
+    private _height = 64;
+    private _isFollowScreen = false;
+    private _depthStencilTexture = undefined;
+    private _state = new RenderTargetState();
+    private _needsUpdateSize = false;
+    private _needsDepthStencil;
     
     constructor() {
         super();

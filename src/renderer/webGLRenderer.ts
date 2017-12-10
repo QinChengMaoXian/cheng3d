@@ -237,7 +237,7 @@ export function WebGLRenderer():void {
 
         // let gltexture = initializedMap.get(texture.id);
         // if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) 
-        //     return gltexture;
+        //     return gltexture; 
         // if (texture instanceof Texture2D) {
         //     gltexture = new glTexture2D(_gl);
         // } else if (texture instanceof TextureCube) {

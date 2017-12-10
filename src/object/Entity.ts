@@ -1,15 +1,19 @@
 import { ObjectBase } from '../core/ObjectBase';
 import { Component } from './Component';
 import { ComponentType } from './ObjectType';
+import { Transform } from './Transform';
+import { Geometry } from '../graphics/Geometry';
+import { Material } from '../material/Material';
+import { Camera } from './Camera';
 
 export class Entity extends ObjectBase {
     _parent = undefined;
     _children = [];
     _components = new Map();
-    transform;
-    geometry;
-    material;
-    camera;
+    transform:Transform;
+    geometry:Geometry;
+    material:Material;
+    camera:Camera;
     light;
 
     constructor() {

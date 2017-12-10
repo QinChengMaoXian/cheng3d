@@ -12,21 +12,20 @@ import { Loader } from '../io/Loader'
 
 import { Logger } from '../core/Base'
 
-
-
 export class GltfLoader {
-    url;
-    constructor(url?, callback?) {
+    constructor(public url?:string, callback?:any) {
         if (url) {
             this.load(url, callback);
         }
     }
 
-    load(url, callback) {
+    load(url:string, callback:any) {
         this.url = url;
         let loader = new Loader();
         loader.loadUrl(url, this._loadFromResponseText.bind(this)).then(gltf => {
-            callback('entity', gltf);
+            if (callback) {
+                callback('entity', gltf);
+            }
             return gltf;
         });
     }
@@ -110,11 +109,17 @@ Object.assign(GltfLoader, {
                         attribute_in = AttribType.TEXCOORD0;
                         break;
 
+                    case 'TANGENT':
+                        attribute_in = AttribType.TANGENT;
+                        break;
+
                     case 'JOINT':
+                    case 'JOINT_0':
                         attribute_in = AttribType.JOINT;
                         break;
 
                     case 'WEIGHT':
+                    case 'WEIGHT_0':
                         attribute_in = AttribType.WEIGHT;
                         break;
                 
@@ -129,33 +134,17 @@ Object.assign(GltfLoader, {
                 cge_geometry.addSingleAttribute(key, attribute_in, attribute.strideCount, attribute.componentType, attribute.data);
             });
 
-            let drawMode = undefined;
-            switch (primitive.mode) {
-                case 0:
-                    drawMode = CGE.POINTS;
-                    break;
-                case 1:
-                    drawMode = CGE.LINES;
-                    break;
-                case 2:
-                    drawMode = CGE.LINE_LOOP;
-                    break;
-                case 3:
-                    drawMode = CGE.LINE_STRIP;
-                    break;
-                case 4:
-                    drawMode = CGE.TRIANGLES;
-                    break;
-                case 5:
-                    drawMode = CGE.TRIANGLE_STRIP;
-                    break;
-                case 6:
-                    drawMode = CGE.TRIANGLE_FAN;
-                    break;
+            let drawModeList = [
+                CGE.POINTS,
+                CGE.LINES,
+                CGE.LINE_LOOP,
+                CGE.LINE_STRIP,
+                CGE.TRIANGLES,
+                CGE.TRIANGLE_STRIP,
+                CGE.TRIANGLE_FAN
+            ]
             
-                default:
-                    break;
-            }
+            let drawMode = primitive.mode ? drawModeList[primitive.mode] : CGE.TRIANGLES;
 
             if (primitive.indices) {
                 const attribute = accessors[primitive.indices];

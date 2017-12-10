@@ -11,8 +11,8 @@ import { FLOAT } from '../graphics/RendererParameter'
 import { Logger } from '../core/Base'
 
 export class ColladaLoader {
-    _loadState;
-    _entity;
+    protected _loadState;
+    protected _entity;
 
     static State = {
         NONE: 'none',

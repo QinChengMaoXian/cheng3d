@@ -1,4 +1,4 @@
-export const VERSION = '04';
+export const VERSION = '05';
 
 export const Logger = {
     info: function(message) {
