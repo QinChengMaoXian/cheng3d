@@ -1,7 +1,8 @@
 import { ObjectBase } from '../core/ObjectBase'
+import { Shader } from '../graphics/Shader';
 
 export class Material extends ObjectBase {
-    _shader = undefined;
+    protected _shader:Shader = undefined;
     _state = undefined;
 
     constructor() {

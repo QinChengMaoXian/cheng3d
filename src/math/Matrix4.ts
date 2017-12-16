@@ -3,9 +3,9 @@ import { GLMAT_EPSILON } from '../core/Base';
 import { Vector3 } from './Vector3';
 
 export class Matrix4 {
-    public data;
+    public m: Float32Array;
     constructor() {
-        this.data = new Float32Array([
+        this.m = new Float32Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -13,8 +13,8 @@ export class Matrix4 {
         ]);
     }
 
-    identity(position) {
-        let m = this.data;
+    public identity() {
+        let m = this.m;
         m[0]    = 1; m[1]   = 0; m[2]   = 0; m[3]   = 0;
         m[4]    = 0; m[5]   = 1; m[6]   = 0; m[7]   = 0;
         m[8]    = 0; m[9]   = 0; m[10]  = 1; m[11]  = 0;
@@ -22,8 +22,8 @@ export class Matrix4 {
         return this;
     }
 
-    translate(position) {
-        let m = this.data;
+    public translate(position) {
+        let m = this.m;
         let x = position.x, y = position.y, z = position.z;
         m[12] += m[0] * x + m[4] * y + m[8] * z;
         m[13] += m[1] * x + m[5] * y + m[9] * z;
@@ -32,8 +32,8 @@ export class Matrix4 {
         return this;
     }
 
-    setPosition(position) {
-        let m = this.data;
+    public setPosition(position) {
+        let m = this.m;
         let x = position.x, y = position.y, z = position.z;
         m[12] = x;
         m[13] = y;
@@ -41,8 +41,8 @@ export class Matrix4 {
         return this;
     }
 
-    rotate(axis, rad) {
-        let m = this.data;
+    public rotate(axis, rad) {
+        let m = this.m;
         let x = axis.x, y = axis.y, z = axis.z,
             len = Math.sqrt(x * x + y * y + z * z),
             s, c, t,
@@ -88,8 +88,8 @@ export class Matrix4 {
         return this;
     }
 
-    scale(v) {
-        let m = this.data;
+    public scale(v) {
+        let m = this.m;
 
         m[0] *= v.x;
         m[1] *= v.x;
@@ -109,20 +109,19 @@ export class Matrix4 {
         return this;
     }
 
-    transpose() {
-        let m = this.data;
-        let array = [
+    public transpose() {
+        let m = this.m;
+        this.m.set([
             m[0], m[4], m[8], m[12],
             m[1], m[5], m[9], m[13],
             m[2], m[6], m[10], m[14],
             m[3], m[7], m[11], m[15],
-        ];
-        this.data = array;
+        ]);
         return this;
     }
 
-    invert() {
-        let m = this.data;
+    public invert() {
+        let m = this.m;
         let a00 = m[0], a01 = m[1], a02 = m[2], a03 = m[3],
             a10 = m[4], a11 = m[5], a12 = m[6], a13 = m[7],
             a20 = m[8], a21 = m[9], a22 = m[10], a23 = m[11],
@@ -168,12 +167,12 @@ export class Matrix4 {
         return this;
     }
 
-    invertTranspose() {
+    public invertTranspose() {
         return this.transpose().invert();
     }
 
-    multiply(matrix) {
-        let a = this.data, b = matrix.data;
+    public multiply(matrix) {
+        let a = this.m, b = matrix.m;
         let a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
             a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
             a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
@@ -205,11 +204,11 @@ export class Matrix4 {
         return this;
     }
 
-    applyMatrix4(matrix) {
+    public applyMatrix4(matrix) {
         return this.multiply(matrix);
     }
 
-    lookAt(eye, center, up) {
+    public lookAt(eye, center, up) {
         let vec_z = eye.clone().sub(center);
         vec_z.normalize();
 
@@ -219,7 +218,7 @@ export class Matrix4 {
         let vec_y = vec_z.cross(vec_x);
         vec_y.normalize();
 
-        let m = this.data;
+        let m = this.m;
 
         m[0] = vec_x.x;
         m[1] = vec_y.x;
@@ -247,76 +246,76 @@ export class Matrix4 {
         return this;
     }
 
-    perspective(fovy, aspect, near, far) {
+    public perspective(fovy, aspect, near, far) {
         let f = 1.0 / Math.tan(fovy / 2), 
             nf = 1.0 / (near - far);
-        this.data[0] = f / aspect;
-        this.data[1] = 0;
-        this.data[2] = 0;
-        this.data[3] = 0;
-        this.data[4] = 0;
-        this.data[5] = f;
-        this.data[6] = 0;
-        this.data[7] = 0;
-        this.data[8] = 0;
-        this.data[9] = 0;
-        this.data[10] = (far + near) * nf;
-        this.data[11] = -1;
-        this.data[12] = 0;
-        this.data[13] = 0;
-        this.data[14] = (2 * far * near) * nf;
-        this.data[15] = 0;
+        this.m[0] = f / aspect;
+        this.m[1] = 0;
+        this.m[2] = 0;
+        this.m[3] = 0;
+        this.m[4] = 0;
+        this.m[5] = f;
+        this.m[6] = 0;
+        this.m[7] = 0;
+        this.m[8] = 0;
+        this.m[9] = 0;
+        this.m[10] = (far + near) * nf;
+        this.m[11] = -1;
+        this.m[12] = 0;
+        this.m[13] = 0;
+        this.m[14] = (2 * far * near) * nf;
+        this.m[15] = 0;
         return this;
     }
 
-    frustum(left, right, bottom, top, near, far) {
+    public frustum(left, right, bottom, top, near, far) {
         let rl = 1 / (right - left),
             tb = 1 / (top - bottom),
             nf = 1 / (near - far);
-        this.data[0] = (near * 2) * rl;
-        this.data[1] = 0;
-        this.data[2] = 0;
-        this.data[3] = 0;
-        this.data[4] = 0;
-        this.data[5] = (near * 2) * tb;
-        this.data[6] = 0;
-        this.data[7] = 0;
-        this.data[8] = (right + left) * rl;
-        this.data[9] = (top + bottom) * tb;
-        this.data[10] = (far + near) * nf;
-        this.data[11] = -1;
-        this.data[12] = 0;
-        this.data[13] = 0;
-        this.data[14] = (2 * far * near) * nf;
-        this.data[15] = 0;
+        this.m[0] = (near * 2) * rl;
+        this.m[1] = 0;
+        this.m[2] = 0;
+        this.m[3] = 0;
+        this.m[4] = 0;
+        this.m[5] = (near * 2) * tb;
+        this.m[6] = 0;
+        this.m[7] = 0;
+        this.m[8] = (right + left) * rl;
+        this.m[9] = (top + bottom) * tb;
+        this.m[10] = (far + near) * nf;
+        this.m[11] = -1;
+        this.m[12] = 0;
+        this.m[13] = 0;
+        this.m[14] = (2 * far * near) * nf;
+        this.m[15] = 0;
         return this;
     }
 
-    orthographic(left, right, bottom, top, near, far) {
+    public orthographic(left, right, bottom, top, near, far) {
         let lr = 1 / (left - right),
             bt = 1 / (bottom - top),
             nf = 1 / (near - far);
-        this.data[0] = -2 * lr;
-        this.data[1] = 0;
-        this.data[2] = 0;
-        this.data[3] = 0;
-        this.data[4] = 0;
-        this.data[5] = -2 * bt;
-        this.data[6] = 0;
-        this.data[7] = 0;
-        this.data[8] = 0;
-        this.data[9] = 0;
-        this.data[10] = 2 * nf;
-        this.data[11] = 0;
-        this.data[12] = (left + right) * lr;
-        this.data[13] = (top + bottom) * bt;
-        this.data[14] = (far + near) * nf;
-        this.data[15] = 1;
+        this.m[0] = -2 * lr;
+        this.m[1] = 0;
+        this.m[2] = 0;
+        this.m[3] = 0;
+        this.m[4] = 0;
+        this.m[5] = -2 * bt;
+        this.m[6] = 0;
+        this.m[7] = 0;
+        this.m[8] = 0;
+        this.m[9] = 0;
+        this.m[10] = 2 * nf;
+        this.m[11] = 0;
+        this.m[12] = (left + right) * lr;
+        this.m[13] = (top + bottom) * bt;
+        this.m[14] = (far + near) * nf;
+        this.m[15] = 1;
         return this;
     }
 
-    makeForQuaternion(quat) {
-        let m = this.data;
+    public makeForQuaternion(quat) {
+        let m = this.m;
         let x = quat.x, y = quat.y, z = quat.z, w = quat.w,
             x2 = x + x,
             y2 = y + y,
@@ -355,8 +354,8 @@ export class Matrix4 {
         return this;
     }
 
-    determinant () {
-        var te = this.data;
+    public determinant () {
+        var te = this.m;
 
         var n11 = te[ 0 ], n12 = te[ 4 ], n13 = te[ 8 ], n14 = te[ 12 ];
         var n21 = te[ 1 ], n22 = te[ 5 ], n23 = te[ 9 ], n24 = te[ 13 ];
@@ -364,7 +363,7 @@ export class Matrix4 {
         var n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
 
         //TODO: make this more efficient
-        // copy to THREE.js;
+        // copy from THREE.js;
         //( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
 
         return (
@@ -404,18 +403,18 @@ export class Matrix4 {
         );
     }
 
-    compose(position, quaternion, scale) {
+    public compose(position, quaternion, scale) {
         this.makeForQuaternion(quaternion);
         this.scale(scale);
         this.setPosition(position);
         return this;
     }
 
-    decompose(position, quaternion, scale) {
+    public decompose(position, quaternion, scale) {
         let vector = new Vector3();
         let matrix = new Matrix4();
 
-        let te = this.data;
+        let te = this.m;
 
         let sx = vector.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
         let sy = vector.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
@@ -433,24 +432,24 @@ export class Matrix4 {
 
         // scale the rotation part
 
-        matrix.data.set( this.data ); 
+        matrix.m.set( this.m ); 
         // at this point matrix is incomplete so we can't use .copy()
 
         var invSX = 1 / sx;
         var invSY = 1 / sy;
         var invSZ = 1 / sz;
 
-        matrix.data[ 0 ] *= invSX;
-        matrix.data[ 1 ] *= invSX;
-        matrix.data[ 2 ] *= invSX;
+        matrix.m[ 0 ] *= invSX;
+        matrix.m[ 1 ] *= invSX;
+        matrix.m[ 2 ] *= invSX;
 
-        matrix.data[ 4 ] *= invSY;
-        matrix.data[ 5 ] *= invSY;
-        matrix.data[ 6 ] *= invSY;
+        matrix.m[ 4 ] *= invSY;
+        matrix.m[ 5 ] *= invSY;
+        matrix.m[ 6 ] *= invSY;
 
-        matrix.data[ 8 ] *= invSZ;
-        matrix.data[ 9 ] *= invSZ;
-        matrix.data[ 10 ] *= invSZ;
+        matrix.m[ 8 ] *= invSZ;
+        matrix.m[ 9 ] *= invSZ;
+        matrix.m[ 10 ] *= invSZ;
 
         quaternion.setFromRotationMatrix( matrix );
 
@@ -461,8 +460,8 @@ export class Matrix4 {
         return this;
     }
 
-    makeBasis ( xAxis, yAxis, zAxis ) {
-        this.data.set([
+    public makeBasis ( xAxis, yAxis, zAxis ) {
+        this.m.set([
             xAxis.x, yAxis.x, zAxis.x, 0,
             xAxis.y, yAxis.y, zAxis.y, 0,
             xAxis.z, yAxis.z, zAxis.z, 0,
@@ -471,14 +470,18 @@ export class Matrix4 {
         return this;
     }
 
-    clone() {
+    public clone() {
         let mat4 = new Matrix4();
-        mat4.data.set(this.data);
+        mat4.m.set(this.m);
         return mat4;
     }
 
-    copy(matrix) {
-        this.data.set(matrix.data);
+    public copy(matrix) {
+        this.m.set(matrix.m);
         return this;
+    }
+
+    public get data() {
+        return this.m;
     }
 }

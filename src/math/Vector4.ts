@@ -1,60 +1,89 @@
 export class Vector4 {
-    x;
-    y;
-    z;
-    w;
-    constructor(x?, y?, z?, w?) {
-        Object.assign(this, {
-            x: x || 0,
-            y: y || 0,
-            z: z || 0,
-            w: w || 0,
-        });
+    public v: Float32Array;
+
+    constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 0) {
+        this.v = new Float32Array([x, y, z, w]);
     }
 
-    set(x, y, z, w) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+    public set(x, y, z, w) {
+        this.v[0] = x;
+        this.v[1] = y;
+        this.v[2] = z;
+        this.v[3] = w;
         return this;
     }
 
-    normalize() {
-        let x = this.x, y = this.y, z = this.z, w = this.w;
+    public normalize() {
+        let x = this.v[0], y = this.v[1], z = this.v[2], w = this.v[3];
         let len = x*x + y*y + z*z + w*w;
         if (len > 0) {
             len = 1 / Math.sqrt(len);
-            this.x = x * len;
-            this.y = y * len;
-            this.z = z * len;
-            this.w = w * len;
+            this.v[0] = x * len;
+            this.v[1] = y * len;
+            this.v[2] = z * len;
+            this.v[3] = w * len;
         }
         return this;
     }
 
-    applyMatrix4(mat4) {
-        let x = this.x, y = this.y, z = this.z, w = this.w, m = mat4.data;
-        this.x = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
-        this.y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
-        this.z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
-        this.w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+    public applyMatrix4(mat4) {
+        let x = this.v[0], y = this.v[1], z = this.v[2], w = this.v[3], m = mat4.v;
+        this.v[0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+        this.v[1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+        this.v[2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+        this.v[3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
         return this;
     }
 
-    clone() {
+    public clone() {
         let vec4 = new Vector4();
-        vec4.x = this.x;
-        vec4.y = this.y;
-        vec4.z = this.z;
-        vec4.w = this.w;
+        vec4.x = this.v[0];
+        vec4.y = this.v[1];
+        vec4.z = this.v[2];
+        vec4.w = this.v[3];
         return vec4;
     }
 
-    copy(v) {
-        this.x = v.x;
-        this.y = v.y;
-        this.z = v.z;
-        this.w = v.w;
+    public copy(v) {
+        this.v[0] = v.v[0];
+        this.v[1] = v.v[1];
+        this.v[2] = v.v[2] ;
+        this.v[3] = v.v[3];
+    }
+
+    public set x(value: number) {
+        this.v[0] = value;
+    }
+    
+    public get x() {
+        return this.v[0];
+    }
+
+    public set y(value: number) {
+        this.v[1] = value;
+    }
+    
+    public get y() {
+        return this.v[1];
+    }
+
+    public set z(value: number) {
+        this.v[2] = value;
+    }
+    
+    public get z() {
+        return this.v[2];
+    }
+
+    public set w(value: number) {
+        this.v[3] = value;
+    }
+
+    public get w() {
+        return this.v[3];
+    }
+
+    public get data() {
+        return this.v;
     }
 }

@@ -17,12 +17,6 @@ export class glProgram extends glObject {
 
     constructor() {
         super();
-        Object.assign(this, {
-            _program: undefined,
-            _attributeLocations: new Map(),
-            _matrixLocations: new Map(),
-            _uniformLocations: new Map(),
-        });
     }
 
     _createShaderFromeText(gl, type, text) {
@@ -114,7 +108,7 @@ export class glProgram extends glObject {
     }
 
     setUniformData(gl, type, location, data) {
-        // TODO: need re-build;
+        // TODO: 写的是个毛;
         switch(type) {
             case UNSIGNED_INT:
                 gl.uniform1i(location, data[0]);

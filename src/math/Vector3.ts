@@ -1,56 +1,51 @@
 export class Vector3 {
-    x;
-    y;
-    z;
-    constructor(x?, y?, z?) {
-        Object.assign(this, {
-            x: x || 0,
-            y: y || 0,
-            z: z || 0,
-        });
+    public v: Float32Array;
+
+    constructor(x: number = 0, y: number = 0, z: number = 0) {
+        this.v = new Float32Array([x, y, z]);
     }
 
-    set(x, y, z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public set(x, y, z) {
+        this.v[0] = x;
+        this.v[1] = y;
+        this.v[2] = z;
         return this;
     }
 
-    add(vec) {
-        this.x += vec.x;
-        this.y += vec.y;
-        this.z += vec.z;
+    public add(vec) {
+        this.v[0] += vec.x;
+        this.v[1] += vec.y;
+        this.v[2] += vec.z;
         return this;
     }
 
-    sub(vec) {
-        this.x -= vec.x;
-        this.y -= vec.y;
-        this.z -= vec.z;
+    public sub(vec) {
+        this.v[0] -= vec.x;
+        this.v[1] -= vec.y;
+        this.v[2] -= vec.z;
         return this;
     }
 
-    negate() {
-        this.x = -this.x;
-        this.y = -this.y;
-        this.z = -this.z;
+    public negate() {
+        this.v[0] = -this.v[0];
+        this.v[1] = -this.v[1];
+        this.v[2] = -this.v[2];
         return this;
     }
 
-    mul(d) {
-        this.x *= d;
-        this.y *= d;
-        this.z *= d;
+    public  mul(d) {
+        this.v[0] *= d;
+        this.v[1] *= d;
+        this.v[2] *= d;
         return this;
     }
 
-    dot(vec) {
-        return this.x * vec.x + this.y * vec.y + this.z * vec.z;
+    public dot(vec) {
+        return this.v[0] * vec.x + this.v[1] * vec.y + this.v[2] * vec.z;
     }
 
-    cross(vec3) {
-        let ax = this.x, ay = this.y, az = this.z,
+    public cross(vec3) {
+        let ax = this.v[0], ay = this.v[1], az = this.v[2],
             bx = vec3.x, by = vec3.y, bz = vec3.z;
         let vec = new Vector3();
         vec.x = ay * bz - az * by;
@@ -59,31 +54,31 @@ export class Vector3 {
         return vec;
     }
 
-    length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); 
+    public length() {
+        return Math.sqrt(this.v[0] * this.v[0] + this.v[1] * this.v[1] + this.v[2] * this.v[2]); 
     }
 
-    normalize() {
+    public normalize() {
         let length = this.length();
         if (length == 0) return this;
         let length_inverse = 1.0 / length;
-        this.x *= length_inverse;
-        this.y *= length_inverse;
-        this.z *= length_inverse;
+        this.v[0] *= length_inverse;
+        this.v[1] *= length_inverse;
+        this.v[2] *= length_inverse;
         return this;
     }
 
-    applyMatrix4(matrix) {
-        let x = this.x, y = this.y, z = this.z;
-        let m = matrix.data;
-        this.x = m[0] * x + m[4] * y + m[8] * z + m[12];
-        this.y = m[1] * x + m[5] * y + m[9] * z + m[13];
-        this.z = m[2] * x + m[6] * y + m[10] * z + m[14];
+    public applyMatrix4(matrix) {
+        let x = this.v[0], y = this.v[1], z = this.v[2];
+        let m = matrix.m;
+        this.v[0] = m[0] * x + m[4] * y + m[8] * z + m[12];
+        this.v[1] = m[1] * x + m[5] * y + m[9] * z + m[13];
+        this.v[2] = m[2] * x + m[6] * y + m[10] * z + m[14];
         return this;
     }
 
-    applyQuaternion(quat) {
-        let x = this.x, y = this.y, z = this.z,
+    public applyQuaternion(quat) {
+        let x = this.v[0], y = this.v[1], z = this.v[2],
             qx = quat.x, qy = quat.y, qz = quat.z, qw = quat.w;
 
         let ix = qw * x + qy * z - qz * y,
@@ -91,27 +86,55 @@ export class Vector3 {
             iz = qw * z + qx * y - qy * x,
             iw = -qx * x - qy * y - qz * z;
 
-        this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-        this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-        this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+        this.v[0] = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+        this.v[1] = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+        this.v[2] = iz * qw + iw * -qz + ix * -qy - iy * -qx;
         return this;
     }
 
-    clone() {
+    public clone() {
         let vec = new Vector3();
-        vec.x = this.x;
-        vec.y = this.y;
-        vec.z = this.z;
+        vec.x = this.v[0];
+        vec.y = this.v[1];
+        vec.z = this.v[2];
         return vec;
     }
 
-    copy(vec3) {
-        this.x = vec3.x;
-        this.y = vec3.y;
-        this.z = vec3.z;
+    public copy(vec3) {
+        this.v[0] = vec3.x;
+        this.v[1] = vec3.y;
+        this.v[2] = vec3.z;
     }
 
-    equal(vec3) {
-        return this.x === vec3.x && this.y === vec3.y && this.z === vec3.z;
+    public equal(vec3) {
+        return this.v[0] === vec3.x && this.v[1] === vec3.y && this.v[2] === vec3.z;
+    }
+
+    public set x(value: number) {
+        this.v[0] = value;
+    }
+    
+    public get x() {
+        return this.v[0];
+    }
+
+    public set y(value: number) {
+        this.v[1] = value;
+    }
+    
+    public get y() {
+        return this.v[1];
+    }
+
+    public set z(value: number) {
+        this.v[2] = value;
+    }
+    
+    public get z() {
+        return this.v[2];
+    }
+
+    public get data() {
+        return this.v;
     }
 }
