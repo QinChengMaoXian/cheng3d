@@ -8,7 +8,7 @@ import { Component } from '../object/Component'
 import { AttribType } from '../graphics/GraphicsTypes'
 import * as CGE from '../graphics/RendererParameter';
 
-import { Loader } from '../io/Loader'
+import { Loader } from "../io/Loader"
 
 import { Logger } from '../core/Base'
 

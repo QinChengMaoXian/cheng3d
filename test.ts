@@ -102,6 +102,7 @@ let gltfCallback = (event, object) => {
 
 window['CGE'] = CGE;
 
+
 let gltfTest = new CGE.GltfLoader();
 gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
 
@@ -212,6 +213,8 @@ cameraEntity.addComponent(CGE.Component.CreateCameraComponent(camera));
 mainScene.setMainCamera(cameraEntity);
 mainScene.addEntity(colorShowingEntity);
 mainScene.addEntity(teapotEntity);
+
+window['scene'] = mainScene;
 
 let events = new Map();
 

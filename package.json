@@ -5,9 +5,10 @@
   "main": "test.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack -w",
+    "start":"webpack-dev-server --hot --port 8000",
     "build": "webpack -d",
-    "start-dev": "webpack-dev-server --hot --port 8000"
+    "build-tsc": "tsc",
+    "start-dev": "webpack-dev-server --hot --host 0.0.0.0 --port 8000"
   },
   "keywords": [
     "webGL",

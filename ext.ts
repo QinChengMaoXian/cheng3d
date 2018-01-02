@@ -1,9 +1,10 @@
 import * as CGE from './src/CGE'
+import { Texture2D } from './src/graphics/Texture2D'
 import { Material } from './src/material/Material'
 
 export const createTexture2DFromImage = function(imgSrc, mipmap) {
-    let texture2d = new CGE.Texture2D();
-    texture2d.setImageSrc(imgSrc);
+    let texture2d = new Texture2D();
+    texture2d.setImageUrl(imgSrc);
     if (mipmap === true) {
         texture2d.setMipmap(true);
         texture2d.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
@@ -41,15 +42,15 @@ export class DeferredMaterial extends Material {
         return [
             {
                 map: this._diffuseMap,
-                type: CGE.MapType.DIFFUSE,
+                type: CGE.TextureType.DIFFUSE,
             },
             {
                 map: this._normalMap,
-                type: CGE.MapType.NORMAL,
+                type: CGE.TextureType.NORMAL,
             },
             {
                 map: this._specularMap,
-                type: CGE.MapType.SPECULAR,
+                type: CGE.TextureType.SPECULAR,
             },
         ];
     }
@@ -134,9 +135,9 @@ export class DeferredMaterial extends Material {
             shader.addAttribName(CGE.AttribType.NORMAL, 'Normal');
             shader.addAttribName(CGE.AttribType.TANGENT, 'Tangent');
             shader.addAttribName(CGE.AttribType.TEXCOORD0, 'UV');
-            shader.addTextureName(CGE.MapType.DIFFUSE, 'diffuseMap');
-            shader.addTextureName(CGE.MapType.NORMAL, 'normalMap');
-            shader.addTextureName(CGE.MapType.SPECULAR, 'specularMap');
+            shader.addTextureName(CGE.TextureType.DIFFUSE, 'diffuseMap');
+            shader.addTextureName(CGE.TextureType.NORMAL, 'normalMap');
+            shader.addTextureName(CGE.TextureType.SPECULAR, 'specularMap');
             shader.addMatrixName(CGE.MatrixType.MVPMatrix, 'MVPMatrix');
             shader.addMatrixName(CGE.MatrixType.MVMatrix, 'MVMatrix');
             shader.addMatrixName(CGE.MatrixType.NormalMVMatrix, 'NormalMVMatrix');
@@ -166,7 +167,7 @@ export class FullScreenTextureMaterial extends Material {
         return [
             {
                 map: this._diffuseMap,
-                type: CGE.MapType.DIFFUSE,
+                type: CGE.TextureType.DIFFUSE,
             },
         ];
     }
@@ -199,7 +200,7 @@ export class FullScreenTextureMaterial extends Material {
             shader.setShaderText(vertexShaderText, fragmentShaderText);
             shader.addAttribName(CGE.AttribType.POSITION, 'Position');
             shader.addAttribName(CGE.AttribType.TEXCOORD0, 'UV');
-            shader.addTextureName(CGE.MapType.DIFFUSE, 'diffuse');
+            shader.addTextureName(CGE.TextureType.DIFFUSE, 'diffuse');
             shader.addMatrixName(CGE.MatrixType.MVPMatrix, 'MVPMatrix');
             FullScreenTextureMaterialShader = shader
         }

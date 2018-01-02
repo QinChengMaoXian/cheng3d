@@ -77,8 +77,8 @@ export class Shader extends GraphicsObject {
         return this._requireUniformNames;
     }
 
-    addTextureName(mapType, name) {
-        this.addUniformName(mapType, name, CGE.UNSIGNED_INT);
+    addTextureName(TextureType, name) {
+        this.addUniformName(TextureType, name, CGE.UNSIGNED_INT);
     }
 
     addTextureNames(array) {
@@ -87,8 +87,8 @@ export class Shader extends GraphicsObject {
         });
     }
 
-    getTextureName(mapType) {
-        return this.getUniformName(mapType);
+    getTextureName(textureType) {
+        return this.getUniformName(textureType);
     }
 
     addRenderLocation(renderType, location) {

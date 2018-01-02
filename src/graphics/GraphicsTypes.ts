@@ -17,7 +17,7 @@ export const AttribType = {
     TEXCOORD4           : _g(),
 };
 
-export const MapType = {
+export const TextureType = {
     DIFFUSE             : _g(),
     NORMAL              : _g(),
     SPECULAR            : _g(),

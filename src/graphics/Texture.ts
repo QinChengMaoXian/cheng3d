@@ -2,13 +2,13 @@ import * as CGE from './RendererParameter';
 import { GraphicsObject } from './GraphicsObject'
 
 export class Texture extends GraphicsObject {
-    _minFilter = CGE.LINEAR;
-    _magFilter = CGE.LINEAR;
-    _format = CGE.RGB;
-    _internalformat = CGE.RGB;
-    _type = CGE.UNSIGNED_BYTE;
-    _mipmap = false;
-    _needMipmap = false;
+    protected _minFilter: number = CGE.LINEAR;
+    protected _magFilter: number = CGE.LINEAR;
+    protected _format: number = CGE.RGB;
+    protected _internalformat: number = CGE.RGB;
+    protected _type: number = CGE.UNSIGNED_BYTE;
+    protected _mipmap: boolean = false;
+    protected _needMipmap: boolean = false;
 
     constructor() {
         super();

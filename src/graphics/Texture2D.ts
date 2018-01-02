@@ -3,30 +3,33 @@ import { Texture } from './Texture'
 import { Loader } from '../io/Loader'
 
 export class Texture2D extends Texture {
-    _wrapS = CGE.CLAMP_TO_EDGE;
-    _wrapT = CGE.CLAMP_TO_EDGE;
-    _img = undefined;
-    _isLoad = false;
-    _width = 0;
-    _height = 0;
+    protected _wrapS: number = CGE.CLAMP_TO_EDGE;
+    protected _wrapT: number = CGE.CLAMP_TO_EDGE;
+    protected _data: Uint8Array | HTMLImageElement;
+    protected _isLoad = false;
+    protected _url: string;
+    protected _width = 0;
+    protected _height = 0;
 
     constructor() {
         super();
     }
 
-    setImageSrc(src) {
+    public setImageUrl(url:string) {
         this._isLoad = false;
+        this._url = url;
         let img = new Image()
-        img.onload = function() {
+        img.onload = () => {
             this._isLoad = true;
-            // TODO: try to add culling image size;
-        }.bind(this);
-        img.src = src;
-        this._img = img;
+            this._width = img.width;
+            this._height = img.height;
+        };
+        img.src = url;
+        this._data = img;
     }
 
     getImage() {
-        return this._img;
+        return this._data instanceof HTMLImageElement ? this._data : null;
     }
 
     getWidth() {
@@ -58,5 +61,9 @@ export class Texture2D extends Texture {
         this._width = width;
         this._height = height;
         this.needsUpdate();
+    }
+
+    public getUrl(): string {
+        return this._url;
     }
 }
