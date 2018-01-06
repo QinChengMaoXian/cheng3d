@@ -28,5 +28,21 @@ export const GetObjectCount = function() {
     };
 }();
 
-export const GLMAT_EPSILON = 0.000001
-export const USE_MULTI_RENDERER = false
+export class Base {
+    protected _id:number = GetObjectCount();
+    public name:string = ''
+    constructor() {
+        
+    }
+
+    public get id() {
+        return this._id;
+    }
+
+    public update(delta) {
+
+    }
+} 
+
+export const GLMAT_EPSILON = 0.000001;
+export const USE_MULTI_RENDERER = false;

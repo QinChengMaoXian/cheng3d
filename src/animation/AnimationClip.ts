@@ -1,7 +1,7 @@
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 import { TrackBase } from './track/TrackBase';
 
-export class AnimationClip extends ObjectBase {
+export class AnimationClip extends Base {
 
     constructor() {
         super();

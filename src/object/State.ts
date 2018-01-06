@@ -1,6 +1,6 @@
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 
-export class State extends ObjectBase {
+export class State extends Base {
     constructor() {
         super();
     }

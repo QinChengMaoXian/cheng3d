@@ -1,7 +1,7 @@
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 import { AnimationClip } from './AnimationClip';
 
-export class Animater extends ObjectBase {
+export class Animater extends Base {
     private _animaterClips: Map<string, AnimationClip> = new Map();
 
     constructor() {

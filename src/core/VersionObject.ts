@@ -1,6 +1,6 @@
-import { ObjectBase } from './ObjectBase';
+import { Base } from './Base';
 
-export class VersionObject extends ObjectBase {
+export class VersionObject extends Base {
     private _updateVersion = 0;
 
     public needsUpdate() {

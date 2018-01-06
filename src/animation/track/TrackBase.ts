@@ -1,7 +1,7 @@
-import { ObjectBase } from "../../core/ObjectBase";
+import { Base } from "../../core/Base";
 import { FrameBase } from "../frame/FrameBase";
 
-export class TrackBase extends ObjectBase {
+export class TrackBase extends Base {
     protected _fps:number;
     protected _loop:boolean = false;
     protected _currentTime = 0;

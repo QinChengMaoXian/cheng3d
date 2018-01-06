@@ -6,7 +6,7 @@ export { Quaternion } from './math/Quaternion';
 export { Matrix4 } from './math/Matrix4';
 export { Plane } from './math/Plane';
 
-export { ObjectBase } from './core/ObjectBase';
+export { Base } from './core/Base';
 export { VersionObject } from './core/VersionObject';
 export { Event } from './core/Event';
 

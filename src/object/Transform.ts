@@ -1,24 +1,20 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 
-export class Transform extends ObjectBase {
-    _position;
-    _rotate;
-    _scale;
-    _matrix;
-    _needsUpdate;
+export class Transform extends Base {
+    protected _position: Vector3;
+    protected _rotate: Quaternion;
+    protected _scale: Vector3;
+    protected _matrix: Matrix4 = new Matrix4();
+    protected _needsUpdate: boolean = true;
 
-    constructor(position?, rotate?, scale?) {
+    constructor(position: Vector3 = new Vector3(), rotate: Quaternion = new Quaternion(), scale: Vector3 = new Vector3(1, 1, 1)) {
         super();
-        Object.assign(this, {
-            _position: position || new Vector3(),
-            _rotate: rotate || new Quaternion(),
-            _scale: scale || new Vector3(1, 1, 1),
-            _matrix: new Matrix4(),
-            _needsUpdate: true,
-        });
+        this._position = position;
+        this._rotate = rotate;
+        this._scale = scale;
         this.makeMatrix();
     }
 
@@ -33,6 +29,10 @@ export class Transform extends ObjectBase {
     setPosition(position) {
         this._position.set(position.x, position.y, position.z);
         this.setNeedUpdateMatrix();
+    }
+
+    setPositionValue(x: number, y: number, z: number) {
+        this
     }
 
     getPosition() {
@@ -58,6 +58,7 @@ export class Transform extends ObjectBase {
     }
 
     getMatrix() {
+        this.makeMatrix();
         return this._matrix;
     }
 

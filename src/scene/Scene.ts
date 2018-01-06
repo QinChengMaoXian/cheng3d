@@ -1,6 +1,6 @@
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 
-export class Scene extends ObjectBase {
+export class Scene extends Base {
     _entities = new Map();
     _mainCamera = undefined;
     _mainLight = undefined;

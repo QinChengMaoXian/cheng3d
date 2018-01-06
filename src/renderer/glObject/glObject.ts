@@ -1,6 +1,6 @@
-import { ObjectBase } from '../../core/ObjectBase'
+import { Base } from '../../core/Base'
 
-export class glObject extends ObjectBase {
+export class glObject extends Base {
     protected _localVersion = -1;
     protected _renderCount = -1;
     

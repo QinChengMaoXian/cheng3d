@@ -1,7 +1,7 @@
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 import { ComponentType } from '../object/ObjectType';
 
-export class Component extends ObjectBase {
+export class Component extends Base {
     _entity;
     _object;
     _type;

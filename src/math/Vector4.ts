@@ -27,7 +27,7 @@ export class Vector4 {
     }
 
     public applyMatrix4(mat4) {
-        let x = this.v[0], y = this.v[1], z = this.v[2], w = this.v[3], m = mat4.v;
+        let x = this.v[0], y = this.v[1], z = this.v[2], w = this.v[3], m = mat4.m;
         this.v[0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
         this.v[1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
         this.v[2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;

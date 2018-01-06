@@ -1,6 +1,6 @@
-import { ObjectBase } from './ObjectBase';
+import { Base } from './Base';
 
-export class Event extends ObjectBase {
+export class Event extends Base {
     _func;
     constructor() {
         super();

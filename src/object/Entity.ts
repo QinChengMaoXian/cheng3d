@@ -1,12 +1,13 @@
-import { ObjectBase } from '../core/ObjectBase';
+import { Base } from '../core/Base';
 import { Component } from './Component';
 import { ComponentType } from './ObjectType';
 import { Transform } from './Transform';
 import { Geometry } from '../graphics/Geometry';
 import { Material } from '../material/Material';
 import { Camera } from './Camera';
+import { Matrix4 } from '../math/Matrix4';
 
-export class Entity extends ObjectBase {
+export class Entity extends Base {
     _parent = undefined;
     _children = [];
     _components = new Map();
@@ -15,6 +16,8 @@ export class Entity extends ObjectBase {
     material:Material;
     camera:Camera;
     light;
+
+    protected _worldMatrix
 
     constructor() {
         super();

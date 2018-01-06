@@ -4,7 +4,7 @@ import { MatrixType } from '../graphics/GraphicsTypes'
 import { Texture2D } from '../graphics/Texture2D'
 import { TextureCube } from '../graphics/TextureCube'
 import { RenderTargetState } from '../graphics/RenderTargetState'
-import { ObjectBase } from '../core/ObjectBase'
+import { Base } from '../core/Base'
 import { Matrix4 } from '../math/Matrix4'
 import { Vector4 } from '../math/Vector4'
 

@@ -1,7 +1,7 @@
-import { ObjectBase } from '../core/ObjectBase'
+import { Base } from '../core/Base'
 import { Shader } from '../graphics/Shader';
 
-export class Material extends ObjectBase {
+export class Material extends Base {
     protected _shader:Shader = undefined;
     _state = undefined;
 
