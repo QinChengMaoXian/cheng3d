@@ -1,10 +1,12 @@
 import * as CGE from './RendererParameter'
 import { GraphicsObject } from './GraphicsObject'
+import { Buffer } from './Buffer'
 
 export class Geometry extends GraphicsObject {
     _attributeDatas = [];
     _indexData = undefined;
     _drawParameter = undefined;
+    private _Buffers:Buffer[] = []; 
 
     constructor() {
         super();

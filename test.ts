@@ -201,6 +201,8 @@ let colorShowingEntity = CGE.Entity.createRenderableEntity(planeVertexGeometry, 
 let teapotTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(1, 1, 1));
 let teapotEntity = CGE.Entity.createRenderableEntity(teapotGeometry, colorShowingMaterial, teapotTransform);
 
+window['teapot'] = teapotEntity;
+
 let camera = new CGE.Camera(window.innerWidth, window.innerHeight);
 camera.setPosition(new CGE.Vector3(-100, 100, 80));
 camera.lookAt(new CGE.Vector3(0, 1, 50));
@@ -318,6 +320,10 @@ window.onkeyup = function(event) {
         default:
             break;
     }
+}
+
+window.onblur = function(event) {
+    events.clear();
 }
 
 let mouseDown = false;

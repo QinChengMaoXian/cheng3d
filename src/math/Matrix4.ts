@@ -1,6 +1,7 @@
 import { GLMAT_EPSILON } from '../core/Base';
 
 import { Vector3 } from './Vector3';
+import { Quaternion } from './Quaternion';
 
 export class Matrix4 {
     public m: Float32Array;
@@ -22,7 +23,7 @@ export class Matrix4 {
         return this;
     }
 
-    public translate(position) {
+    public translate(position: Vector3) {
         let m = this.m;
         let x = position.x, y = position.y, z = position.z;
         m[12] += m[0] * x + m[4] * y + m[8] * z;
@@ -32,7 +33,7 @@ export class Matrix4 {
         return this;
     }
 
-    public setPosition(position) {
+    public setPosition(position: Vector3) {
         let m = this.m;
         let x = position.x, y = position.y, z = position.z;
         m[12] = x;
@@ -41,7 +42,7 @@ export class Matrix4 {
         return this;
     }
 
-    public rotate(axis, rad) {
+    public rotate(axis: Vector3, rad: number) {
         let m = this.m;
         let x = axis.x, y = axis.y, z = axis.z,
             len = Math.sqrt(x * x + y * y + z * z),
@@ -88,7 +89,7 @@ export class Matrix4 {
         return this;
     }
 
-    public scale(v) {
+    public scale(v: Vector3) {
         let m = this.m;
 
         m[0] *= v.x;
@@ -171,44 +172,19 @@ export class Matrix4 {
         return this.transpose().invert();
     }
 
-    public multiply(matrix) {
-        let a = this.m, b = matrix.m;
-        let a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
-            a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
-            a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
-            a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+    public multiply(matrix: Matrix4) {
+        return Matrix4.multiply(this, matrix, this);
+    }
 
-        let b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];  
-        a[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        a[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        a[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        a[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-
-        b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
-        a[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        a[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        a[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        a[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-
-        b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
-        a[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        a[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        a[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        a[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-
-        b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
-        a[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-        a[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-        a[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-        a[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-        return this;
+    public premultiply(matrix: Matrix4) {
+        return Matrix4.multiply(matrix, this, this);
     }
 
     public applyMatrix4(matrix) {
         return this.multiply(matrix);
     }
 
-    public lookAt(eye, center, up) {
+    public lookAt(eye: Vector3, center: Vector3, up: Vector3) {
         let vec_z = eye.clone().sub(center);
         vec_z.normalize();
 
@@ -314,7 +290,7 @@ export class Matrix4 {
         return this;
     }
 
-    public makeForQuaternion(quat) {
+    public makeForQuaternion(quat: Quaternion) {
         let m = this.m;
         let x = quat.x, y = quat.y, z = quat.z, w = quat.w,
             x2 = x + x,
@@ -403,14 +379,14 @@ export class Matrix4 {
         );
     }
 
-    public compose(position, quaternion, scale) {
+    public compose(position: Vector3, quaternion: Quaternion, scale: Vector3) {
         this.makeForQuaternion(quaternion);
         this.scale(scale);
         this.setPosition(position);
         return this;
     }
 
-    public decompose(position, quaternion, scale) {
+    public decompose(position: Vector3, quaternion: Quaternion, scale: Vector3) {
         let vector = new Vector3();
         let matrix = new Matrix4();
 
@@ -460,7 +436,7 @@ export class Matrix4 {
         return this;
     }
 
-    public makeBasis ( xAxis, yAxis, zAxis ) {
+    public makeBasis (xAxis: Vector3, yAxis: Vector3, zAxis: Vector3) {
         this.m.set([
             xAxis.x, yAxis.x, zAxis.x, 0,
             xAxis.y, yAxis.y, zAxis.y, 0,
@@ -476,12 +452,47 @@ export class Matrix4 {
         return mat4;
     }
 
-    public copy(matrix) {
+    public copy(matrix: Matrix4) {
         this.m.set(matrix.m);
         return this;
     }
 
     public get data() {
         return this.m;
+    }
+
+    public static multiply(l: Matrix4, r: Matrix4, out: Matrix4) {
+        //l, r, out 可以为相同的矩阵
+        let a = l.m, b = r.m, o = out.m;
+        let a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+            a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+            a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+            a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+        let b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];  
+        o[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+        o[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+        o[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+        o[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+        b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+        o[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+        o[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+        o[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+        o[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+        b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+        o[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+        o[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+        o[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+        o[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+        b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+        o[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+        o[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+        o[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+        o[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+        return out;
     }
 }

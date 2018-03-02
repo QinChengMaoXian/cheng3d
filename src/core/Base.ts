@@ -29,6 +29,7 @@ export const GetObjectCount = function() {
 }();
 
 export class Base {
+    private uuid: string;
     protected _id:number = GetObjectCount();
     public name:string = ''
     constructor() {

@@ -3,19 +3,26 @@ import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
 import { Base } from '../core/Base';
 
-export class Transform extends Base {
-    protected _position: Vector3;
-    protected _rotate: Quaternion;
-    protected _scale: Vector3;
+export class Object3D extends Base {
+    protected _position: Vector3 = new Vector3();
+    protected _rotate: Quaternion = new Quaternion();
+    protected _scale: Vector3 = new Vector3(1, 1, 1);
     protected _matrix: Matrix4 = new Matrix4();
     protected _needsUpdate: boolean = true;
 
-    constructor(position: Vector3 = new Vector3(), rotate: Quaternion = new Quaternion(), scale: Vector3 = new Vector3(1, 1, 1)) {
+    protected _parent: Object3D = null;
+    protected _children: Object3D[] = [];
+
+    constructor() {
         super();
-        this._position = position;
-        this._rotate = rotate;
-        this._scale = scale;
-        this.makeMatrix();
+    }
+
+    public addChild(child: Object3D) {
+        child._parent = this;
+    }
+
+    public removeChild(child: Object3D) {
+        
     }
 
     public setNeedUpdateMatrix() {
@@ -80,9 +87,9 @@ export class Transform extends Base {
     }
 
     public makeLookAtFromThis(initEye, initCenter, initUp) {
-        let e = initEye === undefined ? new Vector3(0,0,0) : initEye.clone();
-        let c = initCenter === undefined ? new Vector3(1,0,0) : initCenter.clone();
-        let u = initUp === undefined ? new Vector3(0,0,1) : initUp.clone();
+        let e = !initEye ? new Vector3(0,0,0) : initEye.clone();
+        let c = !initCenter ? new Vector3(1,0,0) : initCenter.clone();
+        let u = !initUp ? new Vector3(0,0,1) : initUp.clone();
         e.applyMatrix4(this._matrix);
         c.applyMatrix4(this._matrix);
         u.applyMatrix4(this._matrix);
