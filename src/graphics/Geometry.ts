@@ -12,7 +12,7 @@ export class Geometry extends GraphicsObject {
         super();
     }
     
-    createAttributeParam() {
+    public createAttributeParam() {
         return {
             data: undefined,
             size: 0,
@@ -23,7 +23,7 @@ export class Geometry extends GraphicsObject {
         };
     }
 
-    addSingleAttribute(name, attribute, num, type, data, usage?) {
+    public addSingleAttribute(name, attribute, num, type, data, usage?) {
         let attributeData = {
             data: data,
             size: 1,
@@ -41,7 +41,7 @@ export class Geometry extends GraphicsObject {
         this._attributeDatas.push(attributeData);
     }
 
-    addMultiAttribute(attributeParameters, type, stride, data, usage = CGE.STATIC_DRAW) {
+    public addMultiAttribute(attributeParameters, type, stride, data, usage = CGE.STATIC_DRAW) {
         let attributeData = {
             usage: usage,
             data: data,
@@ -61,11 +61,11 @@ export class Geometry extends GraphicsObject {
         this._attributeDatas.push(attributeData);
     }
 
-    getAttributeDatas() {
+    public getAttributeDatas() {
         return this._attributeDatas;
     }
 
-    setIndexData(data, type?, usage?) {
+    public setIndexData(data, type?, usage?) {
         this._indexData = {
             data: data,
             type: type || CGE.UNSIGNED_SHORT,
@@ -73,11 +73,11 @@ export class Geometry extends GraphicsObject {
         };
     }
 
-    getIndexData() {
+    public getIndexData() {
         return this._indexData;
     }
 
-    setDrawParameter(count, mode?, offset?) {
+    public setDrawParameter(count, mode?, offset?) {
         this._drawParameter = {
             mode: mode || CGE.TRIANGLES,
             count: count || 0,
@@ -85,7 +85,7 @@ export class Geometry extends GraphicsObject {
         };
     }
 
-    getDrawParameter() {
+    public getDrawParameter() {
         return this._drawParameter;
     }
 }

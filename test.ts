@@ -249,7 +249,7 @@ window.onerror = function(event) {
     noError = false;
 }
 
-let _d = 0.5 
+let _d = 0.5;
 
 let forward = CGE.Event.createFromFunc(() => {camera.forwardStep(_d);});
 let back = CGE.Event.createFromFunc(() => {camera.forwardStep(-_d);});
