@@ -1,28 +1,40 @@
+import { Quaternion } from "./Quaternion";
+import { Matrix4 } from "./Matrix4";
+
 export class Vector3 {
+    private static _helper: Vector3 = new Vector3();
+
     public v: Float32Array;
 
     constructor(x: number = 0, y: number = 0, z: number = 0) {
         this.v = new Float32Array([x, y, z]);
     }
 
-    public set(x, y, z): Vector3 {
+    public set(x: number, y: number, z: number): Vector3 {
         this.v[0] = x;
         this.v[1] = y;
         this.v[2] = z;
         return this;
     }
 
-    public add(vec): Vector3 {
+    public add(vec: Vector3): Vector3 {
         this.v[0] += vec.x;
         this.v[1] += vec.y;
         this.v[2] += vec.z;
         return this;
     }
 
-    public sub(vec): Vector3 {
+    public sub(vec: Vector3): Vector3 {
         this.v[0] -= vec.x;
         this.v[1] -= vec.y;
         this.v[2] -= vec.z;
+        return this;
+    }
+
+    public subBy(a: Vector3, b: Vector3): Vector3 {
+        this.v[0] = a.x - b.x;
+        this.v[1] = a.y - b.y;
+        this.v[2] = a.z - b.z;
         return this;
     }
 
@@ -33,21 +45,34 @@ export class Vector3 {
         return this;
     }
 
-    public  mul(d): Vector3 {
+    public mul(d: number): Vector3 {
         this.v[0] *= d;
         this.v[1] *= d;
         this.v[2] *= d;
         return this;
     }
 
-    public dot(vec): number {
+    public dot(vec: Vector3): number {
         return this.v[0] * vec.x + this.v[1] * vec.y + this.v[2] * vec.z;
     }
 
-    public cross(vec3): Vector3 {
+    public crossBy(a: Vector3, b: Vector3) {
+        let ax = a.x, ay = a.y, az = a.z,
+            bx = b.x, by = b.y, bz = b.z;
+        this.x = ay * bz - az * by;
+        this.y = az * bx - ax * bz;
+        this.z = ax * by - ay * bx;
+        return this;
+    }
+
+    public cross(vec3: Vector3): Vector3 {
+        return this.crossd(vec3).clone();
+    }
+
+    public crossd(vec3: Vector3): Vector3 {
         let ax = this.v[0], ay = this.v[1], az = this.v[2],
             bx = vec3.x, by = vec3.y, bz = vec3.z;
-        let vec = new Vector3();
+        let vec = Vector3._helper;
         vec.x = ay * bz - az * by;
         vec.y = az * bx - ax * bz;
         vec.z = ax * by - ay * bx;
@@ -68,7 +93,7 @@ export class Vector3 {
         return this;
     }
 
-    public applyMatrix4(matrix): Vector3 {
+    public applyMatrix4(matrix: Matrix4): Vector3 {
         let x = this.v[0], y = this.v[1], z = this.v[2];
         let m = matrix.m;
         this.v[0] = m[0] * x + m[4] * y + m[8] * z + m[12];
@@ -77,7 +102,7 @@ export class Vector3 {
         return this;
     }
 
-    public applyQuaternion(quat): Vector3 {
+    public applyQuaternion(quat: Quaternion): Vector3 {
         let x = this.v[0], y = this.v[1], z = this.v[2],
             qx = quat.x, qy = quat.y, qz = quat.z, qw = quat.w;
 
@@ -100,14 +125,14 @@ export class Vector3 {
         return vec;
     }
 
-    public copy(vec3): Vector3 {
+    public copy(vec3: Vector3): Vector3 {
         this.v[0] = vec3.x;
         this.v[1] = vec3.y;
         this.v[2] = vec3.z;
         return this;
     }
 
-    public equal(vec3): boolean {
+    public equal(vec3: Vector3): boolean {
         return this.v[0] === vec3.x && this.v[1] === vec3.y && this.v[2] === vec3.z;
     }
 
