@@ -2,6 +2,7 @@ import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
 import { Base } from '../core/Base';
+import { Component } from '../CGE';
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
@@ -9,6 +10,8 @@ export class Object3D extends Base {
     protected _scale: Vector3 = new Vector3(1, 1, 1);
     protected _matrix: Matrix4 = new Matrix4();
     protected _needsUpdate: boolean = true;
+    protected _display: boolean = true;
+    protected _components: Component[] = [];
 
     protected _parent: Object3D = null;
     protected _children: Object3D[] = [];
@@ -18,11 +21,11 @@ export class Object3D extends Base {
     }
 
     public addChild(child: Object3D) {
-        child._parent = this;
+        if (child && child._parent !== this) child.setParent(this);
     }
 
     public removeChild(child: Object3D) {
-        
+        if (child && child._parent === this) child.setParent(null);
     }
 
     public setNeedUpdateMatrix() {
@@ -77,32 +80,19 @@ export class Object3D extends Base {
         }
     }
 
-    public decompose() {
-        this._matrix.decompose(this._position, this._rotate, this._scale);
+    public setParent(parent: Object3D) {
+        if (this._parent === parent) return;
+        if (this._parent) {
+            let children = this._parent._children;
+            children.splice(1, children.indexOf(this));
+        }
+        if (parent) {
+            parent._children.push(this);
+        }
+        this._parent = parent;
     }
 
-    public applyMatrix4(mat4) {
-        this._matrix.applyMatrix4(mat4);
-        this.decompose();
-    }
-
-    public makeLookAtFromThis(initEye, initCenter, initUp) {
-        let e = !initEye ? new Vector3(0,0,0) : initEye.clone();
-        let c = !initCenter ? new Vector3(1,0,0) : initCenter.clone();
-        let u = !initUp ? new Vector3(0,0,1) : initUp.clone();
-        e.applyMatrix4(this._matrix);
-        c.applyMatrix4(this._matrix);
-        u.applyMatrix4(this._matrix);
-        let mat = new Matrix4();
-        mat.lookAt(e, c, u);
-        return mat;
-    }
-
-    public lookAt(center, up) {
-        let c = center.clone();
-        let u = up === undefined ? new Vector3(0,0,1) : up.clone();
-        this._matrix.lookAt(this._position, c, u);
-        this._matrix.invert();
-        this.decompose();
+    public getParent() {
+        return this._parent;
     }
 }

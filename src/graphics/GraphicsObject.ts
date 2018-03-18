@@ -6,11 +6,15 @@ export class GraphicsObject extends VersionObject {
         super();
     }
 
-    setRenderObjectRef(renderer, robj) {
+    public setRenderObjectRef(renderer, robj) {
         this._renderObjectRef = robj;
     }
 
-    getRenderObjectRef(renderer) {
+    public getRenderObjectRef(renderer) {
         return this._renderObjectRef;
+    }
+
+    protected _updateRenderObjectRef() {
+        
     }
 }

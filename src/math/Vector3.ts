@@ -96,9 +96,14 @@ export class Vector3 {
     public applyMatrix4(matrix: Matrix4): Vector3 {
         let x = this.v[0], y = this.v[1], z = this.v[2];
         let m = matrix.m;
-        this.v[0] = m[0] * x + m[4] * y + m[8] * z + m[12];
-        this.v[1] = m[1] * x + m[5] * y + m[9] * z + m[13];
-        this.v[2] = m[2] * x + m[6] * y + m[10] * z + m[14];
+        let nx = m[0] * x + m[4] * y + m[8] * z + m[12];
+        let ny = m[1] * x + m[5] * y + m[9] * z + m[13];
+        let nz = m[2] * x + m[6] * y + m[10] * z + m[14];
+        let nw = m[3] * x + m[7] * y + m[11] * z + m[15];
+        nw = 1.0 / nw;
+        this.v[0] = nx * nw;
+        this.v[1] = ny * nw;
+        this.v[2] = nz * nw;
         return this;
     }
 

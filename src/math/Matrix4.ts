@@ -225,22 +225,23 @@ export class Matrix4 {
     public perspective(fovy, aspect, near, far) {
         let f = 1.0 / Math.tan(fovy / 2), 
             nf = 1.0 / (near - far);
-        this.m[0] = f / aspect;
-        this.m[1] = 0;
-        this.m[2] = 0;
-        this.m[3] = 0;
-        this.m[4] = 0;
-        this.m[5] = f;
-        this.m[6] = 0;
-        this.m[7] = 0;
-        this.m[8] = 0;
-        this.m[9] = 0;
-        this.m[10] = (far + near) * nf;
-        this.m[11] = -1;
-        this.m[12] = 0;
-        this.m[13] = 0;
-        this.m[14] = (2 * far * near) * nf;
-        this.m[15] = 0;
+        let m = this.m;
+        m[0] = f / aspect;
+        m[1] = 0;
+        m[2] = 0;
+        m[3] = 0;
+        m[4] = 0;
+        m[5] = f;
+        m[6] = 0;
+        m[7] = 0;
+        m[8] = 0;
+        m[9] = 0;
+        m[10] = (far + near) * nf;
+        m[11] = -1;
+        m[12] = 0;
+        m[13] = 0;
+        m[14] = (2 * far * near) * nf;
+        m[15] = 0;
         return this;
     }
 

@@ -1,6 +1,7 @@
 import * as CGE from '../graphics/RendererParameter'
 import { Logger } from '../core/Base'
 import { MatrixType } from '../graphics/GraphicsTypes'
+import { Texture } from '../graphics/Texture'
 import { Texture2D } from '../graphics/Texture2D'
 import { TextureCube } from '../graphics/TextureCube'
 import { RenderTargetState } from '../graphics/RenderTargetState'
@@ -218,7 +219,7 @@ export function WebGLRenderer():void {
         // }
     };
 
-    this.initTexture = function(texture) {
+    this.initTexture = function(texture: Texture) {
         let gltexture = texture.getRenderObjectRef(this);
         if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) {
             return gltexture;
@@ -335,13 +336,14 @@ export function WebGLRenderer():void {
         renderCount++;
         let camera = scene.getMainCamera();
         if (camera === undefined) {
-            Logger.warn('follow scene miss mainCamera');
+            Logger.warn('The scene miss mainCamera');
+            Logger.warn(scene);
             return undefined;
         }
         let cameraMatrices = this._getCameraMatrices(camera);
         let entities = scene.getRenderEntities();
-        entities.forEach(function(entity) {
+        entities.forEach(entity => {
             this._renderEntity(entity, cameraMatrices);
-        }.bind(this));
+        });
     };
 };

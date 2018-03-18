@@ -14,8 +14,17 @@ export class Ray {
 
     }
 
+    public at(t: number, target: Vector3) {
+        if (target === undefined) {
+            console.warn('THREE.Ray: .at() target is now required');
+            target = new Vector3();
+        }
+        return target.copy(this._dir).mul(t).add(this._origin);
+    }
+
     /**
-     * from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+     * intersect triangle
+     * http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
      * @param a 
      * @param b 
      * @param c 
@@ -31,6 +40,12 @@ export class Ray {
         edge1.copy(b).sub(a);
         edge2.copy(c).sub(a);
         normal.crossBy(edge1, edge2);
+
+        // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+        // E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+        //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+        //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+        //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
 
         let DdN: number = this._dir.dot(normal);
         let sign: number;
@@ -48,9 +63,31 @@ export class Ray {
         diff.subBy(this._origin, a);
         let DdQxE2: number = sign * this._dir.dot(edge2.crossBy(diff, edge2));
 
-        if ( DdQxE2 < 0 ) {
+        // b1 < 0, no intersection
+        if (DdQxE2 < 0) {
             return null;
         }
 
+        let DdE1xQ: number = sign * this._dir.dot(edge1.cross(diff));
+
+        // b2 < 0, no intersection
+        if (DdE1xQ < 0) {
+            return null;
+        }
+
+        // b1+b2 > 1, no intersection TODO: what is 1 ?
+        if (DdQxE2 + DdE1xQ > DdN) {
+            return null;
+        }
+
+        // Line intersects triangle, check whether ray does.
+        let QdN: number = -sign * diff.dot(normal);
+
+        // t < 0, no intersection
+        if (QdN < 0) {
+            return null;
+        }
+
+        this.at(QdN / DdN, target);
     }
 }
