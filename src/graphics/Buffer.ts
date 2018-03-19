@@ -63,4 +63,17 @@ export class Buffer extends GraphicsObject  {
     public getByteLength(): number {
         return this._data.byteLength;
     }
+
+    public findAttribute(type: number): Attribute {
+        let atts = this._attributes;
+        let l = atts.length;
+
+        for (let i = 0; i < l; i++) {
+            let att = atts[i];
+            if (att.attribType === type) {
+                return att;
+            }
+        }
+        return null;
+    }
 }

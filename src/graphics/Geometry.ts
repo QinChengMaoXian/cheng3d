@@ -1,12 +1,15 @@
 import * as CGE from './RendererParameter'
 import { GraphicsObject } from './GraphicsObject'
 import { Buffer } from './Buffer'
+import { Bounding } from '../bounding/Bounding';
 
 export class Geometry extends GraphicsObject {
-    _attributeDatas = [];
-    _indexData = undefined;
-    _drawParameter = undefined;
-    private _Buffers:Buffer[] = []; 
+    protected _attributeDatas = [];
+    protected _indexData = undefined;
+    protected _drawParameter = undefined;
+    protected _display: boolean = true;
+    protected _bounding: Bounding;
+    protected _buffers: Buffer[] = []; 
 
     constructor() {
         super();
@@ -87,5 +90,9 @@ export class Geometry extends GraphicsObject {
 
     public getDrawParameter() {
         return this._drawParameter;
+    }
+
+    public buildBounding() {
+
     }
 }

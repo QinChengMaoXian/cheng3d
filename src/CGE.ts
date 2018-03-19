@@ -7,8 +7,9 @@ export { Matrix4 } from './math/Matrix4';
 export { Plane } from './math/Plane';
 
 export { Base } from './core/Base';
-export { VersionObject } from './core/VersionObject';
 export { Event } from './core/Event';
+
+export { Bounding } from './bounding/Bounding'
 
 export * from './graphics/GraphicsTypes';
 export * from './graphics/RendererParameter';

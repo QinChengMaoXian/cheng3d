@@ -1,6 +1,6 @@
-import { VersionObject } from '../core/VersionObject'
+import { Base } from '../core/Base'
 
-export class GraphicsObject extends VersionObject {
+export class GraphicsObject extends Base {
     protected _renderObjectRef = undefined;
     constructor() {
         super();
@@ -16,5 +16,9 @@ export class GraphicsObject extends VersionObject {
 
     protected _updateRenderObjectRef() {
         
+    }
+
+    public needsUpdate() {
+        this._renderObjectRef.update();
     }
 }

@@ -198,7 +198,7 @@ export function WebGLRenderer():void {
 
     this.initShader = function(shader) {
         let glprogram = shader.getRenderObjectRef(this);
-        if (glprogram && glprogram.getLocalVersion() === shader.getUpdateVersion()) {
+        if (glprogram !== undefined) {
             return glprogram;
         }
 
@@ -221,7 +221,7 @@ export function WebGLRenderer():void {
 
     this.initTexture = function(texture: Texture) {
         let gltexture = texture.getRenderObjectRef(this);
-        if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) {
+        if (gltexture !== undefined) {
             return gltexture;
         }
             

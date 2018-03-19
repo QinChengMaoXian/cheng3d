@@ -2,7 +2,8 @@ import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
 import { Base } from '../core/Base';
-import { Component } from '../CGE';
+import { Component } from './Component';
+import { Bounding } from '../bounding/Bounding'
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
@@ -12,6 +13,7 @@ export class Object3D extends Base {
     protected _needsUpdate: boolean = true;
     protected _display: boolean = true;
     protected _components: Component[] = [];
+    protected _bounding: Bounding;
 
     protected _parent: Object3D = null;
     protected _children: Object3D[] = [];
@@ -78,6 +80,10 @@ export class Object3D extends Base {
             this._matrix.compose(this._position, this._rotate, this._scale);
             this._needsUpdate = false;
         }
+    }
+
+    public getDisplay() {
+        return this._display;
     }
 
     public setParent(parent: Object3D) {

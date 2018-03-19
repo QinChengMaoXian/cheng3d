@@ -1,15 +1,15 @@
 import { Base } from '../../core/Base'
 
-export class glObject extends Base {
+export class glObject {
     protected _localVersion = -1;
     protected _renderCount = -1;
     protected _update: boolean = false;
     
     constructor() {
-        super();
+        
     }
 
-    public sourceUpdate() {
+    public update() {
 
     }
 
