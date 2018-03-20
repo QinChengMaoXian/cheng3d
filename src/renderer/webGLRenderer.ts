@@ -159,15 +159,18 @@ export function WebGLRenderer(): void {
 
     this.initGeometry = function(geometry) {
         let glbuffer = geometry.getRenderObjectRef(this);
-        if (glbuffer) {
-            return glbuffer;
-        }
-
-        glbuffer = new glBuffer();
-        if (glbuffer.generateFromGeometry(_gl, geometry)) {
+        if (!glbuffer) {
+            glbuffer = new glBuffer();
             geometry.setRenderObjectRef(this, glbuffer);
+        }
+        if (!glbuffer.getUpdate()) {
             return glbuffer;
         }
+        if(!glbuffer.generateFromGeometry(_gl, geometry)) {
+            glbuffer = null;
+            geometry.setRenderObjectRef(this, null);
+        }
+        return glbuffer;
     };
 
     this.initShader = function(shader) {
@@ -209,10 +212,10 @@ export function WebGLRenderer(): void {
     };
 
     this._renderMesh = function(mesh, camera) {
-        
+        let glbuffer = this._
     }
 
     this.renderScene = function(scene, camera) {
-        
+        //
     }
 };
