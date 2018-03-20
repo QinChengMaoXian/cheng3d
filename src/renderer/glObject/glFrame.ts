@@ -2,16 +2,16 @@ import { Logger } from '../../core/Base'
 import { glObject } from './glObject'
 
 export class glFrame extends glObject {
-    _frame = undefined;
-    _depthStencil = undefined;
-    _drawBufferMap = new Map();
-    _drawBuffers = [];
+    protected _frame = undefined;
+    protected _depthStencil = undefined;
+    protected _drawBufferMap = new Map();
+    protected _drawBuffers = [];
 
     constructor() {
         super();
     }
 
-    checkTextures(renderer, textureMap, depthStencilTexture) {
+    public checkTextures(renderer, textureMap, depthStencilTexture) {
         let completed = true;
         textureMap.forEach(function(texture2d, location) {
             let glTexture = renderer.initTexture(texture2d);
@@ -27,11 +27,10 @@ export class glFrame extends glObject {
                 this._depthStencil = glTexture;
             }
         }
-    
         return completed;
     }
 
-    generateFromRenderTarget(gl, renderer, renderTarget, maxFrameAttachment) {
+    public generateFromRenderTarget(gl, renderer, renderTarget, maxFrameAttachment) {
         let textureMap = renderTarget.getTextureMap();
         let depthStencilTexture = renderTarget.getDepthStencilTexture();
         const maxAttachment = maxFrameAttachment || 8;
@@ -60,7 +59,7 @@ export class glFrame extends glObject {
         return this;
     }
 
-    apply(gl) {
+    public apply(gl) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this._frame);
         gl.drawBuffers(this._drawBuffers);
     }

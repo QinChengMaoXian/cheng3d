@@ -66,7 +66,7 @@ export class glTexture2D extends glTexture {
             return undefined;
         }
         this._texture = handler;
-        this.setLocalVersion(texture.getUpdateVersion());
+        // this.setLocalVersion(texture.getUpdateVersion());
         return this;
     }
 

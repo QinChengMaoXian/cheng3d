@@ -437,7 +437,7 @@ export class Matrix4 {
         return this;
     }
 
-    public makeBasis (xAxis: Vector3, yAxis: Vector3, zAxis: Vector3) {
+    public makeBasis(xAxis: Vector3, yAxis: Vector3, zAxis: Vector3) {
         this.m.set([
             xAxis.x, yAxis.x, zAxis.x, 0,
             xAxis.y, yAxis.y, zAxis.y, 0,

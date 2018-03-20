@@ -12,12 +12,12 @@ import { Vector4 } from '../math/Vector4'
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
 import { glFrame } from './glObject/glFrame'
-import { glMesh } from './glObject/glMesh'
 import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
+import { glTexture } from './glObject/glTexture';
 
-export function WebGLRenderer():void {
+export function WebGLRenderer(): void {
     // TODO: The Function name MUST use '_' inital that all called _gl function;
     // TODO: Take unless _gl's function out of constructor;
 
@@ -47,8 +47,7 @@ export function WebGLRenderer():void {
     _ext['WEBGL_depth_texture'] = getExtension("WEBGL_depth_texture");
     _ext['EXT_texture_filter_anisotropic'] = getExtension("EXT_texture_filter_anisotropic");
 
-    if (!_ext['OES_vertex_array_object']
-        || !_ext['WEBGL_draw_buffers']
+    if (!_ext['WEBGL_draw_buffers']
         || !_ext['OES_standard_derivatives']
         || !_ext['OES_texture_half_float']
         || !_ext['OES_texture_float']
@@ -110,27 +109,12 @@ export function WebGLRenderer():void {
                 _gl.disable(_gl.DEPTH_TEST);
             }
         }
-
-        // if (state.isClearStencil !== currentTargetState.isClearStencil) {
-        //     currentTargetState.isClearStencil = state.isClearStencil;
-        //     if (state.isClearStencil) {
-        //         _gl.enable(_gl.STENCIL_TEST);
-        //     } else {
-        //         _gl.disable(_gl.STENCIL_TEST);
-        //     }
-        // }
-
         clear(state.isClearColor, state.isClearDepth, state.isClearStencil);
     };
 
     let self = this;
 
     // let initializedMap = new Map();
-    // glBuffer --->  Geometry
-    // glProgram  ---> material & shader
-    // glTexturexd  ----> texturexd
-    // glFrame -----> renderTarget
-
     // this.getInitializedMap = function() {
     //     return initializedMap;
     // };
@@ -175,7 +159,7 @@ export function WebGLRenderer():void {
 
     this.initGeometry = function(geometry) {
         let glbuffer = geometry.getRenderObjectRef(this);
-        if (glbuffer && glbuffer.getLocalVersion() === geometry.getUpdateVersion()) {
+        if (glbuffer) {
             return glbuffer;
         }
 
@@ -184,16 +168,6 @@ export function WebGLRenderer():void {
             geometry.setRenderObjectRef(this, glbuffer);
             return glbuffer;
         }
-
-        // let glbuffer = initializedMap.get(geometry.id);
-        // if (glbuffer !== undefined && glbuffer.getLocalVersion() === geometry.getUpdateVersion()) 
-        //     return glbuffer;
-
-        // glbuffer = new glBuffer();
-        // if (glbuffer.generateFromGeometry(_gl, geometry)) {
-        //     initializedMap.set(geometry.id, glbuffer);
-        //     return glbuffer;
-        // }
     };
 
     this.initShader = function(shader) {
@@ -207,91 +181,23 @@ export function WebGLRenderer():void {
             shader.setRenderObjectRef(this, glprogram);
             return glprogram;
         }
-
-        // let glprogram = initializedMap.get(shader.id);
-        // if (glprogram !== undefined && glprogram.getLocalVersion() === shader.getUpdateVersion()) 
-        //     return glprogram;
-
-        // glprogram = new glProgram();
-        // if (glprogram.generateFromShader(_gl, shader)) {
-        //     initializedMap.set(shader.id, glprogram);
-        //     return glprogram;
-        // }
     };
 
     this.initTexture = function(texture: Texture) {
-        let gltexture = texture.getRenderObjectRef(this);
-        if (gltexture !== undefined) {
+        let gltexture:any = texture.getRenderObjectRef(this);
+        if (gltexture !== undefined && !gltexture.getUpdate()) {
             return gltexture;
         }
             
         if (texture instanceof Texture2D) {
             gltexture = new glTexture2D(_gl);
+            if (gltexture.generateFromTexture(_gl, texture)) {
+                texture.setRenderObjectRef(this, gltexture);
+                return gltexture;
+            }
         } else if (texture instanceof TextureCube) {
             gltexture = new glTextureCube(_gl);
         }
-
-        if (gltexture.generateFromTexture(_gl, texture)) {
-            texture.setRenderObjectRef(this, gltexture);
-            return gltexture;
-        }
-
-        // let gltexture = initializedMap.get(texture.id);
-        // if (gltexture !== undefined && gltexture.getLocalVersion() === texture.getUpdateVersion()) 
-        //     return gltexture; 
-        // if (texture instanceof Texture2D) {
-        //     gltexture = new glTexture2D(_gl);
-        // } else if (texture instanceof TextureCube) {
-        //     gltexture = new glTextureCube(_gl);
-        // }
-        // if (gltexture.generateFromTexture(_gl, texture)) {
-        //     initializedMap.set(texture.id, gltexture);
-        //     return gltexture;
-        // }
-    };
-
-    let _glMeshManager = {
-        _glMeshMap: new Map(),
-        addGLMesh: function(geometryId, shaderId, glmesh) {
-            let map = this._glMeshMap.get(geometryId);
-            if (map === undefined) {
-                map = new Map();
-                this._glMeshMap.set(geometryId, map);
-            }
-            map.set(shaderId, glmesh);
-        },
-
-        getGLMesh: function(geometryId, shaderId) {
-            let map = this._glMeshMap.get(geometryId);
-            if (map === undefined) {
-                return undefined;
-            }
-            return map.get(shaderId);
-        },
-    };
-
-    // meshMap struct: map(bufferId, map(shaderId, glMesh));
-
-    this._renderEntity = function(entity, cameraMatrices) {
-        let geometry = entity.geometry;
-        let shader = entity.material.getShader();
-        let glmesh = _glMeshManager.getGLMesh(geometry.id, shader.id);
-
-        // TODO: What's the fxxk this?
-        if (glmesh !== undefined
-            && glmesh.getLocalVersion() === geometry.getUpdateVersion() 
-            && glmesh.get2ndLocalVersion() === shader.getUpdateVersion()) {
-            glmesh.checkGLObject(this, entity);
-        } else {
-            glmesh = new glMesh();
-            if (glmesh.generate(_gl, this, entity)) {
-                _glMeshManager.addGLMesh(geometry.id, shader.id, glmesh);
-            } else {
-                return undefined;
-            }
-        }
-        glmesh.apply(_gl, entity, cameraMatrices);
-        glmesh.draw(_gl);
     };
 
     this._getCameraMatrices = function(camera) {
@@ -302,48 +208,11 @@ export function WebGLRenderer():void {
         }
     };
 
-    // let maxFrameAttachment = _gl.getParameter(_gl.MAX_COLOR_ATTACHMENTS);
+    this._renderMesh = function(mesh, camera) {
+        
+    }
 
-    this.applyRenderTarget = function(renderTarget) {
-        if (renderTarget.isFollowScreen) {
-            renderTarget.setSize(screenWidth, screenHeight);
-        }
-        // let glframe = initializedMap.get(renderTarget.id);
-        // if (glframe && glframe.getLocalVersion() === renderTarget.getUpdateVersion()) {
-        //     if (!glframe.checkTextures(this, renderTarget.getTextureMap(), renderTarget.getDepthStencilTexture())) {
-        //         return undefined;
-        //     }
-        // } else {
-        //     glframe = new glFrame();
-        //     if (!glframe.generateFromRenderTarget(_gl, this, renderTarget, maxFrameAttachment)) {
-        //         return undefined;
-        //     }
-        //     initializedMap.set(renderTarget.id, glframe);
-        // }
-        // glframe.apply(_gl);
-        // applyTergetState(renderTarget.getState());
-    };
-
-    this.renderScene = function(scene, renderTarget) {
-        // TODO: renderTarget should be managed by something;
-        if (renderTarget === undefined) {
-            _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
-            applyTergetState(defaultTargetState);
-        } else {
-            self.applyRenderTarget(renderTarget);
-        }
-        clear(true, true, false);
-        renderCount++;
-        let camera = scene.getMainCamera();
-        if (camera === undefined) {
-            Logger.warn('The scene miss mainCamera');
-            Logger.warn(scene);
-            return undefined;
-        }
-        let cameraMatrices = this._getCameraMatrices(camera);
-        let entities = scene.getRenderEntities();
-        entities.forEach(entity => {
-            this._renderEntity(entity, cameraMatrices);
-        });
-    };
+    this.renderScene = function(scene, camera) {
+        
+    }
 };

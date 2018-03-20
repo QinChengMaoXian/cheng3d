@@ -1,35 +1,30 @@
-import { Base } from '../../core/Base'
+import { RenderBase } from '../../graphics/RenderBase'
 
-export class glObject {
+export class glObject extends RenderBase {
     protected _localVersion = -1;
     protected _renderCount = -1;
-    protected _update: boolean = false;
-    
+
     constructor() {
-        
+        super();
     }
 
-    public update() {
-
-    }
-
-    getLocalVersion() {
+    public getLocalVersion() {
         return this._localVersion;
     }
 
-    setLocalVersion(version) {
+    public setLocalVersion(version) {
         this._localVersion = version;
     }
 
-    checkVersion(version) {
+    public checkVersion(version) {
         return version - this._localVersion;
     }
 
-    checkRenderCount(renderCount) {
+    public checkRenderCount(renderCount) {
         return renderCount - this._renderCount; 
     }
 
-    updateRenderCount(renderCount) {
+    public updateRenderCount(renderCount) {
         this._renderCount = renderCount;
     }
 }

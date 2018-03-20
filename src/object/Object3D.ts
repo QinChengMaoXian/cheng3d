@@ -78,6 +78,9 @@ export class Object3D extends Base {
     public makeMatrix() {
         if (this._needsUpdate) {
             this._matrix.compose(this._position, this._rotate, this._scale);
+            if (this._parent) {
+                this._matrix.premultiply(this._matrix);
+            }
             this._needsUpdate = false;
         }
     }

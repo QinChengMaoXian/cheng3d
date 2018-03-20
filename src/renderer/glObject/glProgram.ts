@@ -87,7 +87,7 @@ export class glProgram extends glObject {
     }
 
     generateFromShader(gl, shader) {
-        let version = shader.getUpdateVersion();
+        // let version = shader.getUpdateVersion();
         let program = this._createProgramFromText(gl, shader.getVertexShaderText(), shader.getFragmentShaderText());
 
         if (program === undefined) {
@@ -99,7 +99,7 @@ export class glProgram extends glObject {
         this._createUniformLocationMap(gl, shader.getMatrixNameMap(), this._matrixLocations);
         this._createUniformLocationMap(gl, shader.getUniformNameMap(), this._uniformLocations);
         
-        this.setLocalVersion(version);
+        // this.setLocalVersion(version);
         return this;
     }
 

@@ -1,9 +1,9 @@
 import { glObject } from './glObject'
 
 export class glTexture extends glObject {
-    _minFilter;
-    _magFilter;
-    _texture;
+    protected _minFilter: number | string;
+    protected _magFilter: number | string;
+    protected _texture: number | string;
 
     constructor(gl) {
         super();
@@ -11,12 +11,12 @@ export class glTexture extends glObject {
         this._magFilter = gl.LINEAR;
     }
 
-    setFilter(min, mag) {
+    public setFilter(min, mag) {
         this._minFilter = min;
         this._magFilter = mag;
     }
 
-    getHandler() {
+    public getHandler() {
         return this._texture;
     }
 }

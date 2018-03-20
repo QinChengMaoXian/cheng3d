@@ -1,7 +1,8 @@
+import { RenderBase } from './RenderBase'
 import { Base } from '../core/Base'
 
 export class GraphicsObject extends Base {
-    protected _renderObjectRef = undefined;
+    protected _renderObjectRef: RenderBase = undefined;
     constructor() {
         super();
     }
@@ -19,6 +20,6 @@ export class GraphicsObject extends Base {
     }
 
     public needsUpdate() {
-        this._renderObjectRef.update();
+        this._renderObjectRef.needsUpdate();
     }
 }

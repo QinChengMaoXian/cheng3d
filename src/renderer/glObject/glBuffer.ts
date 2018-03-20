@@ -22,7 +22,7 @@ export class glBuffer extends glObject {
 
     generateFromGeometry(gl, geometry) {
         // TODO: make this function more simple;
-        let version = geometry.getUpdateVersion();
+        // let version = geometry.getUpdateVersion();
         let attributeDatas = geometry.getAttributeDatas();
         let indexData = geometry.getIndexData();
         let drawParameter = geometry.getDrawParameter();
@@ -45,7 +45,7 @@ export class glBuffer extends glObject {
             this._draw = new glDraw(drawParameter.mode, drawParameter.offset, drawParameter.count, 0);
         }
         
-        this.setLocalVersion(version);
+        // this.setLocalVersion(version);
         return this;
     }
 
