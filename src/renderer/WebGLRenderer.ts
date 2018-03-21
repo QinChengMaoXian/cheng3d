@@ -216,6 +216,23 @@ export function WebGLRenderer(): void {
         let mat = mesh.getMaterial();
 
         let buffer = this.initGeometry(geo);
+        if (!buffer) {
+            return;
+        }
+
+        let shader = this.initShader(mat.getShader());
+        if (!shader) {
+            return;
+        }
+
+        let maps = mat.getPropertyProvide();
+        let l = maps.length;
+        for (let i = 0; i < l; i++) {
+            let map = maps[i];
+            let tex = this.initTexture(map.map);
+            
+        }
+
     }
 
     this._renderObject3D = function(object3D, camera) {
