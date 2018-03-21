@@ -203,6 +203,8 @@ export function WebGLRenderer(): void {
         }
     };
 
+    let _camera;
+
     this._getCameraMatrices = function(camera) {
         return {
             viewMatirx: camera.getMatrix().clone(),
@@ -211,7 +213,7 @@ export function WebGLRenderer(): void {
         }
     };
 
-    this._renderMesh = function(mesh, camera) {
+    const _renderMesh = (mesh, camera) => {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
 
@@ -230,25 +232,36 @@ export function WebGLRenderer(): void {
         for (let i = 0; i < l; i++) {
             let map = maps[i];
             let tex = this.initTexture(map.map);
-            
+            if (!tex) {
+                return;
+            }
         }
+    }
+
+    const _addToRenderList = (mesh) => {
 
     }
 
-    this._renderObject3D = function(object3D, camera) {
-        if (object3D.beRendering()) {
-            this._render(object3D, camera);
+    const _preRenderObjects = (obj) => {
+        if(obj.beRendering()) {
+            _addToRenderList(obj);
         }
-
-        const children = object3D.getChildren();
+        const children = obj.getChildren();
         const l = children.length;
         for(let i = 0; i < l; i++) {
             const child = children[i];
-            this._renderMesh(child, camera);
+            _preRenderObjects(child);
         }
     }
 
-    this.renderScene = function(scene, camera) {
-        
+    const _renderScene = (scene, camera) => {
+        this._camera = camera;
+        _preRenderObjects(scene);
     }
+
+    this.renderScene = _renderScene;
+
+    // this.renderScene = function(scene, camera) {
+        
+    // }
 };

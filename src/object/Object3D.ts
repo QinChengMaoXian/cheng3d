@@ -112,4 +112,8 @@ export class Object3D extends Base {
     public beRendering(): boolean {
         return false;
     }
+
+    public getBounding() {
+        return this._bounding;
+    }
 }
