@@ -24,4 +24,8 @@ export class Mesh extends Object3D {
     public getMaterial() {
         return this._material;
     }
+
+    public beRendering(): boolean {
+        return !(!this._geometry || !this._material);
+    }
 }

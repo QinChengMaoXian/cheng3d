@@ -214,6 +214,8 @@ export function WebGLRenderer(): void {
     this._renderMesh = function(mesh, camera) {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
+
+        let buffer = this.initGeometry(geo);
     }
 
     this._renderObject3D = function(object3D, camera) {

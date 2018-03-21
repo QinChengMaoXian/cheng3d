@@ -30,12 +30,16 @@ export class Object3D extends Base {
         if (child && child._parent === this) child.setParent(null);
     }
 
+    public getChildren() {
+        return this._children;
+    }
+
     public setNeedUpdateMatrix() {
         this._needsUpdate = true;
     }
 
     public update(delta: number) {
-        this.makeMatrix();
+        this._makeMatrix();
     }
 
     public setPosition(position: Vector3) {
@@ -71,11 +75,11 @@ export class Object3D extends Base {
     }
 
     public getMatrix() {
-        this.makeMatrix();
+        this._makeMatrix();
         return this._matrix;
     }
 
-    public makeMatrix() {
+    protected _makeMatrix() {
         if (this._needsUpdate) {
             this._matrix.compose(this._position, this._rotate, this._scale);
             if (this._parent) {
@@ -103,5 +107,9 @@ export class Object3D extends Base {
 
     public getParent() {
         return this._parent;
+    }
+
+    public beRendering(): boolean {
+        return false;
     }
 }
