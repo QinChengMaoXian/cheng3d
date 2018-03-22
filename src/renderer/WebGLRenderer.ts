@@ -204,8 +204,13 @@ export function WebGLRenderer(): void {
     };
 
     let _camera;
+    let _renderList = [];
 
-    this._getCameraMatrices = function(camera) {
+    const _render = () => {
+
+    }
+
+    const _getCameraMatrices = (camera) => {
         return {
             viewMatirx: camera.getMatrix().clone(),
             projectionMatirx: camera.getProjectionMatrix().clone(),
@@ -219,27 +224,34 @@ export function WebGLRenderer(): void {
 
         let buffer = this.initGeometry(geo);
         if (!buffer) {
-            return;
+            Logger.warn('the following mesh can not build geometry');
+            Logger.warn(mesh);
+            return false;
         }
 
         let shader = this.initShader(mat.getShader());
         if (!shader) {
-            return;
+            Logger.warn('the following mesh can not build shader');
+            Logger.warn(mesh);
+            return false;
         }
 
-        let maps = mat.getPropertyProvide();
-        let l = maps.length;
+        let images = mat.getPropertyProvide();
+        let l = images.length;
         for (let i = 0; i < l; i++) {
-            let map = maps[i];
-            let tex = this.initTexture(map.map);
+            let image = images[i];
+            let tex = this.initTexture(image.map);
             if (!tex) {
-                return;
+                Logger.warn('the following mesh can not build texture');
+                Logger.warn(mesh);
+                return false;
             }
         }
+        return true;
     }
 
     const _addToRenderList = (mesh) => {
-
+        _renderList.push(mesh);
     }
 
     const _preRenderObjects = (obj) => {
@@ -256,12 +268,10 @@ export function WebGLRenderer(): void {
 
     const _renderScene = (scene, camera) => {
         this._camera = camera;
+        _renderList = [];
         _preRenderObjects(scene);
+        _render();
     }
 
     this.renderScene = _renderScene;
-
-    // this.renderScene = function(scene, camera) {
-        
-    // }
 };
