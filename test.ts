@@ -241,6 +241,7 @@ let render = function(delta) {
     //     transform.applyMatrix4(testMat4);
     // });
     // renderer.renderScene(renderTargetScene, renderTarget);
+    camera.update(delta);
     events.forEach((event) => {
         event.update(delta);
     });
