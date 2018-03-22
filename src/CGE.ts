@@ -24,9 +24,10 @@ export { Transform } from './object/Transform';
 export { Camera } from './object/Camera';
 export { Component } from './object/Component';
 export { Entity } from './object/Entity';
+export { Mesh } from './object/Mesh';
 export { ComponentType } from './object/ObjectType';
 
-export { Scene } from './scene/Scene';
+export { Scene } from './object/Scene';
 
 export { ColladaLoader } from './extensions/ColladaLoader'
 export { GltfLoader } from './extensions/GltfLoader'

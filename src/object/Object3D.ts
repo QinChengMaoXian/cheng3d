@@ -39,15 +39,20 @@ export class Object3D extends Base {
     }
 
     public update(delta: number) {
-        this._makeMatrix();
+        // this._makeMatrix();
+        let l = this._children.length;
+        let children = this._children;
+        for (let i = 0; i < l; i++) {
+            children[i].update(delta);
+        }
     }
 
-    public setPosition(position: Vector3) {
+    public setPositionAt(position: Vector3) {
         this._position.set(position.x, position.y, position.z);
         this.setNeedUpdateMatrix();
     }
 
-    public setPositionValue(x: number, y: number, z: number) {
+    public setPosition(x: number, y: number, z: number) {
         this._position.set(x, y, z);
         this.setNeedUpdateMatrix();
     }
@@ -75,8 +80,7 @@ export class Object3D extends Base {
     }
 
     public getMatrix() {
-        this._makeMatrix();
-        return this._matrix;
+        return this._makeMatrix();
     }
 
     protected _makeMatrix() {
@@ -87,6 +91,7 @@ export class Object3D extends Base {
             }
             this._needsUpdate = false;
         }
+        return this._matrix;
     }
 
     public getDisplay() {

@@ -11,6 +11,7 @@ import { Vector4 } from '../math/Vector4'
 
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
+import { glMesh } from './glObject/glMesh'
 import { glFrame } from './glObject/glFrame'
 import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
@@ -23,6 +24,8 @@ export function WebGLRenderer(): void {
 
     let _canvas = document.createElement('canvas');
     let _gl = _canvas.getContext('webgl', {antialias: true});
+
+    const gl = _gl;
 
     if (_gl === undefined) {
         alert('Can not use webgl');
@@ -204,11 +207,10 @@ export function WebGLRenderer(): void {
     };
 
     let _camera;
+    let _cameraMatrices;
     let _renderList = [];
 
-    const _render = () => {
-
-    }
+    
 
     const _getCameraMatrices = (camera) => {
         return {
@@ -222,32 +224,42 @@ export function WebGLRenderer(): void {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
 
-        let buffer = this.initGeometry(geo);
-        if (!buffer) {
-            Logger.warn('the following mesh can not build geometry');
-            Logger.warn(mesh);
-            return false;
-        }
+        // let buffer = this.initGeometry(geo);
+        // if (!buffer) {
+        //     Logger.warn('the following mesh can not build geometry');
+        //     Logger.warn(mesh);
+        //     return false;
+        // }
 
-        let shader = this.initShader(mat.getShader());
-        if (!shader) {
-            Logger.warn('the following mesh can not build shader');
-            Logger.warn(mesh);
-            return false;
-        }
+        let shader = mat.getShader();
+        // if (!shader) {
+        //     Logger.warn('the following mesh can not build shader');
+        //     Logger.warn(mesh);
+        //     return false;
+        // }
 
-        let images = mat.getPropertyProvide();
-        let l = images.length;
+        let images = mat.getMapProvide();
+        // let l = images.length;
+        // for (let i = 0; i < l; i++) {
+        //     let image = images[i];
+        //     let tex = this.initTexture(image.map);
+        //     if (!tex) {
+        //         Logger.warn('the following mesh can not build texture');
+        //         Logger.warn(mesh);
+        //         return false;
+        //     }
+        // }
+
+        let glmesh = new glMesh();
+        return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
+    }
+
+    const _render = () => {
+        let l = _renderList.length;
         for (let i = 0; i < l; i++) {
-            let image = images[i];
-            let tex = this.initTexture(image.map);
-            if (!tex) {
-                Logger.warn('the following mesh can not build texture');
-                Logger.warn(mesh);
-                return false;
-            }
+            let mesh = _renderList[i];
+            _renderMesh(mesh, _camera);
         }
-        return true;
     }
 
     const _addToRenderList = (mesh) => {
@@ -267,7 +279,9 @@ export function WebGLRenderer(): void {
     }
 
     const _renderScene = (scene, camera) => {
+        clear(true, true, true);
         this._camera = camera;
+        _cameraMatrices = _getCameraMatrices(camera);
         _renderList = [];
         _preRenderObjects(scene);
         _render();

@@ -14,6 +14,7 @@ export class glProgram extends glObject {
     protected _attributeLocations = new Map();
     protected _matrixLocations = new Map();
     protected _uniformLocations = new Map();
+    protected _textureLocations = [];
 
     constructor() {
         super();
@@ -84,6 +85,10 @@ export class glProgram extends glObject {
             let location = gl.getAttribLocation(this._program, name);
             this._attributeLocations.set(attribType, location);
         }.bind(this));
+    }
+
+    protected _createTextureLocations() {
+        
     }
 
     generateFromShader(gl, shader) {

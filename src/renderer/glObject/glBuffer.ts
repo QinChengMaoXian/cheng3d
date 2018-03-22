@@ -46,6 +46,7 @@ export class glBuffer extends glObject {
         }
         
         // this.setLocalVersion(version);
+        this._update = false;
         return this;
     }
 

@@ -8,17 +8,8 @@ export class glMesh extends glObject {
     _uniforms = undefined;
     _glBuffer = undefined;
     _glProgram = undefined;
-    _2ndLocalVersion = -1;
     constructor() {
         super();
-    }
-
-    get2ndLocalVersion() {
-        return this._2ndLocalVersion;
-    }
-
-    set2ndLocalVersion(version) {
-        this._2ndLocalVersion = version;
     }
 
     _initGLObject(renderer, geometry, shader, images) {
@@ -45,10 +36,10 @@ export class glMesh extends glObject {
         return this;
     }
 
-    _createVao(gl, glProgram) {
+    _bindVbo(gl, glProgram) {
         let glBuffer = this._glBuffer;
-        let vao = gl.createVertexArray();
-        gl.bindVertexArray(vao);
+        // let vao = gl.createVertexArray();
+        // gl.bindVertexArray(vao);
         let geometry = glBuffer.getGeometry();
         let vbos = glBuffer.getVbos();
         let attributeDatas = geometry.getAttributeDatas();
@@ -69,14 +60,14 @@ export class glMesh extends glObject {
         if (ibo) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
         }
-        gl.bindVertexArray(null);
-        this._vao = vao;
+        // gl.bindVertexArray(null);
+        // this._vao = vao;
         return this;
     }
 
-    _applyVao(gl) {
-        gl.bindVertexArray(this._vao);
-    }
+    // _applyVao(gl) {
+    //     gl.bindVertexArray(this._vao);
+    // }
 
     _applyTextures(gl) {
         let count = 0;
@@ -87,11 +78,10 @@ export class glMesh extends glObject {
         }.bind(this));
     }
 
-    _applyMatrices(gl, entity, cameraMatrices) {
+    _applyMatrices(gl, mesh, cameraMatrices) {
         let glProgram = this._glProgram;
         let matrixLocaionMap = glProgram.getMatrixLocationMap();
-        let transform = entity.transform;
-        let worldMatrix = transform === undefined ? new Matrix4() : transform.getMatrix();
+        let worldMatrix = mesh.getMatrix()  // transform === undefined ? new Matrix4() : transform.getMatrix();
 
         let getMVMatrix = function() {
             let MVMatrix = undefined;
@@ -155,8 +145,8 @@ export class glMesh extends glObject {
         });
     }
 
-    _applyUniforms(gl, entity) {
-        let material = entity.material;
+    _applyUniforms(gl, mesh) {
+        let material = mesh.getMaterial();
         let properties = material.getPropertyProvide();
         let glProgram = this._glProgram;
         properties.forEach(function(property) {
@@ -186,20 +176,20 @@ export class glMesh extends glObject {
             return undefined;
         }
 
-        if (this._createVao(gl, this._glProgram) === undefined) {
-            return undefined;
-        }
+        // if (this._createVao(gl, this._glProgram) === undefined) {
+        //     return undefined;
+        // }
 
-        let geometryVersion = entity.geometry.getUpdateVersion();
-        let shaderVersion = entity.geometry.getUpdateVersion();
-        this.setLocalVersion(geometryVersion);
-        this.set2ndLocalVersion(shaderVersion);
+        // let geometryVersion = entity.geometry.getUpdateVersion();
+        // let shaderVersion = entity.geometry.getUpdateVersion();
+        // this.setLocalVersion(geometryVersion);
+        // this.set2ndLocalVersion(shaderVersion);
         return this;
     }
 
-    checkGLObject(renderer, entity) {
-        let geometry = entity.geometry;
-        let material = entity.material;
+    checkGLObject(renderer, mesh) {
+        let geometry = mesh.geometry;
+        let material = mesh.material;
         let shader = material.getShader();
         let images = material.getMapProvide();
 
@@ -209,12 +199,16 @@ export class glMesh extends glObject {
         return this;
     }
 
-    apply(gl, entity, cameraMatrices) {
-        this._applyMaterial(gl, entity, cameraMatrices);
-        this._applyVao(gl);
+    draw(renderer, gl, mesh, shader, images, cameraMatrices) {
+        if (!this._initGLObject(renderer, mesh.getGeometry(), shader, images)) return false;
+        this._applyMaterial(gl, mesh, cameraMatrices);
+        this._bindVbo(gl, this._glProgram);
+        this._glBuffer.draw(gl);
+        return true;
+        // this._applyVao(gl);
     }
 
-    draw(gl) {
-        this._glBuffer.draw(gl);
-    }
+    // draw(gl) {
+    //     this._glBuffer.draw(gl);
+    // }
 }

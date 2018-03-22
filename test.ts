@@ -19,10 +19,7 @@ import {
 } from './teapot';
 
 let mainScene = new CGE.Scene();
-
-let colorTexrure = createTexture2DFromImage(test_diff, true);
-colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
-let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
+/*
 
 let manTexture = createTexture2DFromImage(man_diff, true);
 let manShowingMaterial = new FullScreenTextureMaterial(manTexture);
@@ -100,7 +97,7 @@ let gltfCallback = (event, object) => {
     }
 }
 
-window['CGE'] = CGE;
+
 
 
 let gltfTest = new CGE.GltfLoader();
@@ -129,6 +126,43 @@ new Promise((resolve, reject) => {
 });
 
 CGE.Logger.info('now start promise');
+
+
+let teapotGeometry = new CGE.Geometry();
+teapotGeometry.addSingleAttribute('Position', CGE.AttribType.POSITION, 3, CGE.FLOAT, teapotPositions);
+teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 3, CGE.FLOAT, teapotTexCoords);
+teapotGeometry.addSingleAttribute('Normal', CGE.AttribType.NORMAL, 3, CGE.FLOAT, teapotNormals);
+teapotGeometry.addSingleAttribute('Binormal', CGE.AttribType.BINORMAL, 3, CGE.FLOAT, teapotBinormals);
+teapotGeometry.addSingleAttribute('Tangent', CGE.AttribType.TANGENT, 3, CGE.FLOAT, teapotTangents);
+teapotGeometry.setIndexData(teapotIndices);
+teapotGeometry.setDrawParameter(teapotIndices.length);
+
+// TODO: rebuild this class;
+
+
+let colorShowingTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(50, 50, 1));
+let colorShowingEntity = CGE.Entity.createRenderableEntity(planeVertexGeometry, colorShowingMaterial, colorShowingTransform);
+
+let teapotTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(1, 1, 1));
+let teapotEntity = CGE.Entity.createRenderableEntity(teapotGeometry, colorShowingMaterial, teapotTransform);
+
+window['teapot'] = teapotEntity;
+
+let cameraEntity = new CGE.Entity();
+cameraEntity.addComponent(CGE.Component.CreateTransfromComponent(new CGE.Transform()));
+cameraEntity.addComponent(CGE.Component.CreateCameraComponent(camera));
+
+mainScene.setMainCamera(cameraEntity);
+mainScene.addEntity(colorShowingEntity);
+mainScene.addEntity(teapotEntity);
+
+*/
+
+window['CGE'] = CGE;
+
+let colorTexrure = createTexture2DFromImage(test_diff, true);
+colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
+let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -175,16 +209,6 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
-let teapotGeometry = new CGE.Geometry();
-teapotGeometry.addSingleAttribute('Position', CGE.AttribType.POSITION, 3, CGE.FLOAT, teapotPositions);
-teapotGeometry.addSingleAttribute('UV0', CGE.AttribType.TEXCOORD0, 3, CGE.FLOAT, teapotTexCoords);
-teapotGeometry.addSingleAttribute('Normal', CGE.AttribType.NORMAL, 3, CGE.FLOAT, teapotNormals);
-teapotGeometry.addSingleAttribute('Binormal', CGE.AttribType.BINORMAL, 3, CGE.FLOAT, teapotBinormals);
-teapotGeometry.addSingleAttribute('Tangent', CGE.AttribType.TANGENT, 3, CGE.FLOAT, teapotTangents);
-teapotGeometry.setIndexData(teapotIndices);
-teapotGeometry.setDrawParameter(teapotIndices.length);
-
-// TODO: rebuild this class;
 let renderer = new CGE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.enableDepthTest();
@@ -195,30 +219,21 @@ window['renderer'] = renderer;
 
 document.body.appendChild(renderer.getCanvas());
 
-let colorShowingTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(50, 50, 1));
-let colorShowingEntity = CGE.Entity.createRenderableEntity(planeVertexGeometry, colorShowingMaterial, colorShowingTransform);
+window['scene'] = mainScene;
 
-let teapotTransform = new CGE.Transform(new CGE.Vector3(0.0, 0.0, -0.1), undefined, new CGE.Vector3(1, 1, 1));
-let teapotEntity = CGE.Entity.createRenderableEntity(teapotGeometry, colorShowingMaterial, teapotTransform);
+let mesh = new CGE.Mesh();
+mesh.setScale(new CGE.Vector3(100, 100, 100));
+mesh.setGeometry(planeVertexGeometry);
+mesh.setMaterial(colorShowingMaterial);
 
-window['teapot'] = teapotEntity;
+mainScene.addChild(mesh);
+
+let events = new Map();
 
 let camera = new CGE.Camera(window.innerWidth, window.innerHeight);
 camera.setPosition(new CGE.Vector3(-100, 100, 80));
 camera.lookAt(new CGE.Vector3(0, 1, 50));
 camera.update(0);
-
-let cameraEntity = new CGE.Entity();
-cameraEntity.addComponent(CGE.Component.CreateTransfromComponent(new CGE.Transform()));
-cameraEntity.addComponent(CGE.Component.CreateCameraComponent(camera));
-
-mainScene.setMainCamera(cameraEntity);
-mainScene.addEntity(colorShowingEntity);
-mainScene.addEntity(teapotEntity);
-
-window['scene'] = mainScene;
-
-let events = new Map();
 
 let render = function(delta) {
     // renderTargetScene.update();
@@ -230,7 +245,7 @@ let render = function(delta) {
         event.update(delta);
     });
     mainScene.update(delta);
-    renderer.renderScene(mainScene);
+    renderer.renderScene(mainScene, camera);
 };
 
 window.onresize = function() {
