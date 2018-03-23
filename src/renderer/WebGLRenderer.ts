@@ -94,7 +94,6 @@ export function WebGLRenderer(): void {
         );
     };
 
-
     let defaultTargetState = new RenderTargetState();
     let currentTargetState = new RenderTargetState();
 
@@ -123,7 +122,7 @@ export function WebGLRenderer(): void {
     // };
 
     let renderCount = 0;
-    let screenWidth = 0, 
+    let screenWidth = 0,
         screenHeight = 0;
 
     this.enableDepthTest = function() {
@@ -210,8 +209,6 @@ export function WebGLRenderer(): void {
     let _cameraMatrices;
     let _renderList = [];
 
-    
-
     const _getCameraMatrices = (camera) => {
         return {
             viewMatirx: camera.getMatrix().clone(),
@@ -223,33 +220,8 @@ export function WebGLRenderer(): void {
     const _renderMesh = (mesh, camera) => {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
-
-        // let buffer = this.initGeometry(geo);
-        // if (!buffer) {
-        //     Logger.warn('the following mesh can not build geometry');
-        //     Logger.warn(mesh);
-        //     return false;
-        // }
-
         let shader = mat.getShader();
-        // if (!shader) {
-        //     Logger.warn('the following mesh can not build shader');
-        //     Logger.warn(mesh);
-        //     return false;
-        // }
-
         let images = mat.getMapProvide();
-        // let l = images.length;
-        // for (let i = 0; i < l; i++) {
-        //     let image = images[i];
-        //     let tex = this.initTexture(image.map);
-        //     if (!tex) {
-        //         Logger.warn('the following mesh can not build texture');
-        //         Logger.warn(mesh);
-        //         return false;
-        //     }
-        // }
-
         let glmesh = new glMesh();
         return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
     }

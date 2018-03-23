@@ -88,7 +88,7 @@ export class glProgram extends glObject {
     }
 
     protected _createTextureLocations() {
-        
+
     }
 
     generateFromShader(gl, shader) {
@@ -103,7 +103,7 @@ export class glProgram extends glObject {
         this._createAttributeLocationMap(gl, shader.getAttribNameMap());
         this._createUniformLocationMap(gl, shader.getMatrixNameMap(), this._matrixLocations);
         this._createUniformLocationMap(gl, shader.getUniformNameMap(), this._uniformLocations);
-        
+        this._update = false;
         // this.setLocalVersion(version);
         return this;
     }
