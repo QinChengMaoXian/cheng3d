@@ -254,6 +254,7 @@ export function WebGLRenderer(): void {
         clear(true, true, true);
         let v = defaultTargetState.viewport;
         gl.viewport(v.x, v.y, v.z, v.w); 
+        
         this._camera = camera;
         _cameraMatrices = _getCameraMatrices(camera);
         _renderList = [];
