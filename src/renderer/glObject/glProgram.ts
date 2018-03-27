@@ -20,7 +20,7 @@ export class glProgram extends glObject {
         super();
     }
 
-    _createShaderFromeText(gl, type, text) {
+    private _createShaderFromeText(gl, type, text) {
         let shader = gl.createShader(type);
         gl.shaderSource(shader, text);
         gl.compileShader(shader);
@@ -33,7 +33,14 @@ export class glProgram extends glObject {
         return shader;
     }
 
-    _createProgram(gl, vs, fs) {
+    private _build(gl: WebGLRenderingContext) {
+        let uCount = gl.getProgramParameter(this._program, gl.ACTIVE_UNIFORMS);
+        for (let i = 0; i < uCount; i++) {
+            
+        }
+    }
+
+    private _createProgram(gl, vs, fs) {
         let program = gl.createProgram();
         gl.attachShader(program, vs);
         gl.attachShader(program, fs);
@@ -44,10 +51,12 @@ export class glProgram extends glObject {
             Logger.error("Could not initialise shaders shader " + gl.getProgramInfoLog(program));
             return undefined;
         }
+        this._program = program;
+        this._build(gl);
         return program;
     }
 
-    _createProgramFromText(gl, vsText, fsText) {
+    private _createProgramFromText(gl, vsText, fsText) {
         let vs = this._createShaderFromeText(gl, gl.VERTEX_SHADER, vsText);              
         let fs = this._createShaderFromeText(gl, gl.FRAGMENT_SHADER, fsText); 
 
@@ -66,21 +75,21 @@ export class glProgram extends glObject {
         return program;
     }
 
-    _createGLUniformObject(location, type) {
+    private _createGLUniformObject(location, type) {
         return {
             location: location,
             type: type
         };
     }
 
-    _createUniformLocationMap(gl, srcMap, dstMap) {
+    private _createUniformLocationMap(gl, srcMap, dstMap) {
         srcMap.forEach(function(value, key) {
             let location = gl.getUniformLocation(this._program, value.name);
             dstMap.set(key, this._createGLUniformObject(location, value.type));
         }.bind(this));
     }
 
-    _createAttributeLocationMap(gl, locationNameMap) {
+    private _createAttributeLocationMap(gl, locationNameMap) {
         locationNameMap.forEach(function(name, attribType){
             let location = gl.getAttribLocation(this._program, name);
             this._attributeLocations.set(attribType, location);
@@ -99,7 +108,6 @@ export class glProgram extends glObject {
             return undefined;
         }
 
-        this._program = program;
         this._createAttributeLocationMap(gl, shader.getAttribNameMap());
         this._createUniformLocationMap(gl, shader.getMatrixNameMap(), this._matrixLocations);
         this._createUniformLocationMap(gl, shader.getUniformNameMap(), this._uniformLocations);
