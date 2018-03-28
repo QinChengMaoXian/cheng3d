@@ -8,6 +8,7 @@ import {
 } from '../../graphics/RendererParameter'
 import { Logger } from '../../core/Base'
 import { glObject } from './glObject'
+import { GraphicsConst } from '../../graphics/GraphicsConst';
 
 export class glProgram extends glObject {
     protected _program = undefined;
@@ -15,6 +16,8 @@ export class glProgram extends glObject {
     protected _matrixLocations = new Map();
     protected _uniformLocations = new Map();
     protected _textureLocations = [];
+
+    protected _textures = {};
 
     constructor() {
         super();
@@ -34,9 +37,23 @@ export class glProgram extends glObject {
     }
 
     private _build(gl: WebGLRenderingContext) {
-        let uCount = gl.getProgramParameter(this._program, gl.ACTIVE_UNIFORMS);
+        let program = this._program;
+        gl.useProgram(this._program);
+        let uCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+        let tCount = 0;
         for (let i = 0; i < uCount; i++) {
-            
+            let data = gl.getActiveUniform(program, i);
+            if (!data) {
+                return;
+            }
+            if (data.type === gl.SAMPLER_2D || data.type === gl.SAMPLER_CUBE) {
+                let loc = gl.getUniformLocation(program, data.name);
+                gl.uniform1i(loc, tCount);
+                let texMap = GraphicsConst._getTextures();
+                this._textures[texMap[data.name]] = tCount++;
+            } else {
+
+            }
         }
     }
 

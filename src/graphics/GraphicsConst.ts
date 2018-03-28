@@ -1,4 +1,14 @@
 export class GraphicsConst {
+    private static _textureId = 0;
+    private static _textures = {}
+
+    private static _uniformId = 0;
+    private static _uniforms = {}
+
+    private static _attributeId = 0;
+    private static _attributes = {}
+
+    private static _dbg = true;
     
     // supported attribute name;
     public static readonly position     = GraphicsConst._inAtt('a_position');
@@ -34,7 +44,7 @@ export class GraphicsConst {
 
     /**
      * get texture map;
-     * Do NOT call this function, this just use for renderer
+     * Do NOT call this function, this ONLY be used for renderer
      */
     public static _getTextures(): any {
         return GraphicsConst._textures;
@@ -42,7 +52,7 @@ export class GraphicsConst {
 
     /**
      * Get unifrom map
-     * Do NOT call this function, this just use for renderer
+     * Do NOT call this function, this ONLY be used for renderer
      */
     public static _getUniforms(): any {
         return GraphicsConst._uniforms;
@@ -50,22 +60,11 @@ export class GraphicsConst {
 
     /**
      * Get attribute map;
-     * Do NOT call this function, this just use for renderer
+     * Do NOT call this function, this ONLY be used for renderer
      */
     public static _getAttributes(): any {
         return GraphicsConst._attributes;
     }
-
-    private static _textureId = 0;
-    private static _textures = {}
-
-    private static _uniformId = 0;
-    private static _uniforms = {}
-
-    private static _attributeId = 0;
-    private static _attributes = {}
-
-    private static _dbg = true;
 
     private static _inTex(name: string) {
         const r = GraphicsConst;
