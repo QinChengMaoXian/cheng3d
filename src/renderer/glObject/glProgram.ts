@@ -18,6 +18,10 @@ export class glProgram extends glObject {
     protected _textureLocations = [];
 
     protected _textures = {};
+    protected _uniforms = {};
+    protected _attributes = {};
+
+    protected _Macros = [];
 
     constructor() {
         super();
@@ -38,7 +42,7 @@ export class glProgram extends glObject {
 
     private _build(gl: WebGLRenderingContext) {
         let program = this._program;
-        gl.useProgram(this._program);
+        gl.useProgram(program);
         let uCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         let tCount = 0;
         for (let i = 0; i < uCount; i++) {
@@ -46,14 +50,28 @@ export class glProgram extends glObject {
             if (!data) {
                 return;
             }
+            let loc = gl.getUniformLocation(program, data.name);
             if (data.type === gl.SAMPLER_2D || data.type === gl.SAMPLER_CUBE) {
-                let loc = gl.getUniformLocation(program, data.name);
                 gl.uniform1i(loc, tCount);
                 let texMap = GraphicsConst._getTextures();
                 this._textures[texMap[data.name]] = tCount++;
             } else {
-
+                let uniMap = GraphicsConst._getUniforms();
+                this._uniforms[uniMap[data.name]] = {
+                    location: loc,
+                    type: data.type,
+                    name: data.name,
+                    size: data.size
+                }
             }
+        }
+
+        let aCount = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+        for (let i = 0; i < aCount; i++) {
+            let data = gl.getActiveAttrib(program, i);
+            let loc = gl.getAttribLocation(program, data.name);
+            let attribMap = GraphicsConst._getAttributes();
+            this._attributes[attribMap[data.name]] = loc;
         }
     }
 
