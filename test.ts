@@ -364,6 +364,9 @@ window.onmouseup = function(event) {
 
 let dataS = new Date();
 
+let fps = null;
+let fpsUpdate = 0;
+
 function loop() {
     let animationframe = window.requestAnimationFrame
                         ||function(a){
@@ -374,6 +377,14 @@ function loop() {
     }
     let dateE = new Date();
     let delta = dateE.getTime() - dataS.getTime();
+    dataS = dateE;
+    if (fpsUpdate++ % 10 === 0) {
+        if (!fps) {
+            fps = document.getElementById('fps');
+        }
+        var f = 1000 / delta;
+        fps.innerText = 'fpx:' + f.toFixed(0);
+    }
     render(delta);
 };
 
