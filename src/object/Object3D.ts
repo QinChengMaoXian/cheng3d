@@ -10,13 +10,15 @@ export class Object3D extends Base {
     protected _rotate: Quaternion = new Quaternion();
     protected _scale: Vector3 = new Vector3(1, 1, 1);
     protected _matrix: Matrix4 = new Matrix4();
-    protected _needsUpdate: boolean = true;
+    
     protected _display: boolean = true;
     protected _components: Component[] = [];
-    protected _bounding: Bounding;
-
+    
     protected _parent: Object3D = null;
     protected _children: Object3D[] = [];
+
+    protected _needsUpdate: boolean = true;
+    protected _bounding: Bounding;
 
     constructor() {
         super();
@@ -120,5 +122,24 @@ export class Object3D extends Base {
 
     public getBounding() {
         return this._bounding;
+    }
+
+    public toJson(obj?) {
+        let result = super.toJson(obj);
+        result.position = this._position.toJson();
+        result.rotate = this._rotate.toJson();
+        result.scale = this._scale.toJson();
+        result.display = this._display;
+        
+        const children = [];
+        this._children.forEach(child => {
+            children.push(child.toJson());
+        });
+        result.children = children;
+        return result;
+    }
+
+    public fromJson(obj) {
+
     }
 }

@@ -168,4 +168,18 @@ export class Vector3 {
     public get data() {
         return this.v;
     }
+
+    public toJson() {
+        return {
+            x: this.x,
+            y: this.y,
+            z: this.z
+        }
+    }
+
+    public fromJson(obj) {
+        this.x = obj.x;
+        this.y = obj.y;
+        this.z = obj.z;
+    }
 }

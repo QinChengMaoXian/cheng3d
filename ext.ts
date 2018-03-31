@@ -167,7 +167,7 @@ export class FullScreenTextureMaterial extends Material {
         return [
             {
                 map: this._diffuseMap,
-                type: CGE.TextureType.DIFFUSE,
+                type: CGE.GraphicsConst.diffuseMap
             },
         ];
     }

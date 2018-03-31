@@ -29,7 +29,7 @@ export const GetObjectCount = function() {
 }();
 
 export class Base {
-    private uuid: string = generateUUID();
+    private _uuid: string = generateUUID();
     protected _id:number = GetObjectCount();
     public name:string = ''
     constructor() {
@@ -40,8 +40,25 @@ export class Base {
         return this._id;
     }
 
+    public get uuid() {
+        return this._uuid;
+    }
+
     public update(delta) {
 
+    }
+
+    public toJson(obj?) {
+        const result:any = obj || {};
+        result.uuid = this._uuid;
+        result.name = this.name;
+        result.type = this.constructor.name;
+        return result;
+    }
+
+    public fromJson(obj) {
+        this._uuid = obj.uuid;
+        this.name = obj.name;
     }
 }
 

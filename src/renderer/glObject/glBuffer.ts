@@ -5,14 +5,12 @@ export class glBuffer extends glObject {
     _vbos = [];
     _ibo = undefined;
     _draw = undefined;
-    // TODO: remove this;
-    _geometry = undefined;
 
     constructor() {
         super();
     }
 
-    _createBufferFromData(gl, target, data, usage) {
+    private _createBufferFromData(gl, target, data, usage) {
         let buffer = gl.createBuffer();
         gl.bindBuffer(target, buffer);
         gl.bufferData(target, data, usage);
@@ -20,7 +18,7 @@ export class glBuffer extends glObject {
         return buffer;
     }
 
-    generateFromGeometry(gl, geometry) {
+    public generateFromGeometry(gl, geometry) {
         // TODO: make this function more simple;
         // let version = geometry.getUpdateVersion();
         let attributeDatas = geometry.getAttributeDatas();
@@ -30,8 +28,6 @@ export class glBuffer extends glObject {
         if (attributeDatas.length === 0) {
             return undefined;
         }
-
-        this._geometry = geometry;
         
         attributeDatas.forEach(function(attribute){
             let vbo = this._createBufferFromData(gl, gl.ARRAY_BUFFER, attribute.data, attribute.usage);
@@ -50,23 +46,19 @@ export class glBuffer extends glObject {
         return this;
     }
 
-    getGeometry() {
-        return this._geometry;
-    }
-
-    getVbos() {
+    public getVbos() {
         return this._vbos;
     }
 
-    getIbo() {
+    public getIbo() {
         return this._ibo;
     }
 
-    getDraw() {
+    public getDraw() {
         return this._draw;
     }
 
-    draw(gl) {
+    public draw(gl) {
         this._draw.apply(gl);
     }
 }

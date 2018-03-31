@@ -205,6 +205,8 @@ export function WebGLRenderer(): void {
         }
     };
 
+    // const 
+
     let _camera;
     let _cameraMatrices;
     let _renderList = [];
@@ -217,12 +219,12 @@ export function WebGLRenderer(): void {
         }
     };
 
+    let glmesh = new glMesh();
     const _renderMesh = (mesh, camera) => {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
         let shader = mat.getShader();
         let images = mat.getMapProvide();
-        let glmesh = new glMesh();
         return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
     }
 
@@ -254,7 +256,7 @@ export function WebGLRenderer(): void {
         clear(true, true, true);
         let v = defaultTargetState.viewport;
         gl.viewport(v.x, v.y, v.z, v.w); 
-        
+
         this._camera = camera;
         _cameraMatrices = _getCameraMatrices(camera);
         _renderList = [];

@@ -17,9 +17,9 @@ export class glProgram extends glObject {
     protected _uniformLocations = new Map();
     protected _textureLocations = [];
 
-    protected _textures = {};
-    protected _uniforms = {};
-    protected _attributes = {};
+    protected _textures = new Map();
+    protected _uniforms = new Map();
+    protected _attributes = new Map();
 
     protected _Macros = [];
 
@@ -54,15 +54,15 @@ export class glProgram extends glObject {
             if (data.type === gl.SAMPLER_2D || data.type === gl.SAMPLER_CUBE) {
                 gl.uniform1i(loc, tCount);
                 let texMap = GraphicsConst._getTextures();
-                this._textures[texMap[data.name]] = tCount++;
+                this._textures.set(texMap[data.name], tCount++);
             } else {
                 let uniMap = GraphicsConst._getUniforms();
-                this._uniforms[uniMap[data.name]] = {
+                this._uniforms.set(uniMap[data.name], {
                     location: loc,
                     type: data.type,
                     name: data.name,
                     size: data.size
-                }
+                });
             }
         }
 
@@ -70,8 +70,9 @@ export class glProgram extends glObject {
         for (let i = 0; i < aCount; i++) {
             let data = gl.getActiveAttrib(program, i);
             let loc = gl.getAttribLocation(program, data.name);
+            gl.enableVertexAttribArray(loc);
             let attribMap = GraphicsConst._getAttributes();
-            this._attributes[attribMap[data.name]] = loc;
+            this._attributes.set(attribMap[data.name], loc);
         }
     }
 
@@ -156,11 +157,8 @@ export class glProgram extends glObject {
     }
 
     setUniformData(gl, type, location, data) {
-        // TODO: 写的是个毛;
+        // TODO: 写的是个毛; 但是没办法
         switch(type) {
-            case UNSIGNED_INT:
-                gl.uniform1i(location, data[0]);
-                break;
             case FLOAT_VEC2:
                 gl.uniform2fv(location, data);
                 break;
@@ -187,8 +185,7 @@ export class glProgram extends glObject {
             return;
         }
 
-        let location = uniform.location;
-        this.setUniformData(gl, uniform.type, location, data);
+        this.setUniformData(gl, uniform.type, uniform.location, data);
     }
 
     applyMatrixData(gl, uniformType, data) {
@@ -209,15 +206,19 @@ export class glProgram extends glObject {
         return this._matrixLocations.get(matrixType);
     }
 
-    getUniformLocationMap() {
-        return this._uniformLocations;
-    }
+    // getUniformLocationMap() {
+    //     return this._uniformLocations;
+    // }
 
     getMatrixLocationMap() {
         return this._matrixLocations;
     }
 
+    public getTextureIndex(type) {
+        return this._textures.get(type);
+    }
+
     getAttribLocation(attribType) {
-        return this._attributeLocations.get(attribType);
+        return this._attributes.get(attribType);// this._attributeLocations.get(attribType);
     }
 }

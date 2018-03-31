@@ -5,11 +5,15 @@ export { Vector4 } from './math/Vector4';
 export { Quaternion } from './math/Quaternion';
 export { Matrix4 } from './math/Matrix4';
 export { Plane } from './math/Plane';
+export { Ray } from './math/Ray';
 
 export { Base } from './core/Base';
 export { Event } from './core/Event';
 
-export { Bounding } from './bounding/Bounding'
+export { Bounding } from './bounding/Bounding';
+
+export { Material } from './material/Material';
+export { DiffuseMaterial } from './material/DiffuseMaterial';
 
 export * from './graphics/GraphicsTypes';
 export * from './graphics/RendererParameter';
@@ -19,7 +23,9 @@ export { Texture2D } from './graphics/Texture2D';
 export { TextureCube } from './graphics/TextureCube';
 export { RenderTarget } from './graphics/RenderTarget';
 export { RenderTargetState } from './graphics/RenderTargetState';
+export { GraphicsConst } from './graphics/GraphicsConst';
 
+export { Object3D } from './object/Object3D'
 export { Transform } from './object/Transform';
 export { Camera } from './object/Camera';
 export { Component } from './object/Component';

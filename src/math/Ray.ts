@@ -90,4 +90,16 @@ export class Ray {
 
         this.at(QdN / DdN, target);
     }
+
+    public toJson() {
+        return {
+            origin: this._origin.toJson(),
+            dir: this._dir.toJson
+        }
+    }
+
+    public fromJson(obj:any) {
+        this._origin.fromJson(obj.origin);
+        this._dir.fromJson(obj.dir);
+    }
 }

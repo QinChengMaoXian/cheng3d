@@ -162,7 +162,7 @@ window['CGE'] = CGE;
 
 let colorTexrure = createTexture2DFromImage(test_diff, true);
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
-let colorShowingMaterial = new FullScreenTextureMaterial(colorTexrure);
+let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -181,25 +181,25 @@ let planeVertexGeometry = new CGE.Geometry();
 let attribs = [
     {
         name: 'Position',
-        attribute: CGE.AttribType.POSITION, 
+        attribute: CGE.GraphicsConst.position, 
         num: 3,
         offset: 0,
     },
     {
         name: 'UV',
-        attribute: CGE.AttribType.TEXCOORD0, 
+        attribute: CGE.GraphicsConst.texcoord, 
         num: 2,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 3,
     },
     {
         name: 'Normal',
-        attribute: CGE.AttribType.NORMAL, 
+        attribute: CGE.GraphicsConst.normal, 
         num: 3,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 5,
     },
     {
         name: 'Tangent',
-        attribute: CGE.AttribType.TANGENT, 
+        attribute: CGE.GraphicsConst.tangent, 
         num: 3,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 8,
     },
@@ -354,7 +354,6 @@ window.onmousemove = function(event) {
 }
 
 window.onmousedown = function(event) {
-    // CGE.Logger.info(event);
     mouseDown = true;
 }
 
@@ -383,7 +382,7 @@ function loop() {
             fps = document.getElementById('fps');
         }
         var f = 1000 / delta;
-        fps.innerText = 'fpx:' + f.toFixed(0);
+        fps.innerText = 'fps:' + f.toFixed(0);
     }
     render(delta);
 };

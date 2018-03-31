@@ -1,11 +1,11 @@
 export class GraphicsConst {
-    private static _textureId = 0;
+    private static _tid = 0;
     private static _textures = {}
 
-    private static _uniformId = 0;
+    private static _uid = 0;
     private static _uniforms = {}
 
-    private static _attributeId = 0;
+    private static _aid = 0;
     private static _attributes = {}
 
     private static _dbg = true;
@@ -68,20 +68,23 @@ export class GraphicsConst {
 
     private static _inTex(name: string) {
         const r = GraphicsConst;
-        const t = r._textures;
-        t[name] = r._dbg ? name : r._textureId++;
+        const value = r._dbg ? name : r._tid++;
+        r._textures[name] = value;
+        return value;
     }
 
     private static _inUni(name: string) {
         const r = GraphicsConst;
-        const u = r._uniforms;
-        u[name] = r._dbg ? name : r._uniformId++;
+        const value = r._dbg ? name : r._uid++;
+        r._uniforms[name] = value;
+        return value;
     }
 
     private static _inAtt(name: string) {
         const r = GraphicsConst;
-        const a = r._attributes;
-        a[name] = r._dbg ? name : r._attributeId++;
+        const value = r._dbg ? name : r._aid++;
+        r._attributes[name] = value;
+        return value;
     }
 
     private constructor() {}

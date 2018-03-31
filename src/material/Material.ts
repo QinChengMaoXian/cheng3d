@@ -2,7 +2,6 @@ import { Base } from '../core/Base'
 import { Shader } from '../graphics/Shader';
 
 export class Material extends Base {
-
     protected _shader:Shader = undefined;
     protected _alphaTest: boolean = false;
     protected _alphaBlend: boolean = false;
