@@ -1,9 +1,8 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
-import { Base } from '../core/Base';
 
-export class Transform extends Base {
+export class Transform {
     protected _position: Vector3;
     protected _rotate: Quaternion;
     protected _scale: Vector3;
@@ -11,7 +10,6 @@ export class Transform extends Base {
     protected _needsUpdate: boolean = true;
 
     constructor(position: Vector3 = new Vector3(), rotate: Quaternion = new Quaternion(), scale: Vector3 = new Vector3(1, 1, 1)) {
-        super();
         this._position = position;
         this._rotate = rotate;
         this._scale = scale;

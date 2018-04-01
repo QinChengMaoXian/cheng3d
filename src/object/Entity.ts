@@ -1,7 +1,7 @@
 import { Base } from '../core/Base';
 import { Component } from './Component';
 import { ComponentType } from './ObjectType';
-import { Transform } from './Transform';
+import { Transform } from '../math/Transform';
 import { Geometry } from '../graphics/Geometry';
 import { Material } from '../material/Material';
 import { Camera } from './Camera';

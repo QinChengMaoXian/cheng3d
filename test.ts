@@ -231,7 +231,7 @@ mainScene.addChild(mesh);
 let events = new Map();
 
 let camera = new CGE.Camera(window.innerWidth, window.innerHeight);
-camera.setPosition(new CGE.Vector3(-100, 100, 80));
+camera.setPositionAt(new CGE.Vector3(-100, 100, 80));
 camera.lookAt(new CGE.Vector3(0, 1, 50));
 camera.update(0);
 

@@ -3,7 +3,6 @@ import { TextureCube } from '../graphics/TextureCube'
 import { Geometry } from '../graphics/Geometry'
 
 import { Entity } from '../object/Entity'
-import { Transform } from '../object/Transform'
 import { Component } from '../object/Component'
 import { AttribType } from '../graphics/GraphicsTypes'
 import * as CGE from '../graphics/RendererParameter';

@@ -19,7 +19,6 @@ export class glBuffer extends glObject {
     }
 
     public generateFromGeometry(gl, geometry) {
-        // TODO: make this function more simple;
         // let version = geometry.getUpdateVersion();
         let attributeDatas = geometry.getAttributeDatas();
         let indexData = geometry.getIndexData();

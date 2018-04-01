@@ -17,6 +17,11 @@ export class Vector3 {
         return this;
     }
 
+    public setAt(v: Vector3): Vector3 {
+        this.v.set(v.v);
+        return this;
+    }
+
     public add(vec: Vector3): Vector3 {
         this.v[0] += vec.x;
         this.v[1] += vec.y;

@@ -3,7 +3,6 @@ import { TextureCube } from '../graphics/TextureCube'
 import { Geometry } from '../graphics/Geometry'
 
 import { Entity } from '../object/Entity.js'
-import { Transform } from '../object/Transform'
 import { Component } from '../object/Component'
 
 export class LoadObj {

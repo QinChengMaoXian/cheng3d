@@ -16,21 +16,23 @@ export class glMesh extends glObject {
     }
 
     private _checkGLObject(gl, renderer, geometry, shader, images) {
-        this._glBuffer = renderer.initGeometry(geometry);
-        if (!this._glBuffer) {
+        let glBuffer = renderer.initGeometry(geometry);
+        if (!glBuffer) {
             return undefined;
         }
-        
-        this._glProgram = renderer.initShader(shader);
-        if (!this._glProgram) {
+        this._glBuffer = glBuffer;
+
+        let glProgram = renderer.initShader(shader);
+        if (!glProgram) {
             return undefined;
         }
+        this._glProgram = glProgram;
 
         for (let i = 0; i < images.length; i++) {
             let image = images[i];
             let glTexture = renderer.initTexture(image.map);
             if (glTexture) {
-                let texIndex = this._glProgram.getTextureIndex(image.type);
+                let texIndex = glProgram.getTextureIndex(image.type);
                 glTexture.apply(gl, texIndex);
             } else {
                 return;
@@ -58,10 +60,6 @@ export class glMesh extends glObject {
         return this;
     }
 
-    private _applyTextures(gl) {
-
-    }
-
     private _applyMatrices(gl, mesh, cameraMatrices) {
         let glProgram = this._glProgram;
         let matrixLocaionMap = glProgram.getMatrixLocationMap();
@@ -70,7 +68,7 @@ export class glMesh extends glObject {
         }
         let tempMatrix = glMesh._matrix;
 
-        let worldMatrix = mesh.getMatrix()  // transform === undefined ? new Matrix4() : transform.getMatrix();
+        let worldMatrix = mesh.getMatrix();
 
         let MVMatrix = undefined;
         let getMVMatrix = function() {
@@ -88,7 +86,7 @@ export class glMesh extends glObject {
             let location = uniformObject.location;
             let type = uniformObject.type;
             let matrix = glMesh._matrix;
-            // TODO: need re-build; 也许不用了。
+            // TODO: maybe need re-build? but looks like good for used;
             switch (matrixType) {
                 case MatrixType.WMatrix:            matrix = worldMatrix; break;
                 case MatrixType.VMatrix:            matrix = cameraMatrices.viewMatirx; break;
@@ -118,48 +116,12 @@ export class glMesh extends glObject {
         });
     }
 
-    // _applyStates() {
-
-    // }
-
     private _applyMaterial(gl, entity, cameraMatrices) {
         this._glProgram.apply(gl);
         
-        // this._applyTextures(gl);
         this._applyUniforms(gl, entity);
         this._applyMatrices(gl, entity, cameraMatrices);
-
-        //TODO: apply state;
     }
-
-    // generate(gl, renderer, entity) {
-    //     let check = this.checkGLObject(renderer, entity);
-    //     if (check === undefined) {
-    //         return undefined;
-    //     }
-
-        // if (this._createVao(gl, this._glProgram) === undefined) {
-        //     return undefined;
-        // }
-
-        // let geometryVersion = entity.geometry.getUpdateVersion();
-        // let shaderVersion = entity.geometry.getUpdateVersion();
-        // this.setLocalVersion(geometryVersion);
-        // this.set2ndLocalVersion(shaderVersion);
-    //     return this;
-    // }
-
-    // checkGLObject(renderer, mesh) {
-    //     let geometry = mesh.geometry;
-    //     let material = mesh.material;
-    //     let shader = material.getShader();
-    //     let images = material.getMapProvide();
-
-    //     if (this._initGLObject(renderer, geometry, shader, images) === undefined) {
-    //         return undefined;
-    //     }
-    //     return this;
-    // }
 
     public draw(renderer, gl, mesh, shader, images, cameraMatrices) {
         let geo = mesh.getGeometry();
@@ -168,10 +130,5 @@ export class glMesh extends glObject {
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
         this._glBuffer.draw(gl);
         return true;
-        // this._applyVao(gl);
     }
-
-    // draw(gl) {
-    //     this._glBuffer.draw(gl);
-    // }
 }

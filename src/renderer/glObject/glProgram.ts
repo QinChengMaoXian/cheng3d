@@ -15,7 +15,6 @@ export class glProgram extends glObject {
     protected _attributeLocations = new Map();
     protected _matrixLocations = new Map();
     protected _uniformLocations = new Map();
-    protected _textureLocations = [];
 
     protected _textures = new Map();
     protected _uniforms = new Map();
@@ -125,17 +124,6 @@ export class glProgram extends glObject {
         }.bind(this));
     }
 
-    private _createAttributeLocationMap(gl, locationNameMap) {
-        locationNameMap.forEach(function(name, attribType){
-            let location = gl.getAttribLocation(this._program, name);
-            this._attributeLocations.set(attribType, location);
-        }.bind(this));
-    }
-
-    protected _createTextureLocations() {
-
-    }
-
     generateFromShader(gl, shader) {
         // let version = shader.getUpdateVersion();
         let program = this._createProgramFromText(gl, shader.getVertexShaderText(), shader.getFragmentShaderText());
@@ -144,9 +132,7 @@ export class glProgram extends glObject {
             return undefined;
         }
 
-        this._createAttributeLocationMap(gl, shader.getAttribNameMap());
         this._createUniformLocationMap(gl, shader.getMatrixNameMap(), this._matrixLocations);
-        this._createUniformLocationMap(gl, shader.getUniformNameMap(), this._uniformLocations);
         this._update = false;
         // this.setLocalVersion(version);
         return this;

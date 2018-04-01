@@ -1,9 +1,9 @@
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
 import { Quaternion } from '../math/Quaternion';
-import { Transform } from './Transform';
+import { Object3D } from './Object3D';
 
-export class Camera extends Transform {
+export class Camera extends Object3D {
     static get Orthographic() { return 0; }
     static get Perspective() { return 1; }
 
@@ -59,6 +59,15 @@ export class Camera extends Transform {
         }
     }
 
+    protected _makeMatrix() {
+        if (this._needsUpdate) {
+            this._updateMatrix();
+            this.makeProjectionMatrix();
+            this._needsUpdate = false;
+        }
+        return this._matrix;
+    }
+
     enableOrthographicMode(left, right, bottom, top, near, far) {
         this._projectionFunc = this._makeOrthographicMatrix;
         this.mode = Camera.Orthographic;
@@ -111,7 +120,6 @@ export class Camera extends Transform {
     }
 
     applyMatrix4(mat4) {
-        super.applyMatrix4(mat4);
         this._position.applyMatrix4(mat4);
         this.center.applyMatrix4(mat4);
         this.up.applyMatrix4(mat4);

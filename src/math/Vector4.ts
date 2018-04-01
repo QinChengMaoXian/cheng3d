@@ -13,6 +13,10 @@ export class Vector4 {
         return this;
     }
 
+    public setAt(v: Vector4) {
+        this.v.set(v.v);
+    }
+
     public normalize() {
         let x = this.v[0], y = this.v[1], z = this.v[2], w = this.v[3];
         let len = x*x + y*y + z*z + w*w;

@@ -6,6 +6,7 @@ export { Quaternion } from './math/Quaternion';
 export { Matrix4 } from './math/Matrix4';
 export { Plane } from './math/Plane';
 export { Ray } from './math/Ray';
+export { Transform } from './math/Transform';
 
 export { Base } from './core/Base';
 export { Event } from './core/Event';
@@ -26,7 +27,6 @@ export { RenderTargetState } from './graphics/RenderTargetState';
 export { GraphicsConst } from './graphics/GraphicsConst';
 
 export { Object3D } from './object/Object3D'
-export { Transform } from './object/Transform';
 export { Camera } from './object/Camera';
 export { Component } from './object/Component';
 export { Entity } from './object/Entity';
