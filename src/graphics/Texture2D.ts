@@ -3,9 +3,21 @@ import { Texture } from './Texture'
 import { Loader } from '../io/Loader'
 
 export class Texture2D extends Texture {
+    private static _White: Texture2D;
+    public static get White(): Texture2D {
+        if (!Texture2D._White) {
+            let tex = new Texture2D;
+            tex.setFormat(CGE.RGB, CGE.RGB);
+            tex.setType(CGE.UNSIGNED_SHORT_5_6_5);
+            tex.setData(1, 1, new Uint16Array([255]));
+            Texture2D._White = tex;
+        }
+        return Texture2D._White;
+    }
+
     protected _wrapS: number = CGE.CLAMP_TO_EDGE;
     protected _wrapT: number = CGE.CLAMP_TO_EDGE;
-    protected _data: Uint8Array | HTMLImageElement;
+    protected _data: Uint8Array | Float32Array | Uint16Array | HTMLImageElement;
     protected _isLoad = false;
     protected _url: string;
     protected _width = 0;
@@ -28,8 +40,18 @@ export class Texture2D extends Texture {
         this._data = img;
     }
 
+    public setData(width: number, height: number, data: Uint8Array | Float32Array | Uint16Array) {
+        this._width = width;
+        this._height = height;
+        this._data = data;
+    }
+
     getImage() {
         return this._data instanceof HTMLImageElement ? this._data : null;
+    }
+
+    getData() {
+        return this._data;
     }
 
     getWidth() {

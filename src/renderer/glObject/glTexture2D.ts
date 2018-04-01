@@ -29,7 +29,7 @@ export class glTexture2D extends glTexture {
             let image = texture.getImage();
             gl.texImage2D(target, 0, internalformat, format, type, image);
         } else if (texture.getWidth() !== 0 && texture.getHeight() !== 0) {
-            gl.texImage2D(target, 0, internalformat, texture.getWidth(), texture.getHeight(), 0, format, type, null);
+            gl.texImage2D(target, 0, internalformat, texture.getWidth(), texture.getHeight(), 0, format, type, texture.getData());
         } else {
             return undefined;
         }

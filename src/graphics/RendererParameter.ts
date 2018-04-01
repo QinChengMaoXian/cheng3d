@@ -97,6 +97,7 @@ export const DEPTH_COMPONENT                 = 0x1902;
 export const ALPHA                           = 0x1906;
 export const RGB                             = 0x1907;
 export const RGBA                            = 0x1908;
+export const RGB565                          = 0x8D62;
 export const DEPTH_STENCIL                   = 0x84F9;
 
 export const NEAREST                         = 0x2600;
