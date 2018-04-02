@@ -160,8 +160,8 @@ mainScene.addEntity(teapotEntity);
 
 window['CGE'] = CGE;
 
-let colorTexrure = CGE.Texture2D.White;//createTexture2DFromImage(test_diff, true);
-// colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
+let colorTexrure = createTexture2DFromImage(test_diff, true);
+colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
 let vertexPositionData = new Float32Array([

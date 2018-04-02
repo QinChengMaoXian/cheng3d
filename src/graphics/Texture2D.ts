@@ -9,7 +9,7 @@ export class Texture2D extends Texture {
             let tex = new Texture2D;
             tex.setFormat(CGE.RGB, CGE.RGB);
             tex.setType(CGE.UNSIGNED_SHORT_5_6_5);
-            tex.setData(1, 1, new Uint16Array([255]));
+            tex.setData(1, 1, new Uint16Array([65535]));
             Texture2D._White = tex;
         }
         return Texture2D._White;
