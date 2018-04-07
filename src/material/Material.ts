@@ -12,6 +12,7 @@ export class Material extends Base {
     public blendAlphaSrc: number;
     public blendAlphaDst: number;
     protected _maps;
+    protected _properties;
 
     constructor() {
         super();
@@ -25,7 +26,11 @@ export class Material extends Base {
         return this._shader;
     }
 
-    protected add2DMap(name:string, def: Texture2D) {
+    protected add2DMap(type:string|number, def: Texture2D) {
+
+    }
+
+    public get2DMap(type: string|number) {
 
     }
 
