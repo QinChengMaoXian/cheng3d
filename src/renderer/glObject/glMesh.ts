@@ -8,9 +8,9 @@ export class glMesh extends glObject {
     private static _mvmatrix = new Matrix4();
     private static _mvpmatrix = new Matrix4();
 
-    _uniforms = undefined;
-    _glBuffer = undefined;
-    _glProgram = undefined;
+    private _uniforms = undefined;
+    private _glBuffer = undefined;
+    private _glProgram = undefined;
     constructor() {
         super();
     }
@@ -33,7 +33,9 @@ export class glMesh extends glObject {
             let glTexture = renderer.initTexture(image.map);
             if (glTexture) {
                 let texIndex = glProgram.getTextureIndex(image.type);
-                glTexture.apply(gl, texIndex);
+                if (texIndex !== undefined) {
+                    glTexture.apply(gl, texIndex);
+                }
             } else {
                 return;
             }
@@ -60,10 +62,10 @@ export class glMesh extends glObject {
         return this;
     }
 
-    private _applyMatrices(gl, mesh, cameraMatrices) {
+    private _applyUniforms(gl, mesh, cameraMatrices) {
         let glProgram = this._glProgram;
-        let matrixLocaionMap = glProgram.getMatrixLocationMap();
-        if (matrixLocaionMap.length === 0) {
+        let uniforms = glProgram.getUniforms();
+        if (uniforms.length === 0) {
             return;
         }
         let tempMatrix = glMesh._matrix;
@@ -82,17 +84,17 @@ export class glMesh extends glObject {
             return MVPMatrix;
         };
 
-        matrixLocaionMap.forEach(function(uniformObject, matrixType) {
+        uniforms.forEach(function(uniformObject, matrixType) {
             let location = uniformObject.location;
             let type = uniformObject.type;
             let matrix = glMesh._matrix;
             // TODO: maybe need re-build? but looks like good for used;
             switch (matrixType) {
-                case MatrixType.WMatrix:            matrix = worldMatrix; break;
-                case MatrixType.VMatrix:            matrix = cameraMatrices.viewMatirx; break;
-                case MatrixType.PMatrix:            matrix = cameraMatrices.projectionMatirx; break;
+                case GraphicsConst.mMat:            matrix = worldMatrix; break;
+                case GraphicsConst.vMat:            matrix = cameraMatrices.viewMatirx; break;
+                case GraphicsConst.pMat:            matrix = cameraMatrices.projectionMatirx; break;
                 case MatrixType.MVMatrix:           matrix = getMVMatrix(); break;
-                case MatrixType.MVPMatrix:          matrix = getMVPMatrix(); break;
+                case GraphicsConst.mvpMat:          matrix = getMVPMatrix(); break;
                 case MatrixType.NormalWMatrix:      matrix = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case MatrixType.NormalMVMatrix:     matrix = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    matrix = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
@@ -105,22 +107,22 @@ export class glMesh extends glObject {
         });
     }
 
-    private _applyUniforms(gl, mesh) {
-        let material = mesh.getMaterial();
-        let properties = material.getPropertyProvide();
-        let glProgram = this._glProgram;
-        properties.forEach(function(property) {
-            let type = property.type;
-            let data = property.data;
-            glProgram.applyUniformData(gl, type, data);
-        });
-    }
+    // private _applyUniforms(gl, mesh) {
+    //     let material = mesh.getMaterial();
+    //     let properties = material.getPropertyProvide();
+    //     let glProgram = this._glProgram;
+    //     properties.forEach(function(property) {
+    //         let type = property.type;
+    //         let data = property.data;
+    //         glProgram.applyUniformData(gl, type, data);
+    //     });
+    // }
 
     private _applyMaterial(gl, entity, cameraMatrices) {
         this._glProgram.apply(gl);
         
-        this._applyUniforms(gl, entity);
-        this._applyMatrices(gl, entity, cameraMatrices);
+        // this._applyUniforms(gl, entity);
+        this._applyUniforms(gl, entity, cameraMatrices);
     }
 
     public draw(renderer, gl, mesh, shader, images, cameraMatrices) {

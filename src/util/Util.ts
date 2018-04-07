@@ -1,4 +1,4 @@
-export function buildOrderedDitheringMap(n: number = 4) {
+export function BuildOrderedDitheringData(n: number = 4): number[] {
     const l = Math.pow(2, n);
     const l2 = l * l;
     const r = new Array(l2);
@@ -21,6 +21,12 @@ export function buildOrderedDitheringMap(n: number = 4) {
             t[0] /= 4;
         }
         r[y * l + x] = i;
+    }
+    let helf = l2 / 2 - 1;
+    for (let i = 0; i < l2; i++) {
+        if (r[i] < helf) {
+            r[i]++;
+        }
     }
     return r;
 }

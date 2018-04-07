@@ -26,8 +26,17 @@ export class GraphicsConst {
     // supported texture name;
     public static readonly diffuseMap   = GraphicsConst._inTex('u_diffuseMap');
     public static readonly normalMap    = GraphicsConst._inTex('u_normalMap');
+
+    /**
+     * Ordered Dithering Map used for alpha test
+     */
+    public static readonly ODMap        = GraphicsConst._inTex('u_ODMap');
      
     // supported uniform name;
+    /**
+     * Ordered Dithering size' inverse;
+     */
+    public static readonly ODSizeInv    = GraphicsConst._inUni('u_ODSizeInv');
     public static readonly uvOffset     = GraphicsConst._inUni('u_uvOffset');
     public static readonly baseColor    = GraphicsConst._inUni('u_baseColor');
 

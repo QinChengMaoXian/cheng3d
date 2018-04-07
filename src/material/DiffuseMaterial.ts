@@ -2,6 +2,8 @@ import { Material } from './Material';
 import { Shader } from '../graphics/Shader';
 import { GraphicsConst } from '../graphics/GraphicsConst'
 import { AttribType, TextureType, MatrixType } from '../graphics/GraphicsTypes';
+import { Texture2D } from '../CGE';
+import { GraphicsObject } from '../graphics/GraphicsObject';
 
 export class DiffuseMaterial extends Material {
     protected _diffuseMap;
@@ -23,6 +25,10 @@ export class DiffuseMaterial extends Material {
                 map: this._diffuseMap,
                 type: GraphicsConst.diffuseMap
             },
+            {
+                map: Texture2D.ODTex,
+                type: GraphicsConst.ODMap
+            }
         ];
     }
 
@@ -44,11 +50,15 @@ export class DiffuseMaterial extends Material {
             precision mediump float;
             varying vec2 o_uv;
             uniform sampler2D u_diffuseMap;
+            // #define OB_MAP
+            #include[OBMapDecl]
             
             void main()
             {
-                vec4 color = texture2D(u_diffuseMap, o_uv);
-                gl_FragColor = vec4(color.xyz, 1.0);
+                vec4 baseColor = texture2D(u_diffuseMap, o_uv);
+                baseColor.a = 0.4;
+                #include[OBMap]
+                gl_FragColor = vec4(baseColor.xyz, 1.0);
             }`;
             let shader = new Shader();
             if (!shader) return;

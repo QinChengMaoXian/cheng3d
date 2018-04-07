@@ -1,18 +1,31 @@
 import * as CGE from './RendererParameter';
-import { Texture } from './Texture'
-import { Loader } from '../io/Loader'
+import { Texture } from './Texture';
+import { Loader } from '../io/Loader';
+import { BuildOrderedDitheringData } from '../util/Util';
 
 export class Texture2D extends Texture {
     private static _White: Texture2D;
     public static get White(): Texture2D {
         if (!Texture2D._White) {
-            let tex = new Texture2D;
+            let tex = new Texture2D();
             tex.setFormat(CGE.RGB, CGE.RGB);
             tex.setType(CGE.UNSIGNED_SHORT_5_6_5);
             tex.setData(1, 1, new Uint16Array([65535]));
             Texture2D._White = tex;
         }
         return Texture2D._White;
+    }
+
+    private static _ODTex: Texture2D;
+    public static get ODTex(): Texture2D {
+        if (!Texture2D._ODTex) {
+            let tex = new Texture2D();
+            tex.setFormat(CGE.ALPHA, CGE.ALPHA);
+            tex.setType(CGE.UNSIGNED_BYTE);
+            tex.setData(16, 16, new Uint8Array(BuildOrderedDitheringData(4)));
+            Texture2D._ODTex = tex;
+        }
+        return Texture2D._ODTex;
     }
 
     protected _wrapS: number = CGE.CLAMP_TO_EDGE;

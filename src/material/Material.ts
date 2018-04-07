@@ -1,5 +1,6 @@
 import { Base } from '../core/Base'
 import { Shader } from '../graphics/Shader';
+import { Texture2D } from '../graphics/Texture2D';
 
 export class Material extends Base {
     protected _shader:Shader = undefined;
@@ -10,6 +11,7 @@ export class Material extends Base {
     public blendColorDst: number;
     public blendAlphaSrc: number;
     public blendAlphaDst: number;
+    protected _maps;
 
     constructor() {
         super();
@@ -21,6 +23,10 @@ export class Material extends Base {
 
     public getShader(shader) {
         return this._shader;
+    }
+
+    protected add2DMap(name:string, def: Texture2D) {
+
     }
 
     public getMapProvide() {

@@ -207,4 +207,8 @@ export class glProgram extends glObject {
     getAttribLocation(attribType) {
         return this._attributes.get(attribType);// this._attributeLocations.get(attribType);
     }
+
+    public getUniforms() {
+        return this._uniforms;
+    }
 }
