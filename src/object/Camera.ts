@@ -4,8 +4,8 @@ import { Quaternion } from '../math/Quaternion';
 import { Object3D } from './Object3D';
 
 export class Camera extends Object3D {
-    static get Orthographic() { return 0; }
-    static get Perspective() { return 1; }
+    public static readonly Orthographic = 0;
+    public static readonly Perspective = 1;
 
     far;
     near;
@@ -143,7 +143,6 @@ export class Camera extends Object3D {
     }
 
     resize(width, height) {
-        this.setNeedUpdateMatrix();
         let xCenter = (this.right - this.left) * 0.5 + this.left;
         let yCenter = (this.bottom - this.top) * 0.5 + this.top;
         let halfWidth = width * 0.5;
@@ -153,6 +152,7 @@ export class Camera extends Object3D {
         this.top = yCenter - halfHeight;
         this.bottom = yCenter + halfHeight;
         this.aspect = width / height;
+        this.makeProjectionMatrix();
     }
 
     forwardStep(delta) {
