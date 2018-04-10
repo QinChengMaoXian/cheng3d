@@ -2,6 +2,7 @@ import { MatrixType } from '../../graphics/GraphicsTypes'
 import { Matrix4 } from '../../math/Matrix4'
 import { glObject } from './glObject'
 import { GraphicsConst } from '../../graphics/GraphicsConst';
+import { Texture } from '../../graphics/Texture';
 
 export class glMesh extends glObject {
     private static _matrix = new Matrix4();
@@ -15,7 +16,7 @@ export class glMesh extends glObject {
         super();
     }
 
-    private _checkGLObject(gl, renderer, geometry, shader, images) {
+    private _checkGLObject(gl, renderer, geometry, shader, images: Map<string|number, Texture>) {
         let glBuffer = renderer.initGeometry(geometry);
         if (!glBuffer) {
             return undefined;
@@ -28,18 +29,16 @@ export class glMesh extends glObject {
         }
         this._glProgram = glProgram;
 
-        for (let i = 0; i < images.length; i++) {
-            let image = images[i];
-            let glTexture = renderer.initTexture(image.map);
+        //TODO: 这里如何优化？
+        images.forEach((texture, type) => {
+            let glTexture = renderer.initTexture(texture);
             if (glTexture) {
-                let texIndex = glProgram.getTextureIndex(image.type);
+                let texIndex = glProgram.getTextureIndex(type);
                 if (texIndex !== undefined) {
                     glTexture.apply(gl, texIndex);
                 }
-            } else {
-                return;
             }
-        }
+        });
 
         return this;
     }

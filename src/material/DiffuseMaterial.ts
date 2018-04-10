@@ -2,34 +2,23 @@ import { Material } from './Material';
 import { Shader } from '../graphics/Shader';
 import { GraphicsConst } from '../graphics/GraphicsConst'
 import { AttribType, TextureType, MatrixType } from '../graphics/GraphicsTypes';
-import { Texture2D } from '../CGE';
+import { Texture } from '../graphics/Texture';
+import { Texture2D } from '../graphics/Texture2D';
 import { GraphicsObject } from '../graphics/GraphicsObject';
 
 export class DiffuseMaterial extends Material {
     protected _diffuseMap;
     constructor(diffuse) {
         super();
-        this._diffuseMap = diffuse;
-
         let shader = DiffuseMaterial.getShader();
         Object.defineProperty(this, "_shader", { value:shader, writable:false });
+
+        this.setTexture(GraphicsConst.diffuseMap, diffuse);
+        this.setTexture(GraphicsConst.ODMap, Texture2D.ODTex);
     }
 
-    public setDiffuseMap(map) {
-        this._diffuseMap = map;
-    }
-
-    public getMapProvide() {
-        return [
-            {
-                map: this._diffuseMap,
-                type: GraphicsConst.diffuseMap
-            },
-            {
-                map: Texture2D.ODTex,
-                type: GraphicsConst.ODMap
-            }
-        ];
+    public setDiffuseMap(texture: Texture2D) {
+        this.setTexture(GraphicsConst.diffuseMap, texture);
     }
 
     private static _nShader;

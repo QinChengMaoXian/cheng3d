@@ -17,6 +17,7 @@ import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
+import { Mesh } from '../object/Mesh';
 
 export function WebGLRenderer(): void {
     // TODO: The Function name MUST use '_' inital that all called _gl function;
@@ -220,11 +221,11 @@ export function WebGLRenderer(): void {
     };
 
     let glmesh = new glMesh();
-    const _renderMesh = (mesh, camera) => {
+    const _renderMesh = (mesh: Mesh, camera) => {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
         let shader = mat.getShader();
-        let images = mat.getMapProvide();
+        let images = mat.getTextures();
         return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
     }
 

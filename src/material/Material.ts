@@ -18,22 +18,28 @@ export class Material extends Base {
 
     constructor() {
         super();
+        this._textures = new Map();
+        this._properties = new Map();
     }
 
     public setShader(shader) {
         this._shader = shader;
     }
 
-    public getShader(shader) {
+    public getShader() {
         return this._shader;
     }
 
-    protected addTexture(type: string | number, texture: Texture = Texture2D.White) {
+    protected setTexture(type: string | number, texture: Texture = Texture2D.White) {
         this._textures.set(type, texture);
     }
 
     public getTexture(type: string | number) {
         return this._textures.get(type);
+    }
+
+    public getTextures() {
+        return this._textures;
     }
 
     public getMapProvide() {
