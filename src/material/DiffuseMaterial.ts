@@ -63,8 +63,7 @@ export class DiffuseMaterial extends Material {
             let shader = new Shader();
             if (!shader) return;
             shader.setShaderText(vertexShaderText, fragmentShaderText);
-            shader.addMatrixName(MatrixType.MVPMatrix, 'u_mvpMat');
-            DiffuseMaterial._nShader = shader
+            DiffuseMaterial._nShader = shader;
         }
         return DiffuseMaterial._nShader;
     };

@@ -64,6 +64,7 @@ export class glMesh extends glObject {
 
     private _applyUniforms(gl, mesh, cameraMatrices) {
         let glProgram = this._glProgram;
+        let material = mesh.getMaterial();
         let uniforms = glProgram.getUniforms();
         if (uniforms.length === 0) {
             return;
