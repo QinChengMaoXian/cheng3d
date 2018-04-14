@@ -1,21 +1,22 @@
 import * as CGE from './RendererParameter';
 import { Texture } from './Texture'
+import { Texture2D } from './Texture2D';
 
 export class TextureCube extends Texture {
     _wrapS = CGE.CLAMP_TO_EDGE;
     _wrapT = CGE.CLAMP_TO_EDGE;
-    _texture2ds = [undefined, undefined, undefined, undefined, undefined, undefined];
+    _texture2ds: Texture2D[] = [undefined, undefined, undefined, undefined, undefined, undefined];
 
     constructor() {
         super();
     }
 
-    setWarp(wrapS, wrapT) {
+    public setWarp(wrapS, wrapT) {
         this._wrapS = wrapS;
         this._wrapT = wrapT;
     }
 
-    setTexture2ds(positiveX, negativeX, positiveY, negativeY, positiveZ, negativeZ) {
+    public setTexture2ds(positiveX, negativeX, positiveY, negativeY, positiveZ, negativeZ) {
         this._texture2ds[0] = positiveX || this._texture2ds[0];
         this._texture2ds[1] = negativeX || this._texture2ds[1];
         this._texture2ds[2] = positiveY || this._texture2ds[2];
@@ -24,15 +25,15 @@ export class TextureCube extends Texture {
         this._texture2ds[5] = negativeZ || this._texture2ds[5];
     }
 
-    getTexture2ds(){
+    public getTexture2ds(){
         return this._texture2ds;
     }
 
-    getWrapS() {
+    public getWrapS() {
         return this._wrapS;
     }
 
-    getWrapT() {
+    public getWrapT() {
         return this._wrapT;
     }
 }

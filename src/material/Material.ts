@@ -34,12 +34,20 @@ export class Material extends Base {
         this._textures.set(type, texture);
     }
 
+    protected setProperity(type: string | number, data: any) {
+        this._properties.set(type, data);
+    }
+
     public getTexture(type: string | number) {
         return this._textures.get(type);
     }
 
     public getTextures() {
         return this._textures;
+    }
+
+    public getProperties() {
+        return this._properties;
     }
 
     public getMapProvide() {

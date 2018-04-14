@@ -31,10 +31,10 @@ export class Texture2D extends Texture {
     protected _wrapS: number = CGE.CLAMP_TO_EDGE;
     protected _wrapT: number = CGE.CLAMP_TO_EDGE;
     protected _data: Uint8Array | Float32Array | Uint16Array | HTMLImageElement;
-    protected _isLoad = false;
     protected _url: string;
     protected _width = 0;
     protected _height = 0;
+    protected _isLoad: boolean = false;
 
     constructor() {
         super();
@@ -59,40 +59,36 @@ export class Texture2D extends Texture {
         this._data = data;
     }
 
-    getImage() {
+    public getImage() {
         return this._data instanceof HTMLImageElement ? this._data : null;
     }
 
-    getData() {
+    public getData() {
         return this._data;
     }
 
-    getWidth() {
+    public getWidth() {
         return this._width;
     }
 
-    getHeight() {
+    public getHeight() {
         return this._height;
     }
 
-    setWarp(wrapS, wrapT) {
+    public setWarp(wrapS, wrapT) {
         this._wrapS = wrapS;
         this._wrapT = wrapT;
     }
 
-    getWrapS() {
+    public getWrapS() {
         return this._wrapS;
     }
 
-    getWrapT() {
+    public getWrapT() {
         return this._wrapT;
     }
 
-    isLoad() {
-        return this._isLoad;
-    }
-
-    setSize(width, height) {
+    public setSize(width, height) {
         this._width = width;
         this._height = height;
         this.needsUpdate();
@@ -100,5 +96,9 @@ export class Texture2D extends Texture {
 
     public getUrl(): string {
         return this._url;
+    }
+
+    public isLoad() {
+        return this._isLoad;
     }
 }

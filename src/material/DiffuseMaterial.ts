@@ -5,9 +5,12 @@ import { AttribType, TextureType, MatrixType } from '../graphics/GraphicsTypes';
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { GraphicsObject } from '../graphics/GraphicsObject';
+import { Vector3 } from '../math/Vector3';
+import { Vector4 } from '../math/Vector4';
 
 export class DiffuseMaterial extends Material {
     protected _diffuseMap;
+    protected _baseColor: Vector4 = new Vector4();
     constructor(diffuse) {
         super();
         let shader = DiffuseMaterial.getShader();
@@ -15,10 +18,17 @@ export class DiffuseMaterial extends Material {
 
         this.setTexture(GraphicsConst.diffuseMap, diffuse);
         this.setTexture(GraphicsConst.ODMap, Texture2D.ODTex);
+
+        this.setProperity(GraphicsConst.baseColor, this._baseColor);
+        this._baseColor.set(1.0, 1.0, 1.0, 1.0);
     }
 
     public setDiffuseMap(texture: Texture2D) {
         this.setTexture(GraphicsConst.diffuseMap, texture);
+    }
+
+    public setBaseColor(r: number, g: number, b: number, a: number) {
+        this._baseColor.set(r,g,b,a);
     }
 
     private static _nShader;
@@ -28,24 +38,25 @@ export class DiffuseMaterial extends Material {
             attribute vec4 a_position;
             attribute vec2 a_texcoord;
             varying vec2 o_uv;
-            uniform mat4 u_mvpMat;
+            uniform mat4 u_mMat;
+            uniform mat4 u_vpMat;
             void main()
             {
                 o_uv = a_texcoord; // vec2(a_texcoord.x, 1.0 - a_texcoord.y);
-                gl_Position = u_mvpMat * a_position;
+                gl_Position = u_vpMat * u_mMat * a_position;
             }`;
 
             let fragmentShaderText = `#version 100
             precision mediump float;
             varying vec2 o_uv;
             uniform sampler2D u_diffuseMap;
+            uniform vec4 u_baseColor;
             // #define OB_MAP
             #include[OBMapDecl]
             
             void main()
             {
-                vec4 baseColor = texture2D(u_diffuseMap, o_uv);
-                baseColor.a = 0.4;
+                vec4 baseColor = texture2D(u_diffuseMap, o_uv) * u_baseColor;
                 #include[OBMap]
                 gl_FragColor = vec4(baseColor.xyz, 1.0);
             }`;

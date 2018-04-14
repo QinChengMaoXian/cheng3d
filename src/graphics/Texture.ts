@@ -9,50 +9,55 @@ export class Texture extends GraphicsObject {
     protected _type: number = CGE.UNSIGNED_BYTE;
     protected _mipmap: boolean = false;
     protected _needMipmap: boolean = false;
+    
 
     constructor() {
         super();
     }
 
-    setFilter(min, mag) {
+    public setFilter(min, mag) {
         this._minFilter = min || CGE.LINEAR;
         this._magFilter = mag || CGE.LINEAR;
     }
 
-    getMinFilter() {
+    public getMinFilter() {
         return this._minFilter;
     }
 
-    getMagFilter() {
+    public getMagFilter() {
         return this._magFilter;
     }
 
-    setFormat(src, internal) {
+    public setFormat(src, internal) {
         this._format = src || CGE.RGB;
         this._internalformat = internal || src || CGE.RGB;
     }
 
-    getFormat() {
+    public getFormat() {
         return this._format;
     }
 
-    getInternalformat() {
+    public getInternalformat() {
         return this._internalformat;
     }
 
-    setType(type) {
+    public setType(type) {
         this._type = type;
     }
 
-    getType() {
+    public getType() {
         return this._type;
     }
 
-    setMipmap(value:boolean) {
+    public setMipmap(value:boolean) {
         this._needMipmap = value;
     }
 
-    getMipmap() {
+    public getMipmap() {
         return this._needMipmap;
+    }
+
+    public isLoad() {
+        return false;
     }
 }

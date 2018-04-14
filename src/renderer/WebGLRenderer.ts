@@ -194,7 +194,7 @@ export function WebGLRenderer(): void {
         if (gltexture !== undefined && !gltexture.getUpdate()) {
             return gltexture;
         }
-            
+        
         if (texture instanceof Texture2D) {
             gltexture = new glTexture2D(_gl);
             if (gltexture.generateFromTexture(_gl, texture)) {
