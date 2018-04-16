@@ -174,6 +174,18 @@ export class Vector3 {
         return this.v;
     }
 
+    public min(vec: Vector3) {
+        this.v[0] = Math.min(this.v[0], vec.v[0]);
+        this.v[1] = Math.min(this.v[1], vec.v[1]);
+        this.v[2] = Math.min(this.v[2], vec.v[2]);
+    }
+
+    public max(vec: Vector3) {
+        this.v[0] = Math.max(this.v[0], vec.v[0]);
+        this.v[1] = Math.max(this.v[1], vec.v[1]);
+        this.v[2] = Math.max(this.v[2], vec.v[2]);
+    }
+
     public toJson() {
         return {
             x: this.x,
