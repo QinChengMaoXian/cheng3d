@@ -5,12 +5,6 @@ import { OBB } from './OBB';
 import { AABB } from './AABB';
 import { Sphere } from './Sphere';
 
-export interface IBounding {
-    getType();
-
-    intersect(bounding: Bounding);
-}
-
 export class Bounding {
     static TYPE_SPHERE = 0;
     static TYPE_AABB = 1;
