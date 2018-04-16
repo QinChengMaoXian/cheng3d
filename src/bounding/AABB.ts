@@ -1,5 +1,6 @@
 import { Bounding } from './Bounding';
-import { OBB } from './OBB'
+import { OBB } from './OBB';
+import { Sphere } from './Sphere';
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
 
@@ -13,6 +14,20 @@ export class AABB extends Bounding {
 
     public makeFrom(src: AABB, mat: Matrix4) {
         
+    }
+
+    public intersect(bounding: Bounding) {
+        const type = bounding.getType();
+        switch(type) {
+            case Bounding.TYPE_SPHERE:
+                return Bounding.intersectSphereToAABB(<Sphere>bounding, this);
+            case Bounding.TYPE_AABB:
+                return Bounding.intersectAABB(<AABB>bounding, this);
+            case Bounding.TYPE_OBB:
+                return Bounding.intersectOBBToAABB(<OBB>bounding, this);
+            default:
+                return false;
+        }
     }
 
     public setMin(x: number, y: number, z: number) {
@@ -37,5 +52,9 @@ export class AABB extends Bounding {
 
     public getMax() {
         return this._max;
+    }
+
+    public getType() {
+        return Bounding.TYPE_AABB;
     }
 }

@@ -1,5 +1,6 @@
 import { Bounding } from './Bounding';
-import { AABB } from './AABB'
+import { AABB } from './AABB';
+import { Sphere } from './Sphere';
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4'
@@ -15,6 +16,20 @@ export class OBB extends Bounding {
 
     public setFrom(obb: OBB, mat: Matrix4) {
 
+    }
+
+    public intersect(bounding: Bounding) {
+        const type = bounding.getType();
+        switch(type) {
+            case Bounding.TYPE_SPHERE:
+                return Bounding.intersectSphereToOBB(<Sphere>bounding, this);
+            case Bounding.TYPE_AABB:
+                return Bounding.intersectOBBToAABB(this, <AABB>bounding);
+            case Bounding.TYPE_OBB:
+                return Bounding.intersectOBB(<OBB>bounding, this);
+            default:
+                return false;
+        }
     }
 
     public setPosition(x: number, y: number, z: number) {
@@ -51,5 +66,9 @@ export class OBB extends Bounding {
 
     public getRoatation() {
         return this._rotation;
+    }
+
+    public getType() {
+        return Bounding.TYPE_OBB;
     }
 }

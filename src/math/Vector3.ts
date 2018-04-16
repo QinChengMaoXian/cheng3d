@@ -85,7 +85,11 @@ export class Vector3 {
     }
 
     public length(): number {
-        return Math.sqrt(this.v[0] * this.v[0] + this.v[1] * this.v[1] + this.v[2] * this.v[2]); 
+        return Math.sqrt(this.lengthSquare()); 
+    }
+
+    public lengthSquare(): number {
+        return this.v[0] * this.v[0] + this.v[1] * this.v[1] + this.v[2] * this.v[2];
     }
 
     public normalize(): Vector3 {
@@ -105,7 +109,7 @@ export class Vector3 {
         let ny = m[1] * x + m[5] * y + m[9] * z + m[13];
         let nz = m[2] * x + m[6] * y + m[10] * z + m[14];
         let nw = m[3] * x + m[7] * y + m[11] * z + m[15];
-        nw = 1.0 / nw;
+        nw = nw === 1.0 ? 1.0 : 1.0 / nw;
         this.v[0] = nx * nw;
         this.v[1] = ny * nw;
         this.v[2] = nz * nw;
