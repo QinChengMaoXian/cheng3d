@@ -1,6 +1,7 @@
-import * as CGE from './RendererParameter'
-import { GraphicsObject } from './GraphicsObject'
-import { Buffer } from './Buffer'
+import * as CGE from './RendererParameter';
+import { GraphicsObject } from './GraphicsObject';
+import { GraphicsConst } from './GraphicsConst';
+import { Attribute, Buffer } from './Buffer';
 import { Bounding } from '../bounding/Bounding';
 
 export class Geometry extends GraphicsObject {
@@ -10,23 +11,24 @@ export class Geometry extends GraphicsObject {
     protected _display: boolean = true;
     protected _bounding: Bounding;
     protected _buffers: Buffer[] = []; 
+    protected _position: Attribute;
 
     constructor() {
         super();
     }
-    
-    public createAttributeParam() {
-        return {
-            data: undefined,
-            size: 0,
-            type: undefined,
-            stride: 0,
-            attribPointers: [],
-            usage: undefined,
-        };
-    }
 
     public addSingleAttribute(name, attribute, num, type, data, usage?) {
+        let buffer = new Buffer();
+        let attrib = new Attribute(attribute, num, 0, type);
+        buffer.addAttribute(attrib);
+        buffer.setData(data);
+        this._buffers.push(buffer);
+
+        if (attribute === GraphicsConst.position) {
+            this._position = attrib;
+            this._position.data = data;
+        }
+
         let attributeData = {
             data: data,
             size: 1,
@@ -45,6 +47,11 @@ export class Geometry extends GraphicsObject {
     }
 
     public addMultiAttribute(attributeParameters, type, stride, data, usage = CGE.STATIC_DRAW) {
+        let buffer = new Buffer();
+        
+        buffer.setData(data);
+        this._buffers.push(buffer);
+
         let attributeData = {
             usage: usage,
             data: data,
@@ -54,6 +61,17 @@ export class Geometry extends GraphicsObject {
             attribPointers: [],
         };
         attributeParameters.forEach(function(param) {
+            let attrib = new Attribute(param.attribute, param.num, param.offset, param.type);
+            buffer.addAttribute(attrib);
+
+            if (param.attribute === GraphicsConst.position) {
+                if (this._position) {
+                    delete this._position.data;
+                }
+                this._position = attrib;
+                this._position.data = data;
+            }
+
             attributeData.attribPointers.push({
                 name: param.name,
                 attribute: param.attribute,
@@ -86,6 +104,10 @@ export class Geometry extends GraphicsObject {
             count: count || 0,
             offset: offset || 0,
         };
+    }
+
+    public getBuffers() {
+        return this._buffers;
     }
 
     public getDrawParameter() {

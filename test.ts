@@ -9,14 +9,14 @@ let test_diff = './resources/spnza_bricks_a_diff.jpg';
 let man_diff = './resources/VWS_B_Male2-2.jpg';
 let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
 
-import { 
-    teapotPositions,
-    teapotTexCoords,
-    teapotNormals,
-    teapotBinormals,
-    teapotTangents,
-    teapotIndices,
-} from './teapot';
+// import { 
+//     teapotPositions,
+//     teapotTexCoords,
+//     teapotNormals,
+//     teapotBinormals,
+//     teapotTangents,
+//     teapotIndices,
+// } from './teapot';
 
 let mainScene = new CGE.Scene();
 /*
