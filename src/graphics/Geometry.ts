@@ -5,7 +5,6 @@ import { Attribute, Buffer } from './Buffer';
 import { Bounding } from '../bounding/Bounding';
 
 export class Geometry extends GraphicsObject {
-    protected _attributeDatas = [];
     protected _indexData = undefined;
     protected _drawParameter = undefined;
     protected _display: boolean = true;
@@ -28,22 +27,6 @@ export class Geometry extends GraphicsObject {
             this._position = attrib;
             this._position.data = data;
         }
-
-        let attributeData = {
-            data: data,
-            size: 1,
-            type: type,
-            stride: 0,
-            attribPointers: [],
-            usage: usage || CGE.STATIC_DRAW,
-        };
-        attributeData.attribPointers.push({
-            name: name,
-            attribute: attribute,
-            num: num,
-            offset: 0,
-        });
-        this._attributeDatas.push(attributeData);
     }
 
     public addMultiAttribute(attributeParameters, type, stride, data, usage = CGE.STATIC_DRAW) {
@@ -51,39 +34,12 @@ export class Geometry extends GraphicsObject {
         
         buffer.setData(data);
         this._buffers.push(buffer);
+        buffer.setParameter(stride, usage, type);
 
-        let attributeData = {
-            usage: usage,
-            data: data,
-            size: attributeParameters.length,
-            type: type,
-            stride: stride,
-            attribPointers: [],
-        };
-        attributeParameters.forEach(function(param) {
+        attributeParameters.forEach(param => {
             let attrib = new Attribute(param.attribute, param.num, param.offset, param.type);
             buffer.addAttribute(attrib);
-
-            if (param.attribute === GraphicsConst.position) {
-                if (this._position) {
-                    delete this._position.data;
-                }
-                this._position = attrib;
-                this._position.data = data;
-            }
-
-            attributeData.attribPointers.push({
-                name: param.name,
-                attribute: param.attribute,
-                num: param.num,
-                offset: param.offset,
-            });
         });
-        this._attributeDatas.push(attributeData);
-    }
-
-    public getAttributeDatas() {
-        return this._attributeDatas;
     }
 
     public setIndexData(data, type?, usage?) {

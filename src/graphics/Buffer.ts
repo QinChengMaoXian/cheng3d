@@ -24,10 +24,18 @@ export class Buffer extends GraphicsObject  {
 
     protected _data: Float32Array | Uint32Array | Int32Array | Uint16Array | Int16Array | Uint8Array | Int8Array;
     protected _type: number = CGE.FLOAT;
-    protected _attributes: Attribute[];
+    protected _attributes: Attribute[] = [];
+    protected _stride: number;
+    protected _usage: number;
     
     constructor() {
         super();
+    }
+
+    public setParameter(stride: number, usage: number, type: number) {
+        this._stride = stride;
+        this._usage = usage;
+        this._type = type;
     }
 
     public setData(data: number[] | Float32Array | Uint32Array | Int32Array | Uint16Array | Int16Array | Uint8Array | Int8Array, type: number = CGE.FLOAT) {
@@ -75,5 +83,17 @@ export class Buffer extends GraphicsObject  {
             }
         }
         return null;
+    }
+
+    public getAttributes() {
+        return this._attributes;
+    }
+
+    public getStride() {
+        return this._stride;
+    }
+
+    public getUsage() {
+        return this._usage;
     }
 }

@@ -5,7 +5,10 @@ import { Matrix4 } from '../../math/Matrix4';
 import { glObject } from './glObject';
 import { GraphicsConst } from '../../graphics/GraphicsConst';
 import { Texture } from '../../graphics/Texture';
+import { Geometry } from '../../graphics/Geometry';
 import { Mesh } from '../../object/Mesh';
+import { glProgram } from './glProgram';
+
 
 
 export class glMesh extends glObject {
@@ -21,7 +24,7 @@ export class glMesh extends glObject {
         super();
     }
 
-    private _checkGLObject(gl, renderer, geometry, shader, images: Map<string|number, Texture>) {
+    private _checkGLObject(gl: WebGLRenderingContext, renderer, geometry, shader, images: Map<string|number, Texture>) {
         let glBuffer = renderer.initGeometry(geometry);
         if (!glBuffer) {
             return undefined;
@@ -48,21 +51,26 @@ export class glMesh extends glObject {
         return this;
     }
 
-    private _bindVbo(gl, glProgram, geometry) {
+    private _bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
         let glBuffer = this._glBuffer;
         let vbos = glBuffer.getVbos();
-        let attributeDatas = geometry.getAttributeDatas();
-        for (let i = 0; i < vbos.length; i++) {
-            let attribute = attributeDatas[i];
-            let vbo = vbos[i];
-            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-            attribute.attribPointers.forEach(function(param){
-                let location = glProgram.getAttribLocation(param.attribute);
-                if (location === undefined || location === -1) 
-                    return; 
-                gl.vertexAttribPointer(location, param.num, attribute.type, false, attribute.stride, param.offset);
-            }.bind(this));
+        let buffers = geometry.getBuffers();
+
+        let length = buffers.length;
+        for (let i = 0; i < length; i++) {
+            let buffer = buffers[i];
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbos[i]);
+            let attributes = buffer.getAttributes();
+            attributes.forEach( attribute => {
+                let location = glProgram.getAttribLocation(attribute.attribType);
+                if (location === undefined || location === -1) {
+                    return;
+                }
+                gl.vertexAttribPointer(location, attribute.num, buffer.getType(), false, buffer.getStride(), attribute.offset);
+            
+            })
         }
+
         return this;
     }
 
@@ -122,14 +130,14 @@ export class glMesh extends glObject {
         });
     }
 
-    private _applyMaterial(gl, entity, cameraMatrices) {
+    private _applyMaterial(gl: WebGLRenderingContext, entity, cameraMatrices) {
         this._glProgram.apply(gl);
         
         // this._applyUniforms(gl, entity);
         this._applyUniforms(gl, entity, cameraMatrices);
     }
 
-    public draw(renderer, gl, mesh, shader, images, cameraMatrices) {
+    public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, cameraMatrices) {
         let geo = mesh.getGeometry();
         if (!this._checkGLObject(gl, renderer, mesh.getGeometry(), shader, images)) return false;
         this._applyMaterial(gl, mesh, cameraMatrices);

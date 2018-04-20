@@ -1,5 +1,6 @@
-import { glObject } from './glObject'
-import { glDraw, glDrawWithIndex } from './glDraw'
+import { glObject } from './glObject';
+import { glDraw, glDrawWithIndex } from './glDraw';
+import { Geometry } from '../../graphics/Geometry';
 
 export class glBuffer extends glObject {
     _vbos = [];
@@ -18,22 +19,22 @@ export class glBuffer extends glObject {
         return buffer;
     }
 
-    public generateFromGeometry(gl, geometry) {
+    public generateFromGeometry(gl: WebGLRenderingContext, geometry: Geometry) {
         // let version = geometry.getUpdateVersion();
-        let attributeDatas = geometry.getAttributeDatas();
+        let buffers = geometry.getBuffers();
         let indexData = geometry.getIndexData();
         let drawParameter = geometry.getDrawParameter();
 
-        if (attributeDatas.length === 0) {
+        if (buffers.length === 0) {
             return undefined;
         }
         
-        attributeDatas.forEach(function(attribute){
-            let vbo = this._createBufferFromData(gl, gl.ARRAY_BUFFER, attribute.data, attribute.usage);
+        buffers.forEach( buffer => {
+            let vbo = this._createBufferFromData(gl, gl.ARRAY_BUFFER, buffer.getData(), buffer.getUsage());
             this._vbos.push(vbo);
-        }.bind(this));
+        });
 
-        if (geometry._indexData) {
+        if (geometry.getIndexData()) {
             this._ibo = this._createBufferFromData(gl, gl.ELEMENT_ARRAY_BUFFER, indexData.data, indexData.usage);
             this._draw = new glDrawWithIndex(drawParameter.mode, drawParameter.offset, drawParameter.count, indexData.type, this._ibo);
         } else {
