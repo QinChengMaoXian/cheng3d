@@ -30,3 +30,5 @@ export function BuildOrderedDitheringData(n: number = 4): number[] {
     }
     return r;
 }
+
+

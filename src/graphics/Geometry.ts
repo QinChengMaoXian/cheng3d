@@ -3,14 +3,18 @@ import { GraphicsObject } from './GraphicsObject';
 import { GraphicsConst } from './GraphicsConst';
 import { Attribute, Buffer } from './Buffer';
 import { Bounding } from '../bounding/Bounding';
+import { AABB } from '../bounding/AABB'
+import { Vector3 } from '../math/Vector3';
 
 export class Geometry extends GraphicsObject {
     protected _drawParameter = undefined;
     protected _display: boolean = true;
     protected _bounding: Bounding;
     protected _buffers: Buffer[] = []; 
-    protected _position: Attribute;
     protected _indexBuffer: Buffer;
+
+    protected _posAttrib: Attribute;
+    protected _posBuffer: Buffer;
 
     constructor() {
         super();
@@ -25,8 +29,8 @@ export class Geometry extends GraphicsObject {
         this._buffers.push(buffer);
 
         if (attribute === GraphicsConst.position) {
-            this._position = attrib;
-            this._position.data = data;
+            this._posAttrib = attrib;
+            this._posBuffer = buffer;
         }
     }
 
@@ -62,6 +66,14 @@ export class Geometry extends GraphicsObject {
         };
     }
 
+    public getPosAttrib() {
+        return this._posAttrib;
+    }
+
+    public getPosBuffer() {
+        return this._posBuffer;
+    }
+
     public getBuffers() {
         return this._buffers;
     }
@@ -70,7 +82,55 @@ export class Geometry extends GraphicsObject {
         return this._drawParameter;
     }
 
-    public buildBounding() {
+    public getBounding() {
+        if (!this._bounding) {
+            this.buildBounding();
+        }
+        return this._bounding;
+    }
 
+    public buildBounding() {
+        if (!this._posAttrib || !this._posBuffer) {
+            return;
+        }
+
+        const buffer = this._posBuffer;
+        const posAtt = this._posAttrib;
+        const posData = buffer.getData();
+        const stride = buffer.getStride() === 0 ? posAtt.num : buffer.getStride();
+        const offset = posAtt.offset;
+        const num = posAtt.num;
+
+        let min: Vector3 = new Vector3();
+        let max: Vector3 = new Vector3();
+        min.set(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+        max.set(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE)
+
+        let temp: Vector3 = new Vector3();
+
+        if (this._indexBuffer) {
+            const idxData = this._indexBuffer.getData();
+            const l = idxData.length;
+            let index;
+            for (let i = 0; i < l; i++) {
+                index = idxData[i] * stride + offset;
+                temp.set(posData[index], posData[index + 1], num === 2 ? 0 : posData[index + 2]);
+                min.min(temp);
+                max.max(temp);
+            }
+        } else {
+            const l = posData.length;
+            for (let i = 0; i < l; i += 3) {
+                temp.set(posData[i], posData[i+1], posData[i+2]);
+                min.min(temp);
+                max.max(temp);
+            }
+        }
+
+        let aabb = new AABB()
+        aabb.setMinAt(min);
+        aabb.setMaxAt(max);
+
+        this._bounding = aabb;
     }
 }

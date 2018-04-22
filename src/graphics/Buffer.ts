@@ -6,8 +6,7 @@ export class Attribute {
         public attribType: number,
         public num: number,
         public offset: number,
-        public type: number,
-        public data?: any) {
+        public type: number) {
     }
 }
 
