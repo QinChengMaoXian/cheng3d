@@ -5,22 +5,23 @@ import { Attribute, Buffer } from './Buffer';
 import { Bounding } from '../bounding/Bounding';
 
 export class Geometry extends GraphicsObject {
-    protected _indexData = undefined;
     protected _drawParameter = undefined;
     protected _display: boolean = true;
     protected _bounding: Bounding;
     protected _buffers: Buffer[] = []; 
     protected _position: Attribute;
+    protected _indexBuffer: Buffer;
 
     constructor() {
         super();
     }
 
-    public addSingleAttribute(name, attribute, num, type, data, usage?) {
+    public addSingleAttribute(name, attribute, num, type, data, usage = CGE.STATIC_DRAW) {
         let buffer = new Buffer();
         let attrib = new Attribute(attribute, num, 0, type);
         buffer.addAttribute(attrib);
         buffer.setData(data);
+        buffer.setParameter(0, usage, type);
         this._buffers.push(buffer);
 
         if (attribute === GraphicsConst.position) {
@@ -42,16 +43,15 @@ export class Geometry extends GraphicsObject {
         });
     }
 
-    public setIndexData(data, type?, usage?) {
-        this._indexData = {
-            data: data,
-            type: type || CGE.UNSIGNED_SHORT,
-            usage: usage || CGE.STATIC_DRAW,
-        };
+    public setIndexData(data, type: number = CGE.UNSIGNED_SHORT, usage: number = CGE.STATIC_DRAW) {
+        let buffer = new Buffer();
+        buffer.setData(data);
+        buffer.setParameter(0, usage, type);
+        this._indexBuffer = buffer;
     }
 
-    public getIndexData() {
-        return this._indexData;
+    public getIndexBuffer() {
+        return this._indexBuffer;
     }
 
     public setDrawParameter(count, mode?, offset?) {

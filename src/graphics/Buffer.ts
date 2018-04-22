@@ -25,7 +25,7 @@ export class Buffer extends GraphicsObject  {
     protected _data: Float32Array | Uint32Array | Int32Array | Uint16Array | Int16Array | Uint8Array | Int8Array;
     protected _type: number = CGE.FLOAT;
     protected _attributes: Attribute[] = [];
-    protected _stride: number;
+    protected _stride: number = 0;
     protected _usage: number;
     
     constructor() {

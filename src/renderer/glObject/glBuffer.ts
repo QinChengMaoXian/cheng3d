@@ -22,7 +22,7 @@ export class glBuffer extends glObject {
     public generateFromGeometry(gl: WebGLRenderingContext, geometry: Geometry) {
         // let version = geometry.getUpdateVersion();
         let buffers = geometry.getBuffers();
-        let indexData = geometry.getIndexData();
+        let indexBuffer = geometry.getIndexBuffer();
         let drawParameter = geometry.getDrawParameter();
 
         if (buffers.length === 0) {
@@ -34,9 +34,9 @@ export class glBuffer extends glObject {
             this._vbos.push(vbo);
         });
 
-        if (geometry.getIndexData()) {
-            this._ibo = this._createBufferFromData(gl, gl.ELEMENT_ARRAY_BUFFER, indexData.data, indexData.usage);
-            this._draw = new glDrawWithIndex(drawParameter.mode, drawParameter.offset, drawParameter.count, indexData.type, this._ibo);
+        if (geometry.getIndexBuffer()) {
+            this._ibo = this._createBufferFromData(gl, gl.ELEMENT_ARRAY_BUFFER, indexBuffer.getData(), indexBuffer.getUsage());
+            this._draw = new glDrawWithIndex(drawParameter.mode, drawParameter.offset, drawParameter.count, indexBuffer.getType(), this._ibo);
         } else {
             this._draw = new glDraw(drawParameter.mode, drawParameter.offset, drawParameter.count, 0);
         }
@@ -44,6 +44,12 @@ export class glBuffer extends glObject {
         // this.setLocalVersion(version);
         this._update = false;
         return this;
+    }
+
+    public bindIbo(gl: WebGLRenderingContext) {
+        if (this._ibo) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+        }
     }
 
     public getVbos() {

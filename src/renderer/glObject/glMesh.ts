@@ -8,6 +8,7 @@ import { Texture } from '../../graphics/Texture';
 import { Geometry } from '../../graphics/Geometry';
 import { Mesh } from '../../object/Mesh';
 import { glProgram } from './glProgram';
+import { glBuffer } from './glBuffer';
 
 
 
@@ -18,8 +19,8 @@ export class glMesh extends glObject {
     private static _mvpmatrix = new Matrix4();
 
     private _uniforms = undefined;
-    private _glBuffer = undefined;
-    private _glProgram = undefined;
+    private _glBuffer: glBuffer = undefined;
+    private _glProgram: glProgram = undefined;
     constructor() {
         super();
     }
@@ -52,9 +53,10 @@ export class glMesh extends glObject {
     }
 
     private _bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
-        let glBuffer = this._glBuffer;
+        let glBuffer: glBuffer = this._glBuffer;
         let vbos = glBuffer.getVbos();
         let buffers = geometry.getBuffers();
+        let indexBuffer = geometry.getIndexBuffer();
 
         let length = buffers.length;
         for (let i = 0; i < length; i++) {
@@ -67,19 +69,21 @@ export class glMesh extends glObject {
                     return;
                 }
                 gl.vertexAttribPointer(location, attribute.num, buffer.getType(), false, buffer.getStride(), attribute.offset);
-            
             })
         }
+
+        glBuffer.bindIbo(gl);
 
         return this;
     }
 
-    private _applyUniforms(gl, mesh: Mesh, cameraMatrices) {
+    private _applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, cameraMatrices) {
         let glProgram = this._glProgram;
         let material = mesh.getMaterial();
         let properties = material.getProperties();
         let uniforms = glProgram.getUniforms();
-        if (uniforms.length === 0) {
+        
+        if (uniforms.size === 0) {
             return;
         }
         let tempMatrix = glMesh._matrix;

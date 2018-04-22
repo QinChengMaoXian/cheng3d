@@ -164,6 +164,38 @@ let colorTexrure = createTexture2DFromImage(test_diff, true);
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
+let gltfJson = undefined;
+let gltfCallback = (event, object) => {
+    switch (event) {
+        case 'entity':
+            gltfJson = object[0];
+            CGE.Logger.info(gltfJson);
+            let loadShowingTransform = new CGE.Transform(new CGE.Vector3(20.0, 20.0, -0.1), undefined, new CGE.Vector3(50, 50, 50));
+            let gltfTexture = createTexture2DFromImage(gltf_diff, true);
+            let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
+            let mesh = new CGE.Mesh();
+            mesh.setScale(20, 20, 20);
+            mesh.setGeometry(gltfJson);
+            mesh.setMaterial(gltfMaterial);
+            // let loadShowingEntity = CGE.Entity.createRenderableEntity(gltfJson, colorShowingMaterial, loadShowingTransform);
+            mainScene.addChild(mesh);   
+            break;
+
+        case 'error':
+            CGE.Logger.error(object);
+            break;
+    
+        default:
+            break;
+    }
+}
+
+
+
+
+let gltfTest = new CGE.GltfLoader();
+gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
+
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
     1.0,  1.0, 0.0,  5.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -222,7 +254,7 @@ document.body.appendChild(renderer.getCanvas());
 window['scene'] = mainScene;
 
 let mesh = new CGE.Mesh();
-mesh.setScale(new CGE.Vector3(100, 100, 100));
+mesh.setScale(100, 100, 100);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(colorShowingMaterial);
 
@@ -231,9 +263,11 @@ mainScene.addChild(mesh);
 let events = new Map();
 
 let camera = new CGE.Camera(window.innerWidth, window.innerHeight);
-camera.setPositionAt(new CGE.Vector3(-100, 100, 80));
-camera.lookAt(new CGE.Vector3(0, 1, 50));
+camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
+camera.lookAt(new CGE.Vector3(0, 1, 10));
 camera.update(0);
+
+window['camera'] = camera;
 
 let render = function(delta) {
     // renderTargetScene.update();

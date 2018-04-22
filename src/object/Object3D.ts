@@ -63,8 +63,13 @@ export class Object3D extends Base {
         return this._position;
     }
 
-    public setRotate(rotate: Quaternion) {
-        this._rotate.set(rotate.x, rotate.y, rotate.z, rotate.w);
+    public setRotateAt(rotate: Quaternion) {
+        this._rotate.setAt(rotate);
+        this.setNeedUpdateMatrix();
+    }
+
+    public setRotate(x: number, y: number, z: number, w: number) {
+        this._rotate.set(x, y, z, w);
         this.setNeedUpdateMatrix();
     }
 
@@ -72,8 +77,13 @@ export class Object3D extends Base {
         return this._rotate;
     }
 
-    public setScale(scale: Vector3) {
+    public setScaleAt(scale: Vector3) {
         this._scale.set(scale.x, scale.y, scale.z);
+        this.setNeedUpdateMatrix();
+    }
+
+    public setScale(x: number, y: number, z: number) {
+        this._scale.set(x, y, z);
         this.setNeedUpdateMatrix();
     }
 
@@ -89,7 +99,7 @@ export class Object3D extends Base {
         if (this._needsUpdate) {
             this._matrix.compose(this._position, this._rotate, this._scale);
             if (this._parent) {
-                this._matrix.premultiply(this._matrix);
+                this._matrix.premultiply(this._parent._matrix);
             }
             this._needsUpdate = false;
         }
