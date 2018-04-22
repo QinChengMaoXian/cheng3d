@@ -61,12 +61,17 @@ export class glMesh extends glObject {
         let length = buffers.length;
         for (let i = 0; i < length; i++) {
             let buffer = buffers[i];
-            gl.bindBuffer(gl.ARRAY_BUFFER, vbos[i]);
+            let binded = false
             let attributes = buffer.getAttributes();
             attributes.forEach( attribute => {
                 let location = glProgram.getAttribLocation(attribute.attribType);
                 if (location === undefined || location === -1) {
                     return;
+                } else {
+                    if (!binded) {
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbos[i]);
+                        binded = true;
+                    }
                 }
                 gl.vertexAttribPointer(location, attribute.num, buffer.getType(), false, buffer.getStride(), attribute.offset);
             })

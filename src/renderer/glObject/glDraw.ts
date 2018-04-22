@@ -13,7 +13,7 @@ export class glDrawWithIndex extends glDraw {
     }
 
     apply(gl) {
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo);
         gl.drawElements(this._mode, this._count, this._type, this._offset);
     }
 }

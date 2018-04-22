@@ -12,9 +12,6 @@ import { GraphicsConst } from '../../graphics/GraphicsConst';
 
 export class glProgram extends glObject {
     protected _program = undefined;
-    protected _attributeLocations = new Map();
-    protected _matrixLocations = new Map();
-    protected _uniformLocations = new Map();
 
     protected _textures = new Map();
     protected _uniforms = new Map();
@@ -41,7 +38,7 @@ export class glProgram extends glObject {
 
     private _build(gl: WebGLRenderingContext) {
         let program = this._program;
-        gl.useProgram(program);
+        this.apply(gl);
         let uCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         let tCount = 0;
         for (let i = 0; i < uCount; i++) {
@@ -110,21 +107,7 @@ export class glProgram extends glObject {
         return program;
     }
 
-    private _createGLUniformObject(location, type) {
-        return {
-            location: location,
-            type: type
-        };
-    }
-
-    private _createUniformLocationMap(gl, srcMap, dstMap) {
-        srcMap.forEach(function(value, key) {
-            let location = gl.getUniformLocation(this._program, value.name);
-            dstMap.set(key, this._createGLUniformObject(location, value.type));
-        }.bind(this));
-    }
-
-    generateFromShader(gl, shader) {
+    public generateFromShader(gl, shader) {
         // let version = shader.getUpdateVersion();
         let program = this._createProgramFromText(gl, shader.getVertexShaderText(), shader.getFragmentShaderText());
 
@@ -132,17 +115,16 @@ export class glProgram extends glObject {
             return undefined;
         }
 
-        this._createUniformLocationMap(gl, shader.getMatrixNameMap(), this._matrixLocations);
         this._update = false;
         // this.setLocalVersion(version);
         return this;
     }
 
-    apply(gl) {
+    public apply(gl) {
         gl.useProgram(this._program);
     }
 
-    setUniformData(gl, type, location, data) {
+    public setUniformData(gl, type, location, data) {
         // TODO: 写的是个毛; 但是没办法
         switch(type) {
             case FLOAT_VEC2:
@@ -165,47 +147,12 @@ export class glProgram extends glObject {
         }
     }
 
-    applyUniformData(gl, uniformType, data) {
-        let uniform = this.getUniformLocation(uniformType);
-        if (uniform === undefined) {
-            return;
-        }
-
-        this.setUniformData(gl, uniform.type, uniform.location, data);
-    }
-
-    applyMatrixData(gl, uniformType, data) {
-        let uniform = this.getMatrixLocation(uniformType);
-        if (uniform === undefined) {
-            return;
-        }
-
-        let location = uniform.location;
-        this.setUniformData(gl, uniform.type, location, data);
-    }
-
-    getUniformLocation(uniformType) {
-        return this._uniformLocations.get(uniformType);
-    }
-
-    getMatrixLocation(matrixType) {
-        return this._matrixLocations.get(matrixType);
-    }
-
-    // getUniformLocationMap() {
-    //     return this._uniformLocations;
-    // }
-
-    getMatrixLocationMap() {
-        return this._matrixLocations;
-    }
-
     public getTextureIndex(type) {
         return this._textures.get(type);
     }
 
-    getAttribLocation(attribType) {
-        return this._attributes.get(attribType);// this._attributeLocations.get(attribType);
+    public getAttribLocation(attribType) {
+        return this._attributes.get(attribType);
     }
 
     public getUniforms() {

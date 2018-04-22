@@ -170,14 +170,12 @@ let gltfCallback = (event, object) => {
         case 'entity':
             gltfJson = object[0];
             CGE.Logger.info(gltfJson);
-            let loadShowingTransform = new CGE.Transform(new CGE.Vector3(20.0, 20.0, -0.1), undefined, new CGE.Vector3(50, 50, 50));
             let gltfTexture = createTexture2DFromImage(gltf_diff, true);
             let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
             let mesh = new CGE.Mesh();
             mesh.setScale(20, 20, 20);
             mesh.setGeometry(gltfJson);
             mesh.setMaterial(gltfMaterial);
-            // let loadShowingEntity = CGE.Entity.createRenderableEntity(gltfJson, colorShowingMaterial, loadShowingTransform);
             mainScene.addChild(mesh);   
             break;
 
