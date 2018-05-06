@@ -12,6 +12,9 @@ export { Base } from './core/Base';
 export { Event } from './core/Event';
 
 export { Bounding } from './bounding/Bounding';
+export { AABB } from './bounding/AABB';
+export { OBB } from './bounding/OBB';
+export { Sphere } from './bounding/Sphere';
 
 export { Material } from './material/Material';
 export { DiffuseMaterial } from './material/DiffuseMaterial';
