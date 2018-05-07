@@ -55,4 +55,15 @@ export class Sphere extends Bounding {
     public getType() {
         return Bounding.TYPE_SPHERE;
     }
+
+    public copy(sphere: Sphere) {
+        this._pos.copy(sphere._pos);
+        this._radius = sphere._radius;
+    }
+
+    public clone(): Sphere {
+        const sphere = new Sphere();
+        sphere.copy(this);
+        return sphere;
+    }
 }

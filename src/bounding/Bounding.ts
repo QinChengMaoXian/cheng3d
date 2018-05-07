@@ -5,6 +5,8 @@ import { OBB } from './OBB';
 import { AABB } from './AABB';
 import { Sphere } from './Sphere';
 
+import { Matrix4 } from '../math/Matrix4';
+
 export class Bounding {
     static TYPE_SPHERE = 0;
     static TYPE_AABB = 1;
@@ -14,12 +16,24 @@ export class Bounding {
         
     }
 
+    public applyMatrix(mat: Matrix4) {
+
+    }
+
     public getType() {
         return -1;
     }
 
     public intersect(bounding: Bounding) {
         return false;
+    }
+
+    public copy(bounding: Bounding) {
+
+    }
+
+    public clone(): Bounding {
+        return null;
     }
 
     public static _auxVec: Vector3 = new Vector3();

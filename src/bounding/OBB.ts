@@ -3,7 +3,7 @@ import { AABB } from './AABB';
 import { Sphere } from './Sphere';
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
-import { Matrix4 } from '../math/Matrix4'
+import { Matrix4 } from '../math/Matrix4';
 
 export class OBB extends Bounding {
     protected _pos: Vector3 = new Vector3();
@@ -14,8 +14,8 @@ export class OBB extends Bounding {
         super();
     }
 
-    public setFrom(obb: OBB, mat: Matrix4) {
-
+    public applyMatrix(mat: Matrix4) {
+        
     }
 
     public intersect(bounding: Bounding) {
@@ -76,5 +76,11 @@ export class OBB extends Bounding {
         this._pos.copy(obb._pos);
         this._rotation.copy(obb._rotation);
         this._size.copy(obb._size);
+    }
+
+    public clone(): OBB {
+        const obb = new OBB();
+        obb.copy(this);
+        return obb;
     }
 }

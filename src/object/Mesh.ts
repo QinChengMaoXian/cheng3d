@@ -28,4 +28,14 @@ export class Mesh extends Object3D {
     public beRendering(): boolean {
         return !(!this._geometry || !this._material);
     }
+
+    protected _updateBounding() {
+        if (this._bounding && this._bounding.getType() === this._geometry.getBounding().getType()) {
+            this._bounding.copy(this._geometry.getBounding());
+            this._bounding.applyMatrix(this._matrix);
+        } else {
+            this._bounding = this._geometry.getBounding().clone();
+            this._bounding.applyMatrix(this._matrix);
+        }
+    }
 }

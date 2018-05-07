@@ -108,7 +108,12 @@ export class Object3D extends Base {
                 this._matrix.premultiply(this._parent.getMatrix());
             }
             this._needsUpdate = false;
+            this._updateBounding();
         }
+    }
+
+    protected _updateBounding() {
+        
     }
 
     public getDisplay() {

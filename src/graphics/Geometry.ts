@@ -31,6 +31,7 @@ export class Geometry extends GraphicsObject {
         if (attribute === GraphicsConst.position) {
             this._posAttrib = attrib;
             this._posBuffer = buffer;
+            this.buildBounding();
         }
     }
 
@@ -44,6 +45,12 @@ export class Geometry extends GraphicsObject {
         attributeParameters.forEach(param => {
             let attrib = new Attribute(param.attribute, param.num, param.offset, param.type);
             buffer.addAttribute(attrib);
+
+            if (param.attribute === GraphicsConst.position) {
+                this._posAttrib = attrib;
+                this._posBuffer = buffer;
+                this.buildBounding();
+            }
         });
     }
 
@@ -52,6 +59,7 @@ export class Geometry extends GraphicsObject {
         buffer.setData(data);
         buffer.setParameter(0, usage, type);
         this._indexBuffer = buffer;
+        this.buildBounding();
     }
 
     public getIndexBuffer() {
@@ -97,7 +105,7 @@ export class Geometry extends GraphicsObject {
         const buffer = this._posBuffer;
         const posAtt = this._posAttrib;
         const posData = buffer.getData();
-        const stride = buffer.getStride() === 0 ? posAtt.num : buffer.getStride();
+        const stride = buffer.getStride() === 0 ? posAtt.num : (buffer.getStride() / posData.BYTES_PER_ELEMENT );
         const offset = posAtt.offset;
         const num = posAtt.num;
 
@@ -119,9 +127,11 @@ export class Geometry extends GraphicsObject {
                 max.max(temp);
             }
         } else {
-            const l = posData.length;
-            for (let i = 0; i < l; i += 3) {
-                temp.set(posData[i], posData[i+1], posData[i+2]);
+            const l = posData.length / stride;
+            let index;
+            for (let i = 0; i < l; i++) {
+                index = i * stride + offset;
+                temp.set(posData[index], posData[index+1], num === 2 ? 0 : posData[index+2]);
                 min.min(temp);
                 max.max(temp);
             }

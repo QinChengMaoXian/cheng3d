@@ -12,9 +12,10 @@ export class AABB extends Bounding {
         super();
     }
 
-    public makeFrom(src: AABB, mat: Matrix4) {
-        this._max.set(-Infinity, -Infinity, -Infinity);
-        this._min.set(Infinity, Infinity, Infinity);
+    public applyMatrix(mat: Matrix4) {
+        const min = this._min, max = this._max;
+        const minx = min.x, miny = min.y, minz = min.z;
+        const maxx = max.x, maxy = max.y, maxz = max.z;
 
         let aux = Bounding._auxVec;
 
@@ -22,9 +23,9 @@ export class AABB extends Bounding {
             for (let j = 0; j < 2; j++) {
                 for (let i = 0; i < 2; i++) {
                     aux.set(
-                        i === 1 ? src._max.x : src._min.x, 
-                        j === 1 ? src._max.x : src._min.x, 
-                        k === 1 ? src._max.x : src._min.x
+                        i === 1 ? maxx : minx, 
+                        j === 1 ? maxy : miny, 
+                        k === 1 ? maxz : minz
                     );
 
                     aux.applyMatrix4(mat);
@@ -80,5 +81,11 @@ export class AABB extends Bounding {
     public copy(aabb: AABB) {
         this._min.copy(aabb._min);
         this._max.copy(aabb._max);
+    }
+
+    public clone(): AABB {
+        const aabb = new AABB();
+        aabb.copy(this);
+        return aabb;
     }
 }
