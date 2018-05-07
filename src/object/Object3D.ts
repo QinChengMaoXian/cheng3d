@@ -38,10 +38,15 @@ export class Object3D extends Base {
 
     public setNeedUpdateMatrix() {
         this._needsUpdate = true;
+        let l = this._children.length;
+        let children = this._children;
+        for (let i = 0; i < l; i++) {
+            children[i].setNeedUpdateMatrix();
+        }
     }
 
     public update(delta: number) {
-        // this._makeMatrix();
+        this._makeMatrix();
         let l = this._children.length;
         let children = this._children;
         for (let i = 0; i < l; i++) {
@@ -92,18 +97,18 @@ export class Object3D extends Base {
     }
 
     public getMatrix() {
-        return this._makeMatrix();
+        this._makeMatrix();
+        return this._matrix;
     }
 
     protected _makeMatrix() {
         if (this._needsUpdate) {
             this._matrix.compose(this._position, this._rotate, this._scale);
             if (this._parent) {
-                this._matrix.premultiply(this._parent._matrix);
+                this._matrix.premultiply(this._parent.getMatrix());
             }
             this._needsUpdate = false;
         }
-        return this._matrix;
     }
 
     public getDisplay() {

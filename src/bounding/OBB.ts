@@ -71,4 +71,10 @@ export class OBB extends Bounding {
     public getType() {
         return Bounding.TYPE_OBB;
     }
+
+    public copy(obb: OBB) {
+        this._pos.copy(obb._pos);
+        this._rotation.copy(obb._rotation);
+        this._size.copy(obb._size);
+    }
 }

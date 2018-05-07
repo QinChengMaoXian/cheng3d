@@ -57,6 +57,13 @@ export class Vector3 {
         return this;
     }
 
+    public mulAt(v: Vector3): Vector3 {
+        this.v[0] *= v.x;
+        this.v[1] *= v.y;
+        this.v[2] *= v.z;
+        return this;
+    }
+
     public dot(vec: Vector3): number {
         return this.v[0] * vec.x + this.v[1] * vec.y + this.v[2] * vec.z;
     }

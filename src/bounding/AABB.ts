@@ -13,7 +13,26 @@ export class AABB extends Bounding {
     }
 
     public makeFrom(src: AABB, mat: Matrix4) {
-        
+        this._max.set(-Infinity, -Infinity, -Infinity);
+        this._min.set(Infinity, Infinity, Infinity);
+
+        let aux = Bounding._auxVec;
+
+        for (let k = 0; k < 2; k++) {
+            for (let j = 0; j < 2; j++) {
+                for (let i = 0; i < 2; i++) {
+                    aux.set(
+                        i === 1 ? src._max.x : src._min.x, 
+                        j === 1 ? src._max.x : src._min.x, 
+                        k === 1 ? src._max.x : src._min.x
+                    );
+
+                    aux.applyMatrix4(mat);
+                    this._max.max(aux);
+                    this._min.min(aux);
+                }
+            }
+        }
     }
 
     public intersect(bounding: Bounding) {
@@ -56,5 +75,10 @@ export class AABB extends Bounding {
 
     public getType() {
         return Bounding.TYPE_AABB;
+    }
+
+    public copy(aabb: AABB) {
+        this._min.copy(aabb._min);
+        this._max.copy(aabb._max);
     }
 }

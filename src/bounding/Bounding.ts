@@ -22,7 +22,7 @@ export class Bounding {
         return false;
     }
 
-    private static _auxVec: Vector3 = new Vector3();
+    public static _auxVec: Vector3 = new Vector3();
 
     private static _obb1Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];
     private static _obb2Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];

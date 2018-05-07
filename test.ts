@@ -176,7 +176,10 @@ let gltfCallback = (event, object) => {
             mesh.setScale(20, 20, 20);
             mesh.setGeometry(gltfJson);
             mesh.setMaterial(gltfMaterial);
-            mainScene.addChild(mesh);   
+            let obj = new CGE.Object3D();
+            obj.addChild(mesh);
+            obj.name = 'test';
+            mainScene.addChild(obj);   
             break;
 
         case 'error':
