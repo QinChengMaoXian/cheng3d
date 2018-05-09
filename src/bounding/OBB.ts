@@ -15,7 +15,7 @@ export class OBB extends Bounding {
     }
 
     public applyMatrix(mat: Matrix4) {
-        
+        // TODO: 这里怎么写？
     }
 
     public intersect(bounding: Bounding) {
