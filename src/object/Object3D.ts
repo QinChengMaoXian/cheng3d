@@ -1,11 +1,11 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
-import { Base } from '../core/Base';
+import { EventDispatcher } from '../core/EventDispatcher';
 import { Component } from './Component';
 import { Bounding } from '../bounding/Bounding'
 
-export class Object3D extends Base {
+export class Object3D extends EventDispatcher {
     protected _position: Vector3 = new Vector3();
     protected _rotate: Quaternion = new Quaternion();
     protected _scale: Vector3 = new Vector3(1, 1, 1);
