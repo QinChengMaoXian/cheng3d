@@ -16,11 +16,21 @@ export class Handler {
         this.once = false;
     }
 
-    public run() {
+    public run(): any {
         if (this.method) return null;
-        const id = this._id;
         const result = this.method.apply(this.caller, this.args);
         this.once && this.clear();
+        return result;
+    }
+
+    public runWith(data: any) {
+        if (this.method == null) return null;
+        let id = this._id;
+        let result;
+        if (data == null) result = this.method.apply(this.caller, this.args);
+        else if (!this.args && !data.unshift) result = this.method.call(this.caller, data);
+        else if (this.args) result = this.method.apply(this.caller, this.args.concat(data));
+        else result = this.method.apply(this.caller, data);
         return result;
     }
 
