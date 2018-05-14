@@ -1,9 +1,4 @@
 import * as CGE from './src/CGE'
-import { 
-    createTexture2DFromImage, 
-    DeferredMaterial,
-    FullScreenTextureMaterial,
-} from './ext'
 
 let test_diff = './resources/spnza_bricks_a_diff.jpg';
 let man_diff = './resources/VWS_B_Male2-2.jpg';
@@ -160,7 +155,10 @@ mainScene.addEntity(teapotEntity);
 
 window['CGE'] = CGE;
 
-let colorTexrure = createTexture2DFromImage(test_diff, true);
+let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+colorTexrure.setImageUrl(test_diff);
+colorTexrure.setMipmap(true);
+
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
@@ -170,7 +168,9 @@ let gltfCallback = (event, object) => {
         case 'entity':
             gltfJson = object[0];
             CGE.Logger.info(gltfJson);
-            let gltfTexture = createTexture2DFromImage(gltf_diff, true);
+            let gltfTexture = new CGE.Texture2D();
+            gltfTexture.setImageUrl(gltf_diff);
+            gltfTexture.setMipmap(true);
             let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
             let mesh = new CGE.Mesh();
             mesh.setScale(20, 20, 20);

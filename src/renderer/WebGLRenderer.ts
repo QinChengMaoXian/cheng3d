@@ -1,13 +1,16 @@
-import * as CGE from '../graphics/RendererParameter'
-import { Logger } from '../core/Base'
-import { MatrixType } from '../graphics/GraphicsTypes'
-import { Texture } from '../graphics/Texture'
-import { Texture2D } from '../graphics/Texture2D'
-import { TextureCube } from '../graphics/TextureCube'
-import { RenderTargetState } from '../graphics/RenderTargetState'
-import { Base } from '../core/Base'
-import { Matrix4 } from '../math/Matrix4'
-import { Vector4 } from '../math/Vector4'
+import * as CGE from '../graphics/RendererParameter';
+import { Logger } from '../core/Base';
+import { MatrixType } from '../graphics/GraphicsTypes';
+import { Texture } from '../graphics/Texture';
+import { Texture2D } from '../graphics/Texture2D';
+import { TextureCube } from '../graphics/TextureCube';
+import { RenderTargetState } from '../graphics/RenderTargetState';
+import { Base } from '../core/Base';
+import { Matrix4 } from '../math/Matrix4';
+import { Vector4 } from '../math/Vector4';
+import { Scene } from '../object/Scene';
+import { Mesh } from '../object/Mesh';
+import { Object3D } from '../object/Object3D';
 
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
@@ -17,7 +20,22 @@ import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
-import { Mesh } from '../object/Mesh';
+
+
+
+// export class WebGLRenderer {
+//     private _canvas: HTMLCanvasElement;
+//     private _gl: WebGLRenderingContext;
+//     private _ext: {};
+//     constructor() {
+        
+//     }
+//     public getContext(): HTMLCanvasElement {
+//         return this._gl;
+//     }
+//     public renderScene(scene: Scene, camera: Camera) {
+//     }
+// }
 
 export function WebGLRenderer(): void {
     // TODO: The Function name MUST use '_' inital that all called _gl function;
@@ -57,7 +75,7 @@ export function WebGLRenderer(): void {
         || !_ext['OES_texture_float']
         || !_ext['WEBGL_depth_texture']
         || !_ext['EXT_texture_filter_anisotropic']) {
-        alert('Can not use webgl extension');
+        Logger.error('Can not use webgl extension');
         return undefined;
     }
 
@@ -194,7 +212,7 @@ export function WebGLRenderer(): void {
         if (gltexture !== undefined && !gltexture.getUpdate()) {
             return gltexture;
         }
-        
+
         if (texture instanceof Texture2D) {
             gltexture = new glTexture2D(_gl);
             if (gltexture.generateFromTexture(_gl, texture)) {
@@ -205,8 +223,6 @@ export function WebGLRenderer(): void {
             gltexture = new glTextureCube(_gl);
         }
     };
-
-    // const 
 
     let _camera;
     let _cameraMatrices;
@@ -253,7 +269,7 @@ export function WebGLRenderer(): void {
         }
     }
 
-    const _renderScene = (scene, camera) => {
+    const _renderScene = (scene: Object3D, camera) => {
         clear(true, true, true);
         let v = defaultTargetState.viewport;
         gl.viewport(v.x, v.y, v.z, v.w); 
