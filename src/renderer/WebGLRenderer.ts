@@ -11,6 +11,8 @@ import { Vector4 } from '../math/Vector4';
 import { Scene } from '../object/Scene';
 import { Mesh } from '../object/Mesh';
 import { Object3D } from '../object/Object3D';
+import { Camera } from '../object/Camera';
+import { Frame } from '../graphics/Frame';
 
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
@@ -20,6 +22,8 @@ import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
+
+
 
 
 
@@ -269,7 +273,11 @@ export function WebGLRenderer(): void {
         }
     }
 
-    const _renderScene = (scene: Object3D, camera) => {
+    const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
+        if (frame) {
+            
+        }
+
         clear(true, true, true);
         let v = defaultTargetState.viewport;
         gl.viewport(v.x, v.y, v.z, v.w); 
@@ -280,6 +288,6 @@ export function WebGLRenderer(): void {
         _preRenderObjects(scene);
         _render();
     }
-
+    
     this.renderScene = _renderScene;
 };
