@@ -27,7 +27,7 @@ import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
 
 
-/*
+
 export class WebGLRenderer extends Renderer {
     private _canvas: HTMLCanvasElement;
     private _gl: WebGLRenderingContext;
@@ -68,7 +68,7 @@ export class WebGLRenderer extends Renderer {
         this._defaultTargetState.setClearColor(true, new Vector4(r, g, b, a));
     }
 
-    public clear(color, depth, stencil) {
+    public clear(color?, depth?, stencil?) {
         const defaultTargetState = this._defaultTargetState;
         defaultTargetState.setClearColor(true, color);
         defaultTargetState.setClearDepth(true, depth);
@@ -136,6 +136,10 @@ export class WebGLRenderer extends Renderer {
         this._defaultTargetState.setViewport(new Vector4(0, 0, width, height));
     };
 
+    public getCanvas(): HTMLCanvasElement {
+        return this._canvas;
+    }
+
     public getContext(): WebGLRenderingContext {
         return this._gl;
     }
@@ -185,8 +189,8 @@ export class WebGLRenderer extends Renderer {
         });
     }
 }
-*/
 
+/*
 export function WebGLRenderer(): void {
     // TODO: The Function name MUST use '_' inital that all called _gl function;
     // TODO: Take unless _gl's function out of constructor;
@@ -250,7 +254,7 @@ export function WebGLRenderer(): void {
     _gl.depthFunc(_gl.LEQUAL);
     _gl.disable(_gl.BLEND);
 
-    let fxaa = new FXAA();
+    // let fxaa = new FXAA();
 
     // this function is ONLY used for DEBUG;
     this.getContext = function() {
@@ -439,3 +443,5 @@ export function WebGLRenderer(): void {
     
     this.renderScene = _renderScene;
 };
+
+*/

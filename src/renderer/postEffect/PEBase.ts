@@ -1,9 +1,11 @@
+import { Renderer } from "../Renderer";
 
 export class PEBase {
     protected _enable: boolean = false;
+    protected _renderer: Renderer;
     
-    constructor() {
-
+    constructor(renderer: Renderer) {
+        this._renderer = renderer;
     }
 
     public render() {
