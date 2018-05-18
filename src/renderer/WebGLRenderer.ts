@@ -45,10 +45,22 @@ export class WebGLRenderer extends Renderer {
 
     constructor() {
         super();
+        this.init();
     }
 
     public init() {
-        const gl = this._gl;
+        this._canvas = document.createElement('canvas');
+        const _canvas = this._canvas;
+
+        this._gl = _canvas.getContext('webgl', {antialias: true});
+        const _gl = this._gl;
+
+        _gl.enable(_gl.DEPTH_TEST);
+        _gl.depthFunc(_gl.LEQUAL);
+        _gl.disable(_gl.BLEND);
+
+        this._glMesh = new glMesh();
+        
         this._initExtensions();
     }
 
@@ -70,9 +82,9 @@ export class WebGLRenderer extends Renderer {
 
     public clear(color?, depth?, stencil?) {
         const defaultTargetState = this._defaultTargetState;
-        defaultTargetState.setClearColor(true, color);
-        defaultTargetState.setClearDepth(true, depth);
-        defaultTargetState.setClearStencil(true, stencil);
+        // defaultTargetState.setClearColor(true, color);
+        // defaultTargetState.setClearDepth(true, depth);
+        // defaultTargetState.setClearStencil(true, stencil);
     }
 
     public initGeometry(geometry: Geometry) {
@@ -123,7 +135,70 @@ export class WebGLRenderer extends Renderer {
     }
 
     public renderScene(scene: Scene, camera: Camera) {
-        
+        let _camera;
+        let _cameraMatrices;
+        let _renderList = [];
+        const gl = this._gl;
+
+        const _getCameraMatrices = (camera) => {
+            return {
+                viewMatirx: camera.getMatrix().clone(),
+                projectionMatirx: camera.getProjectionMatrix().clone(),
+                viewProjectionMatirx: camera.getViewProjectionMatrix().clone(),
+            }
+        };
+
+        let glmesh = new glMesh();
+        const _renderMesh = (mesh: Mesh, camera) => {
+            let geo = mesh.getGeometry();
+            let mat = mesh.getMaterial();
+            let shader = mat.getShader();
+            let images = mat.getTextures();
+            return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
+        }
+
+        const _render = () => {
+            let l = _renderList.length;
+            for (let i = 0; i < l; i++) {
+                let mesh = _renderList[i];
+                _renderMesh(mesh, _camera);
+            }
+        }
+
+        const _addToRenderList = (mesh) => {
+            _renderList.push(mesh);
+        }
+
+        const _preRenderObjects = (obj) => {
+            if(obj.beRendering()) {
+                _addToRenderList(obj);
+            }
+            const children = obj.getChildren();
+            const l = children.length;
+            for(let i = 0; i < l; i++) {
+                const child = children[i];
+                _preRenderObjects(child);
+            }
+        }
+
+        const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
+            if (frame) {
+                
+            }
+
+            this.clear(true, true, true);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            let v = this._defaultTargetState.viewport;
+            gl.viewport(v.x, v.y, v.z, v.w); 
+
+            _camera = camera;
+            _cameraMatrices = _getCameraMatrices(camera);
+            _renderList = [];
+            _preRenderObjects(scene);
+            _render();
+        }
+
+        _renderScene(scene, camera);
     }
 
     public setSize (width, height) {
@@ -189,259 +264,3 @@ export class WebGLRenderer extends Renderer {
         });
     }
 }
-
-/*
-export function WebGLRenderer(): void {
-    // TODO: The Function name MUST use '_' inital that all called _gl function;
-    // TODO: Take unless _gl's function out of constructor;
-
-    let _canvas = document.createElement('canvas');
-    let _gl = _canvas.getContext('webgl', {antialias: true});
-
-    const gl = _gl;
-
-    if (_gl === undefined) {
-        alert('Can not use webgl');
-        return undefined;
-    }
-
-    let _ext = {};
-
-    let getExtension = function(extName) {
-        let ext = _gl.getExtension(extName) || _gl.getExtension('WEBKIT_' + extName) || _gl.getExtension('MOZ_' + extName);
-        if (!ext) {
-            alert('Can not use webgl extension ' + extName);
-        }
-        return ext;
-    };
-
-    _ext['OES_vertex_array_object'] = getExtension("OES_vertex_array_object");
-    _ext['WEBGL_draw_buffers'] = getExtension("WEBGL_draw_buffers");
-    _ext['OES_standard_derivatives'] = getExtension("OES_standard_derivatives");
-    _ext['OES_texture_half_float'] = getExtension("OES_texture_half_float");
-    _ext['OES_texture_float'] = getExtension("OES_texture_float");
-    _ext['WEBGL_depth_texture'] = getExtension("WEBGL_depth_texture");
-    _ext['EXT_texture_filter_anisotropic'] = getExtension("EXT_texture_filter_anisotropic");
-
-    if (!_ext['WEBGL_draw_buffers']
-        || !_ext['OES_standard_derivatives']
-        || !_ext['OES_texture_half_float']
-        || !_ext['OES_texture_float']
-        || !_ext['WEBGL_depth_texture']
-        || !_ext['EXT_texture_filter_anisotropic']) {
-        Logger.error('Can not use webgl extension');
-        return undefined;
-    }
-
-    Object.assign(_gl, {
-        VERTEX_ARRAY_BINDING: _ext['OES_vertex_array_object'].VERTEX_ARRAY_BINDING_OES,
-        MAX_COLOR_ATTACHMENTS: _ext['WEBGL_draw_buffers'].MAX_COLOR_ATTACHMENTS_WEBGL,
-        MAX_DRAW_BUFFERS: _ext['WEBGL_draw_buffers'].MAX_DRAW_BUFFERS_WEBGL,
-        TEXTURE_MAX_ANISOTROPY: _ext['EXT_texture_filter_anisotropic'].TEXTURE_MAX_ANISOTROPY_EXT,
-
-        createVertexArray: _ext['OES_vertex_array_object'].createVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        deleteVertexArray: _ext['OES_vertex_array_object'].deleteVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        bindVertexArray: _ext['OES_vertex_array_object'].bindVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        isVertexArray: _ext['OES_vertex_array_object'].isVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        
-        drawBuffers: _ext['WEBGL_draw_buffers'].drawBuffersWEBGL.bind(_ext['WEBGL_draw_buffers']),
-    });
-
-    // TODO: Add a class to control gl context;
-
-    let ANISOTROPY = 4.0;
-    _gl.enable(_gl.DEPTH_TEST);
-    _gl.depthFunc(_gl.LEQUAL);
-    _gl.disable(_gl.BLEND);
-
-    // let fxaa = new FXAA();
-
-    // this function is ONLY used for DEBUG;
-    this.getContext = function() {
-        return _gl;
-    };
-
-    let clear = function(color, depth, stencil) {
-        _gl.clear(
-            (color ? _gl.COLOR_BUFFER_BIT : 0) |
-            (depth ? _gl.DEPTH_BUFFER_BIT : 0) |
-            (stencil ? _gl.STENCIL_BUFFER_BIT : 0)
-        );
-    };
-
-    let defaultTargetState = new RenderTargetState();
-    let currentTargetState = new RenderTargetState();
-
-    let applyTergetState = function(state) {
-        let color = state.clearColor;
-        _gl.clearColor(color.x, color.y, color.z, color.w);
-        let viewport = state.viewport;
-        _gl.viewport(viewport.x, viewport.y, viewport.z, viewport.w);
-
-        if (state.isClearDepth !== currentTargetState.isClearDepth) {
-            currentTargetState.isClearDepth = state.isClearDepth;
-            if (state.isClearDepth) {
-                _gl.enable(_gl.DEPTH_TEST);
-            } else {
-                _gl.disable(_gl.DEPTH_TEST);
-            }
-        }
-        clear(state.isClearColor, state.isClearDepth, state.isClearStencil);
-    };
-
-    let self = this;
-
-    // let initializedMap = new Map();
-    // this.getInitializedMap = function() {
-    //     return initializedMap;
-    // };
-
-    let renderCount = 0;
-    let screenWidth = 0,
-        screenHeight = 0;
-
-    this.enableDepthTest = function() {
-        defaultTargetState.setClearDepth(true);
-    };
-
-    this.disableDepthTest = function() {
-        defaultTargetState.setClearDepth(false);
-    };
-
-    this.setSize = function(width, height) {
-        _canvas.width = width;
-        _canvas.height = height;
-        screenWidth = width;
-        screenHeight = height;
-        defaultTargetState.setViewport(new Vector4(0, 0, width, height));
-    };
-
-    this.setOffset = function(x, y, w, h) {
-        defaultTargetState.setViewport(new Vector4(x, y, w, h));
-    };
-
-    this.setClearColor = function(r, g, b, a) {
-        defaultTargetState.setClearColor(true, new Vector4(r, g, b, a));
-    };
-
-    this.getCanvas = function() {
-        return _canvas;
-    };
-
-    this.clear = function (color, depth, stencil){
-        defaultTargetState.setClearColor(true, color);
-        defaultTargetState.setClearDepth(true, depth);
-        defaultTargetState.setClearStencil(true, stencil);
-    };
-
-    this.initGeometry = function(geometry) {
-        let glbuffer = geometry.getRenderObjectRef(this);
-        if (!glbuffer) {
-            glbuffer = new glBuffer();
-            geometry.setRenderObjectRef(this, glbuffer);
-        }
-        if (!glbuffer.getUpdate()) {
-            return glbuffer;
-        }
-        if(!glbuffer.generateFromGeometry(_gl, geometry)) {
-            glbuffer = null;
-            geometry.setRenderObjectRef(this, null);
-        }
-        return glbuffer;
-    };
-
-    this.initShader = function(shader) {
-        let glprogram = shader.getRenderObjectRef(this);
-        if (glprogram !== undefined) {
-            return glprogram;
-        }
-
-        glprogram = new glProgram();
-        if (glprogram.generateFromShader(_gl, shader)) {
-            shader.setRenderObjectRef(this, glprogram);
-            return glprogram;
-        }
-    };
-
-    this.initTexture = function(texture: Texture) {
-        let gltexture:any = texture.getRenderObjectRef(this);
-        if (gltexture !== undefined && !gltexture.getUpdate()) {
-            return gltexture;
-        }
-
-        if (texture instanceof Texture2D) {
-            gltexture = new glTexture2D(_gl);
-            if (gltexture.generateFromTexture(_gl, texture)) {
-                texture.setRenderObjectRef(this, gltexture);
-                return gltexture;
-            }
-        } else if (texture instanceof TextureCube) {
-            gltexture = new glTextureCube(_gl);
-        }
-    };
-
-    let _camera;
-    let _cameraMatrices;
-    let _renderList = [];
-
-    const _getCameraMatrices = (camera) => {
-        return {
-            viewMatirx: camera.getMatrix().clone(),
-            projectionMatirx: camera.getProjectionMatrix().clone(),
-            viewProjectionMatirx: camera.getViewProjectionMatrix().clone(),
-        }
-    };
-
-    let glmesh = new glMesh();
-    const _renderMesh = (mesh: Mesh, camera) => {
-        let geo = mesh.getGeometry();
-        let mat = mesh.getMaterial();
-        let shader = mat.getShader();
-        let images = mat.getTextures();
-        return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
-    }
-
-    const _render = () => {
-        let l = _renderList.length;
-        for (let i = 0; i < l; i++) {
-            let mesh = _renderList[i];
-            _renderMesh(mesh, _camera);
-        }
-    }
-
-    const _addToRenderList = (mesh) => {
-        _renderList.push(mesh);
-    }
-
-    const _preRenderObjects = (obj) => {
-        if(obj.beRendering()) {
-            _addToRenderList(obj);
-        }
-        const children = obj.getChildren();
-        const l = children.length;
-        for(let i = 0; i < l; i++) {
-            const child = children[i];
-            _preRenderObjects(child);
-        }
-    }
-
-    const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
-        if (frame) {
-            
-        }
-
-        clear(true, true, true);
-        let v = defaultTargetState.viewport;
-        gl.viewport(v.x, v.y, v.z, v.w); 
-
-        this._camera = camera;
-        _cameraMatrices = _getCameraMatrices(camera);
-        _renderList = [];
-        _preRenderObjects(scene);
-        _render();
-    }
-    
-    this.renderScene = _renderScene;
-};
-
-*/
