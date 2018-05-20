@@ -30,9 +30,9 @@ export class glFrame extends glObject {
         return completed;
     }
 
-    public generateFromRenderTarget(gl, renderer, renderTarget, maxFrameAttachment) {
-        let textureMap = renderTarget.getTextureMap();
-        let depthStencilTexture = renderTarget.getDepthStencilTexture();
+    public generateFromRenderTarget(gl, renderer, frame, maxFrameAttachment) {
+        let textureMap = frame.getTextureMap();
+        let depthStencilTexture = frame.getDepthStencilTexture();
         const maxAttachment = maxFrameAttachment || 8;
         this._drawBuffers = [];
         if (this.checkTextures(renderer, textureMap, depthStencilTexture) === false) {
@@ -55,7 +55,7 @@ export class glFrame extends glObject {
         }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         this._frame = frameBuffer;
-        this.setLocalVersion(renderTarget.getUpdateVersion());
+        this.setLocalVersion(frame.getUpdateVersion());
         return this;
     }
 

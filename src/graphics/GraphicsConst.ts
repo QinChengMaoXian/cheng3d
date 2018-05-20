@@ -39,6 +39,7 @@ export class GraphicsConst {
     public static readonly ODSizeInv    = GraphicsConst._inUni('u_ODSizeInv');
     public static readonly uvOffset     = GraphicsConst._inUni('u_uvOffset');
     public static readonly baseColor    = GraphicsConst._inUni('u_baseColor');
+    public static readonly pixelSize    = GraphicsConst._inUni('u_pixelSize');
 
     /** world(model) matrix */
     public static readonly mMat         = GraphicsConst._inUni('u_mMat');

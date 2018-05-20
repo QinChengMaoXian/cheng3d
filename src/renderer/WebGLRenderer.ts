@@ -134,7 +134,7 @@ export class WebGLRenderer extends Renderer {
         }
     }
 
-    public renderScene(scene: Scene, camera: Camera) {
+    public renderScene(scene: Object3D, camera: Camera) {
         let _camera;
         let _cameraMatrices;
         let _renderList = [];
@@ -201,6 +201,13 @@ export class WebGLRenderer extends Renderer {
         _renderScene(scene, camera);
     }
 
+    /**
+     * Do NOT call this function;
+     */
+    public _renderPostEffect(scene: Object3D, camera?: Camera) {
+
+    }
+
     public setSize (width, height) {
         const _canvas = this._canvas;
 
@@ -223,10 +230,12 @@ export class WebGLRenderer extends Renderer {
         const _gl = this._gl;
         let _ext = {};
 
+        
+
         let getExtension = function(extName) {
             let ext = _gl.getExtension(extName) || _gl.getExtension('WEBKIT_' + extName) || _gl.getExtension('MOZ_' + extName);
             if (!ext) {
-                alert('Can not use webgl extension ' + extName);
+                Logger.warn('Can not use webgl extension ' + extName);
             }
             return ext;
         };

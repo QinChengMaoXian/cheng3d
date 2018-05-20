@@ -13,28 +13,28 @@ export class RenderTargetState {
         
     }
 
-    setClearColor(enable: boolean, color: Vector4) {
+    public setClearColor(enable: boolean, color: Vector4) {
         this.isClearColor = enable === true;
         if (color) {
             this.clearColor.copy(color);
         }
     }
 
-    setClearDepth(enable: boolean, depth?: number) {
+    public setClearDepth(enable: boolean, depth?: number) {
         this.isClearDepth = enable === true;
         if (depth) {
             this.clearDepth = depth;
         }
     }
 
-    setClearStencil(enable: boolean, stencil?: number) {
+    public setClearStencil(enable: boolean, stencil?: number) {
         this.isClearStencil = enable === true;
         if (stencil) {
             this.clearStencil = stencil;
         }
     }
 
-    setViewport(offset: Vector4) {
+    public setViewport(offset: Vector4) {
         this.viewport.copy(offset);
     }
 }

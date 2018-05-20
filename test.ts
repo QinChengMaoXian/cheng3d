@@ -157,6 +157,7 @@ window['CGE'] = CGE;
 
 let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
 colorTexrure.setImageUrl(test_diff);
+colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
 colorTexrure.setMipmap(true);
 
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
@@ -170,6 +171,7 @@ let gltfCallback = (event, object) => {
             CGE.Logger.info(gltfJson);
             let gltfTexture = new CGE.Texture2D();
             gltfTexture.setImageUrl(gltf_diff);
+            gltfTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
             gltfTexture.setMipmap(true);
             let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
             let mesh = new CGE.Mesh();
@@ -271,11 +273,6 @@ camera.update(0);
 window['camera'] = camera;
 
 let render = function(delta) {
-    // renderTargetScene.update();
-    // trans.forEach(function(transform){
-    //     transform.applyMatrix4(testMat4);
-    // });
-    // renderer.renderScene(renderTargetScene, renderTarget);
     camera.update(delta);
     events.forEach((event) => {
         event.update(delta);
@@ -290,8 +287,6 @@ window.onresize = function() {
     renderer.setSize(width, height);
     camera.resize(width, height);
     camera.update(0);
-    // renderTargetCamera.resize(width, height);
-    // renderTargetCamera.update();
     render(0);
 };
 

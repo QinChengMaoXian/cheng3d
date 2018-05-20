@@ -25,7 +25,7 @@ export { Geometry } from './graphics/Geometry';
 export { Shader } from './graphics/Shader';
 export { Texture2D } from './graphics/Texture2D';
 export { TextureCube } from './graphics/TextureCube';
-export { RenderTarget } from './graphics/RenderTarget';
+export { Frame } from './graphics/Frame';
 export { RenderTargetState } from './graphics/RenderTargetState';
 export { GraphicsConst } from './graphics/GraphicsConst';
 
