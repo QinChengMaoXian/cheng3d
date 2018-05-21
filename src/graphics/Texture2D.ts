@@ -9,7 +9,7 @@ export class Texture2D extends Texture {
         if (!Texture2D._White) {
             let tex = new Texture2D();
             tex.setFormat(CGE.RGB, CGE.RGB);
-            tex.setType(CGE.UNSIGNED_SHORT_5_6_5);
+            tex.setDataType(CGE.UNSIGNED_SHORT_5_6_5);
             tex.setData(1, 1, new Uint16Array([65535]));
             Texture2D._White = tex;
         }
@@ -21,7 +21,7 @@ export class Texture2D extends Texture {
         if (!Texture2D._ODTex) {
             let tex = new Texture2D();
             tex.setFormat(CGE.ALPHA, CGE.ALPHA);
-            tex.setType(CGE.UNSIGNED_BYTE);
+            tex.setDataType(CGE.UNSIGNED_BYTE);
             tex.setData(16, 16, new Uint8Array(BuildOrderedDitheringData(4)));
             Texture2D._ODTex = tex;
         }
@@ -100,5 +100,9 @@ export class Texture2D extends Texture {
 
     public isLoad() {
         return this._isLoad;
+    }
+
+    public getType() {
+        return Texture.TEXTURE2D;
     }
 }

@@ -2,11 +2,14 @@ import * as CGE from './RendererParameter';
 import { GraphicsObject } from './GraphicsObject'
 
 export class Texture extends GraphicsObject {
+    public static readonly TEXTURE2D = 0;
+    public static readonly TEXTURECUBE = 1;
+
     protected _minFilter: number = CGE.LINEAR;
     protected _magFilter: number = CGE.LINEAR;
     protected _format: number = CGE.RGB;
     protected _internalformat: number = CGE.RGB;
-    protected _type: number = CGE.UNSIGNED_BYTE;
+    protected _dataType: number = CGE.UNSIGNED_BYTE;
     protected _mipmap: boolean = false;
     protected _needMipmap: boolean = false;
     
@@ -41,12 +44,12 @@ export class Texture extends GraphicsObject {
         return this._internalformat;
     }
 
-    public setType(type) {
-        this._type = type;
+    public setDataType(type) {
+        this._dataType = type;
     }
 
-    public getType() {
-        return this._type;
+    public getDataType() {
+        return this._dataType;
     }
 
     public setMipmap(value:boolean) {
@@ -59,5 +62,9 @@ export class Texture extends GraphicsObject {
 
     public isLoad() {
         return false;
+    }
+
+    public getType() {
+        return -1;
     }
 }

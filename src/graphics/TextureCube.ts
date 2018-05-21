@@ -36,4 +36,8 @@ export class TextureCube extends Texture {
     public getWrapT() {
         return this._wrapT;
     }
+
+    public getType() {
+        return Texture.TEXTURECUBE;
+    }
 }

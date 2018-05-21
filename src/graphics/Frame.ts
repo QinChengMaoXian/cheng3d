@@ -36,7 +36,7 @@ export class Frame extends GraphicsObject {
         let texture2d = new Texture2D();
         texture2d.setSize(this._width, this._height);
         texture2d.setFormat(format, format);
-        texture2d.setType(dataType);
+        texture2d.setDataType(dataType);
         return texture2d;
     }
 

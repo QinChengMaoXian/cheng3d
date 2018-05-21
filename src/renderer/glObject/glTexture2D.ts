@@ -23,7 +23,7 @@ export class glTexture2D extends glTexture {
     _setTextureData(gl, target, texture) {
         let format = texture.getFormat();
         let internalformat = texture.getInternalformat();
-        let type = texture.getType();
+        let type = texture.getDataType();
 
         if (texture.getImage() !== undefined && texture.isLoad()) {
             let image = texture.getImage();
