@@ -3,7 +3,7 @@ import { Vector3 } from '../../math/Vector3';
 import { Vector4 } from '../../math/Vector4';
 import { Matrix4 } from '../../math/Matrix4';
 import { glObject } from './glObject';
-import { GraphicsConst } from '../../graphics/GraphicsConst';
+import { ShaderConst } from '../../graphics/ShaderConst';
 import { Texture } from '../../graphics/Texture';
 import { Geometry } from '../../graphics/Geometry';
 import { Mesh } from '../../object/Mesh';
@@ -119,12 +119,12 @@ export class glMesh extends glObject {
             let data: Matrix4 | Vector3 | Vector4; //matrix = glMesh._matrix;
             // TODO: maybe need re-build? but looks like good for used;
             switch (uniformType) {
-                case GraphicsConst.mMat:            data = worldMatrix; break;
-                case GraphicsConst.vMat:            data = cameraMatrices.viewMatirx; break;
-                case GraphicsConst.pMat:            data = cameraMatrices.projectionMatirx; break;
-                case GraphicsConst.vpMat:           data = getVPMatrix(); break;
+                case ShaderConst.mMat:            data = worldMatrix; break;
+                case ShaderConst.vMat:            data = cameraMatrices.viewMatirx; break;
+                case ShaderConst.pMat:            data = cameraMatrices.projectionMatirx; break;
+                case ShaderConst.vpMat:           data = getVPMatrix(); break;
                 case MatrixType.MVMatrix:           data = getMVMatrix(); break;
-                case GraphicsConst.mvpMat:          data = getMVPMatrix(); break;
+                case ShaderConst.mvpMat:          data = getMVPMatrix(); break;
                 case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;

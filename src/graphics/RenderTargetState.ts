@@ -1,13 +1,13 @@
 import { Vector4 } from '../math/Vector4'
 
 export class RenderTargetState {
-    isClearColor: boolean = true;
-    clearColor: Vector4 = new Vector4(1,1,1,1);
-    isClearDepth: boolean = false;
-    clearDepth: number = 1.0;
-    isClearStencil: boolean = false;
-    clearStencil: number = 0;
-    viewport: Vector4 = new Vector4();
+    public isClearColor: boolean = true;
+    public clearColor: Vector4 = new Vector4(1,1,1,1);
+    public isClearDepth: boolean = false;
+    public clearDepth: number = 1.0;
+    public isClearStencil: boolean = false;
+    public clearStencil: number = 0;
+    public viewport: Vector4 = new Vector4();
 
     constructor() {
         

@@ -216,25 +216,25 @@ let planeVertexGeometry = new CGE.Geometry();
 let attribs = [
     {
         name: 'Position',
-        attribute: CGE.GraphicsConst.position, 
+        attribute: CGE.ShaderConst.position, 
         num: 3,
         offset: 0,
     },
     {
         name: 'UV',
-        attribute: CGE.GraphicsConst.texcoord, 
+        attribute: CGE.ShaderConst.texcoord, 
         num: 2,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 3,
     },
     {
         name: 'Normal',
-        attribute: CGE.GraphicsConst.normal, 
+        attribute: CGE.ShaderConst.normal, 
         num: 3,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 5,
     },
     {
         name: 'Tangent',
-        attribute: CGE.GraphicsConst.tangent, 
+        attribute: CGE.ShaderConst.tangent, 
         num: 3,
         offset: vertexPositionData.BYTES_PER_ELEMENT * 8,
     },

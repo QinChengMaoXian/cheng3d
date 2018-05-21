@@ -1,5 +1,7 @@
-import { Logger } from '../../core/Base'
-import { glObject } from './glObject'
+import { Logger } from '../../core/Base';
+import { glObject } from './glObject';
+
+import { Renderer } from '../Renderer'
 
 export class glFrame extends glObject {
     protected _frame = undefined;
@@ -11,7 +13,7 @@ export class glFrame extends glObject {
         super();
     }
 
-    public checkTextures(renderer, textureMap, depthStencilTexture) {
+    public checkTextures(renderer: Renderer, textureMap, depthStencilTexture) {
         let completed = true;
         textureMap.forEach(function(texture2d, location) {
             let glTexture = renderer.initTexture(texture2d);

@@ -6,7 +6,7 @@ import { Entity } from '../object/Entity'
 import { Component } from '../object/Component'
 import { AttribType } from '../graphics/GraphicsTypes'
 
-import { GraphicsConst } from '../graphics/GraphicsConst'
+import { ShaderConst } from '../graphics/ShaderConst'
 
 import * as CGE from '../graphics/RendererParameter';
 
@@ -99,30 +99,30 @@ Object.assign(GltfLoader, {
                 const attribute = accessors[attributeId];
                 switch(key) {
                     case 'POSITION':
-                        attribute_in = GraphicsConst.position;
+                        attribute_in = ShaderConst.position;
                         break;
 
                     case 'NORMAL':
-                        attribute_in = GraphicsConst.normal;
+                        attribute_in = ShaderConst.normal;
                         break;
 
                     case 'TEXCOORD':
                     case 'TEXCOORD_0':
-                        attribute_in = GraphicsConst.texcoord;
+                        attribute_in = ShaderConst.texcoord;
                         break;
 
                     case 'TANGENT':
-                        attribute_in = GraphicsConst.tangent;
+                        attribute_in = ShaderConst.tangent;
                         break;
 
                     case 'JOINT':
                     case 'JOINT_0':
-                        attribute_in = GraphicsConst.joints;
+                        attribute_in = ShaderConst.joints;
                         break;
 
                     case 'WEIGHT':
                     case 'WEIGHT_0':
-                        attribute_in = GraphicsConst.weights;
+                        attribute_in = ShaderConst.weights;
                         break;
                 
                     default:

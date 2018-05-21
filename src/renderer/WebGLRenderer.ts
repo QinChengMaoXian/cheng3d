@@ -1,9 +1,7 @@
 import * as CGE from '../graphics/RendererParameter';
 import { Logger } from '../core/Base';
 import { MatrixType } from '../graphics/GraphicsTypes';
-import { Texture } from '../graphics/Texture';
-import { Texture2D } from '../graphics/Texture2D';
-import { TextureCube } from '../graphics/TextureCube';
+
 import { RenderTargetState } from '../graphics/RenderTargetState';
 import { Base } from '../core/Base';
 import { Matrix4 } from '../math/Matrix4';
@@ -15,7 +13,12 @@ import { Camera } from '../object/Camera';
 import { Frame } from '../graphics/Frame';
 import { FXAA } from './postEffect/FXAA';
 import { Renderer } from './Renderer';
+
+import { Texture } from '../graphics/Texture';
+import { Texture2D } from '../graphics/Texture2D';
+import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
+import { Shader } from '../graphics/Shader';
 
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
@@ -26,9 +29,7 @@ import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
 
-
-
-export class WebGLRenderer extends Renderer {
+export class WebGLRenderer extends Base implements Renderer {
     private _canvas: HTMLCanvasElement;
     private _gl: WebGLRenderingContext;
     private _ext: {};
@@ -103,8 +104,8 @@ export class WebGLRenderer extends Renderer {
         return glbuffer;
     }
 
-    public initShader(shader) {
-        let glprogram = shader.getRenderObjectRef(this);
+    public initShader(shader: Shader) {
+        let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
         if (glprogram !== undefined) {
             return glprogram;
         }

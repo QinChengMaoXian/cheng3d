@@ -1,6 +1,6 @@
 import { Material } from './Material';
 import { Shader } from '../graphics/Shader';
-import { GraphicsConst } from '../graphics/GraphicsConst'
+import { ShaderConst } from '../graphics/ShaderConst'
 import { AttribType, TextureType, MatrixType } from '../graphics/GraphicsTypes';
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
@@ -16,7 +16,7 @@ export class ColorMatrial extends Material {
         let shader = ColorMatrial.getShader();
         Object.defineProperty(this, "_shader", { value:shader, writable:false });
 
-        this.setProperity(GraphicsConst.baseColor, this._baseColor);
+        this.setProperity(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
     }
 

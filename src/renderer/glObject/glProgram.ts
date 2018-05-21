@@ -8,7 +8,7 @@ import {
 } from '../../graphics/RendererParameter'
 import { Logger } from '../../core/Base'
 import { glObject } from './glObject'
-import { GraphicsConst } from '../../graphics/GraphicsConst';
+import { ShaderConst } from '../../graphics/ShaderConst';
 
 export class glProgram extends glObject {
     protected _program = undefined;
@@ -49,10 +49,10 @@ export class glProgram extends glObject {
             let loc = gl.getUniformLocation(program, data.name);
             if (data.type === gl.SAMPLER_2D || data.type === gl.SAMPLER_CUBE) {
                 gl.uniform1i(loc, tCount);
-                let texMap = GraphicsConst._getTextures();
+                let texMap = ShaderConst._getTextures();
                 this._textures.set(texMap[data.name], tCount++);
             } else {
-                let uniMap = GraphicsConst._getUniforms();
+                let uniMap = ShaderConst._getUniforms();
                 this._uniforms.set(uniMap[data.name], {
                     location: loc,
                     type: data.type,
@@ -67,7 +67,7 @@ export class glProgram extends glObject {
             let data = gl.getActiveAttrib(program, i);
             let loc = gl.getAttribLocation(program, data.name);
             gl.enableVertexAttribArray(loc);
-            let attribMap = GraphicsConst._getAttributes();
+            let attribMap = ShaderConst._getAttributes();
             this._attributes.set(attribMap[data.name], loc);
         }
     }

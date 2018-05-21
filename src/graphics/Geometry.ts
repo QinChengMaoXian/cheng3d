@@ -1,6 +1,6 @@
 import * as CGE from './RendererParameter';
 import { GraphicsObject } from './GraphicsObject';
-import { GraphicsConst } from './GraphicsConst';
+import { ShaderConst } from './ShaderConst';
 import { Attribute, Buffer } from './Buffer';
 import { Bounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB'
@@ -28,7 +28,7 @@ export class Geometry extends GraphicsObject {
         buffer.setParameter(0, usage, type);
         this._buffers.push(buffer);
 
-        if (attribute === GraphicsConst.position) {
+        if (attribute === ShaderConst.position) {
             this._posAttrib = attrib;
             this._posBuffer = buffer;
             this.buildBounding();
@@ -46,7 +46,7 @@ export class Geometry extends GraphicsObject {
             let attrib = new Attribute(param.attribute, param.num, param.offset, param.type);
             buffer.addAttribute(attrib);
 
-            if (param.attribute === GraphicsConst.position) {
+            if (param.attribute === ShaderConst.position) {
                 this._posAttrib = attrib;
                 this._posBuffer = buffer;
                 this.buildBounding();

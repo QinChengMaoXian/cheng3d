@@ -1,6 +1,6 @@
 import { Material } from './Material';
 import { Shader } from '../graphics/Shader';
-import { GraphicsConst } from '../graphics/GraphicsConst'
+import { ShaderConst } from '../graphics/ShaderConst'
 import { AttribType, TextureType, MatrixType } from '../graphics/GraphicsTypes';
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
@@ -16,15 +16,15 @@ export class DiffuseMaterial extends Material {
         let shader = DiffuseMaterial.getShader();
         Object.defineProperty(this, "_shader", { value:shader, writable:false });
 
-        this.setTexture(GraphicsConst.diffuseMap, diffuse);
-        this.setTexture(GraphicsConst.ODMap, Texture2D.ODTex);
+        this.setTexture(ShaderConst.diffuseMap, diffuse);
+        this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
 
-        this.setProperity(GraphicsConst.baseColor, this._baseColor);
+        this.setProperity(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
     }
 
     public setDiffuseMap(texture: Texture2D) {
-        this.setTexture(GraphicsConst.diffuseMap, texture);
+        this.setTexture(ShaderConst.diffuseMap, texture);
     }
 
     public setBaseColor(r: number, g: number, b: number, a: number) {

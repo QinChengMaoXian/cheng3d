@@ -4,7 +4,7 @@ import { Frame } from "../../graphics/Frame";
 import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
 import { Material } from "../../material/Material";
-import { GraphicsConst } from "../../graphics/GraphicsConst";
+import { ShaderConst } from "../../graphics/ShaderConst";
 import { Shader } from "../../graphics/Shader";
 import { Renderer } from "../Renderer";
 import { FLOAT } from "../../graphics/RendererParameter"
@@ -51,13 +51,13 @@ export class FXAA extends PEBase {
         let attribs = [
             {
                 name: 'Position',
-                attribute: GraphicsConst.position, 
+                attribute: ShaderConst.position, 
                 num: 3,
                 offset: 0,
             },
             {
                 name: 'UV',
-                attribute: GraphicsConst.texcoord, 
+                attribute: ShaderConst.texcoord, 
                 num: 2,
                 offset: vertexPositionData.BYTES_PER_ELEMENT * 3,
             },
@@ -81,14 +81,14 @@ class FXAAMaterial extends Material {
         this._data = { data: new Float32Array([1.0, 1.0]) };
 
         this.setSrcTexture(texture);
-        this.setProperity(GraphicsConst.pixelSize, this._data);
+        this.setProperity(ShaderConst.pixelSize, this._data);
     }
 
     public setSrcTexture(texture: Texture2D) {
         if (!texture) {
             return;
         }
-        this.setTexture(GraphicsConst.diffuseMap, texture);
+        this.setTexture(ShaderConst.diffuseMap, texture);
         let w = texture.getWidth();
         let h = texture.getHeight();
         if (!!w && !!h) {
