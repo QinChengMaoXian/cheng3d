@@ -1,10 +1,11 @@
 import { Logger } from '../../core/Base';
 import { glObject } from './glObject';
 
+import { Frame } from '../../graphics/Frame';
 import { Renderer } from '../Renderer'
 
 export class glFrame extends glObject {
-    protected _frame = undefined;
+    protected _frame: WebGLFramebuffer = undefined;
     protected _depthStencil = undefined;
     protected _drawBufferMap = new Map();
     protected _drawBuffers = [];
@@ -32,10 +33,10 @@ export class glFrame extends glObject {
         return completed;
     }
 
-    public generateFromRenderTarget(gl, renderer, frame, maxFrameAttachment) {
+    public generateFromFrame(gl: WebGLRenderingContext, renderer: Renderer, frame: Frame) {
         let textureMap = frame.getTextureMap();
         let depthStencilTexture = frame.getDepthStencilTexture();
-        const maxAttachment = maxFrameAttachment || 8;
+        const maxAttachment = 4;
         this._drawBuffers = [];
         if (this.checkTextures(renderer, textureMap, depthStencilTexture) === false) {
             return undefined;
@@ -44,7 +45,7 @@ export class glFrame extends glObject {
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
         this._drawBufferMap.forEach(function(glTexure2d, location) {
             if (location >= maxAttachment) {
-                Logger.error('current just support ' + maxFrameAttachment + ' attachments, but you set ' + location);
+                Logger.error('current just support ' + maxAttachment + ' attachments, but you set ' + location);
                 return undefined;
             }
             let attachment = gl.COLOR_ATTACHMENT0 + location;
@@ -57,12 +58,15 @@ export class glFrame extends glObject {
         }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         this._frame = frameBuffer;
-        this.setLocalVersion(frame.getUpdateVersion());
+        this._update = false;
+        // this.setLocalVersion(frame.getUpdateVersion());
         return this;
     }
 
-    public apply(gl) {
+    public apply(gl: WebGLRenderingContext) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this._frame);
-        gl.drawBuffers(this._drawBuffers);
+        if (this._drawBuffers.length > 1 && (<any>gl).drawBuffers) {
+            (<any>gl).drawBuffers(this._drawBuffers);
+        } 
     }
 }

@@ -20,6 +20,9 @@ import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
 import { Shader } from '../graphics/Shader';
 
+import { RenderTargetLocation } from '../graphics/GraphicsTypes';
+import { FullScreenMaterial } from '../material/FullScreenMaterial';
+
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
 import { glMesh } from './glObject/glMesh'
@@ -28,21 +31,35 @@ import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
+import { PlaneGeometry } from '../util/GeometryUtil';
+
 
 export class WebGLRenderer extends Base implements Renderer {
+    private static RendererNum = 0;
+
     private _canvas: HTMLCanvasElement;
     private _gl: WebGLRenderingContext;
-    private _ext: {};
+    private _ext: {} = {};
 
     private _defaultTargetState = new RenderTargetState();
-    private _currentTargetState = new RenderTargetState();
 
     private _screenWidth: number = -1;
     private _screenHeight: number = -1;
 
     private _renderCount: number = 0;
 
+    private _mesh: Mesh;
+
     private _glMesh: glMesh;
+
+    private _curFrame: Frame;
+
+    private _defFrame: Frame;
+
+    private _renderToFloatTexture: boolean = false;
+    private _renderToHalfFloatTexture: boolean = false;
+
+    private _rendererId = WebGLRenderer.RendererNum++;
 
     constructor() {
         super();
@@ -56,13 +73,15 @@ export class WebGLRenderer extends Base implements Renderer {
         this._gl = _canvas.getContext('webgl', {antialias: true});
         const _gl = this._gl;
 
+        this._initExtensions();
+
+        this._initFrame();
+
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
         _gl.disable(_gl.BLEND);
 
         this._glMesh = new glMesh();
-        
-        this._initExtensions();
     }
 
     public enableDepthTest() {
@@ -81,8 +100,15 @@ export class WebGLRenderer extends Base implements Renderer {
         this._defaultTargetState.setClearColor(true, new Vector4(r, g, b, a));
     }
 
-    public clear(color?, depth?, stencil?) {
+    public clear(color?: Vector4, depth?: boolean, stencil?: boolean) {
         const defaultTargetState = this._defaultTargetState;
+        if (color !== null || color !== undefined) {
+            defaultTargetState.setClearColor(true, color);
+        }
+
+        if (color !== null || color !== undefined) {
+
+        }
         // defaultTargetState.setClearColor(true, color);
         // defaultTargetState.setClearDepth(true, depth);
         // defaultTargetState.setClearStencil(true, stencil);
@@ -106,15 +132,20 @@ export class WebGLRenderer extends Base implements Renderer {
 
     public initShader(shader: Shader) {
         let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
-        if (glprogram !== undefined) {
-            return glprogram;
+        if (!glprogram) {
+            glprogram = new glProgram();
+            shader.setRenderObjectRef(this, glprogram);
         }
 
-        glprogram = new glProgram();
-        if (glprogram.generateFromShader(this._gl, shader)) {
-            shader.setRenderObjectRef(this, glprogram);
-            return glprogram;
+        if (!glprogram.getUpdate()) {
+            return glprogram
         }
+
+        if (!glprogram.generateFromShader(this._gl, shader)) {
+            glprogram = null;
+            shader.setRenderObjectRef(this, null);
+        }
+        return glprogram;
     }
 
     public initTexture(texture: Texture) {
@@ -135,7 +166,43 @@ export class WebGLRenderer extends Base implements Renderer {
         }
     }
 
-    public renderScene(scene: Object3D, camera: Camera) {
+    public initFrame(frame: Frame) {
+        let glframe: glFrame = <glFrame>frame.getRenderObjectRef(this);
+        if (!glframe) {
+            glframe = new glFrame();
+            frame.setRenderObjectRef(this, glframe);
+        }
+
+        if (!glframe.getUpdate()) {
+            return glframe;
+        }
+
+        if (!glframe.generateFromFrame(this._gl, this, frame)) {
+            glframe = null;
+            frame.setRenderObjectRef(this, null);
+        }
+
+        return glframe;
+    }
+
+    public useFrame(frame?: Frame) {
+        const gl = this._gl;
+
+        if (!frame) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            return;
+        }
+
+        let glframe = this.initFrame(frame);
+
+        if (!glframe) {
+            return;
+        }
+
+        glframe.apply(gl);
+    }
+
+    public renderScene(scene: Object3D, camera: Camera, frame?: Frame) {
         let _camera;
         let _cameraMatrices;
         let _renderList = [];
@@ -149,7 +216,7 @@ export class WebGLRenderer extends Base implements Renderer {
             }
         };
 
-        let glmesh = new glMesh();
+        let glmesh = this._glMesh;
         const _renderMesh = (mesh: Mesh, camera) => {
             let geo = mesh.getGeometry();
             let mat = mesh.getMaterial();
@@ -183,11 +250,7 @@ export class WebGLRenderer extends Base implements Renderer {
         }
 
         const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
-            if (frame) {
-                
-            }
-
-            this.clear(true, true, true);
+            this.clear();
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             let v = this._defaultTargetState.viewport;
             gl.viewport(v.x, v.y, v.z, v.w); 
@@ -199,7 +262,10 @@ export class WebGLRenderer extends Base implements Renderer {
             _render();
         }
 
-        _renderScene(scene, camera);
+        this.useFrame(this._defFrame);
+        _renderScene(scene, camera, frame);
+        this.useFrame(null);
+        _renderScene(this._mesh, camera);
     }
 
     /**
@@ -216,6 +282,7 @@ export class WebGLRenderer extends Base implements Renderer {
         _canvas.height = height;
         this._screenWidth = width;
         this._screenHeight = height;
+        this._defFrame.setSize(width, height);
         this._defaultTargetState.setViewport(new Vector4(0, 0, width, height));
     };
 
@@ -227,11 +294,24 @@ export class WebGLRenderer extends Base implements Renderer {
         return this._gl;
     }
 
+    private _initFrame() {
+        let frame = new Frame();
+        frame.setSize(this._canvas.width, this._canvas.height);
+        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        frame.enableDepthStencil();
+        this._defFrame = frame;
+
+        let mesh = new Mesh();
+        let geo = new PlaneGeometry();
+        let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
+        mesh.setGeometry(geo);
+        mesh.setMaterial(mat);
+        this._mesh = mesh;
+    }
+
     private _initExtensions() {
         const _gl = this._gl;
-        let _ext = {};
-
-        
+        let _ext = this._ext;
 
         let getExtension = function(extName) {
             let ext = _gl.getExtension(extName) || _gl.getExtension('WEBKIT_' + extName) || _gl.getExtension('MOZ_' + extName);
@@ -265,12 +345,16 @@ export class WebGLRenderer extends Base implements Renderer {
             MAX_DRAW_BUFFERS: _ext['WEBGL_draw_buffers'].MAX_DRAW_BUFFERS_WEBGL,
             TEXTURE_MAX_ANISOTROPY: _ext['EXT_texture_filter_anisotropic'].TEXTURE_MAX_ANISOTROPY_EXT,
 
-            createVertexArray: _ext['OES_vertex_array_object'].createVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            deleteVertexArray: _ext['OES_vertex_array_object'].deleteVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            bindVertexArray: _ext['OES_vertex_array_object'].bindVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            isVertexArray: _ext['OES_vertex_array_object'].isVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            // createVertexArray: _ext['OES_vertex_array_object'].createVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            // deleteVertexArray: _ext['OES_vertex_array_object'].deleteVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            // bindVertexArray: _ext['OES_vertex_array_object'].bindVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            // isVertexArray: _ext['OES_vertex_array_object'].isVertexArrayOES.bind(_ext['OES_vertex_array_object']),
             
             drawBuffers: _ext['WEBGL_draw_buffers'].drawBuffersWEBGL.bind(_ext['WEBGL_draw_buffers']),
         });
+    }
+
+    public getRendererId(): number {
+        return this._rendererId;
     }
 }

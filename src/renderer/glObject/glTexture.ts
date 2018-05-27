@@ -1,9 +1,9 @@
 import { glObject } from './glObject'
 
 export class glTexture extends glObject {
-    protected _minFilter: number | string;
-    protected _magFilter: number | string;
-    protected _texture: number | string;
+    protected _minFilter: number;
+    protected _magFilter: number;
+    protected _texture;
 
     constructor(gl) {
         super();

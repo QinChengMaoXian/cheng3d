@@ -256,6 +256,9 @@ document.body.appendChild(renderer.getCanvas());
 
 window['scene'] = mainScene;
 
+let frame = new CGE.Frame();
+// frame.addTexture()
+
 let mesh = new CGE.Mesh();
 mesh.setScale(100, 100, 100);
 mesh.setGeometry(planeVertexGeometry);

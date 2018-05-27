@@ -1,15 +1,17 @@
 import { GraphicsObject } from './GraphicsObject'
 import { Texture2D } from './Texture2D'
+import { TextureCube } from './TextureCube'
 import * as CGE from './RendererParameter'
 import { RenderTargetState } from './RenderTargetState'
+import { RenderTargetLocation } from './GraphicsTypes';
 import { Vector4 } from "../math/Vector4";
 
 export class Frame extends GraphicsObject {
-    private _textures = new Map();
+    private _textures: Map<RenderTargetLocation, any> = new Map();
     private _width = 64;
     private _height = 64;
     private _isFollowScreen = false;
-    private _depthStencilTexture = undefined;
+    private _depthStencilTexture:Texture2D = undefined;
     private _state = new RenderTargetState();
     private _needsUpdateSize = false;
     private _needsDepthStencil;
@@ -22,6 +24,26 @@ export class Frame extends GraphicsObject {
         if (this._needsUpdateSize) {
             this._needsUpdateSize = false;
         }
+    }
+
+    public addTexture(targetType: RenderTargetLocation, format, dataType, filterMin, filterMag) {
+        let __format = format || CGE.RGBA;
+        let __dataType = dataType || CGE.UNSIGNED_BYTE;
+        let texture2d = this._createTexture2d(__format, __dataType);
+        texture2d.setFilter(filterMin, filterMag);
+        this._textures.set(targetType, texture2d);
+    }
+
+    public setTexture2D(targetType: RenderTargetLocation, texture2d: Texture2D) {
+        this._textures.set(targetType, texture2d);
+    }
+
+    public setTextureCube(targetType: RenderTargetLocation, texture2d: Texture2D, ) {
+
+    }
+
+    public setDepthStencilTexture() {
+        
     }
 
     public getState() {
@@ -97,14 +119,6 @@ export class Frame extends GraphicsObject {
 
     public setOffset(viewport) {
         this._state.setViewport(viewport);
-    }
-
-    public addTexture(targetType, format, dataType, filterMin, filterMag) {
-        let __format = format || CGE.RGBA;
-        let __dataType = dataType || CGE.UNSIGNED_BYTE;
-        let texture2d = this._createTexture2d(__format, __dataType);
-        texture2d.setFilter(filterMin, filterMag);
-        this._textures.set(targetType, texture2d);
     }
 
     public getTextureFromType(targetType) {

@@ -61,9 +61,8 @@ export const UniformType = {
     OTHER2                      : _g(),
 };
 
-export const RenderTargetLocation = {
-    COLOR                       : 0,
-    NORMAL                      : 1,
-    DEPTH                       : 2,
-    // TODO: Add more render target type;
-};
+export const enum RenderTargetLocation {
+    COLOR = 0,
+    NORMAL,
+    DEPTH
+}

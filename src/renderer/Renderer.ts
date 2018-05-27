@@ -5,12 +5,13 @@ import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
 import { Shader } from '../graphics/Shader';
+import { Frame } from '../graphics/Frame'
 
 import { Base } from '../core/Base';
 
 export interface Renderer {
 
-    renderScene(scene: Object3D, camera: Camera);
+    renderScene(scene: Object3D, camera: Camera, frame?: Frame);
 
     initGeometry(geometry: Geometry);
 
@@ -19,4 +20,6 @@ export interface Renderer {
     initTexture(texture: Texture);
 
     _renderPostEffect(scene: Object3D, camera?: Camera);
+
+    getRendererId(): number;
 }

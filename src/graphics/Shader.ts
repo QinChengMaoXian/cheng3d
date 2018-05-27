@@ -117,14 +117,17 @@ export class Shader extends GraphicsObject {
             bool OBMap(float alpha) {
                 return alpha < texture2d(u_ODMap, gl_FragCoord.xy * u_ODSizeInv).a;
             }
-            #endif`,
+            #endif
+        `,
         '#include[OBMap]' : `
             #ifdef OB_MAP
                 if (OBMap(baseColor.a)) {
                     discard;
                 }
             #endif
-        `
+        `,
+        'TEXTURE2D' : 'texture2d',
+        'TEXTURECUBE' : 'textureCube'
     }
 
     private static replaceCode(code: string): string {

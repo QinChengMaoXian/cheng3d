@@ -1,26 +1,30 @@
 import { glTexture } from './glTexture'
+import { Texture2D } from '../../graphics/Texture2D';
 
 export class glTexture2D extends glTexture {
-    _wrapS;
-    _wrapT;
-    constructor(gl) {
+    protected _wrapS: number;
+    protected _wrapT: number;
+    
+    constructor(gl: WebGLRenderingContext) {
         super(gl);
         this._wrapS = gl.CLAMP_TO_EDGE;
         this._wrapT = gl.CLAMP_TO_EDGE;
     }
 
-    _applyParameter(gl, target, mipmap) {
+    protected _applyParameter(gl: WebGLRenderingContext, target, mipmap: boolean) {
         gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, this._minFilter);
         gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, this._magFilter);
         gl.texParameteri(target, gl.TEXTURE_WRAP_S, this._wrapS);
         gl.texParameteri(target, gl.TEXTURE_WRAP_T, this._wrapT);
-        gl.texParameteri(target, gl.TEXTURE_MAX_ANISOTROPY, 2.0);
+        if ((<any>gl).TEXTURE_MAX_ANISOTROPY) {
+            gl.texParameteri(target, (<any>gl).TEXTURE_MAX_ANISOTROPY, 2.0);
+        }
         if (mipmap) {
             gl.generateMipmap(target);
         }
     }
 
-    _setTextureData(gl, target, texture) {
+    protected _setTextureData(gl: WebGLRenderingContext, target, texture) {
         let format = texture.getFormat();
         let internalformat = texture.getInternalformat();
         let type = texture.getDataType();
@@ -36,7 +40,7 @@ export class glTexture2D extends glTexture {
         return this;
     }
 
-    _createTextureDatas(gl, texture2d) {
+    protected _createTextureDatas(gl, texture2d) {
         let handler = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, handler);
         if (this._setTextureData(gl, gl.TEXTURE_2D, texture2d) === undefined) {
@@ -45,11 +49,11 @@ export class glTexture2D extends glTexture {
         return handler;
     }
 
-    _applyParameters(gl, mipmap) {
+    protected _applyParameters(gl, mipmap) {
         this._applyParameter(gl, gl.TEXTURE_2D, mipmap);
     }
 
-    _createGLTextureFromTexture(gl, texture) {
+    protected _createGLTextureFromTexture(gl, texture) {
         let handler = this._createTextureDatas(gl, texture);
         if (handler === undefined) {
             return undefined;
@@ -60,7 +64,7 @@ export class glTexture2D extends glTexture {
         return handler;
     }
 
-    generateFromTexture(gl, texture) {
+    public generateFromTexture(gl: WebGLRenderingContext, texture: Texture2D) {
         let handler = this._createGLTextureFromTexture(gl, texture);
         if (handler === undefined) {
             return undefined;
@@ -71,12 +75,12 @@ export class glTexture2D extends glTexture {
         return this;
     }
 
-    apply(gl, index) {
+    public apply(gl, index) {
         gl.activeTexture(gl.TEXTURE0 + index);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
     }
 
-    setWarp(wrapS, wrapT) {
+    public setWarp(wrapS, wrapT) {
         this._wrapS = wrapS;
         this._wrapT = wrapT;
     }
