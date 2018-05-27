@@ -1,10 +1,10 @@
 import { Vector4 } from '../math/Vector4'
 
-export class RenderTargetState {
+export class FrameState {
     public isClearColor: boolean = true;
     public clearColor: Vector4 = new Vector4(1,1,1,1);
-    public isClearDepth: boolean = false;
-    public clearDepth: number = 1.0;
+    public isClearDepth: boolean = true;
+    public clearDepth: number = 0.0;
     public isClearStencil: boolean = false;
     public clearStencil: number = 0;
     public viewport: Vector4 = new Vector4();

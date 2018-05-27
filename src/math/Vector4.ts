@@ -55,6 +55,12 @@ export class Vector4 {
         this.v[3] = v.v[3];
     }
 
+    public equal(vec4: Vector4): boolean {
+        let s = this.v;
+        let d = vec4.v;
+        return s[0] === d[0] && s[1] === d[1] && s[2] === d[2] && s[3] === d[3];
+    }
+
     public set x(value: number) {
         this.v[0] = value;
     }

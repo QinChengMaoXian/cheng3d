@@ -2,7 +2,7 @@ import { GraphicsObject } from './GraphicsObject'
 import { Texture2D } from './Texture2D'
 import { TextureCube } from './TextureCube'
 import * as CGE from './RendererParameter'
-import { RenderTargetState } from './RenderTargetState'
+import { FrameState } from './FrameState'
 import { RenderTargetLocation } from './GraphicsTypes';
 import { Vector4 } from "../math/Vector4";
 
@@ -11,8 +11,8 @@ export class Frame extends GraphicsObject {
     private _width = 64;
     private _height = 64;
     private _isFollowScreen = false;
-    private _depthStencilTexture:Texture2D = undefined;
-    private _state = new RenderTargetState();
+    private _depthStencilTexture: Texture2D = undefined;
+    private _state = new FrameState();
     private _needsUpdateSize = false;
     private _needsDepthStencil;
     

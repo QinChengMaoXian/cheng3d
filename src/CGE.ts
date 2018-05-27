@@ -26,7 +26,7 @@ export { Shader } from './graphics/Shader';
 export { Texture2D } from './graphics/Texture2D';
 export { TextureCube } from './graphics/TextureCube';
 export { Frame } from './graphics/Frame';
-export { RenderTargetState } from './graphics/RenderTargetState';
+export { FrameState } from './graphics/FrameState';
 export { ShaderConst } from './graphics/ShaderConst';
 
 export { Object3D } from './object/Object3D'

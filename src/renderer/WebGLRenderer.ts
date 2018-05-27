@@ -2,7 +2,7 @@ import * as CGE from '../graphics/RendererParameter';
 import { Logger } from '../core/Base';
 import { MatrixType } from '../graphics/GraphicsTypes';
 
-import { RenderTargetState } from '../graphics/RenderTargetState';
+import { FrameState } from '../graphics/FrameState';
 import { Base } from '../core/Base';
 import { Matrix4 } from '../math/Matrix4';
 import { Vector4 } from '../math/Vector4';
@@ -41,7 +41,8 @@ export class WebGLRenderer extends Base implements Renderer {
     private _gl: WebGLRenderingContext;
     private _ext: {} = {};
 
-    private _defaultTargetState = new RenderTargetState();
+    private _curFrameState = new FrameState();
+    private _defFrameState = new FrameState();
 
     private _screenWidth: number = -1;
     private _screenHeight: number = -1;
@@ -53,7 +54,6 @@ export class WebGLRenderer extends Base implements Renderer {
     private _glMesh: glMesh;
 
     private _curFrame: Frame;
-
     private _defFrame: Frame;
 
     private _renderToFloatTexture: boolean = false;
@@ -79,29 +79,29 @@ export class WebGLRenderer extends Base implements Renderer {
 
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
-        _gl.disable(_gl.BLEND);
+        _gl.enable(_gl.BLEND);
 
         this._glMesh = new glMesh();
     }
 
     public enableDepthTest() {
-        this._defaultTargetState.setClearDepth(true);
+        this._defFrameState.setClearDepth(true);
     }
 
     public disableDepthTest() {
-       this._defaultTargetState.setClearDepth(false);
+       this._defFrameState.setClearDepth(false);
     }
 
     public setOffset(x, y, w, h) {
-        this._defaultTargetState.setViewport(new Vector4(x, y, w, h));
+        this._defFrameState.setViewport(new Vector4(x, y, w, h));
     }
 
     public setClearColor(r, g, b, a) {
-        this._defaultTargetState.setClearColor(true, new Vector4(r, g, b, a));
+        this._defFrameState.setClearColor(true, new Vector4(r, g, b, a));
     }
 
-    public clear(color?: Vector4, depth?: boolean, stencil?: boolean) {
-        const defaultTargetState = this._defaultTargetState;
+    public clear(color?: Vector4, depth?: boolean, stencil?: number) {
+        const defaultTargetState = this._defFrameState;
         if (color !== null || color !== undefined) {
             defaultTargetState.setClearColor(true, color);
         }
@@ -185,11 +185,61 @@ export class WebGLRenderer extends Base implements Renderer {
         return glframe;
     }
 
+    public useFrameState(frameState: FrameState) {
+        const gl = this._gl;
+
+        let cache = this._curFrameState;
+        let clearBit = 0;
+
+        if (!cache.viewport.equal(frameState.viewport)) {
+            cache.viewport.setAt(frameState.viewport);
+            let data = cache.viewport.data;
+            gl.viewport(data[0], data[1], data[2], data[3]);
+        }
+
+        cache.isClearColor = frameState.isClearColor;
+        if (cache.isClearColor) {
+            clearBit = clearBit | gl.COLOR_BUFFER_BIT;
+            if (!cache.clearColor.equal(frameState.clearColor)) {
+                cache.clearColor.setAt(frameState.clearColor);
+                let data = cache.clearColor.data;
+                gl.clearColor(data[0], data[1], data[2], data[3]);
+            }
+        }
+
+        cache.isClearDepth = frameState.isClearDepth;
+        if (cache.isClearDepth) {
+            clearBit = clearBit | gl.DEPTH_BUFFER_BIT;
+            if (cache.clearDepth !== frameState.clearDepth) {
+                cache.clearDepth = frameState.clearDepth;
+                gl.clearDepth(cache.clearDepth);
+            }
+        }
+        
+        cache.isClearStencil = frameState.isClearStencil;
+        if (cache.isClearStencil) {
+            clearBit = clearBit | gl.STENCIL_BUFFER_BIT;
+            if (cache.clearStencil !== frameState.clearStencil) {
+                cache.clearStencil = frameState.clearStencil;
+                gl.clearStencil(cache.clearStencil);
+            }
+        }
+
+        gl.clear(clearBit);
+
+    }
+
     public useFrame(frame?: Frame) {
         const gl = this._gl;
 
         if (!frame) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            this.useFrameState(this._defFrameState);
+            this._curFrame = null;
+            return;
+        }
+
+        if (this._curFrame === frame) {
             return;
         }
 
@@ -200,6 +250,8 @@ export class WebGLRenderer extends Base implements Renderer {
         }
 
         glframe.apply(gl);
+        this.useFrameState(frame.getState());
+        this._curFrame = frame;
     }
 
     public renderScene(scene: Object3D, camera: Camera, frame?: Frame) {
@@ -250,11 +302,6 @@ export class WebGLRenderer extends Base implements Renderer {
         }
 
         const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
-            this.clear();
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            let v = this._defaultTargetState.viewport;
-            gl.viewport(v.x, v.y, v.z, v.w); 
-
             _camera = camera;
             _cameraMatrices = _getCameraMatrices(camera);
             _renderList = [];
@@ -283,7 +330,7 @@ export class WebGLRenderer extends Base implements Renderer {
         this._screenWidth = width;
         this._screenHeight = height;
         this._defFrame.setSize(width, height);
-        this._defaultTargetState.setViewport(new Vector4(0, 0, width, height));
+        this._defFrameState.setViewport(new Vector4(0, 0, width, height));
     };
 
     public getCanvas(): HTMLCanvasElement {
@@ -300,6 +347,7 @@ export class WebGLRenderer extends Base implements Renderer {
         // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
         frame.enableDepthStencil();
+        frame.getState().clearColor.set(0.0, 0.0, 0.0, 0.0);
         this._defFrame = frame;
 
         let mesh = new Mesh();
