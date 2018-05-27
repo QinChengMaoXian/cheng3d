@@ -18,10 +18,12 @@ import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
+import { PlaneGeometry } from '../util/GeometryUtil';
 import { Shader } from '../graphics/Shader';
 
 import { RenderTargetLocation } from '../graphics/GraphicsTypes';
 import { FullScreenMaterial } from '../material/FullScreenMaterial';
+import { FXAAMaterial } from './postEffect/FXAA';
 
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
@@ -31,8 +33,6 @@ import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { glTexture } from './glObject/glTexture';
-import { PlaneGeometry } from '../util/GeometryUtil';
-
 
 export class WebGLRenderer extends Base implements Renderer {
     private static RendererNum = 0;
@@ -297,12 +297,14 @@ export class WebGLRenderer extends Base implements Renderer {
     private _initFrame() {
         let frame = new Frame();
         frame.setSize(this._canvas.width, this._canvas.height);
-        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
         frame.enableDepthStencil();
         this._defFrame = frame;
 
         let mesh = new Mesh();
         let geo = new PlaneGeometry();
+        // let mat = new FXAAMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
         let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
         mesh.setGeometry(geo);
         mesh.setMaterial(mat);
@@ -345,10 +347,10 @@ export class WebGLRenderer extends Base implements Renderer {
             MAX_DRAW_BUFFERS: _ext['WEBGL_draw_buffers'].MAX_DRAW_BUFFERS_WEBGL,
             TEXTURE_MAX_ANISOTROPY: _ext['EXT_texture_filter_anisotropic'].TEXTURE_MAX_ANISOTROPY_EXT,
 
-            // createVertexArray: _ext['OES_vertex_array_object'].createVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            // deleteVertexArray: _ext['OES_vertex_array_object'].deleteVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            // bindVertexArray: _ext['OES_vertex_array_object'].bindVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            // isVertexArray: _ext['OES_vertex_array_object'].isVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            createVertexArray: _ext['OES_vertex_array_object'].createVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            deleteVertexArray: _ext['OES_vertex_array_object'].deleteVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            bindVertexArray: _ext['OES_vertex_array_object'].bindVertexArrayOES.bind(_ext['OES_vertex_array_object']),
+            isVertexArray: _ext['OES_vertex_array_object'].isVertexArrayOES.bind(_ext['OES_vertex_array_object']),
             
             drawBuffers: _ext['WEBGL_draw_buffers'].drawBuffersWEBGL.bind(_ext['WEBGL_draw_buffers']),
         });

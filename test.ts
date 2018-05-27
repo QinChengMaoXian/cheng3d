@@ -422,4 +422,7 @@ function loop() {
 
 setTimeout(render, 200);
 
+window['loop'] = loop;
+window['render'] = render; 
+
 loop();

@@ -63,6 +63,7 @@ export const UniformType = {
 
 export const enum RenderTargetLocation {
     COLOR = 0,
-    NORMAL,
-    DEPTH
+    RT1,
+    RT2,
+    RT3
 }

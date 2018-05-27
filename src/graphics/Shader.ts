@@ -126,7 +126,7 @@ export class Shader extends GraphicsObject {
                 }
             #endif
         `,
-        'TEXTURE2D' : 'texture2d',
+        'TEXTURE2D' : 'texture2D',
         'TEXTURECUBE' : 'textureCube'
     }
 
