@@ -247,8 +247,8 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 let renderer = new CGE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.enableDepthTest();
-renderer.clear();
-renderer.setClearColor(0.2, 0.1, 0.1, 1.0);
+renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
+
 
 window['renderer'] = renderer;
 

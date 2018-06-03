@@ -1,5 +1,5 @@
 import * as CGE from '../graphics/RendererParameter';
-import { Logger } from '../core/Base';
+import { Logger } from '../core/Logger';
 import { MatrixType } from '../graphics/GraphicsTypes';
 
 import { FrameState } from '../graphics/FrameState';
@@ -98,20 +98,6 @@ export class WebGLRenderer extends Base implements Renderer {
 
     public setClearColor(r, g, b, a) {
         this._defFrameState.setClearColor(true, new Vector4(r, g, b, a));
-    }
-
-    public clear(color?: Vector4, depth?: boolean, stencil?: number) {
-        const defaultTargetState = this._defFrameState;
-        if (color !== null || color !== undefined) {
-            defaultTargetState.setClearColor(true, color);
-        }
-
-        if (color !== null || color !== undefined) {
-
-        }
-        // defaultTargetState.setClearColor(true, color);
-        // defaultTargetState.setClearDepth(true, depth);
-        // defaultTargetState.setClearStencil(true, stencil);
     }
 
     public initGeometry(geometry: Geometry) {
@@ -347,13 +333,14 @@ export class WebGLRenderer extends Base implements Renderer {
         // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
         frame.enableDepthStencil();
-        frame.getState().clearColor.set(0.0, 0.0, 0.0, 0.0);
+        frame.getState().clearColor.set(1.0, 0.5, 0.5, 0.0);
         this._defFrame = frame;
 
         let mesh = new Mesh();
         let geo = new PlaneGeometry();
         // let mat = new FXAAMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
         let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
+        // let mat = new FullScreenMaterial(frame.getDepthStencilTexture());
         mesh.setGeometry(geo);
         mesh.setMaterial(mat);
         this._mesh = mesh;

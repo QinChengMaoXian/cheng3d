@@ -1,4 +1,4 @@
-import { Logger } from '../core/Base'
+import { Logger } from '../core/Logger'
 
 export class Loader {
     constructor() {

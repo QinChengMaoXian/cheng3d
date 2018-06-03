@@ -1,4 +1,4 @@
-import { Logger } from '../../core/Base';
+import { Logger } from '../../core/Logger';
 import { glObject } from './glObject';
 
 import { Frame } from '../../graphics/Frame';

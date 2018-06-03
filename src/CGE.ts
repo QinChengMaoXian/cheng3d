@@ -1,5 +1,9 @@
 export * from './core/Base';
 
+export { Logger } from './core/Logger';
+
+export * from './core/Static';
+
 export { Vector3 } from './math/Vector3';
 export { Vector4 } from './math/Vector4';
 export { Quaternion } from './math/Quaternion';

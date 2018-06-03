@@ -1,4 +1,4 @@
-import { GetTypeCount } from '../core/Base';
+import { GetTypeCount } from '../core/Static';
 
 const _g = GetTypeCount;
 

@@ -12,7 +12,7 @@ import * as CGE from '../graphics/RendererParameter';
 
 import { Loader } from "../io/Loader"
 
-import { Logger } from '../core/Base'
+import { Logger } from '../core/Logger'
 
 export class GltfLoader {
     constructor(public url?:string, callback?:any) {

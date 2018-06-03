@@ -4,8 +4,9 @@ import { Matrix4 } from '../math/Matrix4';
 import { EventDispatcher } from '../core/EventDispatcher';
 import { Component } from './Component';
 import { Bounding } from '../bounding/Bounding'
+import { Base } from '../core/Base';
 
-export class Object3D extends EventDispatcher {
+export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
     protected _rotate: Quaternion = new Quaternion();
     protected _scale: Vector3 = new Vector3(1, 1, 1);

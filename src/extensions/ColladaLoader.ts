@@ -7,7 +7,7 @@ import { Component } from '../object/Component'
 import { AttribType } from '../graphics/GraphicsTypes'
 import { FLOAT } from '../graphics/RendererParameter'
 
-import { Logger } from '../core/Base'
+import { Logger } from '../core/Logger'
 
 export class ColladaLoader {
     protected _loadState;

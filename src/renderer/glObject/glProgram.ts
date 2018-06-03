@@ -6,7 +6,7 @@ import {
     FLOAT_MAT3,
     FLOAT_MAT4
 } from '../../graphics/RendererParameter'
-import { Logger } from '../../core/Base'
+import { Logger } from '../../core/Logger'
 import { glObject } from './glObject'
 import { ShaderConst } from '../../graphics/ShaderConst';
 
@@ -17,7 +17,7 @@ export class glProgram extends glObject {
     protected _uniforms = new Map();
     protected _attributes = new Map();
 
-    protected _Macros = [];
+    protected _macros = [];
 
     constructor() {
         super();
