@@ -30,6 +30,7 @@ export class Sprite extends Base {
     private _update() {
         if (this._needsUpdate) {
             this._updateBounding();
+            this._needsUpdate = false;
         }
     }
 

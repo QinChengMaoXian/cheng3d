@@ -4,14 +4,14 @@ let test_diff = './resources/spnza_bricks_a_diff.jpg';
 let man_diff = './resources/VWS_B_Male2-2.jpg';
 let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
 
-// import { 
-//     teapotPositions,
-//     teapotTexCoords,
-//     teapotNormals,
-//     teapotBinormals,
-//     teapotTangents,
-//     teapotIndices,
-// } from './teapot';
+import { 
+    teapotPositions,
+    teapotTexCoords,
+    teapotNormals,
+    teapotBinormals,
+    teapotTangents,
+    teapotIndices,
+} from './teapot';
 
 let mainScene = new CGE.Scene();
 /*
@@ -244,6 +244,16 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
+let teapotGeometry = new CGE.Geometry();
+teapotGeometry.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, teapotPositions);
+teapotGeometry.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 3, CGE.FLOAT, teapotTexCoords);
+teapotGeometry.addSingleAttribute('Normal', CGE.ShaderConst.normal, 3, CGE.FLOAT, teapotNormals);
+teapotGeometry.addSingleAttribute('Binormal', CGE.ShaderConst.binomial, 3, CGE.FLOAT, teapotBinormals);
+teapotGeometry.addSingleAttribute('Tangent', CGE.ShaderConst.tangent, 3, CGE.FLOAT, teapotTangents);
+teapotGeometry.setIndexData(teapotIndices);
+teapotGeometry.setDrawParameter(teapotIndices.length);
+
+
 let renderer = new CGE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.enableDepthTest();
@@ -256,7 +266,7 @@ document.body.appendChild(renderer.getCanvas());
 
 window['scene'] = mainScene;
 
-let frame = new CGE.Frame();
+// let frame = new CGE.Frame();
 // frame.addTexture()
 
 let mesh = new CGE.Mesh();
@@ -264,7 +274,14 @@ mesh.setScale(100, 100, 100);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(colorShowingMaterial);
 
+let teapotMesh = new CGE.Mesh();
+teapotMesh.setScale(1, 1, 1);
+teapotMesh.setPosition(50, 50, 0);
+teapotMesh.setGeometry(teapotGeometry);
+teapotMesh.setMaterial(colorShowingMaterial);
+
 mainScene.addChild(mesh);
+mainScene.addChild(teapotMesh);
 
 let events = new Map();
 

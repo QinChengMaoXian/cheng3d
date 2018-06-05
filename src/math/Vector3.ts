@@ -2,7 +2,7 @@ import { Quaternion } from "./Quaternion";
 import { Matrix4 } from "./Matrix4";
 
 export class Vector3 {
-    private static _helper: Vector3 = new Vector3();
+    public static _helper: Vector3 = new Vector3();
 
     public v: Float32Array;
 
@@ -68,6 +68,9 @@ export class Vector3 {
         return this.v[0] * vec.x + this.v[1] * vec.y + this.v[2] * vec.z;
     }
 
+    /**
+     * Will change this;
+     */
     public crossBy(a: Vector3, b: Vector3) {
         let ax = a.x, ay = a.y, az = a.z,
             bx = b.x, by = b.y, bz = b.z;
@@ -77,18 +80,19 @@ export class Vector3 {
         return this;
     }
 
+    /**
+     * Will new a Vector3, do not change this;
+     * @param vec3 
+     */
     public cross(vec3: Vector3): Vector3 {
-        return this.crossd(vec3).clone();
+        return Vector3._helper.crossBy(this, vec3).clone();
     }
 
-    public crossd(vec3: Vector3): Vector3 {
-        let ax = this.v[0], ay = this.v[1], az = this.v[2],
-            bx = vec3.x, by = vec3.y, bz = vec3.z;
-        let vec = Vector3._helper;
-        vec.x = ay * bz - az * by;
-        vec.y = az * bx - ax * bz;
-        vec.z = ax * by - ay * bx;
-        return vec;
+    /**
+     * Will change this;
+     */
+    public crossAt(vec3: Vector3): Vector3 {
+        return this.crossBy(this, vec3);
     }
 
     public length(): number {
