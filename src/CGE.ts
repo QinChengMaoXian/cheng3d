@@ -23,6 +23,9 @@ export { Sphere } from './bounding/Sphere';
 export { Material } from './material/Material';
 export { DiffuseMaterial } from './material/DiffuseMaterial';
 
+export { Light } from './light/Light';
+export { DirectionLight } from './light/DirectionLight';
+
 export * from './graphics/GraphicsTypes';
 export * from './graphics/RendererParameter';
 export { Geometry } from './graphics/Geometry';

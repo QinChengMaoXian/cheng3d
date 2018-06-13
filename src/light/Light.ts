@@ -12,7 +12,7 @@ export class Light extends Object3D {
 
     protected _color: Vector4 = new Vector4();
 
-    protected _isShadow: boolean = false;
+    protected _shadow: boolean = false;
 
     constructor() {
         super();
@@ -24,15 +24,12 @@ export class Light extends Object3D {
     }
 
     public enableShadow() {
-        this._isShadow = true;
+        this._shadow = true;
     }
 
     public disableShadow() {
-        this._isShadow = false;
+        this._shadow = false;
     }
-
-    private _enableShadow() {}
-    private _disableShadow() {}
 
     public getType() {
         return -1;
