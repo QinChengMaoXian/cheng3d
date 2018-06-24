@@ -26,6 +26,7 @@ export class ShaderConst {
     // supported texture name;
     public static readonly diffuseMap   = ShaderConst._inTex('u_diffuseMap');
     public static readonly normalMap    = ShaderConst._inTex('u_normalMap');
+    public static readonly specularMap  = ShaderConst._inTex('u_normalMap');
 
     /**
      * Ordered Dithering Map used for alpha test
@@ -40,6 +41,10 @@ export class ShaderConst {
     public static readonly uvOffset     = ShaderConst._inUni('u_uvOffset');
     public static readonly baseColor    = ShaderConst._inUni('u_baseColor');
     public static readonly pixelSize    = ShaderConst._inUni('u_pixelSize');
+    public static readonly cameraPos    = ShaderConst._inUni('u_cameraPos');
+    public static readonly lightColor   = ShaderConst._inUni('u_lightColor');
+    public static readonly lightPos     = ShaderConst._inUni('u_lightPos');
+    public static readonly lightDir     = ShaderConst._inUni('u_lightDir');
 
     /** world(model) matrix */
     public static readonly mMat         = ShaderConst._inUni('u_mMat');
@@ -47,6 +52,8 @@ export class ShaderConst {
     public static readonly vMat         = ShaderConst._inUni('u_vMat');
     /** projection matrix */
     public static readonly pMat         = ShaderConst._inUni('u_pMat');
+    /** view projection matrix */
+    public static readonly mvMat        = ShaderConst._inUni('u_mvMat');
     /** view projection matrix */
     public static readonly vpMat        = ShaderConst._inUni('u_vpMat');
     /** model view projection matrix */

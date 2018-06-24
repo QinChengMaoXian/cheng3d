@@ -1,4 +1,4 @@
-import { Light } from "./Light";
+import { LightType, Light } from "./Light";
 import { Vector3 } from "../math/Vector3";
 
 export class DirectionLight extends Light {
@@ -22,6 +22,6 @@ export class DirectionLight extends Light {
     }
 
     public getType() {
-        return 0;
+        return LightType.Direction;
     }
 }

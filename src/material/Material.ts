@@ -38,6 +38,16 @@ export class Material extends Base {
         this._properties.set(type, data);
     }
 
+    public setTextureUrl(type: string | number, url: string) {
+        let texture2d = new Texture2D();
+        texture2d.setImageUrl(url);
+        this._textures.set(type, texture2d);
+    }
+
+    public clone() {
+        
+    }
+
     public getTexture(type: string | number) {
         return this._textures.get(type);
     }

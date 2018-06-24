@@ -3,9 +3,10 @@ import { Object3D } from '../object/Object3D'
 import { Vector4 } from '../math/Vector4'
 
 export enum LightType {
-    Direction = 0,
-    Point = 1,
-    Spot = 2,
+    None = 0,
+    Direction = 1,
+    Point = 2,
+    Spot = 3,
 }
 
 export class Light extends Object3D {
@@ -31,7 +32,11 @@ export class Light extends Object3D {
         this._shadow = false;
     }
 
+    public isLighting() {
+        return true;
+    }
+
     public getType() {
-        return -1;
+        return LightType.None;
     }
 }

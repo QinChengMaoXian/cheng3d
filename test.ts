@@ -1,6 +1,7 @@
 import * as CGE from './src/CGE'
 
 let test_diff = './resources/spnza_bricks_a_diff.jpg';
+let test_normal = './resources/spnza_bricks_a_ddn.jpg';
 let man_diff = './resources/VWS_B_Male2-2.jpg';
 let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
 
@@ -159,9 +160,18 @@ let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, tr
 colorTexrure.setImageUrl(test_diff);
 colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
 colorTexrure.setMipmap(true);
+colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT)
+let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+normalTexture.setImageUrl(test_normal);
+normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+normalTexture.setMipmap(true);
+normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
+
+
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
+
+let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture);
 
 let gltfJson = undefined;
 let gltfCallback = (event, object) => {
@@ -276,9 +286,11 @@ mesh.setMaterial(colorShowingMaterial);
 
 let teapotMesh = new CGE.Mesh();
 teapotMesh.setScale(1, 1, 1);
-teapotMesh.setPosition(50, 50, 0);
+teapotMesh.setPosition(10, 50, 20);
 teapotMesh.setGeometry(teapotGeometry);
-teapotMesh.setMaterial(colorShowingMaterial);
+
+teapotMesh.setMaterial(standMat);
+// teapotMesh.setMaterial(colorShowingMaterial);
 
 mainScene.addChild(mesh);
 mainScene.addChild(teapotMesh);
@@ -442,4 +454,4 @@ setTimeout(render, 200);
 window['loop'] = loop;
 window['render'] = render; 
 
-loop();
+// loop();

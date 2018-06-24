@@ -260,7 +260,7 @@ export class WebGLRenderer extends Base implements Renderer {
             let mat = mesh.getMaterial();
             let shader = mat.getShader();
             let images = mat.getTextures();
-            return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices);
+            return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices, camera);
         }
 
         const _render = () => {
@@ -275,15 +275,17 @@ export class WebGLRenderer extends Base implements Renderer {
             _renderList.push(mesh);
         }
 
-        const _preRenderObjects = (obj) => {
-            if(obj.beRendering()) {
+        const _preRenderObjects = (obj: Object3D, isRendering: boolean) => {
+            let display = obj.getDisplay() && isRendering;
+            if(obj.beRendering() && display) {
                 _addToRenderList(obj);
             }
+
             const children = obj.getChildren();
             const l = children.length;
             for(let i = 0; i < l; i++) {
                 const child = children[i];
-                _preRenderObjects(child);
+                _preRenderObjects(child, display);
             }
         }
 
@@ -291,7 +293,7 @@ export class WebGLRenderer extends Base implements Renderer {
             _camera = camera;
             _cameraMatrices = _getCameraMatrices(camera);
             _renderList = [];
-            _preRenderObjects(scene);
+            _preRenderObjects(scene, scene.getDisplay());
             _render();
         }
 

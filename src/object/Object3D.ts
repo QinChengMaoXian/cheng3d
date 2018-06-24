@@ -13,7 +13,7 @@ export class Object3D extends Base {
     protected _matrix: Matrix4 = new Matrix4();
     
     protected _display: boolean = true;
-    protected _components: Component[] = [];
+    // protected _components: Component[] = [];
     
     protected _parent: Object3D = null;
     protected _children: Object3D[] = [];
@@ -141,10 +141,15 @@ export class Object3D extends Base {
         return false;
     }
 
+    public isLighting(): boolean {
+        return false;
+    }
+
     public getBounding() {
         return this._bounding;
     }
 
+    // TODO
     public toJson(obj?) {
         let result = super.toJson(obj);
         result.position = this._position.toJson();
@@ -160,6 +165,7 @@ export class Object3D extends Base {
         return result;
     }
 
+    // TODO
     public fromJson(obj) {
 
     }

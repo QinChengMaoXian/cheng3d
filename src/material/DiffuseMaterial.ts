@@ -31,6 +31,10 @@ export class DiffuseMaterial extends Material {
         this._baseColor.set(r,g,b,a);
     }
 
+    public clone() {
+        
+    }
+
     private static _nShader;
     private static getShader() {
         if (DiffuseMaterial._nShader === undefined) {

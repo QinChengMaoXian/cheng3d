@@ -9,6 +9,7 @@ import { Geometry } from '../../graphics/Geometry';
 import { Mesh } from '../../object/Mesh';
 import { glProgram } from './glProgram';
 import { glBuffer } from './glBuffer';
+import { Camera } from '../../object/Camera';
 
 
 
@@ -82,7 +83,7 @@ export class glMesh extends glObject {
         return this;
     }
 
-    private _applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, cameraMatrices) {
+    private _applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, cameraMatrices, camera: Camera) {
         let glProgram = this._glProgram;
         let material = mesh.getMaterial();
         let properties = material.getProperties();
@@ -117,14 +118,16 @@ export class glMesh extends glObject {
             let location = uniformObject.location;
             let type = uniformObject.type;
             let data: Matrix4 | Vector3 | Vector4; //matrix = glMesh._matrix;
-            // TODO: maybe need re-build? but looks like good for used;
+            // TODO: maybe need re-build? but looks good for use;
             switch (uniformType) {
-                case ShaderConst.mMat:            data = worldMatrix; break;
-                case ShaderConst.vMat:            data = cameraMatrices.viewMatirx; break;
-                case ShaderConst.pMat:            data = cameraMatrices.projectionMatirx; break;
-                case ShaderConst.vpMat:           data = getVPMatrix(); break;
+                case ShaderConst.mMat:              data = worldMatrix; break;
+                case ShaderConst.vMat:              data = cameraMatrices.viewMatirx; break;
+                case ShaderConst.pMat:              data = cameraMatrices.projectionMatirx; break;
+                case ShaderConst.vpMat:             data = getVPMatrix(); break;
                 case MatrixType.MVMatrix:           data = getMVMatrix(); break;
-                case ShaderConst.mvpMat:          data = getMVPMatrix(); break;
+                case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
+                case ShaderConst.mvMat:             data = getMVMatrix(); break;
+                case ShaderConst.cameraPos:         data = camera.getPosition(); break;
                 case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
@@ -139,17 +142,17 @@ export class glMesh extends glObject {
         });
     }
 
-    private _applyMaterial(gl: WebGLRenderingContext, entity, cameraMatrices) {
+    private _applyMaterial(gl: WebGLRenderingContext, entity, cameraMatrices, camera) {
         this._glProgram.apply(gl);
         
         // this._applyUniforms(gl, entity);
-        this._applyUniforms(gl, entity, cameraMatrices);
+        this._applyUniforms(gl, entity, cameraMatrices, camera);
     }
 
-    public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, cameraMatrices) {
+    public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, cameraMatrices, camera) {
         let geo = mesh.getGeometry();
         if (!this._checkGLObject(gl, renderer, mesh.getGeometry(), shader, images)) return false;
-        this._applyMaterial(gl, mesh, cameraMatrices);
+        this._applyMaterial(gl, mesh, cameraMatrices, camera);
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
         this._glBuffer.draw(gl);
         return true;
