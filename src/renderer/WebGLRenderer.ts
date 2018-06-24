@@ -27,7 +27,7 @@ import { FXAAMaterial } from './postEffect/FXAA';
 
 import { glBuffer } from './glObject/glBuffer'
 import { glDraw } from './glObject/glDraw'
-import { glMesh } from './glObject/glMesh'
+import { glRenderExt } from './glObject/glRenderExt'
 import { glFrame } from './glObject/glFrame'
 import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
@@ -51,7 +51,7 @@ export class WebGLRenderer extends Base implements Renderer {
 
     private _mesh: Mesh;
 
-    private _glMesh: glMesh;
+    private _glRenderExt: glRenderExt;
 
     private _curFrame: Frame;
     private _defFrame: Frame;
@@ -81,7 +81,7 @@ export class WebGLRenderer extends Base implements Renderer {
         _gl.depthFunc(_gl.LEQUAL);
         _gl.enable(_gl.BLEND);
 
-        this._glMesh = new glMesh();
+        this._glRenderExt = new glRenderExt();
     }
 
     public enableDepthTest() {
@@ -240,34 +240,27 @@ export class WebGLRenderer extends Base implements Renderer {
         this._curFrame = frame;
     }
 
+    protected _renderMesh = (mesh: Mesh, camera) => {
+        let geo = mesh.getGeometry();
+        let mat = mesh.getMaterial();
+        let shader = mat.getShader();
+        let images = mat.getTextures();
+        return this._glRenderExt.draw(this, this._gl, mesh, shader, images, camera);
+    }
+
     public renderScene(scene: Object3D, camera: Camera, frame?: Frame) {
         let _camera;
         let _cameraMatrices;
         let _renderList = [];
         const gl = this._gl;
 
-        const _getCameraMatrices = (camera) => {
-            return {
-                viewMatirx: camera.getMatrix().clone(),
-                projectionMatirx: camera.getProjectionMatrix().clone(),
-                viewProjectionMatirx: camera.getViewProjectionMatrix().clone(),
-            }
-        };
-
-        let glmesh = this._glMesh;
-        const _renderMesh = (mesh: Mesh, camera) => {
-            let geo = mesh.getGeometry();
-            let mat = mesh.getMaterial();
-            let shader = mat.getShader();
-            let images = mat.getTextures();
-            return glmesh.draw(this, gl, mesh, shader, images, _cameraMatrices, camera);
-        }
+        let glmesh = this._glRenderExt;
 
         const _render = () => {
             let l = _renderList.length;
             for (let i = 0; i < l; i++) {
                 let mesh = _renderList[i];
-                _renderMesh(mesh, _camera);
+                this._renderMesh(mesh, _camera);
             }
         }
 
@@ -291,7 +284,6 @@ export class WebGLRenderer extends Base implements Renderer {
 
         const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
             _camera = camera;
-            _cameraMatrices = _getCameraMatrices(camera);
             _renderList = [];
             _preRenderObjects(scene, scene.getDisplay());
             _render();

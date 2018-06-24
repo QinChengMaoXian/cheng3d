@@ -16,10 +16,11 @@ export class Camera extends Object3D {
     fovy;
     aspect;
     mode = Camera.Perspective;
-    projection = new Matrix4();
+    protected projection = new Matrix4();
+    protected viewProjection = new Matrix4();
     center = new Vector3();
     up = new Vector3(0, 0, 1);
-    _projectionFunc;
+    protected _projectionFunc: Function;
 
     constructor(width, height, fovy?, near?, far?) {
         super();
@@ -52,19 +53,20 @@ export class Camera extends Object3D {
     }
 
     update(delta) {
+        this._update();
+    }
+
+    protected _update() {
         if (this._needsUpdate) {
             this._updateMatrix();
             this.makeProjectionMatrix();
+            this.makeViewProjectionMatrix();
             this._needsUpdate = false;
         }
     }
 
     protected _makeMatrix() {
-        if (this._needsUpdate) {
-            this._updateMatrix();
-            this.makeProjectionMatrix();
-            this._needsUpdate = false;
-        }
+        this._update();
         return this._matrix;
     }
 
@@ -77,6 +79,7 @@ export class Camera extends Object3D {
         this.top = top || this.top;
         this.near = near || this.near;
         this.far = far || this.far;
+        this.resize(right - left, bottom - top);
     }
 
     enablePerspectiveMode(fovy, aspect, near, far) {
@@ -109,10 +112,14 @@ export class Camera extends Object3D {
         return this.projection;
     }
 
+    makeViewProjectionMatrix() {
+        let mat4 = this.viewProjection
+        mat4.copy(this.projection);
+        mat4.applyMatrix4(this._matrix);
+    }
+
     getViewProjectionMatrix() {
-        let mat4 = this.projection.clone();
-        mat4.applyMatrix4(this.getMatrix());
-        return mat4;
+        return this.viewProjection;
     }
 
     makeMatrix() {
@@ -152,7 +159,8 @@ export class Camera extends Object3D {
         this.top = yCenter - halfHeight;
         this.bottom = yCenter + halfHeight;
         this.aspect = width / height;
-        this.makeProjectionMatrix();
+        this._needsUpdate = true;
+        this._update();
     }
 
     forwardStep(delta) {

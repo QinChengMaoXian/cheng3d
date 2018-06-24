@@ -10,16 +10,22 @@ import { Mesh } from '../../object/Mesh';
 import { glProgram } from './glProgram';
 import { glBuffer } from './glBuffer';
 import { Camera } from '../../object/Camera';
+import { DirectionLight } from '../../light/DirectionLight';
 
 
 
-export class glMesh extends glObject {
+export class glRenderExt extends glObject {
     private static _matrix = new Matrix4();
     private static _vpmatrix = new Matrix4();
     private static _mvmatrix = new Matrix4();
     private static _mvpmatrix = new Matrix4();
 
-    private _uniforms = undefined;
+    public vMatrix  = new Matrix4();
+    public pMatrix  = new Matrix4();
+    public vpMatrix = new Matrix4();
+
+    public dirLight: DirectionLight;
+
     private _glBuffer: glBuffer = undefined;
     private _glProgram: glProgram = undefined;
     constructor() {
@@ -83,7 +89,7 @@ export class glMesh extends glObject {
         return this;
     }
 
-    private _applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, cameraMatrices, camera: Camera) {
+    private _applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, camera: Camera) {
         let glProgram = this._glProgram;
         let material = mesh.getMaterial();
         let properties = material.getProperties();
@@ -92,25 +98,25 @@ export class glMesh extends glObject {
         if (uniforms.size === 0) {
             return;
         }
-        let tempMatrix = glMesh._matrix;
+        let tempMatrix = glRenderExt._matrix;
 
         let worldMatrix = mesh.getMatrix();
 
         let MVMatrix = undefined;
         let getMVMatrix = function() {
-            MVMatrix = MVMatrix || glMesh._mvmatrix.copy(cameraMatrices.viewMatirx).applyMatrix4(worldMatrix);
+            MVMatrix = MVMatrix || glRenderExt._mvmatrix.copy(camera.getMatrix()).applyMatrix4(worldMatrix);
             return MVMatrix;
         };
 
         let VPMatrix = undefined;
         let getVPMatrix = function() {
-            VPMatrix = VPMatrix || glMesh._vpmatrix.copy(cameraMatrices.projectionMatirx).applyMatrix4(cameraMatrices.viewMatirx);
+            VPMatrix = VPMatrix || glRenderExt._vpmatrix.copy(camera.getProjectionMatrix()).applyMatrix4(camera.getMatrix());
             return VPMatrix;
         };
 
         let MVPMatrix = undefined;
         let getMVPMatrix = function() {
-            MVPMatrix = MVPMatrix || glMesh._mvpmatrix.copy(cameraMatrices.viewProjectionMatirx).applyMatrix4(worldMatrix);
+            MVPMatrix = MVPMatrix || glRenderExt._mvpmatrix.copy(camera.getViewProjectionMatrix()).applyMatrix4(worldMatrix);
             return MVPMatrix;
         };
 
@@ -121,8 +127,8 @@ export class glMesh extends glObject {
             // TODO: maybe need re-build? but looks good for use;
             switch (uniformType) {
                 case ShaderConst.mMat:              data = worldMatrix; break;
-                case ShaderConst.vMat:              data = cameraMatrices.viewMatirx; break;
-                case ShaderConst.pMat:              data = cameraMatrices.projectionMatirx; break;
+                case ShaderConst.vMat:              data = camera.getMatrix(); break;
+                case ShaderConst.pMat:              data = camera.getProjectionMatrix(); break;
                 case ShaderConst.vpMat:             data = getVPMatrix(); break;
                 case MatrixType.MVMatrix:           data = getMVMatrix(); break;
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
@@ -132,8 +138,7 @@ export class glMesh extends glObject {
                 case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
                 case MatrixType.InverseWMatrix:     data = tempMatrix.copy(worldMatrix).invert(); break;
-                case MatrixType.InverseVMatrix:     data = tempMatrix.copy(cameraMatrices.viewMatirx).invert(); break;
-                case MatrixType.InversePMatrix:     data = tempMatrix.copy(cameraMatrices.projectionMatirx).invert(); break;
+                case MatrixType.InverseVMatrix:     data = tempMatrix.copy(camera.getMatrix()).invert(); break;
                 default:                            data = properties.get(uniformType); break;
             }
             if (data) {
@@ -142,17 +147,17 @@ export class glMesh extends glObject {
         });
     }
 
-    private _applyMaterial(gl: WebGLRenderingContext, entity, cameraMatrices, camera) {
+    private _applyMaterial(gl: WebGLRenderingContext, entity, camera) {
         this._glProgram.apply(gl);
         
         // this._applyUniforms(gl, entity);
-        this._applyUniforms(gl, entity, cameraMatrices, camera);
+        this._applyUniforms(gl, entity, camera);
     }
 
-    public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, cameraMatrices, camera) {
+    public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, camera) {
         let geo = mesh.getGeometry();
         if (!this._checkGLObject(gl, renderer, mesh.getGeometry(), shader, images)) return false;
-        this._applyMaterial(gl, mesh, cameraMatrices, camera);
+        this._applyMaterial(gl, mesh, camera);
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
         this._glBuffer.draw(gl);
         return true;
