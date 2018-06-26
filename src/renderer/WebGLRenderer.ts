@@ -248,13 +248,21 @@ export class WebGLRenderer extends Base implements Renderer {
         return this._glRenderExt.draw(this, this._gl, mesh, shader, images, camera);
     }
 
+    protected _renderScene(scene: Object3D) {
+
+    }
+
     public renderScene(scene: Object3D, camera: Camera, frame?: Frame) {
         let _camera;
         let _cameraMatrices;
         let _renderList = [];
         const gl = this._gl;
 
-        let glmesh = this._glRenderExt;
+        let glRenderExt = this._glRenderExt;
+
+        glRenderExt.vMatrix.copy(camera.getMatrix());
+        glRenderExt.pMatrix.copy(camera.getProjectionMatrix());
+        glRenderExt.vpMatrix.copy(camera.getViewProjectionMatrix());
 
         const _render = () => {
             let l = _renderList.length;

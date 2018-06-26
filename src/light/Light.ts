@@ -36,6 +36,10 @@ export class Light extends Object3D {
         return true;
     }
 
+    public getColor() {
+        return this._color;
+    }
+
     public getType() {
         return LightType.None;
     }

@@ -25,6 +25,8 @@ export class glRenderExt extends glObject {
     public vpMatrix = new Matrix4();
 
     public dirLight: DirectionLight;
+    public lightColor: Vector4;
+    public lightDir: Vector3;
 
     private _glBuffer: glBuffer = undefined;
     private _glProgram: glProgram = undefined;
@@ -102,43 +104,48 @@ export class glRenderExt extends glObject {
 
         let worldMatrix = mesh.getMatrix();
 
+        let vMat = this.vMatrix;
+        let pMat = this.pMatrix;
+        let vpMat = this.vpMatrix;
+
         let MVMatrix = undefined;
         let getMVMatrix = function() {
-            MVMatrix = MVMatrix || glRenderExt._mvmatrix.copy(camera.getMatrix()).applyMatrix4(worldMatrix);
+            MVMatrix = MVMatrix || glRenderExt._mvmatrix.copy(vMat).applyMatrix4(worldMatrix);
             return MVMatrix;
         };
 
         let VPMatrix = undefined;
         let getVPMatrix = function() {
-            VPMatrix = VPMatrix || glRenderExt._vpmatrix.copy(camera.getProjectionMatrix()).applyMatrix4(camera.getMatrix());
+            VPMatrix = VPMatrix || glRenderExt._vpmatrix.copy(pMat).applyMatrix4(vMat);
             return VPMatrix;
         };
 
         let MVPMatrix = undefined;
         let getMVPMatrix = function() {
-            MVPMatrix = MVPMatrix || glRenderExt._mvpmatrix.copy(camera.getViewProjectionMatrix()).applyMatrix4(worldMatrix);
+            MVPMatrix = MVPMatrix || glRenderExt._mvpmatrix.copy(vpMat).applyMatrix4(worldMatrix);
             return MVPMatrix;
         };
 
-        uniforms.forEach(function(uniformObject, uniformType) {
+        uniforms.forEach((uniformObject, uniformType) => {
             let location = uniformObject.location;
             let type = uniformObject.type;
             let data: Matrix4 | Vector3 | Vector4; //matrix = glMesh._matrix;
             // TODO: maybe need re-build? but looks good for use;
             switch (uniformType) {
                 case ShaderConst.mMat:              data = worldMatrix; break;
-                case ShaderConst.vMat:              data = camera.getMatrix(); break;
-                case ShaderConst.pMat:              data = camera.getProjectionMatrix(); break;
+                case ShaderConst.vMat:              data = vMat; break;
+                case ShaderConst.pMat:              data = pMat; break;
                 case ShaderConst.vpMat:             data = getVPMatrix(); break;
-                case MatrixType.MVMatrix:           data = getMVMatrix(); break;
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
                 case ShaderConst.mvMat:             data = getMVMatrix(); break;
                 case ShaderConst.cameraPos:         data = camera.getPosition(); break;
+                case ShaderConst.lightColor:        data = this.dirLight.getColor();
+                case ShaderConst.lightDir:          data = this.dirLight.getColor();
                 case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
                 case MatrixType.InverseWMatrix:     data = tempMatrix.copy(worldMatrix).invert(); break;
-                case MatrixType.InverseVMatrix:     data = tempMatrix.copy(camera.getMatrix()).invert(); break;
+                case MatrixType.InverseVMatrix:     data = tempMatrix.copy(vMat).invert(); break;
                 default:                            data = properties.get(uniformType); break;
             }
             if (data) {
