@@ -1,3 +1,34 @@
+import { Vector3 } from "../math/Vector3";
+
+let vec0 = new Vector3();
+let vec1 = new Vector3();
+
+export const FloatD = 0.000001;
+
+export function createNormal(poly: number[] | Float32Array, out: Vector3) {
+    vec0.set(poly[0] - poly[3], poly[1] - poly[4], poly[2] - poly[5]);
+    vec1.set(poly[3] - poly[6], poly[4] - poly[7], poly[5] - poly[8]);
+    out.crossBy(vec0, vec1);
+}
+
+let n0 = new Vector3()
+let n1 = new Vector3();
+
+export function crossConvexPolygon(poly0: number[] | Float32Array, poly1: number[] | Float32Array): boolean {
+    if (poly0.length < 9 || poly1.length < 9) {
+        return false;
+    }
+
+    createNormal(poly0, n0);
+    createNormal(poly1, n1);
+    
+    let dot = n0.dot(n1);
+
+    if (dot < FloatD) {
+
+    }
+}
+
 export function BuildOrderedDitheringData(n: number = 4): number[] {
     const l = Math.pow(2, n);
     const l2 = l * l;
