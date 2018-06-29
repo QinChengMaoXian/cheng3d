@@ -1,8 +1,9 @@
 import { Quaternion } from "./Quaternion";
 import { Matrix4 } from "./Matrix4";
+import { ObjectPool } from "../util/ObjectPool";
 
 export class Vector3 {
-    public static _helper: Vector3 = new Vector3();
+    public static pool = new ObjectPool<Vector3>(Vector3, 6);
 
     public v: Float32Array;
 
@@ -85,7 +86,7 @@ export class Vector3 {
      * @param vec3 
      */
     public cross(vec3: Vector3): Vector3 {
-        return Vector3._helper.crossBy(this, vec3).clone();
+        return Vector3.pool.create().crossBy(this, vec3);
     }
 
     /**

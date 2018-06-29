@@ -41,13 +41,14 @@ export class Quaternion extends Vector4 {
         let v2 = vec2.clone().normalize();
         let dot = v1.dot(v2);
         if (dot < -0.999999) {
-            let tmpvec3 = Vector3._helper;
+            let tmpvec3 = Vector3.pool.create();
             tmpvec3.set(1,0,0).crossAt(v1);
             if (tmpvec3.lengthSquare() < 0.000000001) {
                 tmpvec3.set(0,1,0).crossAt(v2);
             }
             tmpvec3.normalize();
-            this.setAxisAngle(tmpvec3, Math.PI)
+            this.setAxisAngle(tmpvec3, Math.PI);
+            Vector3.pool.recovery(tmpvec3);
             return this;
         } else if (dot > 0.999999) {
             this.v[0] = 0;
