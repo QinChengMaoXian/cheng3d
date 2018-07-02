@@ -192,7 +192,7 @@ let gltfCallback = (event, object) => {
             let obj = new CGE.Object3D();
             obj.addChild(mesh);
             obj.name = 'test';
-            mainScene.addChild(obj);   
+            // mainScene.addChild(obj);   
             break;
 
         case 'error':
@@ -272,7 +272,7 @@ renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
 
 
-let tri_scale = 20;
+let tri_scale = 10;
 
 let tri_num = 10;
 let half_num = tri_num / 2;
@@ -291,9 +291,13 @@ for (let k = 0; k < tri_num; k++) {
         }
     }
 }
+// console.log(vertexd);
 
 let tri1 = new CGE.Triangle();
 let tri2 = new CGE.Triangle();
+
+window['tri1'] = tri1;
+window['tri2'] = tri2;
 
 // let results = [];
 
@@ -307,14 +311,16 @@ for (let i = 0; i < le; i++) {
     let index = i * 18;
 
     tri1.point1.set(vertexd[index + 0], vertexd[index + 1], vertexd[index + 2]);
-    tri1.point2.set(vertexd[index + 4], vertexd[index + 5], vertexd[index + 6]);
-    tri1.point3.set(vertexd[index + 7], vertexd[index + 7], vertexd[index + 8]);
+    tri1.point2.set(vertexd[index + 3], vertexd[index + 4], vertexd[index + 5]);
+    tri1.point3.set(vertexd[index + 6], vertexd[index + 7], vertexd[index + 8]);
 
     tri2.point1.set(vertexd[index + 9], vertexd[index + 10], vertexd[index + 11]);
     tri2.point2.set(vertexd[index + 12], vertexd[index + 13], vertexd[index + 14]);
     tri2.point3.set(vertexd[index + 15], vertexd[index + 16], vertexd[index + 17]);
 
     let result = CGE.triangleIntersect(tri1, tri2);
+
+    // console.log(result);
 
     let result1 = result ? 0.25 : 0.75;
     let result2 = result ? 0.75 : 0.25;
@@ -378,8 +384,8 @@ teapotMesh.setGeometry(teapotGeometry);
 teapotMesh.setMaterial(standMat);
 // teapotMesh.setMaterial(colorShowingMaterial);
 
-mainScene.addChild(mesh);
-mainScene.addChild(teapotMesh);
+// mainScene.addChild(mesh);
+// mainScene.addChild(teapotMesh);
 
 let events = new Map();
 

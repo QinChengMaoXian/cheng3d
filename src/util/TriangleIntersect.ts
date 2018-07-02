@@ -34,9 +34,9 @@ function on_segment(p1x, p1y, p2x, p2y, px, py): boolean {
 }
 
 function get_central_point(centralPoint: Vector3, tri: Triangle) {
-	centralPoint.x = (tri.point1.x + tri.point2.x + tri.point3.x) / 3;
-	centralPoint.y = (tri.point1.y + tri.point2.y + tri.point3.y) / 3;
-	centralPoint.z = (tri.point1.z + tri.point2.z + tri.point3.z) / 3;
+	centralPoint.x = (tri.point1.x + tri.point2.x + tri.point3.x);
+	centralPoint.y = (tri.point1.y + tri.point2.y + tri.point3.y);
+	centralPoint.z = (tri.point1.z + tri.point2.z + tri.point3.z);
 }
 
 function segments_intersert(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y): boolean {
@@ -89,6 +89,32 @@ function line_triangle_intersert_inSamePlane(tri: Triangle, v1: Vector3, v2: Vec
     return false;
 }
 
+function is_point_within_triangle_3(tri: Triangle, vec: Vector3) {
+    let v0 = Vector3.pool.create().subBy(tri.point3, tri.point1).mul(3);
+    let v1 = Vector3.pool.create().subBy(tri.point2, tri.point1).mul(3);
+    let v2 = Vector3.pool.create().copy(tri.point1).negate().mul(3).add(vec);
+
+    let dot00 = v0.dot(v0);
+    let dot01 = v0.dot(v1);
+    let dot02 = v0.dot(v2);
+    let dot11 = v1.dot(v1);
+    let dot12 = v1.dot(v2);
+    let inverDeno = 1.0 / ( dot00* dot11 - dot01* dot01 );
+    let u = ( dot11* dot02 - dot01* dot12 ) * inverDeno;
+
+    if (u < 0 || u > 1) { // if u out of range, return directly
+        return false;
+    }
+
+    let v = ( dot00* dot12 - dot01* dot02 ) * inverDeno;
+
+    if ( v < 0 || v > 1 ) { // if v out of range, return directly
+		return false;
+    }    
+    
+	return u + v <= 1;
+}
+
 function triangle_intersert_inSamePlane(tri1: Triangle, tri2: Triangle): boolean {
     let v1 = Vector3.pool.create().subBy(tri1.point2, tri1.point1);
     let v2 = Vector3.pool.create().subBy(tri1.point3, tri1.point2);
@@ -120,7 +146,7 @@ function triangle_intersert_inSamePlane(tri1: Triangle, tri2: Triangle): boolean
         get_central_point(centralPoint1, tri1);
         get_central_point(centralPoint2, tri2);
 
-        let result = is_point_within_triangle(tri2, centralPoint1) || is_point_within_triangle(tri1, centralPoint2);
+        let result = is_point_within_triangle_3(tri2, centralPoint1) || is_point_within_triangle_3(tri1, centralPoint2);
 
         Vector3.pool.recovery(centralPoint1);
         Vector3.pool.recovery(centralPoint2);
