@@ -4,6 +4,7 @@ let test_diff = './resources/spnza_bricks_a_diff.jpg';
 let test_normal = './resources/spnza_bricks_a_ddn.jpg';
 let man_diff = './resources/VWS_B_Male2-2.jpg';
 let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
+let color_diff = './resources/color.jpg'
 
 import { 
     teapotPositions,
@@ -270,6 +271,91 @@ renderer.enableDepthTest();
 renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
 
+
+let tri_scale = 20;
+
+let tri_num = 10;
+let half_num = tri_num / 2;
+
+let vertexd = new Float32Array(tri_num * tri_num * tri_num * 18);
+
+for (let k = 0; k < tri_num; k++) {
+    for (let j = 0; j < tri_num; j++) {
+        for (let i = 0; i < tri_num; i++) {
+            let index = (k * tri_num * tri_num + j * tri_num + i) * 18;
+            for (let t = 0; t < 6; t++) {
+                vertexd[index + t * 3 + 0] = ((Math.random() + i - half_num) * tri_scale);
+                vertexd[index + t * 3 + 1] = ((Math.random() + j - half_num) * tri_scale);
+                vertexd[index + t * 3 + 2] = ((Math.random() + k) * tri_scale);
+            }
+        }
+    }
+}
+
+let tri1 = new CGE.Triangle();
+let tri2 = new CGE.Triangle();
+
+// let results = [];
+
+let uvd = new Float32Array(tri_num * tri_num * tri_num * 12);
+
+console.log(Date.now());
+
+let le = tri_num * tri_num * tri_num;
+
+for (let i = 0; i < le; i++) {
+    let index = i * 18;
+
+    tri1.point1.set(vertexd[index + 0], vertexd[index + 1], vertexd[index + 2]);
+    tri1.point2.set(vertexd[index + 4], vertexd[index + 5], vertexd[index + 6]);
+    tri1.point3.set(vertexd[index + 7], vertexd[index + 7], vertexd[index + 8]);
+
+    tri2.point1.set(vertexd[index + 9], vertexd[index + 10], vertexd[index + 11]);
+    tri2.point2.set(vertexd[index + 12], vertexd[index + 13], vertexd[index + 14]);
+    tri2.point3.set(vertexd[index + 15], vertexd[index + 16], vertexd[index + 17]);
+
+    let result = CGE.triangleIntersect(tri1, tri2);
+
+    let result1 = result ? 0.25 : 0.75;
+    let result2 = result ? 0.75 : 0.25;
+
+    let i2 = i * 12;
+
+    for (let t = 0; t < 3; t++) {
+        uvd[i2 + t * 2 + 0] = result1;
+        uvd[i2 + t * 2 + 1] = result1;
+    }
+
+    for (let t = 3; t < 6; t++) {
+        uvd[i2 + t * 2 + 0] = result1;
+        uvd[i2 + t * 2 + 1] = result2;
+    }
+}
+console.log(Date.now());
+
+// console.log(uvd);
+
+// console.log(results);
+
+let triGeo = new CGE.Geometry();
+triGeo.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, vertexd);
+triGeo.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 2, CGE.FLOAT, uvd);
+// triGeo.setIndexData(indexd);
+triGeo.setDrawParameter(vertexd.length / 3);
+
+let triTexture = new CGE.Texture2D();
+triTexture.setImageUrl(color_diff);
+triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+triTexture.setMipmap(true);
+let triMaterial = new CGE.DiffuseMaterial(triTexture);
+
+let triMesh = new CGE.Mesh();
+triMesh.setGeometry(triGeo);
+triMesh.setMaterial(triMaterial);
+
+mainScene.addChild(triMesh);
+
+
 window['renderer'] = renderer;
 
 document.body.appendChild(renderer.getCanvas());
@@ -454,4 +540,4 @@ setTimeout(render, 200);
 window['loop'] = loop;
 window['render'] = render; 
 
-loop();
+// loop();
