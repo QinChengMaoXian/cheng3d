@@ -17,14 +17,14 @@ export class Triangle {
     }
 
     get point1(): Vector3 {
-        return this.point1[0];
+        return this.points[0];
     }
 
     get point2(): Vector3 {
-        return this.point1[1];
+        return this.points[1];
     }
 
     get point3(): Vector3 {
-        return this.point1[2];
+        return this.points[2];
     }
 }

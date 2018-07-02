@@ -11,6 +11,7 @@ export { Matrix4 } from './math/Matrix4';
 export { Plane } from './math/Plane';
 export { Ray } from './math/Ray';
 export { Transform } from './math/Transform';
+export { Triangle } from './math/Triangle';
 
 export { Base } from './core/Base';
 export { Event } from './core/Event';
@@ -46,9 +47,11 @@ export { ComponentType } from './object/ObjectType';
 
 export { Scene } from './object/Scene';
 
-export { ColladaLoader } from './extensions/ColladaLoader'
-export { GltfLoader } from './extensions/GltfLoader'
+export { ColladaLoader } from './extensions/ColladaLoader';
+export { GltfLoader } from './extensions/GltfLoader';
 
-export { Loader } from './io/Loader'
+export { Loader } from './io/Loader';
 
-export { WebGLRenderer } from './renderer/WebGLRenderer'
+export { triangleIntersect } from './util/TriangleIntersect';
+
+export { WebGLRenderer } from './renderer/WebGLRenderer';
