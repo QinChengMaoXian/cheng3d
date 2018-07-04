@@ -270,13 +270,7 @@ Object.assign(GltfLoader, {
         const objects = glTF['images'];
         Object.keys(objects).forEach(key => {
             const imgObj = objects[key];
-            const loader = new Loader();
-            glTF.promising[key] = loader.loadImg(
-                glTF.urlDir + imgObj.uri, 
-                image => {
-                    imgObj.data = image;
-                }
-            );
+            glTF.promising[key] = Loader.loadImg(glTF.urlDir + imgObj.uri);
         });
     },
 })

@@ -4,10 +4,12 @@ import { Base } from '../core/Base';
 export class Sprite extends Base {
 
     // x, y, w, h
-    protected _data: Uint32Array = new Uint32Array(4);
+    protected _data: Int32Array = new Int32Array(6);
 
     protected _parent: Sprite = null;
     protected _children: Sprite[] = [];
+
+    protected _sizeForce = false;
 
     protected _needsUpdate: boolean = true;
 
@@ -29,17 +31,12 @@ export class Sprite extends Base {
 
     private _update() {
         if (this._needsUpdate) {
-            this._updateBounding();
             this._needsUpdate = false;
         }
     }
 
     public needsUpdate() {
         this._needsUpdate = true;
-    }
-
-    protected _updateBounding() {
-
     }
 
     public setParent(parent: Sprite) {
@@ -66,6 +63,10 @@ export class Sprite extends Base {
         return this._data[0];
     } 
 
+    public set y(value: number) {
+        this._data[1] = value
+    }
+
     public get y(): number {
         return this._data[1];
     } 
@@ -78,5 +79,9 @@ export class Sprite extends Base {
     public get height(): number {
         this._update();
         return this._data[3];
+    }
+
+    public get scalex(): number {
+        return this._data[4];
     }
 }

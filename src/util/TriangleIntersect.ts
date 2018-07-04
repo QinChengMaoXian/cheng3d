@@ -3,7 +3,7 @@ import { Vector3 } from "../math/Vector3";
 
 // https://blog.csdn.net/fourierfeng/article/details/11969915
 
-let a = [[0,0,0],[0,0,0],[0,0,0]];
+let a = [new Float32Array(3), new Float32Array(3), new Float32Array(3)];
 
 function get_vector4_det(v1: Vector3, v2: Vector3, v3: Vector3, v4: Vector3): number {
 	for (let i = 0; i != 3; ++i ) {
@@ -99,6 +99,11 @@ function is_point_within_triangle_3(tri: Triangle, vec: Vector3) {
     let dot02 = v0.dot(v2);
     let dot11 = v1.dot(v1);
     let dot12 = v1.dot(v2);
+
+    Vector3.pool.recovery(v0);
+    Vector3.pool.recovery(v1);
+    Vector3.pool.recovery(v2);
+
     let inverDeno = 1.0 / ( dot00* dot11 - dot01* dot01 );
     let u = ( dot11* dot02 - dot01* dot12 ) * inverDeno;
 
@@ -165,6 +170,11 @@ function is_point_within_triangle(tri: Triangle, vec: Vector3) {
     let dot02 = v0.dot(v2);
     let dot11 = v1.dot(v1);
     let dot12 = v1.dot(v2);
+
+    Vector3.pool.recovery(v0);
+    Vector3.pool.recovery(v1);
+    Vector3.pool.recovery(v2);
+
     let inverDeno = 1.0 / ( dot00* dot11 - dot01* dot01 );
     let u = ( dot11* dot02 - dot01* dot12 ) * inverDeno;
 
@@ -181,124 +191,125 @@ function is_point_within_triangle(tri: Triangle, vec: Vector3) {
 	return u + v <= 1;
 }
 
+let nums = new Float32Array(9);
 
 export function triangleIntersect(tri1: Triangle, tri2: Triangle): boolean {
 
     let tri1_a = tri1.point1, tri1_b = tri1.point2, tri1_c = tri1.point3;
     let tri2_a = tri2.point1, tri2_b = tri2.point2, tri2_c = tri2.point3;
 
-    let p1_tri2_p1 = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_a);
-    let p1_tri2_p2 = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_b);
-    let p1_tri2_p3 = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_c);
+    nums[0] = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_a);
+    nums[1] = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_b);
+    nums[2] = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_c);
 
-    if (p1_tri2_p1 > 0 && p1_tri2_p2 > 0 && p1_tri2_p3 > 0) {
+    if (nums[0] > 0 && nums[1] > 0 && nums[2] > 0) {
         return false;
     } 
     
-    if (p1_tri2_p1 < 0 && p1_tri2_p2 < 0 && p1_tri2_p3 < 0) {
+    if (nums[0] < 0 && nums[1] < 0 && nums[2] < 0) {
         return false;
     }
 
-    if (p1_tri2_p1 === 0 && p1_tri2_p1 === 0 && p1_tri2_p1 === 0) {
+    if (nums[0] === 0 && nums[0] === 0 && nums[0] === 0) {
         return triangle_intersert_inSamePlane(tri1, tri2);
     }
 
-    if (p1_tri2_p1 === 0 && p1_tri2_p2 * p1_tri2_p3 > 0) {
+    if (nums[0] === 0 && nums[1] * nums[2] > 0) {
         return is_point_within_triangle(tri1, tri2_a);
-    } else if (p1_tri2_p2 === 0 && p1_tri2_p3 * p1_tri2_p1 > 0) {
+    } else if (nums[1] === 0 && nums[2] * nums[0] > 0) {
         return is_point_within_triangle(tri1, tri2_b);
-    } else if (p1_tri2_p3 === 0 && p1_tri2_p1 * p1_tri2_p2 > 0) {
+    } else if (nums[2] === 0 && nums[0] * nums[1] > 0) {
         return is_point_within_triangle(tri1, tri2_c);
     }
 
-    let p2_tri1_p1 = get_vector4_det(tri2_a, tri2_b, tri2_c, tri1_a);
-    let p2_tri1_p2 = get_vector4_det(tri2_a, tri2_b, tri2_c, tri1_b);
-    let p2_tri1_p3 = get_vector4_det(tri2_a, tri2_b, tri2_c, tri1_c);
+    nums[3] = get_vector4_det(tri2_a, tri2_b, tri2_c, tri1_a);
+    nums[4] = get_vector4_det(tri2_a, tri2_b, tri2_c, tri1_b);
+    nums[5] = get_vector4_det(tri2_a, tri2_b, tri2_c, tri1_c);
 
-    if (p2_tri1_p1 > 0 && p2_tri1_p2 > 0 && p2_tri1_p3 > 0) {
+    if (nums[3] > 0 && nums[4] > 0 && nums[5] > 0) {
         return false;
     } 
     
-    if (p2_tri1_p1 < 0 && p2_tri1_p2 < 0 && p2_tri1_p3 < 0) {
+    if (nums[3] < 0 && nums[4] < 0 && nums[5] < 0) {
         return false;
     }
 
-    if (p2_tri1_p1 === 0 && p2_tri1_p2 * p2_tri1_p3 > 0) {
+    if (nums[3] === 0 && nums[4] * nums[5] > 0) {
         return is_point_within_triangle(tri1, tri2_a);
-    } else if (p2_tri1_p2 === 0 && p2_tri1_p3 * p2_tri1_p1 > 0) {
+    } else if (nums[4] === 0 && nums[5] * nums[3] > 0) {
         return is_point_within_triangle(tri1, tri2_b);
-    } else if (p2_tri1_p3 === 0 && p2_tri1_p1 * p2_tri1_p2 > 0) {
+    } else if (nums[5] === 0 && nums[3] * nums[4] > 0) {
         return is_point_within_triangle(tri1, tri2_c);
     }
 
     let m;
     let im;
 
-    if (p2_tri1_p2 * p2_tri1_p3 >= 0 && p2_tri1_p1 !== 0) {
-        if (p2_tri1_p1 < 0) {
+    if (nums[4] * nums[5] >= 0 && nums[3] !== 0) {
+        if (nums[3] < 0) {
             m = tri2_b;
 			tri2_b = tri2_c;
             tri2_c = m;
             
-			im = p1_tri2_p2;
-			p1_tri2_p2 = p1_tri2_p3;
+			im = nums[1];
+			nums[1] = nums[2];
         }
-    } else if (p2_tri1_p1 * p2_tri1_p3 >= 0 && p2_tri1_p2 != 0) {
+    } else if (nums[3] * nums[5] >= 0 && nums[4] != 0) {
 		m = tri1_a;
 		tri1_a = tri1_b;
 		tri1_b = tri1_c;
         tri1_c = m;
         
-		if (p2_tri1_p2 < 0) {
+		if (nums[4] < 0) {
 			m = tri2_b;
 			tri2_b = tri2_c;
             tri2_c = m;
             
-			im = p1_tri2_p2;
-			p1_tri2_p2 = p1_tri2_p3;
-			p1_tri2_p3 = im;
+			im = nums[1];
+			nums[1] = nums[2];
+			nums[2] = im;
 		}
-	} else if (p2_tri1_p1 * p2_tri1_p2 >= 0 && p2_tri1_p3 != 0) {
+	} else if (nums[3] * nums[4] >= 0 && nums[5] != 0) {
 		m = tri1_a;
 		tri1_a = tri1_c;
 		tri1_c = tri1_b;
         tri1_b = m;
 
-		if (p2_tri1_p3 < 0) {
+		if (nums[5] < 0) {
 			m = tri2_b;
 			tri2_b = tri2_c;
             tri2_c = m;
             
-			im = p1_tri2_p2;
-			p1_tri2_p2 = p1_tri2_p3;
-			p1_tri2_p3 = im;
+			im = nums[1];
+			nums[1] = nums[2];
+			nums[2] = im;
 		}
 	}
  
-	if (p1_tri2_p2 * p1_tri2_p3 >= 0 && p1_tri2_p1 != 0) {
-		if ( p1_tri2_p1 < 0 ) {
+	if (nums[1] * nums[2] >= 0 && nums[0] != 0) {
+		if ( nums[0] < 0 ) {
 			m = tri1_b;
 			tri1_b = tri1_c;
 			tri1_c = m;
 		}
-	} else if (p1_tri2_p1 * p1_tri2_p3 >= 0 && p1_tri2_p2 != 0) {
+	} else if (nums[0] * nums[2] >= 0 && nums[1] != 0) {
 		m = tri2_a;
 		tri2_a = tri2_b;
 		tri2_b = tri2_c;
         tri2_c = m;
         
-		if (p1_tri2_p2 < 0) {
+		if (nums[1] < 0) {
 			m = tri1_b;
 			tri1_b = tri1_c;
 			tri1_c = m;
 		}
-	} else if (p1_tri2_p1 * p1_tri2_p2 >= 0 && p1_tri2_p3 != 0) {
+	} else if (nums[0] * nums[1] >= 0 && nums[2] != 0) {
 		m = tri2_a;
 		tri2_a = tri2_c;
 		tri2_c = tri2_b;
         tri2_b = m;
         
-		if (p1_tri2_p3 < 0) {
+		if (nums[2] < 0) {
 			m = tri1_b;
 			tri1_b = tri1_c;
 			tri1_c = m;

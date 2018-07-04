@@ -274,7 +274,7 @@ renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
 let tri_scale = 10;
 
-let tri_num = 10;
+let tri_num = 15;
 let half_num = tri_num / 2;
 
 let vertexd = new Float32Array(tri_num * tri_num * tri_num * 18);
@@ -301,26 +301,32 @@ window['tri2'] = tri2;
 
 // let results = [];
 
+let t1p1 = tri1.point1;
+let t1p2 = tri1.point2;
+let t1p3 = tri1.point3;
+
+let t2p1 = tri2.point1;
+let t2p2 = tri2.point2;
+let t2p3 = tri2.point3;
+
 let uvd = new Float32Array(tri_num * tri_num * tri_num * 12);
 
-console.log(Date.now());
+let startTime = Date.now();
 
 let le = tri_num * tri_num * tri_num;
 
 for (let i = 0; i < le; i++) {
     let index = i * 18;
 
-    tri1.point1.set(vertexd[index + 0], vertexd[index + 1], vertexd[index + 2]);
-    tri1.point2.set(vertexd[index + 3], vertexd[index + 4], vertexd[index + 5]);
-    tri1.point3.set(vertexd[index + 6], vertexd[index + 7], vertexd[index + 8]);
+    t1p1.set(vertexd[index + 0], vertexd[index + 1], vertexd[index + 2]);
+    t1p2.set(vertexd[index + 3], vertexd[index + 4], vertexd[index + 5]);
+    t1p3.set(vertexd[index + 6], vertexd[index + 7], vertexd[index + 8]);
 
-    tri2.point1.set(vertexd[index + 9], vertexd[index + 10], vertexd[index + 11]);
-    tri2.point2.set(vertexd[index + 12], vertexd[index + 13], vertexd[index + 14]);
-    tri2.point3.set(vertexd[index + 15], vertexd[index + 16], vertexd[index + 17]);
+    t2p1.set(vertexd[index + 9], vertexd[index + 10], vertexd[index + 11]);
+    t2p2.set(vertexd[index + 12], vertexd[index + 13], vertexd[index + 14]);
+    t2p3.set(vertexd[index + 15], vertexd[index + 16], vertexd[index + 17]);
 
     let result = CGE.triangleIntersect(tri1, tri2);
-
-    // console.log(result);
 
     let result1 = result ? 0.25 : 0.75;
     let result2 = result ? 0.75 : 0.25;
@@ -337,7 +343,10 @@ for (let i = 0; i < le; i++) {
         uvd[i2 + t * 2 + 1] = result2;
     }
 }
-console.log(Date.now());
+
+let endTime = Date.now(); 
+
+console.log(startTime, endTime, endTime - startTime);
 
 // console.log(uvd);
 

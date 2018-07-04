@@ -3,7 +3,7 @@ import { EventDispatcher } from './EventDispatcher';
 
 export class Base extends EventDispatcher {
     private _uuid: string = generateUUID();
-    protected _id:number = GetObjectCount();
+    private _id:number = GetObjectCount();
     public name:string = '';
 
     constructor() {

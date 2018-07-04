@@ -1,6 +1,13 @@
 import { Base } from './Base';
 
 export class Event extends Base {
+    static readonly CLICK = "click";
+    
+    static readonly MOUSE_ON = "mouse_on";
+    static readonly MOUSE_MOVE = "mouse_move";
+    static readonly MOUSE_END = "mouse_end";
+
+
     _func;
     constructor() {
         super();

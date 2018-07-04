@@ -1,21 +1,25 @@
 import { Logger } from '../core/Logger'
+import { Texture2D } from '../graphics/Texture2D';
 
 export class Loader {
+    private static _imgMap: Map<string, Texture2D> = new Map();
+
     constructor() {
 
     }
 
-    loadImg(url, callback) {
-        return new Promise((resolve, reject) => {
-            const image = new Image();
-            image.onload = () => resolve(image);
-            image.onerror = () => reject(new Error('Could not load image at ' + url));
-            image.src = url;
-        })
-        .then(image => {
-            return callback ? callback(image) : image;
-        })
-        .catch(errMsg => Logger.error(errMsg));
+    static loadImg(url) {
+
+        let texture = this._imgMap.get(url);
+        if (texture) {
+            return texture;
+        }
+
+        texture = new Texture2D();
+        texture.setImageUrl(url);
+        this._imgMap.set(url, texture);
+
+        return texture;
     }
 
     loadUrl(url, callback?, type = 'text') {
