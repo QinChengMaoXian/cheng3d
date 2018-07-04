@@ -16,7 +16,7 @@ export class Ray {
 
     public at(t: number, target: Vector3) {
         if (target === undefined) {
-            console.warn('THREE.Ray: .at() target is now required');
+            console.warn('CGE.Ray: .at() target is now required');
             target = new Vector3();
         }
         return target.copy(this._dir).mul(t).add(this._origin);
@@ -51,13 +51,13 @@ export class Ray {
         let sign: number;
 
         if (DdN > 0) {
-            if (backfaceCulling) return null;
+            if (backfaceCulling) return false;
             sign = 1;
         } else if (DdN < 0) {
             sign = -1;
             DdN = -DdN;
         } else {
-            return null;
+            return false;
         }
 
         diff.subBy(this._origin, a);
@@ -65,19 +65,19 @@ export class Ray {
 
         // b1 < 0, no intersection
         if (DdQxE2 < 0) {
-            return null;
+            return false;
         }
 
         let DdE1xQ: number = sign * this._dir.dot(edge1.cross(diff));
 
         // b2 < 0, no intersection
         if (DdE1xQ < 0) {
-            return null;
+            return false;
         }
 
         // b1+b2 > 1, no intersection TODO: what is 1 ?
         if (DdQxE2 + DdE1xQ > DdN) {
-            return null;
+            return false;
         }
 
         // Line intersects triangle, check whether ray does.
@@ -85,10 +85,12 @@ export class Ray {
 
         // t < 0, no intersection
         if (QdN < 0) {
-            return null;
+            return false;
         }
 
         this.at(QdN / DdN, target);
+
+        return true;
     }
 
     public toJson() {

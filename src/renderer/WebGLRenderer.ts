@@ -26,13 +26,11 @@ import { FullScreenMaterial } from '../material/FullScreenMaterial';
 import { FXAAMaterial } from './postEffect/FXAA';
 
 import { glBuffer } from './glObject/glBuffer'
-import { glDraw } from './glObject/glDraw'
 import { glRenderExt } from './glObject/glRenderExt'
 import { glFrame } from './glObject/glFrame'
 import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
-import { glTexture } from './glObject/glTexture';
 
 export class WebGLRenderer extends Base implements Renderer {
     private static RendererNum = 0;
