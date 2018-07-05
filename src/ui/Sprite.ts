@@ -87,11 +87,18 @@ export class Sprite extends Base {
     }
 
     static checkEvent(base: Sprite, event: Event) {
-        let x = event.stageX;
-        let y = event.stageY;
+        let px = event.stageX;
+        let py = event.stageY;
 
-        
-        
+        let sx = base.x;
+        let sy = base.y;
+
+        let ex = sx + base.width;
+        let ey = sy + base.height;
+
+        if (px >= sx && px <= ex && py >= sy && py <= ey) {
+            
+        }
 
     }
 }
