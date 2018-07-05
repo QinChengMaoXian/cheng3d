@@ -1,4 +1,5 @@
 import { Object3D } from '../object/Object3D';
+import { Event } from '../core/Event'
 import { Base } from '../core/Base';
 
 export class Sprite extends Base {
@@ -83,5 +84,14 @@ export class Sprite extends Base {
 
     public get scalex(): number {
         return this._data[4];
+    }
+
+    static checkEvent(base: Sprite, event: Event) {
+        let x = event.stageX;
+        let y = event.stageY;
+
+        
+        
+
     }
 }
