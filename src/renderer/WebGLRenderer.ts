@@ -12,7 +12,7 @@ import { Object3D } from '../object/Object3D';
 import { Camera } from '../object/Camera';
 import { Frame } from '../graphics/Frame';
 import { FXAA } from './postEffect/FXAA';
-import { Renderer } from './Renderer';
+import { Renderer, IRenderer } from './Renderer';
 
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
@@ -31,8 +31,9 @@ import { glFrame } from './glObject/glFrame'
 import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
+import { Platform } from '../platform/Platform';
 
-export class WebGLRenderer extends Base implements Renderer {
+export class WebGLRenderer extends Renderer implements IRenderer {
     private static RendererNum = 0;
 
     private _canvas: HTMLCanvasElement;
@@ -61,11 +62,10 @@ export class WebGLRenderer extends Base implements Renderer {
 
     constructor() {
         super();
-        this.init();
     }
 
-    public init() {
-        this._canvas = document.createElement('canvas');
+    public init(width: number, height: number) {
+        this._canvas =  Platform.createCanvas();
         const _canvas = this._canvas;
 
         this._gl = _canvas.getContext('webgl', {antialias: true});
@@ -80,6 +80,8 @@ export class WebGLRenderer extends Base implements Renderer {
         _gl.enable(_gl.BLEND);
 
         this._glRenderExt = new glRenderExt();
+
+        this.setSize(width, height);
     }
 
     public enableDepthTest() {
@@ -308,14 +310,17 @@ export class WebGLRenderer extends Base implements Renderer {
 
     }
 
-    public setSize (width, height) {
+    public setSize(width, height) {
         const _canvas = this._canvas;
 
         _canvas.width = width;
         _canvas.height = height;
+
         this._screenWidth = width;
         this._screenHeight = height;
+
         this._defFrame.setSize(width, height);
+
         this._defFrameState.setViewport(new Vector4(0, 0, width, height));
     };
 

@@ -2,7 +2,7 @@ import { Logger } from '../../core/Logger';
 import { glObject } from './glObject';
 
 import { Frame } from '../../graphics/Frame';
-import { Renderer } from '../Renderer'
+import { WebGLRenderer } from '../WebGLRenderer';
 
 export class glFrame extends glObject {
     protected _frame: WebGLFramebuffer = undefined;
@@ -14,7 +14,7 @@ export class glFrame extends glObject {
         super();
     }
 
-    public checkTextures(renderer: Renderer, textureMap, depthStencilTexture) {
+    public checkTextures(renderer: WebGLRenderer, textureMap, depthStencilTexture) {
         let completed = true;
         textureMap.forEach(function(texture2d, location) {
             let glTexture = renderer.initTexture(texture2d);
@@ -33,7 +33,7 @@ export class glFrame extends glObject {
         return completed;
     }
 
-    public generateFromFrame(gl: WebGLRenderingContext, renderer: Renderer, frame: Frame) {
+    public generateFromFrame(gl: WebGLRenderingContext, renderer: WebGLRenderer, frame: Frame) {
         let textureMap = frame.getTextureMap();
         let depthStencilTexture = frame.getDepthStencilTexture();
         const maxAttachment = 4;

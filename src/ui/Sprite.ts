@@ -56,6 +56,12 @@ export class Sprite extends Base {
         return this._parent;
     }
 
+    public setSize(width: number, height: number) {
+        this._data[2] = width;
+        this._data[3] = height;
+        this._update();
+    }
+
     public set x(value: number) {
         this._data[0] = value
     }
@@ -72,18 +78,28 @@ export class Sprite extends Base {
         return this._data[1];
     } 
 
+    public set width(value: number) {
+        this._data[2] = value;
+    } 
+
     public get width(): number {
-        this._update();
         return this._data[2];
     }
 
+    public set height(value: number) {
+        this._data[3] = value;
+    } 
+
     public get height(): number {
-        this._update();
         return this._data[3];
     }
 
     public get scalex(): number {
         return this._data[4];
+    }
+
+    public get scaley(): number {
+        return this._data[5];
     }
 
     static checkEvent(base: Sprite, event: Event) {

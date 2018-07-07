@@ -1,11 +1,12 @@
 import { glTexture2D } from './glTexture2D'
+import { TextureCube } from '../../graphics/TextureCube';
 
 export class glTextureCube extends glTexture2D {
     constructor(gl) {
         super(gl);
     }
 
-    _createTextureDatas(gl, textureCube) {
+    _createTextureDatas(gl: WebGLRenderingContext, textureCube: TextureCube) {
         let handler = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, handler);
         let textures = textureCube.getTexture2ds();
