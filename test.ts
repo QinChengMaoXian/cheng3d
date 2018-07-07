@@ -135,13 +135,13 @@ const app = new CGE.Application();
 app.init(window.innerWidth, window.innerHeight);
 window['app'] = app;
 
-let renderer = app.renderer;
+let renderer = app.getRenderer();
 renderer.enableDepthTest();
 renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
-let mainScene = app.scene;
+let mainScene = app.getScene();
 
-let camera = app.camera;
+let camera = app.getCamera();
 camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
 camera.lookAt(new CGE.Vector3(0, 1, 10));
 

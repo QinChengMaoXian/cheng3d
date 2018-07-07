@@ -51,6 +51,8 @@ export class Application {
 
         this._renderer = new WebGLRenderer();
         this._renderer.init(width, height);
+
+        this._addEventListener();
     }
 
     public setSize(width: number, height: number) {
@@ -105,23 +107,109 @@ export class Application {
         this._renderer.renderScene(this._obj3d, this._camera);
     }
 
-    get renderer() {
+    private _addEventListener() {
+        let canvas = this._renderer.getCanvas();
+
+        canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
+        canvas.addEventListener('mousemove', this._onMouseMove.bind(this));
+        canvas.addEventListener('mouseup', this._onMouseUp.bind(this));
+        canvas.addEventListener('mouseover', this._onMouseOver.bind(this));
+        canvas.addEventListener('mouseout', this._onMouseOut.bind(this));
+
+        canvas.addEventListener('keydown', this._onKeyDown.bind(this));
+        canvas.addEventListener('keypress', this._onKeyPress.bind(this));
+        canvas.addEventListener('keyup', this._onKeyUp.bind(this));
+
+        canvas.addEventListener('touchstart', this._onTouchStart.bind(this));
+        canvas.addEventListener('touchmove', this._onTouchMove.bind(this));
+        canvas.addEventListener('touchend', this._onTouchEnd.bind(this));
+        canvas.addEventListener('touchcancel', this._onTouchCancel.bind(this));
+    }
+
+    private _removeEventListener() {
+        let canvas = this._renderer.getCanvas();
+
+        canvas.removeEventListener('mousedown', this._onMouseDown.bind(this));
+        canvas.removeEventListener('mousemove', this._onMouseMove.bind(this));
+        canvas.removeEventListener('mouseup', this._onMouseUp.bind(this));
+        canvas.removeEventListener('mouseover', this._onMouseOver.bind(this));
+        canvas.removeEventListener('mouseout', this._onMouseOut.bind(this));
+
+        canvas.removeEventListener('keydown', this._onKeyDown.bind(this));
+        canvas.removeEventListener('keypress', this._onKeyPress.bind(this));
+        canvas.removeEventListener('keyup', this._onKeyUp.bind(this));
+
+        canvas.removeEventListener('touchstart', this._onTouchStart.bind(this));
+        canvas.removeEventListener('touchmove', this._onTouchMove.bind(this));
+        canvas.removeEventListener('touchend', this._onTouchEnd.bind(this));
+        canvas.removeEventListener('touchcancel', this._onTouchCancel.bind(this));
+    }
+
+    private _onMouseDown(e: MouseEvent) {
+        
+    }
+
+    private _onMouseMove(e: MouseEvent) {
+        
+    }
+
+    private _onMouseUp(e: MouseEvent) {
+        
+    }
+
+    private _onMouseOver(e: MouseEvent) {
+        
+    }
+
+    private _onMouseOut(e: MouseEvent) {
+        
+    }
+
+    private _onKeyDown(e: KeyboardEvent) {
+
+    }
+
+    private _onKeyPress(e: KeyboardEvent) {
+
+    }
+
+    private _onKeyUp(e: KeyboardEvent) {
+
+    }
+
+    private _onTouchStart(e: TouchEvent) {
+
+    }
+
+    private _onTouchMove(e: TouchEvent) {
+
+    }
+
+    private _onTouchEnd(e: TouchEvent) {
+
+    }
+
+    private _onTouchCancel(e: TouchEvent) {
+
+    }
+
+    getRenderer() {
         return this._renderer;
     }
 
-    get scene() {
+    getScene() {
         return this._scene;
     }
 
-    get stage() {
+    getStage() {
         return this._stage;
     }
 
-    get timer() {
+    getTimer() {
         return this._stage;
     }
 
-    get camera() {
+    getCamera() {
         return this._camera;
     }
 
