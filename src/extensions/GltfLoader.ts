@@ -12,7 +12,9 @@ import * as CGE from '../graphics/RendererParameter';
 
 import { Loader } from "../io/Loader"
 
-import { Logger } from '../core/Logger'
+import { Logger } from '../core/Logger';
+
+import { base64decode } from '../util/Base64'
 
 export class GltfLoader {
     constructor(public url?:string, callback?:any) {
@@ -23,8 +25,8 @@ export class GltfLoader {
 
     load(url:string, callback:any) {
         this.url = url;
-        let loader = new Loader();
-        loader.loadUrl(url, this._loadFromResponseText.bind(this)).then(gltf => {
+        
+        Loader.loadUrl(url, this._loadFromResponseText.bind(this)).then(gltf => {
             if (callback) {
                 callback('entity', gltf);
             }
@@ -255,14 +257,20 @@ Object.assign(GltfLoader, {
         const objects = glTF['buffers'];
         Object.keys(objects).forEach(key => {
             const buffer = objects[key];
-            const loader = new Loader();
-            glTF.promising[key] = loader.loadUrl(
-                glTF.urlDir + buffer.uri, 
-                xmlHttp => {
-                    buffer.data = xmlHttp.response;
-                }, 
-                buffer.type || 'text'
-            );
+            let uri:string = buffer.uri;
+            let reg = new RegExp(`data:[\\S]+;base64,`);
+            if(reg.test(uri)) {
+                buffer.data = base64decode(uri.split(',')[1]);
+            } else {
+                const loader = new Loader();
+                glTF.promising[key] = Loader.loadUrl(
+                    glTF.urlDir + uri, 
+                    xmlHttp => {
+                        buffer.data = xmlHttp.response;
+                    }, 
+                    buffer.type || 'text'
+                );
+            };
         });
     },
 

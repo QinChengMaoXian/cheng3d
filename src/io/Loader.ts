@@ -22,7 +22,7 @@ export class Loader {
         return texture;
     }
 
-    loadUrl(url, callback?, type = 'text') {
+    static loadUrl(url, callback?, type = 'text') {
         return this._XMLHttpRequest(url, type)
             .then(xmlHttpResponse => {
                 return callback ? callback(xmlHttpResponse) : xmlHttpResponse;
@@ -30,7 +30,7 @@ export class Loader {
             .catch(errMsg => Logger.error(errMsg));
     }
 
-    loadUrls(urls, callback) {
+    static loadUrls(urls, callback) {
         const promises = urls.map(({url, type}) => {
             return this._XMLHttpRequest(url, type)
             .then(xmlHttpResponse => {
@@ -45,7 +45,7 @@ export class Loader {
             .catch(errMsg => Logger.error(errMsg));
     }
 
-    _XMLHttpRequest(url, type) {
+    protected static _XMLHttpRequest(url, type) {
         return new Promise((resolve, reject) => {
             const xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = () => {

@@ -1,4 +1,3 @@
-
 import { Scene } from "../object/Scene";
 import { Stage } from "../ui/Stage";
 import { WebGLRenderer } from "../renderer/WebGLRenderer";
@@ -31,6 +30,8 @@ export class Application {
 
     protected _camera: Camera;
 
+    protected _listenersMap: Map<string, any>;
+
     constructor() {
         
     }
@@ -47,12 +48,12 @@ export class Application {
         this._obj3d.addChild(this._scene);
 
         this._camera = new Camera(width, height);
-        this._scene.addChild(this._camera);
 
         this._renderer = new WebGLRenderer();
         this._renderer.init(width, height);
 
-        this._addEventListener();
+        this._listenersMap = new Map();
+        this._addEventListeners();
     }
 
     public setSize(width: number, height: number) {
@@ -104,53 +105,44 @@ export class Application {
     }
 
     private _render(delta: number) {
-        this._renderer.renderScene(this._obj3d, this._camera);
+        this._renderer.renderScene(this._obj3d, this._scene.getActiveCamera() || this._camera);
     }
 
-    private _addEventListener() {
+    private _addEventListener(key: string, listener: any) {
         let canvas = this._renderer.getCanvas();
-
-        canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
-        canvas.addEventListener('mousemove', this._onMouseMove.bind(this));
-        canvas.addEventListener('mouseup', this._onMouseUp.bind(this));
-        canvas.addEventListener('mouseover', this._onMouseOver.bind(this));
-        canvas.addEventListener('mouseout', this._onMouseOut.bind(this));
-
-        canvas.addEventListener('keydown', this._onKeyDown.bind(this));
-        canvas.addEventListener('keypress', this._onKeyPress.bind(this));
-        canvas.addEventListener('keyup', this._onKeyUp.bind(this));
-
-        canvas.addEventListener('touchstart', this._onTouchStart.bind(this));
-        canvas.addEventListener('touchmove', this._onTouchMove.bind(this));
-        canvas.addEventListener('touchend', this._onTouchEnd.bind(this));
-        canvas.addEventListener('touchcancel', this._onTouchCancel.bind(this));
+        canvas.addEventListener(key, listener);
+        this._listenersMap.set(key, listener);
     }
 
-    private _removeEventListener() {
+    private _addEventListeners() {
         let canvas = this._renderer.getCanvas();
 
-        canvas.removeEventListener('mousedown', this._onMouseDown.bind(this));
-        canvas.removeEventListener('mousemove', this._onMouseMove.bind(this));
-        canvas.removeEventListener('mouseup', this._onMouseUp.bind(this));
-        canvas.removeEventListener('mouseover', this._onMouseOver.bind(this));
-        canvas.removeEventListener('mouseout', this._onMouseOut.bind(this));
+        this._addEventListener('mousedown', this._onMouseDown.bind(this));
+        this._addEventListener('mousemove', this._onMouseMove.bind(this));
+        this._addEventListener('mouseup', this._onMouseUp.bind(this));
+        this._addEventListener('mouseover', this._onMouseOver.bind(this));
+        this._addEventListener('mouseout', this._onMouseOut.bind(this));
 
-        canvas.removeEventListener('keydown', this._onKeyDown.bind(this));
-        canvas.removeEventListener('keypress', this._onKeyPress.bind(this));
-        canvas.removeEventListener('keyup', this._onKeyUp.bind(this));
+        this._addEventListener('touchstart', this._onTouchStart.bind(this));
+        this._addEventListener('touchmove', this._onTouchMove.bind(this));
+        this._addEventListener('touchend', this._onTouchEnd.bind(this));
+        this._addEventListener('touchcancel', this._onTouchCancel.bind(this));
+    }
 
-        canvas.removeEventListener('touchstart', this._onTouchStart.bind(this));
-        canvas.removeEventListener('touchmove', this._onTouchMove.bind(this));
-        canvas.removeEventListener('touchend', this._onTouchEnd.bind(this));
-        canvas.removeEventListener('touchcancel', this._onTouchCancel.bind(this));
+    private _removeEventListeners() {
+        let canvas = this._renderer.getCanvas();
+        this._listenersMap.forEach((listener: any, key: string) => {
+            canvas.removeEventListener(key, listener);
+        });
+        this._listenersMap.clear();
     }
 
     private _onMouseDown(e: MouseEvent) {
-        
+        console.log(e);
     }
 
     private _onMouseMove(e: MouseEvent) {
-        
+
     }
 
     private _onMouseUp(e: MouseEvent) {
@@ -166,31 +158,31 @@ export class Application {
     }
 
     private _onKeyDown(e: KeyboardEvent) {
-
+        console.log(e);
     }
 
     private _onKeyPress(e: KeyboardEvent) {
-
+        console.log(e);
     }
 
     private _onKeyUp(e: KeyboardEvent) {
-
+        console.log(e);
     }
 
     private _onTouchStart(e: TouchEvent) {
-
+        
     }
 
     private _onTouchMove(e: TouchEvent) {
-
+        
     }
 
     private _onTouchEnd(e: TouchEvent) {
-
+        
     }
 
     private _onTouchCancel(e: TouchEvent) {
-
+        
     }
 
     getRenderer() {

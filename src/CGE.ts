@@ -50,6 +50,7 @@ export { Scene } from './object/Scene';
 
 export { ColladaLoader } from './extensions/ColladaLoader';
 export { GltfLoader } from './extensions/GltfLoader';
+export { OBJLoader } from './extensions/ObjLoader';
 
 export { Loader } from './io/Loader';
 

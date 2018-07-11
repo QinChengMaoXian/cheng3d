@@ -12,6 +12,8 @@ export class Event extends Base {
     static readonly KEY_DOWN = "key_down";
     static readonly KEY_UP = "key_up";
 
+    static readonly CLIENT_RESIZE = "client_resize";
+
     protected _type: string;
 
     protected _x: number;

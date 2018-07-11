@@ -2,7 +2,7 @@ import * as CGE from './src/CGE'
 
 let test_diff = './resources/spnza_bricks_a_diff.jpg';
 let test_normal = './resources/spnza_bricks_a_ddn.jpg';
-let man_diff = './resources/VWS_B_Male2-2.jpg';
+let man_diff = './resources/cartoon/Avatar_Bronya_Color.png';
 let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
 let color_diff = './resources/color.jpg'
 
@@ -20,10 +20,17 @@ normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
 normalTexture.setMipmap(true);
 normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
 
+let objLoader = new CGE.OBJLoader();
 
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
 let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture);
+
+let gltfTexture = new CGE.Texture2D();
+gltfTexture.setImageUrl(man_diff);
+gltfTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+gltfTexture.setMipmap(true);
+let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
 
 let gltfJson = undefined;
 let gltfCallback = (event, object) => {
@@ -31,19 +38,16 @@ let gltfCallback = (event, object) => {
         case 'entity':
             gltfJson = object[0];
             CGE.Logger.info(gltfJson);
-            let gltfTexture = new CGE.Texture2D();
-            gltfTexture.setImageUrl(gltf_diff);
-            gltfTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-            gltfTexture.setMipmap(true);
-            let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
+            
+            
             let mesh = new CGE.Mesh();
-            mesh.setScale(20, 20, 20);
+            mesh.setScale(1, 1, 1);
             mesh.setGeometry(gltfJson);
             mesh.setMaterial(gltfMaterial);
             let obj = new CGE.Object3D();
             obj.addChild(mesh);
             obj.name = 'test';
-            // mainScene.addChild(obj);   
+            mainScene.addChild(obj);   
             break;
 
         case 'error':
@@ -59,7 +63,7 @@ let gltfCallback = (event, object) => {
 
 
 let gltfTest = new CGE.GltfLoader();
-gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
+gltfTest.load('./resources/cartoon/test.gltf', gltfCallback);
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -243,6 +247,11 @@ triMesh.setMaterial(triMaterial);
 
 mainScene.addChild(triMesh);
 
+objLoader.load('./resources/cartoon/test.obj').then(mesh => {
+    mesh.setMaterial(gltfMaterial);
+    mainScene.addChild(mesh);
+});
+
 document.body.appendChild(renderer.getCanvas());
 
 
@@ -278,69 +287,6 @@ let right = CGE.Event.createFromFunc(() => {camera.horizontalStep(_d);});
 let verticalTop = CGE.Event.createFromFunc(() => {camera.verticalStep(_d);});
 let verticalDown = CGE.Event.createFromFunc(() => {camera.verticalStep(-_d);});
 
-window.onkeydown = function(event) {
-    // CGE.Logger.info(event);
-    switch(event.which || event.keyCode) {
-        case 87:
-            events.set(forward.id, forward);
-            break;
-
-        case 65:
-            events.set(left.id, left);
-            break;
-
-        case 83:
-            events.set(back.id, back);
-            break;
-
-        case 68:
-            events.set(right.id, right);
-            break;
-
-        case 81:
-            events.set(verticalTop.id, verticalTop);
-            break;
-        
-        case 69:
-            events.set(verticalDown.id, verticalDown);
-            break;
-
-        default:
-            break;
-    }
-}
-
-window.onkeyup = function(event) {
-    switch(event.which || event.keyCode) {
-        case 87:
-            events.delete(forward.id);
-            break;
-
-        case 65:
-            events.delete(left.id);
-            break;
-
-        case 83:
-            events.delete(back.id);
-            break;
-
-        case 68:
-            events.delete(right.id);
-            break;
-
-        case 81:
-            events.delete(verticalTop.id);
-            break;
-        
-        case 69:
-            events.delete(verticalDown.id);
-            break;
-
-        default:
-            break;
-    }
-}
-
 window.onblur = function(event) {
     events.clear();
 }
@@ -363,6 +309,10 @@ window.onmousedown = function(event) {
 window.onmouseup = function(event) {
     mouseDown = false;
 }
+
+// window.onkeydown = function(e) {
+//     console.log(e);
+// }
 
 app.start();
 

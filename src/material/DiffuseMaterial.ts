@@ -46,7 +46,7 @@ export class DiffuseMaterial extends Material {
             uniform mat4 u_vpMat;
             void main()
             {
-                o_uv = a_texcoord; // vec2(a_texcoord.x, 1.0 - a_texcoord.y);
+                o_uv = vec2(a_texcoord.x, 1.0 - a_texcoord.y); //a_texcoord; // 
                 gl_Position = u_vpMat * u_mMat * a_position;
             }`;
 

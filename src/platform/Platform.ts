@@ -19,4 +19,6 @@ export class Platform {
     public static get cancelAnimationFrame(): (handle: number) => void {
         return window.cancelAnimationFrame.bind(window);
     }
+
+    public static 
 }
