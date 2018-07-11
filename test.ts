@@ -59,11 +59,8 @@ let gltfCallback = (event, object) => {
     }
 }
 
-
-
-
-let gltfTest = new CGE.GltfLoader();
-gltfTest.load('./resources/cartoon/test.gltf', gltfCallback);
+// let gltfTest = new CGE.GltfLoader();
+// gltfTest.load('./resources/cartoon/test.gltf', gltfCallback);
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -223,7 +220,7 @@ for (let i = 0; i < le; i++) {
 
 let endTime = Date.now(); 
 
-console.log(startTime, endTime, endTime - startTime);
+// console.log(startTime, endTime, endTime - startTime);
 
 // console.log(uvd);
 
@@ -245,10 +242,11 @@ let triMesh = new CGE.Mesh();
 triMesh.setGeometry(triGeo);
 triMesh.setMaterial(triMaterial);
 
-mainScene.addChild(triMesh);
+// mainScene.addChild(triMesh);
 
 objLoader.load('./resources/cartoon/test.obj').then(mesh => {
     mesh.setMaterial(gltfMaterial);
+    mesh.setScale(0.2, 0.2, 0.2);
     mainScene.addChild(mesh);
 });
 

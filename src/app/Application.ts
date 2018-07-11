@@ -110,7 +110,12 @@ export class Application {
 
     private _addEventListener(key: string, listener: any) {
         let canvas = this._renderer.getCanvas();
-        canvas.addEventListener(key, listener);
+        let document = Platform.document();
+        if (key.indexOf('key') > -1) {
+            document.addEventListener(key, listener);
+        } else {
+            canvas.addEventListener(key, listener);
+        }
         this._listenersMap.set(key, listener);
     }
 
@@ -127,18 +132,29 @@ export class Application {
         this._addEventListener('touchmove', this._onTouchMove.bind(this));
         this._addEventListener('touchend', this._onTouchEnd.bind(this));
         this._addEventListener('touchcancel', this._onTouchCancel.bind(this));
+
+        let document = Platform.document();
+
+        document.addEventListener('keydown', this._onKeyDown.bind(this));
+        document.addEventListener('keypress', this._onKeyDown.bind(this));
+        document.addEventListener('keyup', this._onKeyDown.bind(this));
     }
 
     private _removeEventListeners() {
         let canvas = this._renderer.getCanvas();
+        let document = Platform.document();
         this._listenersMap.forEach((listener: any, key: string) => {
-            canvas.removeEventListener(key, listener);
+            if (key.indexOf('key') > -1) {
+                document.removeEventListener(key, listener);
+            } else {
+                canvas.removeEventListener(key, listener);
+            }
         });
         this._listenersMap.clear();
     }
 
     private _onMouseDown(e: MouseEvent) {
-        console.log(e);
+
     }
 
     private _onMouseMove(e: MouseEvent) {
@@ -158,15 +174,15 @@ export class Application {
     }
 
     private _onKeyDown(e: KeyboardEvent) {
-        console.log(e);
+        
     }
 
     private _onKeyPress(e: KeyboardEvent) {
-        console.log(e);
+        
     }
 
     private _onKeyUp(e: KeyboardEvent) {
-        console.log(e);
+        
     }
 
     private _onTouchStart(e: TouchEvent) {

@@ -424,8 +424,6 @@ export class OBJLoader {
             // let cTangentQuat: Int16Array = GeometryUtil.calcTangentFrame(normalData, tangentData);
             // let geometry: Geometry = new CompressedGeometry([cPos[0], cUV[0], cTangentQuat], indexData, cPos[1], cPos[2], cUV[1], cUV[2]);
             let geometry: Geometry = new Geometry();
-            console.log(uvData);
-            console.log(this._uvRawArray);
             geometry.addSingleAttribute('Position', ShaderConst.position, 3, FLOAT, posData);
             geometry.addSingleAttribute('UV', ShaderConst.texcoord, 2, FLOAT, uvData);
             geometry.addSingleAttribute('Normal', ShaderConst.normal, 3, FLOAT, normalData);

@@ -8,6 +8,10 @@ export class Platform {
         return Date.now()
     }
 
+    public static document(): HTMLDocument {
+        return document;
+    }
+
     public static createCanvas(): HTMLCanvasElement {
         return document.createElement('canvas');
     }
