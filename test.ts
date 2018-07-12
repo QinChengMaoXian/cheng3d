@@ -275,38 +275,38 @@ window.onerror = function(event) {
     noError = false;
 }
 
-let _d = 0.5;
+// let _d = 0.5;
 
-let forward = CGE.Event.createFromFunc(() => {camera.forwardStep(_d);});
-let back = CGE.Event.createFromFunc(() => {camera.forwardStep(-_d);});
-let left = CGE.Event.createFromFunc(() => {camera.horizontalStep(-_d);});
-let right = CGE.Event.createFromFunc(() => {camera.horizontalStep(_d);});
+// let forward = CGE.Event.createFromFunc(() => {camera.forwardStep(_d);});
+// let back = CGE.Event.createFromFunc(() => {camera.forwardStep(-_d);});
+// let left = CGE.Event.createFromFunc(() => {camera.horizontalStep(-_d);});
+// let right = CGE.Event.createFromFunc(() => {camera.horizontalStep(_d);});
 
-let verticalTop = CGE.Event.createFromFunc(() => {camera.verticalStep(_d);});
-let verticalDown = CGE.Event.createFromFunc(() => {camera.verticalStep(-_d);});
+// let verticalTop = CGE.Event.createFromFunc(() => {camera.verticalStep(_d);});
+// let verticalDown = CGE.Event.createFromFunc(() => {camera.verticalStep(-_d);});
 
-window.onblur = function(event) {
-    events.clear();
-}
+// window.onblur = function(event) {
+//     events.clear();
+// }
 
-let mouseDown = false;
+// let mouseDown = false;
 
-window.onmousemove = function(event) {
-    if (mouseDown) {
-        let del = 0.005;
-        let moveX = event.movementX * del;
-        let moveY = event.movementY * del;
-        camera.rotateViewFromForward(moveX, moveY);
-    }
-}
+// window.onmousemove = function(event) {
+//     if (mouseDown) {
+//         let del = 0.005;
+//         let moveX = event.movementX * del;
+//         let moveY = event.movementY * del;
+//         camera.rotateViewFromForward(moveX, moveY);
+//     }
+// }
 
-window.onmousedown = function(event) {
-    mouseDown = true;
-}
+// window.onmousedown = function(event) {
+//     mouseDown = true;
+// }
 
-window.onmouseup = function(event) {
-    mouseDown = false;
-}
+// window.onmouseup = function(event) {
+//     mouseDown = false;
+// }
 
 // window.onkeydown = function(e) {
 //     console.log(e);

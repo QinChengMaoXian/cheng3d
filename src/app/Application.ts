@@ -32,6 +32,8 @@ export class Application {
 
     protected _listenersMap: Map<string, any>;
 
+    protected _keylist: number[] = [];
+
     constructor() {
         
     }
@@ -102,6 +104,30 @@ export class Application {
         this._timer.update(delta);
         this._scene.update(delta);
         this._stage.update(delta);
+
+        this._keylist.forEach(key => {
+            switch (key) {
+                case 87:
+                    this._camera.forwardStep(0.5);
+                    break;
+    
+                case 83:
+                    this._camera.forwardStep(-0.5);
+                    break;
+    
+                case 65:
+                    this._camera.horizontalStep(-0.5);
+                    break;
+    
+                case 68:
+                    this._camera.horizontalStep(0.5);
+                    break;
+                    
+                default:
+                    break;
+            }
+        })
+        
     }
 
     private _render(delta: number) {
@@ -136,8 +162,8 @@ export class Application {
         let document = Platform.document();
 
         document.addEventListener('keydown', this._onKeyDown.bind(this));
-        document.addEventListener('keypress', this._onKeyDown.bind(this));
-        document.addEventListener('keyup', this._onKeyDown.bind(this));
+        document.addEventListener('keypress', this._onKeyPress.bind(this));
+        document.addEventListener('keyup', this._onKeyUp.bind(this));
     }
 
     private _removeEventListeners() {
@@ -154,11 +180,16 @@ export class Application {
     }
 
     private _onMouseDown(e: MouseEvent) {
-
+        
     }
 
     private _onMouseMove(e: MouseEvent) {
-
+        if ((e.buttons & 0x01) > 0) {
+            let del = 0.005;
+            let moveX = e.movementX * del;
+            let moveY = e.movementY * del;
+            this._camera.rotateViewFromForward(moveX, moveY);
+        }
     }
 
     private _onMouseUp(e: MouseEvent) {
@@ -174,7 +205,9 @@ export class Application {
     }
 
     private _onKeyDown(e: KeyboardEvent) {
-        
+        if (this._keylist.indexOf(e.keyCode) < 0) {
+            this._keylist.push(e.keyCode);
+        }
     }
 
     private _onKeyPress(e: KeyboardEvent) {
@@ -182,7 +215,10 @@ export class Application {
     }
 
     private _onKeyUp(e: KeyboardEvent) {
-        
+        let index = this._keylist.indexOf(e.keyCode);
+        if (index > -1) {
+            this._keylist.splice(index, 1);
+        }
     }
 
     private _onTouchStart(e: TouchEvent) {
