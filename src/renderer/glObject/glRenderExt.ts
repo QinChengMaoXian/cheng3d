@@ -11,6 +11,7 @@ import { glProgram } from './glProgram';
 import { glBuffer } from './glBuffer';
 import { Camera } from '../../object/Camera';
 import { DirectionLight } from '../../light/DirectionLight';
+import { Shader } from '../../graphics/Shader';
 
 
 
@@ -133,14 +134,15 @@ export class glRenderExt extends glObject {
             // TODO: maybe need re-build? but looks good for use;
             switch (uniformType) {
                 case ShaderConst.mMat:              data = worldMatrix; break;
+                case ShaderConst.mIMat:             data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case ShaderConst.vMat:              data = vMat; break;
                 case ShaderConst.pMat:              data = pMat; break;
                 case ShaderConst.vpMat:             data = getVPMatrix(); break;
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
                 case ShaderConst.mvMat:             data = getMVMatrix(); break;
                 case ShaderConst.cameraPos:         data = camera.getPosition(); break;
-                case ShaderConst.lightColor:        data = this.dirLight.getColor();
-                case ShaderConst.lightDir:          data = this.dirLight.getColor();
+                case ShaderConst.lightColor:        data = this.dirLight.getColor(); break;
+                case ShaderConst.lightDir:          data = this.dirLight.getDirection(); break;
                 case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;

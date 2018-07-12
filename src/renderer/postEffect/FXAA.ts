@@ -81,7 +81,7 @@ export class FXAAMaterial extends Material {
         this._data = { data: new Float32Array([1.0, 1.0]) };
 
         this.setSrcTexture(texture);
-        this.setProperity(ShaderConst.pixelSize, this._data);
+        this.setProperty(ShaderConst.pixelSize, this._data);
     }
 
     public setSrcTexture(texture: Texture2D) {

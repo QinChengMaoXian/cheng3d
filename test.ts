@@ -4,7 +4,11 @@ let test_diff = './resources/spnza_bricks_a_diff.jpg';
 let test_normal = './resources/spnza_bricks_a_ddn.jpg';
 let man_diff = './resources/cartoon/Avatar_Bronya_Color.png';
 let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
-let color_diff = './resources/color.jpg'
+let color_diff = './resources/color.jpg';
+
+let cartoon_color = './resources/cartoon/Avatar_Bronya_Color.png';
+let cartoon_light = './resources/cartoon/Avatar_Bronya_Lightmap.jpg';
+let cartoon_emission = './resources/cartoon/Avatar_Bronya_Emissionmap.jpg';
 
 window['CGE'] = CGE;
 
@@ -63,9 +67,9 @@ let gltfCallback = (event, object) => {
 // gltfTest.load('./resources/cartoon/test.gltf', gltfCallback);
 
 let vertexPositionData = new Float32Array([
-    -1.0, 1.0, 0.0,  0.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
-    1.0,  1.0, 0.0,  5.0, 5.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
-    1.0, -1.0, 0.0,  5.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+    -1.0, 1.0, 0.0,  0.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+    1.0,  1.0, 0.0,  1.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+    1.0, -1.0, 0.0,  1.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
     -1.0, -1.0, 0.0, 0.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
 ]);
 
@@ -138,7 +142,7 @@ window['app'] = app;
 
 let renderer = app.getRenderer();
 renderer.enableDepthTest();
-renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
+renderer.setClearColor(0.2, 0.2, 0.2, 1.0);
 
 let mainScene = app.getScene();
 
@@ -244,21 +248,23 @@ triMesh.setMaterial(triMaterial);
 
 // mainScene.addChild(triMesh);
 
+let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
+
 objLoader.load('./resources/cartoon/test.obj').then(mesh => {
-    mesh.setMaterial(gltfMaterial);
-    mesh.setScale(0.2, 0.2, 0.2);
+    mesh.setMaterial(cartoonMat);
+    mesh.setScale(0.4, 0.4, 0.4);
+    mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
     mainScene.addChild(mesh);
 });
 
 document.body.appendChild(renderer.getCanvas());
 
-
-
 let mesh = new CGE.Mesh();
-mesh.setScale(100, 100, 100);
+mesh.setPosition(1, 2, 1);
+mesh.setScale(5, 10, 10);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(colorShowingMaterial);
-
+mainScene.addChild(mesh);
 
 let events = new Map();
 

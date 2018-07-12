@@ -19,7 +19,7 @@ export class FullScreenMaterial extends Material {
         this.setTexture(ShaderConst.diffuseMap, diffuse);
         this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
 
-        this.setProperity(ShaderConst.baseColor, this._baseColor);
+        this.setProperty(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
     }
 

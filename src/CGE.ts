@@ -25,6 +25,7 @@ export { Sphere } from './bounding/Sphere';
 export { Material } from './material/Material';
 export { DiffuseMaterial } from './material/DiffuseMaterial';
 export { StandardMaterial } from './material/StandardMaterial';
+export { CartoonMaterial } from './material/CartoonMaterial';
 
 export { Light } from './light/Light';
 export { DirectionLight } from './light/DirectionLight';

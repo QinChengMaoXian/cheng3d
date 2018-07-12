@@ -22,7 +22,7 @@ export class StandardMaterial extends Material {
         this.setTexture(ShaderConst.normalMap, normal);
         this.setTexture(ShaderConst.diffuseMap, diffuse);
 
-        this.setProperity(ShaderConst.baseColor, this._baseColor);
+        this.setProperty(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
     }
 

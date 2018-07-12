@@ -3,6 +3,9 @@ import { Shader } from '../graphics/Shader';
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 
+/**
+ * 临时的着色器代码写在了材质内，但是并不正确；
+ */
 export class Material extends Base {
     protected _shader: Shader = undefined;
     protected _alphaTest: boolean = false;
@@ -34,7 +37,7 @@ export class Material extends Base {
         this._textures.set(type, texture);
     }
 
-    protected setProperity(type: string | number, data: any) {
+    protected setProperty(type: string | number, data: any) {
         this._properties.set(type, data);
     }
 

@@ -9,5 +9,6 @@ export const Logger = {
 
     error: function(...message) {
         console.error(...message);
+        throw message;
     },
 };

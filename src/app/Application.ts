@@ -131,7 +131,7 @@ export class Application {
     }
 
     private _render(delta: number) {
-        this._renderer.renderScene(this._obj3d, this._scene.getActiveCamera() || this._camera);
+        this._renderer.renderScene(this._scene, this._scene.getActiveCamera() || this._camera);
     }
 
     private _addEventListener(key: string, listener: any) {

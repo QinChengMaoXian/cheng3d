@@ -26,7 +26,7 @@ export class Quaternion extends Vector4 {
         return this;
     }
 
-    public setAxisAngle(axis, rad) {
+    public setAxisAngle(axis: Vector3, rad) {
         rad = rad * 0.5;
         let s = Math.sin(rad);
         this.v[0] = s * axis.x;

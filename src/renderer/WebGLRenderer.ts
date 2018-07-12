@@ -97,6 +97,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     public setClearColor(r, g, b, a) {
+        this._defFrame.getState().clearColor.set(r, g, b, 0.0);
         this._defFrameState.setClearColor(true, new Vector4(r, g, b, a));
     }
 
@@ -264,6 +265,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         glRenderExt.pMatrix.copy(camera.getProjectionMatrix());
         glRenderExt.vpMatrix.copy(camera.getViewProjectionMatrix());
 
+        if (scene instanceof Scene) {
+            glRenderExt.dirLight = (<Scene>scene).getMainLight();
+        }
+
         const _render = () => {
             let l = _renderList.length;
             for (let i = 0; i < l; i++) {
@@ -320,6 +325,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this._screenHeight = height;
 
         this._defFrame.setSize(width, height);
+        this.initFrame(this._defFrame);
 
         this._defFrameState.setViewport(new Vector4(0, 0, width, height));
     };
@@ -338,7 +344,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
         frame.enableDepthStencil();
-        frame.getState().clearColor.set(1.0, 0.5, 0.5, 0.0);
+        frame.getState().clearColor.set(0.2, 0.2, 0.2, 0.0);
         this._defFrame = frame;
 
         let mesh = new Mesh();

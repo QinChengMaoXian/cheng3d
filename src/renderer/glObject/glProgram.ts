@@ -28,7 +28,7 @@ export class glProgram extends glObject {
         gl.shaderSource(shader, text);
         gl.compileShader(shader);
         if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) == 0) {
-            Logger.error(text);
+            Logger.warn(text);
             Logger.error(gl.getShaderInfoLog(shader));
             gl.deleteShader(shader);
             return undefined;
