@@ -4,12 +4,12 @@ import { Vector3 } from "../math/Vector3";
 export class DirectionLight extends Light {
     protected static readonly DefDir = new Vector3(0, 0, -1);
 
-    protected _dir: Vector3;
+    protected _dir: Vector3 = new Vector3();
 
     constructor() {
         super();
 
-        this._dir = new Vector3(-100, 100, 100).normalize();
+        this.setPosition(1,1,1);
     }
 
     public setPosition(x, y, z) {

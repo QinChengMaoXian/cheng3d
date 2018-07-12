@@ -1,14 +1,11 @@
 import * as CGE from './src/CGE'
 
-let test_diff = './resources/spnza_bricks_a_diff.jpg';
-let test_normal = './resources/spnza_bricks_a_ddn.jpg';
-let man_diff = './resources/cartoon/Avatar_Bronya_Color.png';
-let gltf_diff = './resources/Cesium_Man/Cesium_Man.jpg'
-let color_diff = './resources/color.jpg';
+let test_diff = './res/spnza_bricks_a_diff.jpg';
 
-let cartoon_color = './resources/cartoon/Avatar_Bronya_Color.png';
-let cartoon_light = './resources/cartoon/Avatar_Bronya_Lightmap.jpg';
-let cartoon_emission = './resources/cartoon/Avatar_Bronya_Emissionmap.jpg';
+let cartoon_color = './res/bronya_color.png';
+let cartoon_light = './res/bronya_lightmap.jpg';
+let cartoon_emission = './res/bronya_emission.jpg';
+let cartoon_obj = './res/bronya.obj'
 
 window['CGE'] = CGE;
 
@@ -18,23 +15,23 @@ colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
 colorTexrure.setMipmap(true);
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-normalTexture.setImageUrl(test_normal);
-normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-normalTexture.setMipmap(true);
-normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
+// let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+// normalTexture.setImageUrl(test_normal);
+// normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+// normalTexture.setMipmap(true);
+// normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
 
 let objLoader = new CGE.OBJLoader();
 
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
-let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture);
+// let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture);
 
-let gltfTexture = new CGE.Texture2D();
-gltfTexture.setImageUrl(man_diff);
-gltfTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-gltfTexture.setMipmap(true);
-let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
+// let gltfTexture = new CGE.Texture2D();
+// gltfTexture.setImageUrl(man_diff);
+// gltfTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+// gltfTexture.setMipmap(true);
+// let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
 
 let gltfJson = undefined;
 let gltfCallback = (event, object) => {
@@ -47,7 +44,7 @@ let gltfCallback = (event, object) => {
             let mesh = new CGE.Mesh();
             mesh.setScale(1, 1, 1);
             mesh.setGeometry(gltfJson);
-            mesh.setMaterial(gltfMaterial);
+            // mesh.setMaterial(gltfMaterial);
             let obj = new CGE.Object3D();
             obj.addChild(mesh);
             obj.name = 'test';
@@ -230,27 +227,27 @@ let endTime = Date.now();
 
 // console.log(results);
 
-let triGeo = new CGE.Geometry();
-triGeo.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, vertexd);
-triGeo.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 2, CGE.FLOAT, uvd);
-// triGeo.setIndexData(indexd);
-triGeo.setDrawParameter(vertexd.length / 3);
+// let triGeo = new CGE.Geometry();
+// triGeo.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, vertexd);
+// triGeo.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 2, CGE.FLOAT, uvd);
+// // triGeo.setIndexData(indexd);
+// triGeo.setDrawParameter(vertexd.length / 3);
 
-let triTexture = new CGE.Texture2D();
-triTexture.setImageUrl(color_diff);
-triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-triTexture.setMipmap(true);
-let triMaterial = new CGE.DiffuseMaterial(triTexture);
+// let triTexture = new CGE.Texture2D();
+// triTexture.setImageUrl(color_diff);
+// triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+// triTexture.setMipmap(true);
+// let triMaterial = new CGE.DiffuseMaterial(triTexture);
 
-let triMesh = new CGE.Mesh();
-triMesh.setGeometry(triGeo);
-triMesh.setMaterial(triMaterial);
+// let triMesh = new CGE.Mesh();
+// triMesh.setGeometry(triGeo);
+// triMesh.setMaterial(triMaterial);
 
 // mainScene.addChild(triMesh);
 
 let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
 
-objLoader.load('./resources/cartoon/test.obj').then(mesh => {
+objLoader.load(cartoon_obj).then(mesh => {
     mesh.setMaterial(cartoonMat);
     mesh.setScale(0.4, 0.4, 0.4);
     mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
