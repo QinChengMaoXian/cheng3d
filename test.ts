@@ -1,6 +1,8 @@
 import * as CGE from './src/CGE'
 
 let test_diff = './res/spnza_bricks_a_diff.jpg';
+let test_ddn = './res/spnza_bricks_a_ddn.jpg';
+let test_spec = './res/spnza_bricks_a_spec.png';
 
 let cartoon_color = './res/bronya_color.png';
 let cartoon_light = './res/bronya_lightmap.jpg';
@@ -15,17 +17,23 @@ colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
 colorTexrure.setMipmap(true);
 colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-// let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-// normalTexture.setImageUrl(test_normal);
-// normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-// normalTexture.setMipmap(true);
-// normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
+let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+normalTexture.setImageUrl(test_ddn);
+normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+normalTexture.setMipmap(true);
+normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
+
+let specTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+specTexture.setImageUrl(test_spec);
+specTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+specTexture.setMipmap(true);
+specTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
 
 let objLoader = new CGE.OBJLoader();
 
 let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
-// let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture);
+let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture, specTexture);
 
 // let gltfTexture = new CGE.Texture2D();
 // gltfTexture.setImageUrl(man_diff);
@@ -260,7 +268,7 @@ let mesh = new CGE.Mesh();
 mesh.setPosition(1, 2, 1);
 mesh.setScale(5, 10, 10);
 mesh.setGeometry(planeVertexGeometry);
-mesh.setMaterial(colorShowingMaterial);
+mesh.setMaterial(standMat);
 mainScene.addChild(mesh);
 
 let events = new Map();

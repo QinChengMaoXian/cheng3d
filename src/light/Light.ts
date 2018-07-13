@@ -11,7 +11,7 @@ export enum LightType {
 
 export class Light extends Object3D {
 
-    protected _color: Vector4 = new Vector4();
+    protected _color: Vector4 = new Vector4(1.0, 1.0, 1.0, 1.0);
 
     protected _shadow: boolean = false;
 

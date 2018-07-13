@@ -102,12 +102,13 @@ export class CartoonMaterial extends Material {
             uniform vec3 u_cameraPos;
             uniform vec4 u_merged;
             uniform vec3 u_lightDir;
+            uniform vec4 u_lightColor;
 
             void main()
             {
                 vec3 lightDir = u_lightDir;
 
-                vec3 lightIntensity = vec3(1.0, 1.0, 1.0);
+                vec3 lightIntensity = u_lightColor.xyz;
 
                 vec4 specular = texture2D(u_specularMap, v_uv);
                 vec4 emissive = texture2D(u_emissiveMap, v_uv);

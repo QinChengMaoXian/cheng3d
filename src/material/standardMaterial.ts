@@ -21,6 +21,7 @@ export class StandardMaterial extends Material {
 
         this.setTexture(ShaderConst.normalMap, normal);
         this.setTexture(ShaderConst.diffuseMap, diffuse);
+        this.setTexture(ShaderConst.specularMap, specular);
 
         this.setProperty(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
@@ -103,17 +104,16 @@ export class StandardMaterial extends Material {
 
             uniform sampler2D u_diffuseMap;
             uniform sampler2D u_normalMap;
+            uniform sampler2D u_specularMap;
 
             uniform vec3 u_cameraPos;
             uniform vec4 u_baseColor;
-            // uniform vec3 u_lightDir;
-            // uniform vec4 u_lightColor;
+            uniform vec3 u_lightDir;
+            uniform vec4 u_lightColor;
 
-            const vec4 lightDir = vec4(normalize(vec3(0, 0, -1)), 1.0);
+            // const vec4 lightDir = vec4(normalize(vec3(0, 0, -1)), 1.0);
 
-            const vec4 u_lightColor = vec4(1.0);
-
-            float Roughness = 0.04;
+            // const vec4 u_lightColor = vec4(1.0);
 
             const float PI = 3.14159265359;
 
@@ -170,6 +170,14 @@ export class StandardMaterial extends Material {
             
             void main()
             {
+                vec4 spec = texture2D(u_specularMap, v_uv);
+                float reflec = spec.r * 0.16;
+                float roughness = spec.g;
+                float metalic = spec.b;
+
+                vec4 baseColor = (1.0 - metalic) * texture2D(u_diffuseMap, v_uv) *  u_baseColor;
+                vec3 reflectance = mix(vec3(reflec), baseColor.xyz, metalic);
+
                 vec3 normalTex = texture2D(u_normalMap, v_uv).xyz;
                 vec3 normal = normalTex * 2.0 - 1.0;
                 mat3 normalMatrix = mat3(
@@ -178,14 +186,14 @@ export class StandardMaterial extends Material {
                     normalize(v_tangentToView2)
                 );
 
-                vec3 L = normalize(lightDir.xyz);
+                vec3 L = normalize(u_lightDir.xyz);
                 vec3 V = normalize(u_cameraPos - v_worldPos);
                 vec3 N = normalize(normalMatrix * normal); // normalize(v_normal);//
                 vec3 H = normalize(V + L);
 
-                // float G = GeometrySmith(N, V, L, Roughness);
-                // float D = DistributionGGX(N, H, Roughness);
-                // vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), vec3(0.04), Roughness);
+                // float G = GeometrySmith(N, V, L, roughness);
+                // float D = DistributionGGX(N, H, roughness);
+                // vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), vec3(0.04), roughness);
 
                 // vec3 nominator = D * G * F;//分子
 
@@ -195,13 +203,13 @@ export class StandardMaterial extends Material {
                 float NdotL = dot(N, L); 
                 float NdotV = dot(N, V); 
 
-                float brdf = SampleDFG(Roughness, NdotV, NdotL);
+                float brdf = SampleDFG(roughness, NdotV, NdotL);
 
                 // vec3 kS = F;
                 // vec3 kD = vec3(1.0) - kS;
 
                 vec3 lo = ( brdf) * u_lightColor.xyz; // * max(NdotL, 0.0); 
-                vec4 baseColor = texture2D(u_diffuseMap, v_uv) *  u_baseColor;
+                
                 
                 gl_FragColor = vec4(baseColor.xyz * lo, 1.0);
                 // gl_FragColor = vec4(v_normal, 1.0);
