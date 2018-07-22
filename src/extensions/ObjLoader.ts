@@ -69,7 +69,7 @@ export class OBJLoader {
 
     load(filePath: string) {
         return Loader.loadUrl(filePath).then(data => {
-            return this.parseData(data.responseText);
+            return this.parseData(data);
         });
     }
 

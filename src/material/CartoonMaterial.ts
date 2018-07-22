@@ -15,20 +15,9 @@ export class CartoonMaterial extends Material {
         let shader = CartoonMaterial.getShader();
         this._shader = shader;
 
-        let baseColorMap = new Texture2D();
-        baseColorMap.setImageUrl(baseColor);
-        baseColorMap.setFormat(RGBA, RGBA);
-        this.setTexture(ShaderConst.baseColorMap, baseColorMap);
-
-        let specularMap = new Texture2D();
-        specularMap.setImageUrl(specular);
-        specularMap.setFormat(RGBA, RGBA);
-        this.setTexture(ShaderConst.specularMap, specularMap);
-
-        let emissiveMap = new Texture2D();
-        emissiveMap.setImageUrl(emissive);
-        emissiveMap.setFormat(RGBA, RGBA);
-        this.setTexture(ShaderConst.emissiveMap, emissiveMap);
+        this.setTexture2DFromUrl(ShaderConst.baseColorMap, baseColor);
+        this.setTexture2DFromUrl(ShaderConst.specularMap, specular);
+        this.setTexture2DFromUrl(ShaderConst.emissiveMap, emissive);
 
         this.setTexture(ShaderConst.cartoonLUTMap, CartoonMaterial.getCartoonStyleLUT());
 

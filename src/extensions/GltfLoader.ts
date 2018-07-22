@@ -254,6 +254,7 @@ Object.assign(GltfLoader, {
         });
     },
     'pre_buffers': (glTF) => {
+        // TODO: 修改这里
         const objects = glTF['buffers'];
         Object.keys(objects).forEach(key => {
             const buffer = objects[key];
@@ -265,9 +266,6 @@ Object.assign(GltfLoader, {
                 const loader = new Loader();
                 glTF.promising[key] = Loader.loadUrl(
                     glTF.urlDir + uri, 
-                    xmlHttp => {
-                        buffer.data = xmlHttp.response;
-                    }, 
                     buffer.type || 'text'
                 );
             };
@@ -278,7 +276,7 @@ Object.assign(GltfLoader, {
         const objects = glTF['images'];
         Object.keys(objects).forEach(key => {
             const imgObj = objects[key];
-            glTF.promising[key] = Loader.loadImg(glTF.urlDir + imgObj.uri);
+            // glTF.promising[key] = Loader.loadImg(glTF.urlDir + imgObj.uri);
         });
     },
 })

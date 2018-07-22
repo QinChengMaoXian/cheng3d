@@ -11,12 +11,12 @@ import { Vector4 } from '../math/Vector4';
 export class DiffuseMaterial extends Material {
     protected _diffuseMap;
     protected _baseColor: Vector4 = new Vector4();
-    constructor(diffuse) {
+    constructor(diffuse: string) {
         super();
         let shader = DiffuseMaterial.getShader();
         Object.defineProperty(this, "_shader", { value:shader, writable:false });
 
-        this.setTexture(ShaderConst.diffuseMap, diffuse);
+        this.setTexture2DFromUrl(ShaderConst.diffuseMap, diffuse);
         this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
 
         this.setProperty(ShaderConst.baseColor, this._baseColor);

@@ -1,11 +1,6 @@
 import { Material } from './Material';
 import { Shader } from '../graphics/Shader';
-import { ShaderConst } from '../graphics/ShaderConst'
-import { AttribType, TextureType, MatrixType } from '../graphics/GraphicsTypes';
-import { Texture } from '../graphics/Texture';
-import { Texture2D } from '../graphics/Texture2D';
-import { GraphicsObject } from '../graphics/GraphicsObject';
-import { Vector3 } from '../math/Vector3';
+import { ShaderConst } from '../graphics/ShaderConst';
 import { Vector4 } from '../math/Vector4';
 
 export class ColorMatrial extends Material {

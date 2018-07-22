@@ -14,14 +14,14 @@ export class StandardMaterial extends Material {
     protected _specularMap;
     protected _baseColor: Vector4 = new Vector4();
 
-    constructor(diffuse?: Texture2D, normal?: Texture2D, specular?: Texture2D) {
+    constructor(diffuse?: string, normal?: string, specular?: string) {
         super();
         let shader = StandardMaterial.getShader();
         Object.defineProperty(this, "_shader", { value:shader, writable:false });
 
-        this.setTexture(ShaderConst.normalMap, normal);
-        this.setTexture(ShaderConst.diffuseMap, diffuse);
-        this.setTexture(ShaderConst.specularMap, specular);
+        this.setTexture2DFromUrl(ShaderConst.normalMap, normal);
+        this.setTexture2DFromUrl(ShaderConst.diffuseMap, diffuse);
+        this.setTexture2DFromUrl(ShaderConst.specularMap, specular);
 
         this.setProperty(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);

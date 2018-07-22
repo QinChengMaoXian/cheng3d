@@ -11,29 +11,29 @@ let cartoon_obj = './res/bronya.obj'
 
 window['CGE'] = CGE;
 
-let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-colorTexrure.setImageUrl(test_diff);
-colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
-colorTexrure.setMipmap(true);
-colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT);
+// let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+// colorTexrure.setImageUrl(test_diff);
+// colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
+// colorTexrure.setMipmap(true);
+// colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-normalTexture.setImageUrl(test_ddn);
-normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-normalTexture.setMipmap(true);
-normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
+// let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+// normalTexture.setImageUrl(test_ddn);
+// normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+// normalTexture.setMipmap(true);
+// normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-let specTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-specTexture.setImageUrl(test_spec);
-specTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-specTexture.setMipmap(true);
-specTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
+// let specTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
+// specTexture.setImageUrl(test_spec);
+// specTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+// specTexture.setMipmap(true);
+// specTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
 
 let objLoader = new CGE.OBJLoader();
 
-let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
+// let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
-let standMat = new CGE.StandardMaterial(colorTexrure, normalTexture, specTexture);
+let standMat = new CGE.StandardMaterial(test_diff, test_ddn, test_spec);
 
 // let gltfTexture = new CGE.Texture2D();
 // gltfTexture.setImageUrl(man_diff);
@@ -67,6 +67,10 @@ let gltfCallback = (event, object) => {
             break;
     }
 }
+
+// CGE.Loader.loadImage('').then(img => {
+
+// })
 
 // let gltfTest = new CGE.GltfLoader();
 // gltfTest.load('./resources/cartoon/test.gltf', gltfCallback);

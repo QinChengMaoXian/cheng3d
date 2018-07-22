@@ -18,7 +18,7 @@ import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
-import { PlaneGeometry } from '../util/GeometryUtil';
+import { ScreenGeometry } from '../util/GeometryUtil';
 import { Shader } from '../graphics/Shader';
 
 import { RenderTargetLocation } from '../graphics/GraphicsTypes';
@@ -348,7 +348,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this._defFrame = frame;
 
         let mesh = new Mesh();
-        let geo = new PlaneGeometry();
+        let geo = new ScreenGeometry();
+        geo.makeTri();
         // let mat = new FXAAMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
         let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
         // let mat = new FullScreenMaterial(frame.getDepthStencilTexture());

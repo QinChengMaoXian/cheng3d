@@ -2,6 +2,8 @@ import { Base } from '../core/Base'
 import { Shader } from '../graphics/Shader';
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
+import { Loader } from '../io/Loader';
+import { RGBA } from '../graphics/RendererParameter';
 
 /**
  * 临时的着色器代码写在了材质内，但是并不正确；
@@ -31,6 +33,16 @@ export class Material extends Base {
 
     public getShader() {
         return this._shader;
+    }
+
+    protected setTexture2DFromUrl(type: string | number, url: string, defTexture?: Texture2D) {
+        this._properties.set(type, defTexture || Texture2D.White);
+        Loader.loadImage(url).then((img: HTMLImageElement) => {
+            let tex = new Texture2D();
+            tex.setFormat(RGBA, RGBA);
+            tex.setImageUrl(url, img);
+            this._textures.set(type, tex);
+        })
     }
 
     protected setTexture(type: string | number, texture: Texture = Texture2D.White) {

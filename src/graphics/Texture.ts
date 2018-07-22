@@ -60,10 +60,6 @@ export class Texture extends GraphicsObject {
         return this._needMipmap;
     }
 
-    public isLoad() {
-        return false;
-    }
-
     public getType() {
         return -1;
     }

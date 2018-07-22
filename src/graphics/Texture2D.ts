@@ -34,33 +34,34 @@ export class Texture2D extends Texture {
     protected _url: string;
     protected _width = 0;
     protected _height = 0;
-    protected _isLoad: boolean = false;
 
     constructor() {
         super();
     }
 
-    public setImageUrl(url:string) {
-        this._isLoad = false;
+    public setImageUrl(url:string, image?: HTMLImageElement) {
         this._url = url;
-        let img = new Image()
-        img.onload = () => {
-            this._isLoad = true;
-            this._width = img.width;
-            this._height = img.height;
-        };
-        img.src = url;
-        this._data = img;
+        if (image) {
+            this._data = image;
+        } else {
+            Loader.loadImage(url).then((img: HTMLImageElement) => {
+                this._data = img;
+                this._width = img.width;
+                this._height = img.height;
+                this.needsUpdate();
+                return img;
+            });     
+        }
     }
 
-    public setData(width: number, height: number, data: Uint8Array | Float32Array | Uint16Array) {
+    public setData(width: number, height: number, data: HTMLImageElement | Uint8Array | Float32Array | Uint16Array) {
         this._width = width;
         this._height = height;
         this._data = data;
     }
 
     public getImage() {
-        return this._data instanceof HTMLImageElement ? this._data : null;
+        return this._data;
     }
 
     public getData() {
@@ -96,10 +97,6 @@ export class Texture2D extends Texture {
 
     public getUrl(): string {
         return this._url;
-    }
-
-    public isLoad() {
-        return this._isLoad;
     }
 
     public getType() {

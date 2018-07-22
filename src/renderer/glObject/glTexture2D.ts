@@ -24,16 +24,17 @@ export class glTexture2D extends glTexture {
         }
     }
 
-    protected _setTextureData(gl: WebGLRenderingContext, target, texture) {
+    protected _setTextureData(gl: WebGLRenderingContext, target, texture: Texture2D) {
         let format = texture.getFormat();
         let internalformat = texture.getInternalformat();
         let type = texture.getDataType();
 
-        if (texture.getImage() !== undefined && texture.isLoad()) {
-            let image = texture.getImage();
+        if (texture.getUrl() && texture.getImage()) {
+            let image = <HTMLImageElement>texture.getImage();
             gl.texImage2D(target, 0, internalformat, format, type, image);
         } else if (texture.getWidth() !== 0 && texture.getHeight() !== 0) {
-            gl.texImage2D(target, 0, internalformat, texture.getWidth(), texture.getHeight(), 0, format, type, texture.getData());
+            let data = <ArrayBufferView>texture.getData();
+            gl.texImage2D(target, 0, internalformat, texture.getWidth(), texture.getHeight(), 0, format, type, data);
         } else {
             return undefined;
         }
