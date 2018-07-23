@@ -97,7 +97,7 @@ export class Application {
         this._lastTime = now;
 
         this._update(delta);
-        this._render(delta);
+        this._render();
     }
 
     private _update(delta: number) {
@@ -130,7 +130,7 @@ export class Application {
         
     }
 
-    private _render(delta: number) {
+    private _render() {
         this._renderer.renderScene(this._scene, this._scene.getActiveCamera() || this._camera);
     }
 

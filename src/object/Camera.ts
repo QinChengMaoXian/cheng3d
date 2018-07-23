@@ -7,52 +7,52 @@ export class Camera extends Object3D {
     public static readonly Orthographic = 0;
     public static readonly Perspective = 1;
 
-    far;
-    near;
-    left;
-    right;
-    bottom;
-    top;
-    fovy;
-    aspect;
-    mode = Camera.Perspective;
-    protected projection = new Matrix4();
-    protected viewProjection = new Matrix4();
-    center = new Vector3();
-    up = new Vector3(0, 0, 1);
+    protected _far: number;
+    protected _near: number;
+    protected _left: number;
+    protected _right: number;
+    protected _bottom: number;
+    protected _top: number;
+    protected _fovy: number;
+    protected _aspect: number;
+    protected _mode: number = Camera.Perspective;
+    protected _projection = new Matrix4();
+    protected _viewProjection = new Matrix4();
+    protected _center = new Vector3();
+    protected _up = new Vector3(0, 0, 1);
     protected _projectionFunc: Function;
 
-    constructor(width, height, fovy?, near?, far?) {
+    constructor(width: number, height: number, _fovy?: number, _near?: number, _far?: number) {
         super();
         let w = (width || 800) * 0.5;
         let h = (height || 600) * 0.5;
         Object.assign(this, {
-            far: far || 2000.0,
-            near: near || 0.1,
-            left: -w, 
-            right: w, 
-            bottom: h, 
-            top: -h,
-            fovy: fovy || Math.PI / 3,
-            aspect: w / h,
-            mode: Camera.Perspective,
-            projection: new Matrix4(),
-            center: new Vector3(),
-            up: new Vector3(0, 0, 1),
+            _far: _far || 2000.0,
+            _near: _near || 0.1,
+            _left: -w, 
+            _right: w, 
+            _bottom: h, 
+            _top: -h,
+            _fovy: _fovy || Math.PI / 3,
+            _aspect: w / h,
+            _mode: Camera.Perspective,
+            _projection: new Matrix4(),
+            _center: new Vector3(),
+            _up: new Vector3(0, 0, 1),
             _projectionFunc: this._makePerspectiveMatrix.bind(this)
         });
         this._resetUp();
     }
 
-    _resetUp() {
-        let forward = this.center.clone().sub(this._position).normalize();
-        let rightAxis = forward.cross(this.up.clone().normalize());
+    protected _resetUp() {
+        let forward = this._center.clone().sub(this._position).normalize();
+        let rightAxis = forward.cross(this._up.clone().normalize());
         if (forward.equal(rightAxis)) 
             return;
-        this.up = rightAxis.cross(forward).normalize();
+        this._up = rightAxis.cross(forward).normalize();
     }
 
-    update(delta) {
+    update(delta: number) {
         this._update();
     }
 
@@ -70,138 +70,138 @@ export class Camera extends Object3D {
         return this._matrix;
     }
 
-    enableOrthographicMode(left, right, bottom, top, near, far) {
+    enableOrthographicMode(_left, _right, _bottom, _top, _near, _far) {
         this._projectionFunc = this._makeOrthographicMatrix;
-        this.mode = Camera.Orthographic;
-        this.left = left || this.left;
-        this.right = right || this.right;
-        this.bottom = bottom || this.bottom;
-        this.top = top || this.top;
-        this.near = near || this.near;
-        this.far = far || this.far;
-        this.resize(right - left, bottom - top);
+        this._mode = Camera.Orthographic;
+        this._left = _left || this._left;
+        this._right = _right || this._right;
+        this._bottom = _bottom || this._bottom;
+        this._top = _top || this._top;
+        this._near = _near || this._near;
+        this._far = _far || this._far;
+        this.resize(_right - _left, _bottom - _top);
     }
 
-    enablePerspectiveMode(fovy, aspect, near, far) {
+    enablePerspectiveMode(_fovy, _aspect, _near, _far) {
         this._projectionFunc = this._makePerspectiveMatrix;
-        this.mode = Camera.Perspective;
-        this.fovy = fovy || this.fovy;
-        this.aspect = aspect || this.aspect;
-        let height = Math.abs(this.bottom - this.top);
-        let width = height * aspect;
+        this._mode = Camera.Perspective;
+        this._fovy = _fovy || this._fovy;
+        this._aspect = _aspect || this._aspect;
+        let height = Math.abs(this._bottom - this._top);
+        let width = height * _aspect;
         this.resize(width, height);
     }
 
     getMode() {
-        return this.mode;
+        return this._mode;
     }
 
     makeProjectionMatrix() {
         this._projectionFunc();
     }
 
-    _makeOrthographicMatrix() {
-        this.projection.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
+    protected _makeOrthographicMatrix() {
+        this._projection.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far);
     }
 
-    _makePerspectiveMatrix() {
-        this.projection.perspective(this.fovy, this.aspect, this.near, this.far);
+    protected _makePerspectiveMatrix() {
+        this._projection.perspective(this._fovy, this._aspect, this._near, this._far);
     }
 
     getProjectionMatrix() {
-        return this.projection;
+        return this._projection;
     }
 
     makeViewProjectionMatrix() {
-        let mat4 = this.viewProjection
-        mat4.copy(this.projection);
+        let mat4 = this._viewProjection
+        mat4.copy(this._projection);
         mat4.applyMatrix4(this._matrix);
     }
 
     getViewProjectionMatrix() {
-        return this.viewProjection;
+        return this._viewProjection;
     }
 
     makeMatrix() {
-        this.lookAt(this.center);
+        this.lookAt(this._center);
     }
 
     applyMatrix4(mat4) {
         this._position.applyMatrix4(mat4);
-        this.center.applyMatrix4(mat4);
-        this.up.applyMatrix4(mat4);
+        this._center.applyMatrix4(mat4);
+        this._up.applyMatrix4(mat4);
     }
 
-    setUp(up) {
-        this.up.copy(up);
+    setUp(_up) {
+        this._up.copy(_up);
         this.setNeedUpdateMatrix();
     }
 
-    lookAt(center) {
-        if (center) {
-            this.center.copy(center);
+    lookAt(_center) {
+        if (_center) {
+            this._center.copy(_center);
             this._resetUp();
             this.setNeedUpdateMatrix();
         }
     }
 
     _updateMatrix() {
-        this._matrix.lookAt(this._position, this.center, this.up);
+        this._matrix.lookAt(this._position, this._center, this._up);
     }
 
     resize(width, height) {
-        let xCenter = (this.right - this.left) * 0.5 + this.left;
-        let yCenter = (this.bottom - this.top) * 0.5 + this.top;
+        let xCenter = (this._right - this._left) * 0.5 + this._left;
+        let yCenter = (this._bottom - this._top) * 0.5 + this._top;
         let halfWidth = width * 0.5;
         let halfHeight = height * 0.5;
-        this.left = xCenter - halfWidth;
-        this.right = xCenter + halfWidth;
-        this.top = yCenter - halfHeight;
-        this.bottom = yCenter + halfHeight;
-        this.aspect = width / height;
+        this._left = xCenter - halfWidth;
+        this._right = xCenter + halfWidth;
+        this._top = yCenter - halfHeight;
+        this._bottom = yCenter + halfHeight;
+        this._aspect = width / height;
         this._needsUpdate = true;
         this._update();
     }
 
     forwardStep(delta) {
-        let dir = this.center.clone().sub(this._position).normalize().mul(delta);
+        let dir = this._center.clone().sub(this._position).normalize().mul(delta);
         this._addPosCenter(dir);
     }
 
     horizontalStep(delta) {
-        let dir = this.center.clone().sub(this._position).cross(this.up).normalize().mul(delta);
+        let dir = this._center.clone().sub(this._position).cross(this._up).normalize().mul(delta);
         this._addPosCenter(dir);
     }
 
     verticalStep(delta) {
-        this.center.z += delta;
+        this._center.z += delta;
         this._position.z += delta;
         this.setNeedUpdateMatrix();
     }
 
     _addPosCenter(dir) {
         this._position.add(dir);
-        this.center.add(dir);
+        this._center.add(dir);
         this.setNeedUpdateMatrix();
     }
 
     _rotateView(axis, rad) {
         let quat = new Quaternion();
         quat.setAxisAngle(axis, -rad);
-        let temp = this.center.clone().sub(this._position)
+        let temp = this._center.clone().sub(this._position)
         let length = temp.length();
         let dir = temp.normalize();
 
         dir.applyQuaternion(quat);
-        this.center = this._position.clone().add(dir.mul(length));
-        this.up.applyQuaternion(quat);   
+        this._center = this._position.clone().add(dir.mul(length));
+        this._up.applyQuaternion(quat);   
     }
 
     rotateViewFromForward(movementX, movementY) {
         // enhance this.
         this._rotateView(new Vector3(0,0,1), movementX);
-        let forward = this.center.clone().sub(this._position).normalize();
-        let rightAxis = forward.cross(this.up.clone().normalize());
+        let forward = this._center.clone().sub(this._position).normalize();
+        let rightAxis = forward.cross(this._up.clone().normalize());
         this._rotateView(rightAxis, movementY);
         this.setNeedUpdateMatrix();
     }
