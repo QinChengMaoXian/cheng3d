@@ -134,14 +134,14 @@ export class Camera extends Object3D {
 
     setUp(_up) {
         this._up.copy(_up);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     lookAt(_center) {
         if (_center) {
             this._center.copy(_center);
             this._resetUp();
-            this.setNeedUpdateMatrix();
+            this.enableUpdateMat();
         }
     }
 
@@ -176,13 +176,13 @@ export class Camera extends Object3D {
     verticalStep(delta) {
         this._center.z += delta;
         this._position.z += delta;
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     _addPosCenter(dir) {
         this._position.add(dir);
         this._center.add(dir);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     _rotateView(axis, rad) {
@@ -203,6 +203,6 @@ export class Camera extends Object3D {
         let forward = this._center.clone().sub(this._position).normalize();
         let rightAxis = forward.cross(this._up.clone().normalize());
         this._rotateView(rightAxis, movementY);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 }

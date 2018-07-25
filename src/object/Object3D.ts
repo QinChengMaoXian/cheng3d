@@ -37,32 +37,33 @@ export class Object3D extends Base {
         return this._children;
     }
 
-    public setNeedUpdateMatrix() {
+    public enableUpdateMat() {
         this._needsUpdate = true;
-        let l = this._children.length;
-        let children = this._children;
-        for (let i = 0; i < l; i++) {
-            children[i].setNeedUpdateMatrix();
-        }
     }
 
-    public update(delta: number) {
-        this._makeMatrix();
+    protected _update(delta: number) {
+
+    }
+
+    public update(delta: number, parentUpdate: boolean = false) {
+        let isUpdate = this._needsUpdate || parentUpdate;
+        this._makeMatrix(parentUpdate);
+        this._update(delta);
         let l = this._children.length;
         let children = this._children;
         for (let i = 0; i < l; i++) {
-            children[i].update(delta);
+            children[i].update(delta, isUpdate);
         }
     }
 
     public setPositionAt(position: Vector3) {
         this._position.set(position.x, position.y, position.z);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     public setPosition(x: number, y: number, z: number) {
         this._position.set(x, y, z);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     public getPosition() {
@@ -71,12 +72,12 @@ export class Object3D extends Base {
 
     public setRotateAt(rotate: Quaternion) {
         this._rotate.setAt(rotate);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     public setRotate(x: number, y: number, z: number, w: number) {
         this._rotate.set(x, y, z, w);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     public getRotate() {
@@ -85,12 +86,12 @@ export class Object3D extends Base {
 
     public setScaleAt(scale: Vector3) {
         this._scale.set(scale.x, scale.y, scale.z);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     public setScale(x: number, y: number, z: number) {
         this._scale.set(x, y, z);
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     public getScale() {
@@ -102,13 +103,15 @@ export class Object3D extends Base {
         return this._matrix;
     }
 
-    protected _makeMatrix() {
-        if (this._needsUpdate) {
-            this._matrix.compose(this._position, this._rotate, this._scale);
-            if (this._parent) {
+    protected _makeMatrix(parentUpdate: boolean = false) {
+        if (this._needsUpdate || parentUpdate) {
+            if (this._needsUpdate) {
+                this._matrix.compose(this._position, this._rotate, this._scale);
+                this._needsUpdate = false;
+            }
+            if (this._parent && parentUpdate) {
                 this._matrix.premultiply(this._parent.getMatrix());
             }
-            this._needsUpdate = false;
             this._updateBounding();
         }
     }

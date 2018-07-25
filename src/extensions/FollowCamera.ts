@@ -22,7 +22,7 @@ export class FollowCamera extends Camera {
 
     set target(t: Object3D) {
         this._target = t;
-        this.setNeedUpdateMatrix();
+        this.enableUpdateMat();
     }
 
     get target(): Object3D {
