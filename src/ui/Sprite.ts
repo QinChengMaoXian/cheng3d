@@ -10,8 +10,6 @@ export class Sprite extends Base {
     protected _parent: Sprite = null;
     protected _children: Sprite[] = [];
 
-    protected _sizeForce = false;
-
     protected _needsUpdate: boolean = true;
 
     constructor() {
