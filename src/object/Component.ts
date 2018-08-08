@@ -1,5 +1,5 @@
 import { Base } from '../core/Base';
-import { ComponentType } from '../object/ObjectType';
+import { ComponentType } from './ObjectType';
 
 export class Component extends Base {
     _entity;

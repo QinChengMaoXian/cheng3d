@@ -7,9 +7,15 @@ let test_spec = './res/spnza_bricks_a_spec.png';
 let cartoon_color = './res/bronya_color.png';
 let cartoon_light = './res/bronya_lightmap.jpg';
 let cartoon_emission = './res/bronya_emission.jpg';
-let cartoon_obj = './res/bronya.obj'
+let cartoon_obj = './res/bronya.obj';
 
 window['CGE'] = CGE;
+
+import { Main } from './projects/kamihikouki/main';
+
+let main = new Main();
+main.init();
+let app = main.getApp();
 
 // let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
 // colorTexrure.setImageUrl(test_diff);
@@ -145,7 +151,7 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 
 // teapotMesh.setMaterial(standMat);
 
-const app = new CGE.Application();
+// const app = new CGE.Application();
 app.init(window.innerWidth, window.innerHeight);
 window['app'] = app;
 

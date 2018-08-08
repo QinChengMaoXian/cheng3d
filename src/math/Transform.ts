@@ -1,6 +1,6 @@
-import { Vector3 } from '../math/Vector3';
-import { Quaternion } from '../math/Quaternion';
-import { Matrix4 } from '../math/Matrix4';
+import { Vector3 } from './Vector3';
+import { Quaternion } from './Quaternion';
+import { Matrix4 } from './Matrix4';
 
 export class Transform {
     protected _position: Vector3;
