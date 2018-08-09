@@ -7,6 +7,7 @@ export class app {
     static init() {
         if (!this._app) {
             this._app = new CGE.Application;
+            this._app.init(window.innerWidth, window.innerHeight);
         }
     }
 

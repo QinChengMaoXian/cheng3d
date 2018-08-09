@@ -37,6 +37,9 @@ export class Material extends Base {
 
     protected setTexture2DFromUrl(type: string | number, url: string, defTexture?: Texture2D) {
         this._properties.set(type, defTexture || Texture2D.White);
+        if (!url || url === '') {
+            return;
+        }
         Loader.loadImage(url).then((img: HTMLImageElement) => {
             let tex = new Texture2D();
             tex.setFormat(RGBA, RGBA);

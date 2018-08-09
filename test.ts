@@ -60,9 +60,9 @@ let gltfCallback = (event, object) => {
             mesh.setGeometry(gltfJson);
             // mesh.setMaterial(gltfMaterial);
             let obj = new CGE.Object3D();
-            obj.addChild(mesh);
+            // obj.addChild(mesh);
             obj.name = 'test';
-            mainScene.addChild(obj);   
+            // mainScene.addChild(obj);   
             break;
 
         case 'error':
@@ -152,7 +152,7 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 // teapotMesh.setMaterial(standMat);
 
 // const app = new CGE.Application();
-app.init(window.innerWidth, window.innerHeight);
+
 window['app'] = app;
 
 let renderer = app.getRenderer();
@@ -269,7 +269,7 @@ objLoader.load(cartoon_obj).then(mesh => {
     mesh.setMaterial(cartoonMat);
     mesh.setScale(0.4, 0.4, 0.4);
     mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
-    mainScene.addChild(mesh);
+    // mainScene.addChild(mesh);
 });
 
 document.body.appendChild(renderer.getCanvas());
@@ -279,7 +279,7 @@ mesh.setPosition(1, 2, 1);
 mesh.setScale(5, 10, 10);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(standMat);
-mainScene.addChild(mesh);
+// mainScene.addChild(mesh);
 
 let events = new Map();
 
