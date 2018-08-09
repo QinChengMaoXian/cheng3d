@@ -20,7 +20,7 @@ export class AirplaneView extends CGE.Mesh {
     /**
      * TODO：load from files
      */
-    protected _createGeo() {
+    protected _createGeo(): CGE.Geometry {
         let geo = new CGE.Geometry();
 
         let vertexPositionData = new Float32Array([

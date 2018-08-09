@@ -36,7 +36,7 @@ export class Material extends Base {
     }
 
     protected setTexture2DFromUrl(type: string | number, url: string, defTexture?: Texture2D) {
-        this._properties.set(type, defTexture || Texture2D.White);
+        this._textures.set(type, defTexture || Texture2D.White);
         if (!url || url === '') {
             return;
         }
