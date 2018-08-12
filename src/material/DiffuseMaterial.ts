@@ -17,7 +17,7 @@ export class DiffuseMaterial extends Material {
         Object.defineProperty(this, "_shader", { value:shader, writable:false });
 
         this.setTexture2DFromUrl(ShaderConst.diffuseMap, diffuse);
-        this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
+        // this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
 
         this.setProperty(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
