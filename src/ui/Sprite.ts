@@ -5,7 +5,7 @@ import { Base } from '../core/Base';
 export class Sprite extends Base {
 
     // x, y, w, h
-    protected _data: Int32Array = new Int32Array(6);
+    protected _data:{} = {};
 
     protected _parent: Sprite = null;
     protected _children: Sprite[] = [];
@@ -61,43 +61,43 @@ export class Sprite extends Base {
     }
 
     public set x(value: number) {
-        this._data[0] = value
+        this._data['x'] = value
     }
 
     public get x(): number {
-        return this._data[0];
+        return this._data['x'] || 0;
     } 
 
     public set y(value: number) {
-        this._data[1] = value
+        this._data['y'] = value
     }
 
     public get y(): number {
-        return this._data[1];
+        return this._data['y'] || 0;
     } 
 
     public set width(value: number) {
-        this._data[2] = value;
+        this._data['width'] = value;
     } 
 
     public get width(): number {
-        return this._data[2];
+        return this._data['width'] || 0;
     }
 
     public set height(value: number) {
-        this._data[3] = value;
+        this._data['height'] = value;
     } 
 
     public get height(): number {
-        return this._data[3];
+        return this._data['height'] || 0;
     }
 
     public get scalex(): number {
-        return this._data[4];
+        return this._data['scalex'];
     }
 
     public get scaley(): number {
-        return this._data[5];
+        return this._data['scaley'];
     }
 
     static checkEvent(base: Sprite, event: Event) {

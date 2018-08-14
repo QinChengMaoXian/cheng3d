@@ -132,6 +132,8 @@ export class Object3D extends Base {
         }
         if (parent) {
             parent._children.push(this);
+        } else {
+            this._preCleanup();
         }
         this._parent = parent;
     }
@@ -150,6 +152,10 @@ export class Object3D extends Base {
 
     public getBounding() {
         return this._bounding;
+    }
+
+    private _preCleanup() {
+
     }
 
     // TODO
