@@ -1,7 +1,7 @@
 import * as CGE from '../../src/CGE';
 import { Manager } from './manager/Manager';
 
-export class App {
+export class App extends CGE.EventDispatcher {
 
     private static _app: App;
 
@@ -18,7 +18,7 @@ export class App {
     private _manager: Manager;
 
     constructor() {
-
+        super();
     }
 
     private init() {
@@ -26,6 +26,7 @@ export class App {
         this._cgeApp.init(CGE.Platform.width, CGE.Platform.height);
 
         this._manager = new Manager();
+        this._manager.init();
     }
 
     public get cgeApp(): CGE.Application {
