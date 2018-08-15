@@ -15,7 +15,7 @@ import { Main } from './projects/kamihikouki/main';
 
 let main = new Main();
 main.init();
-let app = main.getApp();
+let app = main.getCGEApp();
 
 // let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
 // colorTexrure.setImageUrl(test_diff);

@@ -24,5 +24,11 @@ export class Platform {
         return window.cancelAnimationFrame.bind(window);
     }
 
-    public static 
+    public static get width() {
+        return window.innerWidth;
+    }
+
+    public static get height() {
+        return window.innerHeight;
+    }
 }

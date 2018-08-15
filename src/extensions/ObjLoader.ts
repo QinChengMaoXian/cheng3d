@@ -2,7 +2,7 @@ import { Texture2D } from '../graphics/Texture2D'
 import { TextureCube } from '../graphics/TextureCube'
 import { Geometry } from '../graphics/Geometry'
 
-import { Entity } from '../object/Entity.js'
+import { Entity } from '../object/Entity'
 import { Component } from '../object/Component'
 import { Object3D } from '../object/Object3D';
 import { Mesh } from '../object/Mesh';
