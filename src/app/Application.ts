@@ -106,9 +106,10 @@ export class Application extends EventDispatcher {
     }
 
     private _update(delta: number) {
-        this._timer.update(delta);
+        this._timer.preUpdate(delta);
         this._scene.update(delta);
         this._stage.update(delta);
+        this._timer.lateUpdate(delta);
 
         this._keylist.forEach(key => {
             switch (key) {

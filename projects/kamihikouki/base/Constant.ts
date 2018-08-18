@@ -7,4 +7,3 @@ export enum LayerKey {
     Wind,
     Length,
 }
-

@@ -1,5 +1,8 @@
 export class Platform {
     
+    protected static reqAniBindWin = window.requestAnimationFrame.bind(window);
+    protected static celAniBindWin = window.cancelAnimationFrame.bind(window);
+
     public static init() {
 
     }
@@ -17,11 +20,11 @@ export class Platform {
     }
 
     public static get requestAnimationFrame(): (callback: FrameRequestCallback) => number {
-        return window.requestAnimationFrame.bind(window);
+        return this.reqAniBindWin;
     }
 
     public static get cancelAnimationFrame(): (handle: number) => void {
-        return window.cancelAnimationFrame.bind(window);
+        return this.celAniBindWin;
     }
 
     public static get width() {
