@@ -17,7 +17,7 @@ export class Handler {
     }
 
     public run(): any {
-        if (this.method) return null;
+        if (!this.method) return null;
         const result = this.method.apply(this.caller, this.args);
         this.once && this.clear();
         return result;

@@ -1,6 +1,7 @@
-import * as CGE from '../../../src/CGE'
+import * as CGE from '../../../src/CGE';
+import { BaseView } from "./BaseView";
 
-export class AirplaneView extends CGE.Mesh {
+export class AirplaneView extends BaseView {
 
     constructor() {
         super();

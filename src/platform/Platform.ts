@@ -5,7 +5,7 @@ export class Platform {
     }
 
     public static now(): number {
-        return Date.now()
+        return performance.now() || Date.now()
     }
 
     public static document(): HTMLDocument {

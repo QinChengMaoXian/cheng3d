@@ -1,6 +1,8 @@
 import * as CGE from '../../src/CGE';
 import { Manager } from './manager/Manager';
 
+export const manager = new Manager;
+
 export class App extends CGE.EventDispatcher {
 
     private static _app: App;
@@ -17,19 +19,34 @@ export class App extends CGE.EventDispatcher {
 
     private _manager: Manager;
 
+    private _scene: CGE.Scene;
+
     constructor() {
         super();
     }
 
     private init() {
-        this._cgeApp = new CGE.Application();
-        this._cgeApp.init(CGE.Platform.width, CGE.Platform.height);
+        let cgeApp = new CGE.Application();
+        cgeApp.init(CGE.Platform.width, CGE.Platform.height);
+        this._cgeApp = cgeApp;
 
-        this._manager = new Manager();
-        this._manager.init();
+        this._scene = cgeApp.getScene();
+
+        cgeApp.getTimer().once(2000, this, ()=>{ console.log('dddddd'); });
+
+        this._manager = manager;
+        manager.init();
     }
 
     public get cgeApp(): CGE.Application {
         return this._cgeApp;
+    }
+
+    get scene(): CGE.Scene {
+        return this._scene;
+    }
+
+    get manager() {
+        return this._manager;
     }
 }

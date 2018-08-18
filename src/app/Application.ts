@@ -5,8 +5,9 @@ import { Timer } from "../core/Timer";
 import { Object3D } from "../object/Object3D";
 import { Platform } from "../platform/Platform";
 import { Camera } from "../object/Camera";
+import { EventDispatcher } from "../core/EventDispatcher";
 
-export class Application {
+export class Application extends EventDispatcher {
 
     public slow: boolean = false;
 
@@ -34,8 +35,10 @@ export class Application {
 
     protected _keylist: number[] = [];
 
+    private _loopBindThis;
+
     constructor() {
-        
+        super();
     }
 
     public init(width: number, height: number) {
@@ -56,6 +59,8 @@ export class Application {
 
         this._listenersMap = new Map();
         this._addEventListeners();
+
+        this._loopBindThis = this._loop.bind(this);
     }
 
     public setSize(width: number, height: number) {
@@ -82,7 +87,7 @@ export class Application {
         if (this._stop) {
             return;
         }
-        this._frameId = Platform.requestAnimationFrame(this._loop.bind(this));
+        this._frameId = Platform.requestAnimationFrame(this._loopBindThis);
 
         this._frameCount++;     
 
@@ -146,8 +151,6 @@ export class Application {
     }
 
     private _addEventListeners() {
-        let canvas = this._renderer.getCanvas();
-
         this._addEventListener('mousedown', this._onMouseDown.bind(this));
         this._addEventListener('mousemove', this._onMouseMove.bind(this));
         this._addEventListener('mouseup', this._onMouseUp.bind(this));
@@ -250,7 +253,7 @@ export class Application {
     }
 
     getTimer() {
-        return this._stage;
+        return this._timer;
     }
 
     getCamera() {

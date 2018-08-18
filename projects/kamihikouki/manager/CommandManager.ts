@@ -1,12 +1,19 @@
-
-export enum CommandType {
-    Event = 0,
-    Control,
-}
+import { Command } from "../command/Command";
 
 export class CommandManager {
+
+    private _cache: Command[];
     
-    type: CommandType;
-    
+    constructor() {
+
+    }
+
+    public init() {
+
+    }
+
+    public execute(cmd: Command) {
+
+    }
 
 }

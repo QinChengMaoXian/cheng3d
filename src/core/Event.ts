@@ -14,6 +14,8 @@ export class Event extends Base {
 
     static readonly CLIENT_RESIZE = "client_resize";
 
+    static readonly LOOP_FRAME = "loop_frame";
+
     protected _type: string;
 
     protected _x: number;

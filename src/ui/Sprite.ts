@@ -4,8 +4,8 @@ import { Base } from '../core/Base';
 
 export class Sprite extends Base {
 
-    // x, y, w, h
-    protected _data:{} = {};
+    // all paramter
+    protected _P:{} = {};
 
     protected _parent: Sprite = null;
     protected _children: Sprite[] = [];
@@ -55,49 +55,49 @@ export class Sprite extends Base {
     }
 
     public setSize(width: number, height: number) {
-        this._data[2] = width;
-        this._data[3] = height;
+        this._P[2] = width;
+        this._P[3] = height;
         this._update();
     }
 
-    public set x(value: number) {
-        this._data['x'] = value
+    public set x(v: number) {
+        this._P['x'] = v
     }
 
     public get x(): number {
-        return this._data['x'] || 0;
+        return this._P['x'] || 0;
     } 
 
-    public set y(value: number) {
-        this._data['y'] = value
+    public set y(v: number) {
+        this._P['y'] = v
     }
 
     public get y(): number {
-        return this._data['y'] || 0;
+        return this._P['y'] || 0;
     } 
 
-    public set width(value: number) {
-        this._data['width'] = value;
+    public set width(v: number) {
+        this._P['width'] = v;
     } 
 
     public get width(): number {
-        return this._data['width'] || 0;
+        return this._P['width'] || 0;
     }
 
-    public set height(value: number) {
-        this._data['height'] = value;
+    public set height(v: number) {
+        this._P['height'] = v;
     } 
 
     public get height(): number {
-        return this._data['height'] || 0;
+        return this._P['height'] || 0;
     }
 
-    public get scalex(): number {
-        return this._data['scalex'];
+    public set mouseEnable(v: boolean) {
+        this._P['mouseEnable'] = v;
     }
 
-    public get scaley(): number {
-        return this._data['scaley'];
+    public get mouseEnable(): boolean {
+        return this._P['mouseEnable'] || false;
     }
 
     static checkEvent(base: Sprite, event: Event) {
