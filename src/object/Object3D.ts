@@ -47,12 +47,17 @@ export class Object3D extends Base {
 
     public update(delta: number, parentUpdate: boolean = false) {
         let isUpdate = this._needsUpdate || parentUpdate;
-        this._makeMatrix(parentUpdate);
         this._update(delta);
+        this._makeMatrix(parentUpdate);
+        
         let l = this._children.length;
         let children = this._children;
         for (let i = 0; i < l; i++) {
             children[i].update(delta, isUpdate);
+        }
+
+        if (isUpdate) {
+            this._updateBounding();
         }
     }
 
@@ -112,7 +117,6 @@ export class Object3D extends Base {
             if (this._parent && parentUpdate) {
                 this._matrix.premultiply(this._parent.getMatrix());
             }
-            this._updateBounding();
         }
     }
 

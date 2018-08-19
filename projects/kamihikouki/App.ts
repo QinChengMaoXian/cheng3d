@@ -32,8 +32,6 @@ export class App extends CGE.EventDispatcher {
 
         this._scene = cgeApp.getScene();
 
-        cgeApp.getTimer().loop(1000, this, ()=>{ console.log('dddddd'); });
-
         this._manager = manager;
         manager.init();
     }
