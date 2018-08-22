@@ -4,6 +4,7 @@ import { Wind } from "../model/wind";
 import { Relic } from "../model/Relic";
 import { App, manager } from "../App";
 import { LayerKey } from "../base/Constant";
+import { PlayScene } from "../model/PlayScene";
 
 export class PlayManager {
     
@@ -13,6 +14,8 @@ export class PlayManager {
     protected _winds: Wind[];
     protected _relics: Relic[];
 
+    protected _currectPlayScene: PlayScene;
+
     constructor() {
 
     }
@@ -21,6 +24,8 @@ export class PlayManager {
         // test
         this._air = new Airplane;
         this._air.init(1);
+
+        this._currectPlayScene = new PlayScene;
 
         manager.layer.addToLayer(this._air.getView(), LayerKey.Player);
     }
