@@ -1,6 +1,5 @@
-import * as CGE from '../../../src/CGE'
-import { AirplaneView } from '../view/AirplaneView';
-import { App } from '../App';
+import * as CGE from '../../../src/CGE';
+import { AirplaneView } from '../view/AIrplaneView';
 
 export class Airplane {
 
@@ -14,7 +13,7 @@ export class Airplane {
     protected _view: AirplaneView;
 
     constructor() {
-        // App.instance.cgeApp.getTimer().frameLoop(1, this, this.update);
+        
     }
 
     public update() {
@@ -35,6 +34,22 @@ export class Airplane {
 
     public getView() {
         return this._view;
+    }
+
+    public turnLeft(d: number) {
+
+    }
+
+    public turnRight(d: number) {
+
+    }
+
+    public lookUp(d: number) {
+
+    }
+
+    public lookDown(d: number) {
+
     }
 
     public setPos(x: number, y: number,z: number) {

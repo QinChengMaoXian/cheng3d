@@ -7,12 +7,6 @@ import { LayerKey } from "../base/Constant";
 import { PlayScene } from "../model/PlayScene";
 
 export class PlayManager {
-    
-    protected _air: Airplane;
-    protected _ground: Ground;
-
-    protected _winds: Wind[];
-    protected _relics: Relic[];
 
     protected _currectPlayScene: PlayScene;
 
@@ -21,13 +15,9 @@ export class PlayManager {
     }
 
     public init() {
-        // test
-        this._air = new Airplane;
-        this._air.init(1);
-
         this._currectPlayScene = new PlayScene;
+        this._currectPlayScene.init();
 
-        manager.layer.addToLayer(this._air.getView(), LayerKey.Player);
     }
 
     public checkPoint() {
@@ -35,19 +25,19 @@ export class PlayManager {
     } 
 
     get airPlane() {
-        return this._air;
+        return this._currectPlayScene.airPlane;
     }
 
     get ground() {
-        return this._ground;
+        return this._currectPlayScene.ground;
     }
 
     get winds() {
-        return this._winds;
+        return this._currectPlayScene.winds;
     }
 
     get relics() {
-        return this._relics;
+        return this._currectPlayScene.relics;
     }
 
 }

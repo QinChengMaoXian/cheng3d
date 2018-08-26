@@ -21,22 +21,31 @@ export class App extends CGE.EventDispatcher {
 
     private _scene: CGE.Scene;
 
+    private _timer: CGE.Timer;
+
     constructor() {
         super();
     }
 
     private init() {
         let cgeApp = new CGE.Application();
-        cgeApp.init(CGE.Platform.width, CGE.Platform.height);
-        this._cgeApp = cgeApp;
 
+        cgeApp.init(CGE.Platform.width, CGE.Platform.height);
+        
+        this._timer = cgeApp.getTimer();
         this._scene = cgeApp.getScene();
+
+        this._cgeApp = cgeApp;
 
         this._manager = manager;
         manager.init();
     }
 
-    public get cgeApp(): CGE.Application {
+    get timer(): CGE.Timer {
+        return this._timer;
+    }
+
+    get cgeApp(): CGE.Application {
         return this._cgeApp;
     }
 

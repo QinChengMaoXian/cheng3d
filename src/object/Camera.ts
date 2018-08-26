@@ -137,9 +137,9 @@ export class Camera extends Object3D {
         this.enableUpdateMat();
     }
 
-    lookAt(_center) {
-        if (_center) {
-            this._center.copy(_center);
+    lookAt(center) {
+        if (center) {
+            this._center.copy(center);
             this._resetUp();
             this.enableUpdateMat();
         }

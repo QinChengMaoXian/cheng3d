@@ -17,6 +17,7 @@ export { Triangle } from './math/Triangle';
 export { Base } from './core/Base';
 export { Event } from './core/Event';
 export { EventDispatcher } from './core/EventDispatcher';
+export { Timer } from './core/Timer';
 
 export { Bounding } from './bounding/Bounding';
 export { AABB } from './bounding/AABB';

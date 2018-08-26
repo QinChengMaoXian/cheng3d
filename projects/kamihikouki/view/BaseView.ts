@@ -8,4 +8,8 @@ export class BaseView extends CGE.Mesh {
         manager.layer.addToLayer(this, key);
     }
 
+    public removeToLayer(key: LayerKey) {
+        manager.layer.removeToLayer(this, key);
+    }
+
 }

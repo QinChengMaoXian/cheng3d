@@ -17,6 +17,9 @@ let main = new Main();
 main.init();
 let app = main.getCGEApp();
 
+// let app = new CGE.Application();
+// app.init(CGE.Platform.width, CGE.Platform.height);
+
 // let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
 // colorTexrure.setImageUrl(test_diff);
 // colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
@@ -165,9 +168,9 @@ let camera = app.getCamera();
 camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
 camera.lookAt(new CGE.Vector3(0, 1, 10));
 
-let tri_scale = 10;
+let tri_scale = 100;
 
-let tri_num = 2;
+let tri_num = 20;
 let half_num = tri_num / 2;
 
 let vertexd = new Float32Array(tri_num * tri_num * tri_num * 18);
@@ -245,23 +248,24 @@ let endTime = Date.now();
 
 // console.log(results);
 
-// let triGeo = new CGE.Geometry();
-// triGeo.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, vertexd);
-// triGeo.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 2, CGE.FLOAT, uvd);
-// // triGeo.setIndexData(indexd);
-// triGeo.setDrawParameter(vertexd.length / 3);
+let triGeo = new CGE.Geometry();
+triGeo.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, vertexd);
+triGeo.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 2, CGE.FLOAT, uvd);
+// triGeo.setIndexData(indexd);
+triGeo.setDrawParameter(vertexd.length / 3);
 
 // let triTexture = new CGE.Texture2D();
 // triTexture.setImageUrl(color_diff);
 // triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
 // triTexture.setMipmap(true);
-// let triMaterial = new CGE.DiffuseMaterial(triTexture);
+let triMaterial = new CGE.DiffuseMaterial('./resources/color.jpg');
 
-// let triMesh = new CGE.Mesh();
-// triMesh.setGeometry(triGeo);
-// triMesh.setMaterial(triMaterial);
+let triMesh = new CGE.Mesh();
+triMesh.setGeometry(triGeo);
+triMesh.setMaterial(triMaterial);
+triMesh.setPosition(0, 0, -200);
 
-// mainScene.addChild(triMesh);
+mainScene.addChild(triMesh);
 
 let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
 

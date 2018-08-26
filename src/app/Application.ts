@@ -109,6 +109,7 @@ export class Application extends EventDispatcher {
         this._timer.preUpdate(delta);
         this._scene.update(delta);
         this._stage.update(delta);
+        this._camera.update(delta);
         this._timer.lateUpdate(delta);
 
         this._keylist.forEach(key => {
