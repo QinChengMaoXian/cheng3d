@@ -112,28 +112,28 @@ export class Application extends EventDispatcher {
         this._camera.update(delta);
         this._timer.lateUpdate(delta);
 
-        this._keylist.forEach(key => {
-            switch (key) {
-                case 87:
-                    this._camera.forwardStep(0.5);
-                    break;
+        // this._keylist.forEach(key => {
+        //     switch (key) {
+        //         case 87:
+        //             this._camera.forwardStep(0.5);
+        //             break;
     
-                case 83:
-                    this._camera.forwardStep(-0.5);
-                    break;
+        //         case 83:
+        //             this._camera.forwardStep(-0.5);
+        //             break;
     
-                case 65:
-                    this._camera.horizontalStep(-0.5);
-                    break;
+        //         case 65:
+        //             this._camera.horizontalStep(-0.5);
+        //             break;
     
-                case 68:
-                    this._camera.horizontalStep(0.5);
-                    break;
+        //         case 68:
+        //             this._camera.horizontalStep(0.5);
+        //             break;
                     
-                default:
-                    break;
-            }
-        })
+        //         default:
+        //             break;
+        //     }
+        // })
         
     }
 
@@ -210,9 +210,9 @@ export class Application extends EventDispatcher {
     }
 
     private _onKeyDown(e: KeyboardEvent) {
-        if (this._keylist.indexOf(e.keyCode) < 0) {
-            this._keylist.push(e.keyCode);
-        }
+        // if (this._keylist.indexOf(e.keyCode) < 0) {
+        //     this._keylist.push(e.keyCode);
+        // }
     }
 
     private _onKeyPress(e: KeyboardEvent) {
@@ -220,10 +220,10 @@ export class Application extends EventDispatcher {
     }
 
     private _onKeyUp(e: KeyboardEvent) {
-        let index = this._keylist.indexOf(e.keyCode);
-        if (index > -1) {
-            this._keylist.splice(index, 1);
-        }
+        // let index = this._keylist.indexOf(e.keyCode);
+        // if (index > -1) {
+        //     this._keylist.splice(index, 1);
+        // }
     }
 
     private _onTouchStart(e: TouchEvent) {
