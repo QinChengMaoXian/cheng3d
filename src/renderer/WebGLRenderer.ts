@@ -384,7 +384,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             || !_ext['OES_texture_float']
             || !_ext['WEBGL_depth_texture']
             || !_ext['EXT_texture_filter_anisotropic']) {
-            Logger.error('Can not use webgl extension');
+            // Logger.error('Can not use webgl extension');
             return undefined;
         }
 

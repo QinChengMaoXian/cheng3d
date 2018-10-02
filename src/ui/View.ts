@@ -1,6 +1,6 @@
-import { Sprite } from "./Sprite";
+import { Box } from "./Box";
 
-export class View extends Sprite {
+export class View extends Box {
 
     constructor() {
         super();

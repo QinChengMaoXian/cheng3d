@@ -5,6 +5,7 @@ import { Timer } from "../core/Timer";
 import { Object3D } from "../object/Object3D";
 import { Platform } from "../platform/Platform";
 import { Camera } from "../object/Camera";
+import { Event } from "../core/Event";
 import { EventDispatcher } from "../core/EventDispatcher";
 
 export class Application extends EventDispatcher {
@@ -111,30 +112,6 @@ export class Application extends EventDispatcher {
         this._stage.update(delta);
         this._camera.update(delta);
         this._timer.lateUpdate(delta);
-
-        // this._keylist.forEach(key => {
-        //     switch (key) {
-        //         case 87:
-        //             this._camera.forwardStep(0.5);
-        //             break;
-    
-        //         case 83:
-        //             this._camera.forwardStep(-0.5);
-        //             break;
-    
-        //         case 65:
-        //             this._camera.horizontalStep(-0.5);
-        //             break;
-    
-        //         case 68:
-        //             this._camera.horizontalStep(0.5);
-        //             break;
-                    
-        //         default:
-        //             break;
-        //     }
-        // })
-        
     }
 
     private _render() {
@@ -185,16 +162,11 @@ export class Application extends EventDispatcher {
     }
 
     private _onMouseDown(e: MouseEvent) {
-        
+        this._stage.event(Event.MOUSE_DOWN, [e]);
     }
 
     private _onMouseMove(e: MouseEvent) {
-        if ((e.buttons & 0x01) > 0) {
-            let del = 0.005;
-            let moveX = e.movementX * del;
-            let moveY = e.movementY * del;
-            this._camera.rotateViewFromForward(moveX, moveY);
-        }
+        
     }
 
     private _onMouseUp(e: MouseEvent) {
@@ -210,9 +182,7 @@ export class Application extends EventDispatcher {
     }
 
     private _onKeyDown(e: KeyboardEvent) {
-        // if (this._keylist.indexOf(e.keyCode) < 0) {
-        //     this._keylist.push(e.keyCode);
-        // }
+        
     }
 
     private _onKeyPress(e: KeyboardEvent) {
@@ -220,10 +190,7 @@ export class Application extends EventDispatcher {
     }
 
     private _onKeyUp(e: KeyboardEvent) {
-        // let index = this._keylist.indexOf(e.keyCode);
-        // if (index > -1) {
-        //     this._keylist.splice(index, 1);
-        // }
+        
     }
 
     private _onTouchStart(e: TouchEvent) {

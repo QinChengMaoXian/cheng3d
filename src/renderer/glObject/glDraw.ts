@@ -8,7 +8,7 @@ export class glDraw {
 }
 
 export class glDrawWithIndex extends glDraw {
-    constructor(mode: number, offset: number, count: number, type: number, public _ibo: number) {
+    constructor(mode: number, offset: number, count: number, type: number) {
         super(mode, offset, count, type);
     }
 

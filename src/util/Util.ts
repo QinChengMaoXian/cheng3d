@@ -31,4 +31,22 @@ export function BuildOrderedDitheringData(n: number = 4): number[] {
     return r;
 }
 
+export interface IPoint2D {
+    x: number;
+    y: number;
+}
 
+export function Check2DPointInPoly(pt: IPoint2D, poly: IPoint2D[]): boolean {
+    let i, j;
+    let c: boolean = false;
+    for (i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        let posi = poly[i];
+        let posj = poly[j];
+
+        if ((((posi.y <= pt.y) && (pt.y < posj.y)) || ((posj.y <= pt.y) && (pt.y < posi.y)))
+            && (pt.x < (posj.x - posi.x) * (pt.y - posi.y) / (posj.y - posi.y) + posi.x)) {
+            c = !c;
+        }
+    }
+    return c;
+}

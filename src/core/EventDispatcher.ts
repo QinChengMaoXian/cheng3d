@@ -8,7 +8,7 @@ export class EventDispatcher {
         
     }
 
-    public add(type: string, celler: any, method: Function, args?: any[]) {
+    public on(type: string, celler: any, method: Function, args?: any[]) {
         this._addEvent(type, celler, method, args, false);
     }
 
@@ -16,7 +16,7 @@ export class EventDispatcher {
         this._addEvent(type, celler, method, args, true);
     }
 
-    public remove(type: string, celler: any, method: Function) {
+    public off(type: string, celler: any, method: Function) {
         let events = this._events;
         let handlers = events.get(type);
         if (handlers) {
@@ -53,7 +53,7 @@ export class EventDispatcher {
         this._events.clear();
     }
 
-    public emit(type: string, args?: any[]) {
+    public event(type: string, args?: any[]) {
         let events = this._events;
         let handlers = events.get(type);
         if (handlers) {

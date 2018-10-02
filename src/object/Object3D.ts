@@ -5,6 +5,7 @@ import { EventDispatcher } from '../core/EventDispatcher';
 import { Component } from './Component';
 import { Bounding } from '../bounding/Bounding'
 import { Base } from '../core/Base';
+import { RenderBase } from '../graphics/RenderBase';
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
@@ -160,6 +161,39 @@ export class Object3D extends Base {
 
     private _preCleanup() {
 
+    }
+
+    public set x(v: number) {
+        if (this._position.x !== v) {
+            this.enableUpdateMat();
+            this._position.x = v;
+        }
+    }
+
+    public get x() {
+        return this._position.x;
+    }
+
+    public set y(v: number) {
+        if (this._position.y !== v) {
+            this.enableUpdateMat();
+            this._position.y = v;
+        }
+    }
+
+    public get y() {
+        return this._position.y;
+    }
+
+    public set z(v: number) {
+        if (this._position.z !== v) {
+            this.enableUpdateMat();
+            this._position.z = v;
+        }
+    }
+
+    public get z() {
+        return this._position.z;
     }
 
     // TODO

@@ -1,6 +1,7 @@
-import { Sprite } from "./Sprite";
+import { Box } from "./Box";
 
-export class Image extends Sprite {
+export class Image extends Box {
+
     protected _skin: string;
 
     constructor() {
@@ -8,7 +9,7 @@ export class Image extends Sprite {
     }
 
     set skin(skin: string) {
-        
+        this._skin = skin;
     }
 
     get skin(): string {

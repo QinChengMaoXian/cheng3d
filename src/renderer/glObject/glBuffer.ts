@@ -3,15 +3,15 @@ import { glDraw, glDrawWithIndex } from './glDraw';
 import { Geometry } from '../../graphics/Geometry';
 
 export class glBuffer extends glObject {
-    _vbos = [];
-    _ibo = undefined;
-    _draw = undefined;
+    protected _vbos: WebGLBuffer[] = [];
+    protected _ibo: WebGLBuffer = undefined;
+    protected _draw: glDraw = undefined;
 
     constructor() {
         super();
     }
 
-    private _createBufferFromData(gl, target, data, usage) {
+    private _createBufferFromData(gl: WebGLRenderingContext, target: number, data: any, usage: number) {
         let buffer = gl.createBuffer();
         gl.bindBuffer(target, buffer);
         gl.bufferData(target, data, usage);
@@ -36,7 +36,7 @@ export class glBuffer extends glObject {
 
         if (geometry.getIndexBuffer()) {
             this._ibo = this._createBufferFromData(gl, gl.ELEMENT_ARRAY_BUFFER, indexBuffer.getData(), indexBuffer.getUsage());
-            this._draw = new glDrawWithIndex(drawParameter.mode, drawParameter.offset, drawParameter.count, indexBuffer.getType(), this._ibo);
+            this._draw = new glDrawWithIndex(drawParameter.mode, drawParameter.offset, drawParameter.count, indexBuffer.getType());
         } else {
             this._draw = new glDraw(drawParameter.mode, drawParameter.offset, drawParameter.count, 0);
         }

@@ -82,7 +82,7 @@ export class Vector3 {
     }
 
     /**
-     * Will new a Vector3, do not change this;
+     * Will new a Vector3, not change this;
      * @param vec3 
      */
     public cross(vec3: Vector3): Vector3 {

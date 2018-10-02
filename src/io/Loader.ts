@@ -1,5 +1,4 @@
 import { Logger } from '../core/Logger'
-import { Texture2D } from '../graphics/Texture2D';
 import { EventDispatcher } from '../core/EventDispatcher';
 
 const events: EventDispatcher = new EventDispatcher();
@@ -69,7 +68,7 @@ export class Loader {
                 this._disposeLoad();
                 if (xmlHttp.status == 200) {
                     this._loadedMap.set(url, xmlHttp.response);
-                    events.emit(url, [xmlHttp.response]);
+                    events.event(url, [xmlHttp.response]);
                     this._xmlRequests.push(xmlHttp);
                 } else {
                     Logger.error(xmlHttp);

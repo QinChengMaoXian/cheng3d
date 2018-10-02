@@ -5,9 +5,9 @@ import { Sprite } from '../ui/Sprite';
 export class Event extends Base {
     static readonly CLICK = "click";
     
-    static readonly MOUSE_ON = "mouse_on";
+    static readonly MOUSE_DOWN = "mouse_on";
     static readonly MOUSE_MOVE = "mouse_move";
-    static readonly MOUSE_END = "mouse_end";
+    static readonly MOUSE_UP = "mouse_end";
 
     static readonly KEY_DOWN = "key_down";
     static readonly KEY_UP = "key_up";

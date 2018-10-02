@@ -3,7 +3,11 @@ import { GLMAT_EPSILON } from '../core/Base';
 import { Vector3 } from './Vector3';
 import { Quaternion } from './Quaternion';
 
+
 export class Matrix4 {
+
+    static readonly unitMat4: Matrix4 = new Matrix4;
+
     public m: Float32Array;
     constructor() {
         this.m = new Float32Array([
