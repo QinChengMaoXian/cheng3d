@@ -1,40 +1,69 @@
 import { Sprite } from "./Sprite";
 import { Event } from "../core/Event";
-import { Object3D } from "../object/Object3D";
+
+export interface IRenderResult {
+    img: string;
+    start: number;
+    length: number;
+}
+
+export interface IResultObj {
+    data: Float32Array;
+    indices: Uint16Array;
+    dataCount: number;
+    indexCount: number;
+    result: IRenderResult[];
+}
 
 export class Stage extends Sprite {
+
+    private _data: Float32Array = new Float32Array(65535);
+    private _indices: Uint16Array = new Uint16Array(65535 * 2);
 
     constructor() {
         super();
     }
 
-    public createRenderMesh(parent: Object3D) {
-        const children = this._children;
+    public createRenderMesh() {
 
+        let resultObj: IResultObj = {
+            data: this._data,
+            indices: this._indices,
+            dataCount: 0,
+            indexCount: 0,
+            result: [],
+        }
+        
+        this._createRenderMesh(this, resultObj);
+
+        return resultObj;
+    }
+
+    protected _createRenderMesh(sprite: Sprite, resultObj: IResultObj) {
+        if (sprite.isRender()) {
+            let data = sprite.getStageData();
+        }
+        
+        let children = sprite.getChildren();
         let l = children.length;
 
         for (let i = 0; i < l; i++) {
+            let child = <Sprite>children[i];
 
+            this._createRenderMesh(child, resultObj);
         }
     }
 
-    protected _createRenderMesh(sprite: Sprite) {
+    protected _onMouseDown(e: Event) {
+
+    }
+
+    protected _onMouseMove(e: Event) {
         
     }
 
-    static checkEvent(base: Sprite, event: Event) {
-        let x = event.stageX;
-        let y = event.stageY;
-
-        let rectData = base.getRectData();
-
-        let sx = rectData[0];
-        let sy = rectData[1];
-
-        let ex = sx + rectData[2];
-        let ey = sy + rectData[3];
-
-        return x >= sx && x <= ex && y >= sy && y <= ey;
+    protected _onMouseUp(e: Event) {
+        
     }
 }
 

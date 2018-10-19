@@ -13,7 +13,7 @@ export class Object3D extends Base {
     protected _scale: Vector3 = new Vector3(1, 1, 1);
     protected _matrix: Matrix4 = new Matrix4();
     
-    protected _display: boolean = true;
+    protected _visible: boolean = true;
     // protected _components: Component[] = [];
     
     protected _parent: Object3D = null;
@@ -125,8 +125,12 @@ export class Object3D extends Base {
         
     }
 
-    public getDisplay() {
-        return this._display;
+    public set visible(v: boolean) {
+        this._visible = v;
+    }
+
+    public get visible() {
+        return this._visible;
     }
 
     public setParent(parent: Object3D) {
@@ -196,13 +200,21 @@ export class Object3D extends Base {
         return this._position.z;
     }
 
+    public set rotateZ(v: number) {
+
+    }
+
+    public get rotateZ() {
+        return 
+    }
+
     // TODO
     public toJson(obj?) {
         let result = super.toJson(obj);
         result.position = this._position.toJson();
         result.rotate = this._rotate.toJson();
         result.scale = this._scale.toJson();
-        result.display = this._display;
+        result.visible = this.visible;
         
         const children = [];
         this._children.forEach(child => {

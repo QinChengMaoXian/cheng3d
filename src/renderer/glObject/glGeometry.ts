@@ -2,7 +2,7 @@ import { glObject } from './glObject';
 import { glDraw, glDrawWithIndex } from './glDraw';
 import { Geometry } from '../../graphics/Geometry';
 
-export class glBuffer extends glObject {
+export class glGeometry extends glObject {
     protected _vbos: WebGLBuffer[] = [];
     protected _ibo: WebGLBuffer = undefined;
     protected _draw: glDraw = undefined;
@@ -66,5 +66,9 @@ export class glBuffer extends glObject {
 
     public draw(gl) {
         this._draw.apply(gl);
+    }
+
+    public drawOther(draw: glDraw, gl: WebGLRenderingContext) {
+        draw.apply(gl);
     }
 }

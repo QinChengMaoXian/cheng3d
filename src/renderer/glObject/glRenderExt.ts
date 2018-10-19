@@ -8,12 +8,10 @@ import { Texture } from '../../graphics/Texture';
 import { Geometry } from '../../graphics/Geometry';
 import { Mesh } from '../../object/Mesh';
 import { glProgram } from './glProgram';
-import { glBuffer } from './glBuffer';
+import { glGeometry } from './glGeometry';
 import { Camera } from '../../object/Camera';
 import { DirectionLight } from '../../light/DirectionLight';
 import { Shader } from '../../graphics/Shader';
-
-
 
 export class glRenderExt extends glObject {
     private static _matrix = new Matrix4();
@@ -29,7 +27,7 @@ export class glRenderExt extends glObject {
     public lightColor: Vector4;
     public lightDir: Vector3;
 
-    private _glBuffer: glBuffer = undefined;
+    private _glBuffer: glGeometry = undefined;
     private _glProgram: glProgram = undefined;
     constructor() {
         super();
@@ -63,7 +61,7 @@ export class glRenderExt extends glObject {
     }
 
     private _bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
-        let glBuffer: glBuffer = this._glBuffer;
+        let glBuffer: glGeometry = this._glBuffer;
         let vbos = glBuffer.getVbos();
         let buffers = geometry.getBuffers();
         let indexBuffer = geometry.getIndexBuffer();
@@ -170,5 +168,9 @@ export class glRenderExt extends glObject {
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
         this._glBuffer.draw(gl);
         return true;
+    }
+
+    public directComplexRender(gl: WebGLRenderingContext, buffers) {
+
     }
 }

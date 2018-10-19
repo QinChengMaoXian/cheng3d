@@ -15,4 +15,8 @@ export class Image extends Box {
     get skin(): string {
         return this._skin;
     }
+
+    public getIsRender() {
+        return this.visible && this.skin && this.skin !== '';
+    }
 }

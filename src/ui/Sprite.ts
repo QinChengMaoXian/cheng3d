@@ -1,6 +1,5 @@
-import { Base } from '../core/Base';
-import { Matrix4 } from '../math/Matrix4';
 import { Object3D } from '../object/Object3D';
+import { Vector3 } from '../math/Vector3';
 
 export class Sprite extends Object3D {
 
@@ -9,24 +8,9 @@ export class Sprite extends Object3D {
 
     protected _: Float32Array = new Float32Array(4);
 
-    // protected _parent: Sprite = null;
-    // protected _children: Sprite[] = [];
-
     constructor() {
         super();
     }
-
-    // public addChild(child: Sprite) {
-    //     if (child && child._parent !== this) child.setParent(this);
-    // }
-
-    // public removeChild(child: Sprite) {
-    //     if (child && child._parent === this) child.setParent(null);
-    // }
-
-    // public getChildren() {
-    //     return this._children;
-    // }
 
     protected _update() {
         if (this._needsUpdate) {
@@ -37,22 +21,6 @@ export class Sprite extends Object3D {
     public needsUpdate() {
         this._needsUpdate = true;
     }
-
-    // public setParent(parent: Sprite) {
-    //     if (this._parent === parent) return;
-    //     if (this._parent) {
-    //         let children = this._parent._children;
-    //         children.splice(1, children.indexOf(this));
-    //     }
-    //     if (parent) {
-    //         parent._children.push(this);
-    //     }
-    //     this._parent = parent;
-    // }
-
-    // public getParent() {
-    //     return this._parent;
-    // }
 
     public setSize(width: number, height: number) {
         this._[0] = width;
@@ -96,8 +64,53 @@ export class Sprite extends Object3D {
         return [this.x, this.y, this.width, this.height];
     }
 
-    public getStagePosData(): number[] {
-        let mat:Matrix4 = this._parent ? this._parent.getMatrix() : Matrix4.unitMat4;
-        return []
+    public getStageData(): number[] {
+        let rectData = this.getRectData();
+
+        let mat = this._matrix;
+
+        let xs = rectData[0];
+        let ys = rectData[1];
+        let xe = xs + rectData[2];
+        let ye = ys + rectData[3];
+
+        let param = [[xs, ys], [xs, ye], [xe, ye], [xe, ys]];
+
+        let result = [];
+
+        let vec = new Vector3;
+
+        for (let i = 0; i < 4; i++) {
+            let d = param[i];
+            vec.set(d[0], d[1], 0);
+            vec.applyMatrix4(mat);
+            result.push(vec.x, vec.y);
+        }
+
+        return result;
+    }
+
+    public isRender(): boolean {
+        return false;
+    }
+
+    public getUIData(): string {
+        return '';
+    }
+
+    public getIsFont(): boolean {
+        return false;
+    }
+
+    static checkEvent(base: Sprite, x: number, y: number) {
+        let rectData = base.getRectData();
+
+        let sx = rectData[0];
+        let sy = rectData[1];
+
+        let ex = sx + rectData[2];
+        let ey = sy + rectData[3];
+
+        return x >= sx && x <= ex && y >= sy && y <= ey;
     }
 }

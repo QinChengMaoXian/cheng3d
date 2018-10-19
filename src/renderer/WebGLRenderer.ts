@@ -25,13 +25,14 @@ import { RenderTargetLocation } from '../graphics/GraphicsTypes';
 import { FullScreenMaterial } from '../material/FullScreenMaterial';
 import { FXAAMaterial } from './postEffect/FXAA';
 
-import { glBuffer } from './glObject/glBuffer'
+import { glGeometry } from './glObject/glGeometry'
 import { glRenderExt } from './glObject/glRenderExt'
 import { glFrame } from './glObject/glFrame'
 import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { Platform } from '../platform/Platform';
+import { Buffer } from '../graphics/Buffer';
 
 export class WebGLRenderer extends Renderer implements IRenderer {
     private static RendererNum = 0;
@@ -102,20 +103,24 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     public initGeometry(geometry: Geometry) {
-        let glbuffer: glBuffer = <glBuffer>geometry.getRenderObjectRef(this);
-        if (!glbuffer) {
-            glbuffer = new glBuffer();
-            geometry.setRenderObjectRef(this, glbuffer);
+        let glgeo: glGeometry = <glGeometry>geometry.getRenderObjectRef(this);
+        if (!glgeo) {
+            glgeo = new glGeometry();
+            geometry.setRenderObjectRef(this, glgeo);
         }
-        if (!glbuffer.getUpdate()) {
-            return glbuffer;
+        if (!glgeo.getUpdate()) {
+            return glgeo;
         }
-        if(!glbuffer.generateFromGeometry(this._gl, geometry)) {
-            glbuffer = null;
+        if(!glgeo.generateFromGeometry(this._gl, geometry)) {
+            glgeo = null;
             geometry.setRenderObjectRef(this, null);
         }
-        return glbuffer;
+        return glgeo;
     }
+
+    public initBuffers(vbuffers : Buffer[], iBuffer: Buffer) {
+
+    } 
 
     public initShader(shader: Shader) {
         let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
@@ -282,7 +287,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         const _preRenderObjects = (obj: Object3D, isRendering: boolean) => {
-            let display = obj.getDisplay() && isRendering;
+            let display = obj.visible && isRendering;
             if(obj.beRendering() && display) {
                 _addToRenderList(obj);
             }
@@ -298,7 +303,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
             _camera = camera;
             _renderList = [];
-            _preRenderObjects(scene, scene.getDisplay());
+            _preRenderObjects(scene, scene.visible);
             _render();
         }
 
@@ -309,7 +314,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     /**
-     * Do NOT call this function;
+     * User do NOT call this function;
      */
     public _renderPostEffect(scene: Object3D, camera?: Camera) {
 
