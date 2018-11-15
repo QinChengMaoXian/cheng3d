@@ -58,6 +58,7 @@ export class Geometry extends GraphicsObject {
         let buffer = new Buffer();
         buffer.setData(data);
         buffer.setParameter(0, usage, type);
+        buffer.setIsIndex(true);
         this._indexBuffer = buffer;
         this.buildBounding();
     }

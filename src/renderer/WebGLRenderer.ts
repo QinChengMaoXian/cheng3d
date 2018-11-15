@@ -118,10 +118,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         return glgeo;
     }
 
-    public initBuffers(vbuffers : Buffer[], iBuffer: Buffer) {
-
-    } 
-
     public initShader(shader: Shader) {
         let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
         if (!glprogram) {
@@ -349,7 +345,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
         frame.enableDepthStencil();
-        frame.getState().clearColor.set(0.2, 0.2, 0.2, 0.0);
+        frame.getState().clearColor.set(1.0, 0.5, 0.5, 0.0);
         this._defFrame = frame;
 
         let mesh = new Mesh();

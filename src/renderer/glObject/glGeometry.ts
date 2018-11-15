@@ -1,22 +1,19 @@
 import { glObject } from './glObject';
 import { glDraw, glDrawWithIndex } from './glDraw';
 import { Geometry } from '../../graphics/Geometry';
+import { glBuffer } from './glBuffer'; 
 
 export class glGeometry extends glObject {
-    protected _vbos: WebGLBuffer[] = [];
-    protected _ibo: WebGLBuffer = undefined;
-    protected _draw: glDraw = undefined;
+    // protected _vbos: WebGLBuffer[] = [];
+    // protected _ibo: WebGLBuffer = null;
+
+    protected _vbuffers: glBuffer[] = [];
+    protected _ibuffer: glBuffer = null;
+
+    protected _draw: glDraw = null;
 
     constructor() {
         super();
-    }
-
-    private _createBufferFromData(gl: WebGLRenderingContext, target: number, data: any, usage: number) {
-        let buffer = gl.createBuffer();
-        gl.bindBuffer(target, buffer);
-        gl.bufferData(target, data, usage);
-        gl.bindBuffer(target, null);
-        return buffer;
     }
 
     public generateFromGeometry(gl: WebGLRenderingContext, geometry: Geometry) {
@@ -29,35 +26,41 @@ export class glGeometry extends glObject {
             return undefined;
         }
         
-        buffers.forEach( buffer => {
-            let vbo = this._createBufferFromData(gl, gl.ARRAY_BUFFER, buffer.getData(), buffer.getUsage());
-            this._vbos.push(vbo);
+        let vbuffers = this._vbuffers;
+
+        vbuffers.length = buffers.length;
+
+        buffers.forEach((buffer, index) => {
+            let vbuffer = new glBuffer();
+            vbuffer.generateFromBuffer(gl, buffer);
+            vbuffers[index] = vbuffer;
         });
 
-        if (geometry.getIndexBuffer()) {
-            this._ibo = this._createBufferFromData(gl, gl.ELEMENT_ARRAY_BUFFER, indexBuffer.getData(), indexBuffer.getUsage());
+        if (indexBuffer) {
+            let ibuffer = new glBuffer();
+            ibuffer.generateFromBuffer(gl, indexBuffer);
+            this._ibuffer = ibuffer;
             this._draw = new glDrawWithIndex(drawParameter.mode, drawParameter.offset, drawParameter.count, indexBuffer.getType());
         } else {
             this._draw = new glDraw(drawParameter.mode, drawParameter.offset, drawParameter.count, 0);
         }
-        
-        // this.setLocalVersion(version);
+
         this._update = false;
         return this;
     }
 
     public bindIbo(gl: WebGLRenderingContext) {
-        if (this._ibo) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+        if (this._ibuffer) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibuffer.getNativeBuffer());
         }
     }
 
-    public getVbos() {
-        return this._vbos;
+    public getvBuffers() {
+        return this._vbuffers;
     }
 
-    public getIbo() {
-        return this._ibo;
+    public getiBuffer() {
+        return this._ibuffer;
     }
 
     public getDraw() {

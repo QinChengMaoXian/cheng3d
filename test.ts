@@ -160,7 +160,7 @@ window['app'] = app;
 
 let renderer = app.getRenderer();
 renderer.enableDepthTest();
-renderer.setClearColor(0.2, 0.2, 0.2, 1.0);
+renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
 let mainScene = app.getScene();
 

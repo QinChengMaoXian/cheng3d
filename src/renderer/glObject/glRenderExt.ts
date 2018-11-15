@@ -27,18 +27,18 @@ export class glRenderExt extends glObject {
     public lightColor: Vector4;
     public lightDir: Vector3;
 
-    private _glBuffer: glGeometry = undefined;
+    private _glGeo: glGeometry = undefined;
     private _glProgram: glProgram = undefined;
     constructor() {
         super();
     }
 
     private _checkGLObject(gl: WebGLRenderingContext, renderer, geometry, shader, images: Map<string|number, Texture>) {
-        let glBuffer = renderer.initGeometry(geometry);
-        if (!glBuffer) {
+        let glGeo = renderer.initGeometry(geometry);
+        if (!glGeo) {
             return undefined;
         }
-        this._glBuffer = glBuffer;
+        this._glGeo = glGeo;
 
         let glProgram = renderer.initShader(shader);
         if (!glProgram) {
@@ -56,15 +56,13 @@ export class glRenderExt extends glObject {
                 }
             }
         });
-
         return this;
     }
 
     private _bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
-        let glBuffer: glGeometry = this._glBuffer;
-        let vbos = glBuffer.getVbos();
+        let glGeo: glGeometry = this._glGeo;
+        let vbuffers = glGeo.getvBuffers();
         let buffers = geometry.getBuffers();
-        let indexBuffer = geometry.getIndexBuffer();
 
         let length = buffers.length;
         for (let i = 0; i < length; i++) {
@@ -77,7 +75,7 @@ export class glRenderExt extends glObject {
                     return;
                 } else {
                     if (!binded) {
-                        gl.bindBuffer(gl.ARRAY_BUFFER, vbos[i]);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbuffers[i].getNativeBuffer());
                         binded = true;
                     }
                 }
@@ -85,7 +83,7 @@ export class glRenderExt extends glObject {
             })
         }
 
-        glBuffer.bindIbo(gl);
+        glGeo.bindIbo(gl);
 
         return this;
     }
@@ -157,16 +155,14 @@ export class glRenderExt extends glObject {
     private _applyMaterial(gl: WebGLRenderingContext, entity, camera) {
         this._glProgram.apply(gl);
         
-        // this._applyUniforms(gl, entity);
         this._applyUniforms(gl, entity, camera);
     }
 
     public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, camera) {
-        let geo = mesh.getGeometry();
         if (!this._checkGLObject(gl, renderer, mesh.getGeometry(), shader, images)) return false;
         this._applyMaterial(gl, mesh, camera);
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
-        this._glBuffer.draw(gl);
+        this._glGeo.draw(gl);
         return true;
     }
 

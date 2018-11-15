@@ -26,6 +26,7 @@ export class Buffer extends GraphicsObject  {
     protected _attributes: Attribute[] = [];
     protected _stride: number = 0;
     protected _usage: number;
+    protected _isIndex: boolean = false;
     
     constructor() {
         super();
@@ -94,5 +95,13 @@ export class Buffer extends GraphicsObject  {
 
     public getUsage() {
         return this._usage;
+    }
+
+    public setIsIndex(value: boolean) {
+        this._isIndex = value;
+    } 
+
+    public isIndex() {
+        return this._isIndex;
     }
 }
