@@ -102,7 +102,26 @@ export class Sprite extends Object3D {
         return false;
     }
 
+    public checkPick(x: number, y: number) {
+
+        let mat = this._matrix.clone().applyMatrix4(this._parent.getMatrix());
+        mat.invert();
+        let vec = new Vector3(x, y, 0);
+        vec.applyMatrix4(mat);
+
+        let rectData = this.getRectData();
+
+        let sx = rectData[0];
+        let sy = rectData[1];
+
+        let ex = sx + rectData[2];
+        let ey = sy + rectData[3];
+
+        return vec.x >= sx && vec.x <= ex && vec.y >= sy && vec.y <= ey;
+    }
+
     static checkEvent(base: Sprite, x: number, y: number) {
+        
         let rectData = base.getRectData();
 
         let sx = rectData[0];

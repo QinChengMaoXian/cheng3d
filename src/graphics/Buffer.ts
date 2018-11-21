@@ -6,7 +6,7 @@ export class Attribute {
         public attribType: number,
         public num: number,
         public offset: number,
-        public type: number) {
+        public type: number = CGE.FLOAT) {
     }
 }
 

@@ -79,7 +79,7 @@ export class glRenderExt extends glObject {
                         binded = true;
                     }
                 }
-                gl.vertexAttribPointer(location, attribute.num, buffer.getType(), false, buffer.getStride(), attribute.offset);
+                gl.vertexAttribPointer(location, attribute.num, attribute.type, false, buffer.getStride(), attribute.offset);
             })
         }
 
@@ -164,6 +164,10 @@ export class glRenderExt extends glObject {
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
         this._glGeo.draw(gl);
         return true;
+    }
+
+    public drawUI(renderer, gl: WebGLRenderingContext) {
+        
     }
 
     public directComplexRender(gl: WebGLRenderingContext, buffers) {
