@@ -121,7 +121,7 @@ export class Sprite extends Object3D {
     }
 
     static checkEvent(base: Sprite, x: number, y: number) {
-        
+
         let rectData = base.getRectData();
 
         let sx = rectData[0];

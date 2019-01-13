@@ -20,7 +20,8 @@ export class Geometry extends GraphicsObject {
         super();
     }
 
-    public addSingleAttribute(name, attribute, num, type, data, usage = CGE.STATIC_DRAW) {
+    public addSingleAttribute(name: string, attribute: string | number, num: number, type: number, 
+        data: number[] | Float32Array | Uint32Array | Int32Array | Uint16Array | Int16Array | Uint8Array | Int8Array, usage = CGE.STATIC_DRAW) {
         let buffer = new Buffer();
         let attrib = new Attribute(attribute, num, 0, type);
         buffer.addAttribute(attrib);

@@ -3,7 +3,7 @@ import { GraphicsObject } from './GraphicsObject'
 
 export class Attribute {
     constructor(
-        public attribType: number,
+        public attribType: string | number,
         public num: number,
         public offset: number,
         public type: number = CGE.FLOAT) {
