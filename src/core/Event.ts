@@ -8,9 +8,12 @@ export class Event extends Base {
     static readonly MOUSE_DOWN = "mouse_on";
     static readonly MOUSE_MOVE = "mouse_move";
     static readonly MOUSE_UP = "mouse_end";
+    static readonly MOUSE_OVER = "mouse_over";
+    static readonly MOUSE_OUT = "mouse_out";
 
     static readonly KEY_DOWN = "key_down";
     static readonly KEY_UP = "key_up";
+    static readonly KEY_CLICK = "key_click";
 
     static readonly CLIENT_RESIZE = "client_resize";
 

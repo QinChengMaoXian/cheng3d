@@ -1,5 +1,6 @@
 import { Object3D } from '../object/Object3D';
 import { Vector3 } from '../math/Vector3';
+import { Matrix4 } from '../math/Matrix4';
 
 export class Sprite extends Object3D {
 
@@ -104,7 +105,7 @@ export class Sprite extends Object3D {
 
     public checkPick(x: number, y: number) {
 
-        let mat = this._matrix.clone().applyMatrix4(this._parent.getMatrix());
+        let mat = Matrix4.pubTemp.copy(this._matrix).applyMatrix4(this._parent.getMatrix());
         mat.invert();
         let vec = new Vector3(x, y, 0);
         vec.applyMatrix4(mat);

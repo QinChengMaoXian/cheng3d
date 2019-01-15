@@ -18,6 +18,7 @@ export class glRenderExt extends glObject {
     private static _vpmatrix = new Matrix4();
     private static _mvmatrix = new Matrix4();
     private static _mvpmatrix = new Matrix4();
+    private static _f32 = new Float32Array(16);
 
     public vMatrix  = new Matrix4();
     public pMatrix  = new Matrix4();
@@ -123,6 +124,8 @@ export class glRenderExt extends glObject {
             return MVPMatrix;
         };
 
+        let f32 = glRenderExt._f32;
+
         uniforms.forEach((uniformObject, uniformType) => {
             let location = uniformObject.location;
             let type = uniformObject.type;
@@ -146,7 +149,10 @@ export class glRenderExt extends glObject {
                 case MatrixType.InverseVMatrix:     data = tempMatrix.copy(vMat).invert(); break;
                 default:                            data = properties.get(uniformType); break;
             }
-            if (data) {
+            if (data.data.length === 16) {
+                f32.set(data.data);
+                glProgram.setUniformData(gl, type, location, f32);
+            } else {
                 glProgram.setUniformData(gl, type, location, data.data);
             }
         });
