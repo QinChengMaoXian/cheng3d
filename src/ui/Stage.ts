@@ -22,6 +22,9 @@ export class Stage extends Sprite {
 
     constructor() {
         super();
+        this.on(Event.MOUSE_DOWN, this, this._onMouseDown);
+        this.on(Event.MOUSE_MOVE, this, this._onMouseMove);
+        this.on(Event.MOUSE_UP, this, this._onMouseUp);
     }
 
     public createRenderMesh() {
@@ -55,7 +58,7 @@ export class Stage extends Sprite {
     }
 
     protected _onMouseDown(e: Event) {
-
+        console.log(e);
     }
 
     protected _onMouseMove(e: Event) {

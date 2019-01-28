@@ -44,11 +44,7 @@ let objLoader = new CGE.OBJLoader();
 
 let standMat = new CGE.StandardMaterial(test_diff, test_ddn, test_spec);
 
-// let gltfTexture = new CGE.Texture2D();
-// gltfTexture.setImageUrl(man_diff);
-// gltfTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-// gltfTexture.setMipmap(true);
-// let gltfMaterial = new CGE.DiffuseMaterial(gltfTexture);
+let gltfMaterial = new CGE.DiffuseMaterial(test_diff);
 
 let gltfJson = undefined;
 let gltfCallback = (event, object) => {
@@ -61,11 +57,11 @@ let gltfCallback = (event, object) => {
             let mesh = new CGE.Mesh();
             mesh.setScale(1, 1, 1);
             mesh.setGeometry(gltfJson);
-            // mesh.setMaterial(gltfMaterial);
+            mesh.setMaterial(gltfMaterial);
             let obj = new CGE.Object3D();
-            // obj.addChild(mesh);
+            obj.addChild(mesh);
             obj.name = 'test';
-            // mainScene.addChild(obj);   
+            mainScene.addChild(obj);   
             break;
 
         case 'error':
@@ -165,8 +161,10 @@ renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 let mainScene = app.getScene();
 
 let camera = app.getCamera();
+
 camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
 camera.lookAt(new CGE.Vector3(0, 1, 10));
+mainScene.setActiveCamera(camera);
 
 let tri_scale = 100;
 
@@ -273,7 +271,7 @@ objLoader.load(cartoon_obj).then(mesh => {
     mesh.setMaterial(cartoonMat);
     mesh.setScale(0.4, 0.4, 0.4);
     mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
-    // mainScene.addChild(mesh);
+    mainScene.addChild(mesh);
 });
 
 document.body.appendChild(renderer.getCanvas());

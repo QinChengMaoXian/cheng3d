@@ -32,20 +32,8 @@ export class Event extends Base {
 
     protected _native: any;
 
-    _func;
     constructor() {
         super();
-        this._func = undefined;
-    }
-
-    setFunc(func) {
-        this._func = func;
-    }
-
-    update(delta) {
-        if (!this._func) 
-            return;
-        this._func(delta);
     }
 
     get type(): string {
@@ -58,11 +46,5 @@ export class Event extends Base {
 
     get stageY(): number {
         return this._y;
-    }
-
-    static createFromFunc(func) {
-        let event = new Event();
-        event.setFunc(func);
-        return event;
     }
 }

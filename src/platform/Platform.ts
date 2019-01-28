@@ -15,6 +15,10 @@ export class Platform {
         return document;
     }
 
+    public static window(): Window {
+        return window;
+    }
+
     public static createCanvas(): HTMLCanvasElement {
         return document.createElement('canvas');
     }

@@ -17,6 +17,10 @@ export class Scene extends Object3D {
         return this._mainLight;
     }
 
+    public setActiveCamera(camera: Camera) {
+        this._activeCamera = camera;
+    }
+
     public getActiveCamera() {
         return this._activeCamera;
     }

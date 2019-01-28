@@ -122,7 +122,9 @@ export class Object3D extends Base {
     }
 
     protected _updateBounding() {
-        
+        if (this._bounding) {
+            // this._bounding
+        }
     }
 
     public set visible(v: boolean) {
