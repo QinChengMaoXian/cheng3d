@@ -1,8 +1,9 @@
 import { Vector3 } from "./Vector3";
 
-
 export class Triangle {
-    public points: Vector3[] = [new Vector3(), new Vector3(), new Vector3()];
+    point1 = new Vector3();
+    point2 = new Vector3();
+    point3 = new Vector3();
 
     constructor(p1?: Vector3, p2?: Vector3, p3?: Vector3) {
         if (p1) {
@@ -14,17 +15,5 @@ export class Triangle {
         if (p3) {
             this.point3.copy(p3);
         }
-    }
-
-    get point1(): Vector3 {
-        return this.points[0];
-    }
-
-    get point2(): Vector3 {
-        return this.points[1];
-    }
-
-    get point3(): Vector3 {
-        return this.points[2];
     }
 }

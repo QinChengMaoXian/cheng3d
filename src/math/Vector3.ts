@@ -3,6 +3,8 @@ import { Matrix4 } from "./Matrix4";
 import { ObjectPool } from "../util/ObjectPool";
 
 export class Vector3 {
+    static pubTemp: Vector3 = new Vector3();
+
     public static pool = new ObjectPool<Vector3>(Vector3, 6);
 
     public v: Float32Array;

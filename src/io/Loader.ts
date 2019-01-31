@@ -75,8 +75,9 @@ export class Loader {
                 }
             }
         }
-        xmlHttp.responseType = type !== undefined ? type : '';
+        
         xmlHttp.open('GET', url, true);
+        xmlHttp.responseType = !type ? '' : type;
         xmlHttp.send(null);
     }
 

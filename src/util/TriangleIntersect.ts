@@ -3,7 +3,7 @@ import { Vector3 } from "../math/Vector3";
 
 // https://blog.csdn.net/fourierfeng/article/details/11969915
 
-let a = [new Float32Array(3), new Float32Array(3), new Float32Array(3)];
+let a: number[][] = [[0,0,0], [0,0,0], [0,0,0]];
 
 function get_vector4_det(v1: Vector3, v2: Vector3, v3: Vector3, v4: Vector3): number {
 	for (let i = 0; i != 3; ++i ) {

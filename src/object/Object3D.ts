@@ -111,13 +111,11 @@ export class Object3D extends Base {
 
     protected _makeMatrix(parentUpdate: boolean = false) {
         if (this._needsUpdate || parentUpdate) {
-            if (this._needsUpdate) {
-                this._matrix.compose(this._position, this._rotate, this._scale);
-                this._needsUpdate = false;
-            }
-            if (this._parent && parentUpdate) {
+            this._matrix.compose(this._position, this._rotate, this._scale);
+            if (this._parent) {
                 this._matrix.premultiply(this._parent.getMatrix());
             }
+            this._needsUpdate = false;
         }
     }
 

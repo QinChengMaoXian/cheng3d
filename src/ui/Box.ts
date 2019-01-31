@@ -1,6 +1,6 @@
-import { Component } from "./Component";
+import { Sprite } from "./Sprite";
 
-export class Box extends Component {
+export class Box extends Sprite {
 
     constructor() {
         super();

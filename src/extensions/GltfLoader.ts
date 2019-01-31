@@ -26,16 +26,18 @@ export class GltfLoader {
     load(url:string, callback:any) {
         this.url = url;
         
-        Loader.loadUrl(url, this._loadFromResponseText.bind(this)).then(gltf => {
-            if (callback) {
-                callback('entity', gltf);
-            }
-            return gltf;
+        Loader.loadUrl(url).then(text => {
+            this._loadFromResponseText(text).then((gltf) => {
+                if (callback) {
+                    callback('entity', gltf);
+                }
+                return gltf;
+            });
         });
     }
 
-    _loadFromResponseText(xmlHttp) {
-        const glTF =  eval("(" + xmlHttp.responseText + ")");
+    _loadFromResponseText(jsonText) {
+        const glTF =  JSON.parse(jsonText);
         const urlDir = this.url.substring(0, this.url.lastIndexOf('/') + 1);
         // result.set(GltfLoader.PROMISE, new Map());
         // result.set(GltfLoader.URL_DIR, urlDir);
@@ -267,7 +269,9 @@ Object.assign(GltfLoader, {
                 glTF.promising[key] = Loader.loadUrl(
                     glTF.urlDir + uri, 
                     buffer.type || 'text'
-                );
+                ).then(data => {
+                    buffer.data = data;
+                });
             };
         });
     },

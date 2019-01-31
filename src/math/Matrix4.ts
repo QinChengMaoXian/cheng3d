@@ -219,7 +219,7 @@ export class Matrix4 {
         m[14] = 0;//-(z0 * eyex + z1 * eyey + z2 * eyez);
         m[15] = 1;
 
-        let vec3 = eye.clone().applyMatrix4(this);
+        let vec3 = Vector3.pubTemp.copy(eye).applyMatrix4(this);
 
         m[12] = -vec3.x;
         m[13] = -vec3.y;

@@ -17,6 +17,8 @@ let main = new Main();
 main.init();
 let app = main.getCGEApp();
 
+let game_app = main.getApp();
+
 // let app = new CGE.Application();
 // app.init(CGE.Platform.width, CGE.Platform.height);
 
@@ -55,13 +57,17 @@ let gltfCallback = (event, object) => {
             
             
             let mesh = new CGE.Mesh();
-            mesh.setScale(1, 1, 1);
+            mesh.setScale(0.1, 0.1, 0.1);
             mesh.setGeometry(gltfJson);
             mesh.setMaterial(gltfMaterial);
+            mesh.setPosition(0,0,0);
             let obj = new CGE.Object3D();
             obj.addChild(mesh);
-            obj.name = 'test';
-            mainScene.addChild(obj);   
+            obj.name = 'gltftest';
+            mainScene.addChild(obj);  
+            app.getTimer().frameLoop(1, this, () => {
+                obj.setPositionAt(game_app.manager.play.airPlane.getPos());
+            })
             break;
 
         case 'error':
@@ -73,12 +79,13 @@ let gltfCallback = (event, object) => {
     }
 }
 
+
 // CGE.Loader.loadImage('').then(img => {
 
 // })
 
-// let gltfTest = new CGE.GltfLoader();
-// gltfTest.load('./resources/cartoon/test.gltf', gltfCallback);
+let gltfTest = new CGE.GltfLoader();
+gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -282,8 +289,6 @@ mesh.setScale(5, 10, 10);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(standMat);
 // mainScene.addChild(mesh);
-
-let events = new Map();
 
 window['camera'] = camera;
 

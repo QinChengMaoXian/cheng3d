@@ -1,5 +1,5 @@
 import * as CGE from '../../../src/CGE';
-import { AirplaneView } from '../view/AIrplaneView';
+import { AirplaneView } from '../view/AirplaneView';
 
 export class Airplane {
 

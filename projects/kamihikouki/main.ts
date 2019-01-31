@@ -12,4 +12,8 @@ export class Main {
         return App.instance.cgeApp;
     }
 
+    getApp(): App {
+        return App.instance;
+    }
+
 }
