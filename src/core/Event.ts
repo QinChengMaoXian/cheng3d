@@ -1,5 +1,5 @@
 import { Base } from './Base';
-import { Point2D } from '../math/Point2D';
+import { Point2D } from '../math/Point2';
 import { Sprite } from '../ui/Sprite';
 
 export class Event extends Base {

@@ -1,4 +1,5 @@
 import { Vector3 } from "./Vector3";
+import { triangleIntersect } from "../util/TriangleIntersect";
 
 export class Triangle {
     point1 = new Vector3();
@@ -15,5 +16,9 @@ export class Triangle {
         if (p3) {
             this.point3.copy(p3);
         }
+    }
+
+    public intersectTriangle(triangle: Triangle) {
+        return triangleIntersect(this, triangle);
     }
 }
