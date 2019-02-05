@@ -1,4 +1,4 @@
-export class Point2D {
+export class Point2 {
     public x: number;
     public y: number;    
 

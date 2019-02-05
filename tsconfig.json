@@ -3,5 +3,10 @@
         "target": "es6",
         "declaration": true,
         "sourceMap": true
-    }
+    },
+
+    "exclude": [
+        "node_modules",
+        "examples/**/*"
+    ]
 }

@@ -1,6 +1,6 @@
 import { Sprite } from "./Sprite";
 
-export class Box extends Sprite {
+export class Panel extends Sprite {
 
     constructor() {
         super();

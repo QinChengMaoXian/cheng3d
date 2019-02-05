@@ -1,5 +1,5 @@
 import { Base } from './Base';
-import { Point2D } from '../math/Point2';
+import { Point2 } from '../math/Point2';
 import { Sprite } from '../ui/Sprite';
 
 export class Event extends Base {
@@ -25,7 +25,7 @@ export class Event extends Base {
     protected _y: number;
 
     protected _touchId: number;
-    protected _touchs: Point2D[];
+    protected _touchs: Point2[];
     
     protected _currectSprite: Sprite;
     protected _baseSprite: Sprite;

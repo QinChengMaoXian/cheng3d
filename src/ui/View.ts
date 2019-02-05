@@ -1,6 +1,6 @@
-import { Box } from "./Box";
+import { Panel } from "./Panel";
 
-export class View extends Box {
+export class View extends Panel {
 
     constructor() {
         super();

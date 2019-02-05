@@ -6,7 +6,7 @@ import { Loader } from '../io/Loader';
 import { RGBA } from '../graphics/RendererParameter';
 
 /**
- * 临时的着色器代码写在了材质内，但是并不正确；
+ * 材质基类 
  */
 export class Material extends Base {
     protected _shader: Shader = undefined;

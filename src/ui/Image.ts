@@ -1,6 +1,6 @@
-import { Box } from "./Box";
+import { Panel } from "./Panel";
 
-export class Image extends Box {
+export class Image extends Panel {
 
     protected _skin: string;
 
