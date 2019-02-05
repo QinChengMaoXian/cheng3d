@@ -34,9 +34,13 @@ export class StandardMaterial extends Material {
     public setBaseColor(r: number, g: number, b: number, a: number) {
         this._baseColor.set(r,g,b,a);
     }
-
+ 
     public clone() {
         
+    }
+
+    public get type(): string {
+        return 'standard';
     }
 
     private static _nShader;
