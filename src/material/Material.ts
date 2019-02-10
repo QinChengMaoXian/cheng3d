@@ -1,15 +1,15 @@
 import { Base } from '../core/Base'
-import { Shader } from '../graphics/Shader';
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { Loader } from '../io/Loader';
 import { RGBA } from '../graphics/RendererParameter';
+import { Shader } from '../graphics/Shader';
 
 /**
  * 材质基类 
  */
 export class Material extends Base {
-    protected _shader: Shader = undefined;
+    protected _shader: Shader = new Shader;
     protected _alphaTest: boolean = false;
     protected _alphaBlend: boolean = false;
     public blendFunc: number;
@@ -25,14 +25,6 @@ export class Material extends Base {
         super();
         this._textures = new Map();
         this._properties = new Map();
-    }
-
-    public setShader(shader) {
-        this._shader = shader;
-    }
-
-    public getShader() {
-        return this._shader;
     }
 
     protected setTexture2DFromUrl(type: string | number, url: string, defTexture?: Texture2D) {
@@ -84,5 +76,13 @@ export class Material extends Base {
 
     public getPropertyProvide() {
         return [];
+    }
+
+    public get type(): string {
+        return '';
+    }
+
+    public get shader(): Shader {
+        return this._shader;
     }
 }

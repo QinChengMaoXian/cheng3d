@@ -11,7 +11,8 @@ import { glProgram } from './glProgram';
 import { glGeometry } from './glGeometry';
 import { Camera } from '../../object/Camera';
 import { DirectionLight } from '../../light/DirectionLight';
-import { Shader } from '../../graphics/Shader';
+import { WebGLRenderer } from '../WebGLRenderer';
+import { Material } from '../../material/Material';
 
 export class glRenderExt extends glObject {
     private static _matrix = new Matrix4();
@@ -34,31 +35,31 @@ export class glRenderExt extends glObject {
         super();
     }
 
-    private _checkGLObject(gl: WebGLRenderingContext, renderer, geometry, shader, images: Map<string|number, Texture>) {
-        let glGeo = renderer.initGeometry(geometry);
-        if (!glGeo) {
-            return undefined;
-        }
-        this._glGeo = glGeo;
+    // private _checkGLObject(gl: WebGLRenderingContext, renderer: WebGLRenderer, geometry: Geometry, material: Material, images: Map<string|number, Texture>) {
+    //     let glGeo = renderer.initGeometry(geometry);
+    //     if (!glGeo) {
+    //         return undefined;
+    //     }
+    //     this._glGeo = glGeo;
 
-        let glProgram = renderer.initShader(shader);
-        if (!glProgram) {
-            return undefined;
-        }
-        this._glProgram = glProgram;
+    //     let glProgram = renderer.initShader(shader);
+    //     if (!glProgram) {
+    //         return undefined;
+    //     }
+    //     this._glProgram = glProgram;
 
-        //TODO: 加载的纹理还没加载好怎么办？
-        images.forEach((texture, type) => {
-            let glTexture = renderer.initTexture(texture);
-            if (glTexture) {
-                let texIndex = glProgram.getTextureIndex(type);
-                if (texIndex !== undefined) {
-                    glTexture.apply(gl, texIndex);
-                }
-            }
-        });
-        return this;
-    }
+    //     //TODO: 加载的纹理还没加载好怎么办？
+    //     images.forEach((texture, type) => {
+    //         let glTexture = renderer.initTexture(texture);
+    //         if (glTexture) {
+    //             let texIndex = glProgram.getTextureIndex(type);
+    //             if (texIndex !== undefined) {
+    //                 glTexture.apply(gl, texIndex);
+    //             }
+    //         }
+    //     });
+    //     return this;
+    // }
 
     private _bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
         let glGeo: glGeometry = this._glGeo;
@@ -165,7 +166,7 @@ export class glRenderExt extends glObject {
     }
 
     public draw(renderer, gl: WebGLRenderingContext, mesh, shader, images, camera) {
-        if (!this._checkGLObject(gl, renderer, mesh.getGeometry(), shader, images)) return false;
+        // if (!this._checkGLObject(gl, renderer, mesh.getGeometry(), shader, images)) return false;
         this._applyMaterial(gl, mesh, camera);
         this._bindVbo(gl, this._glProgram, mesh.getGeometry());
         this._glGeo.draw(gl);

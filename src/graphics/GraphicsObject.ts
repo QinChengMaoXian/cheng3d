@@ -19,7 +19,7 @@ export class GraphicsObject extends Base {
         
     }
 
-    public needsUpdate() {
+    public needsUpdate() { 
         let rbfs = this._renderObjectRef
         let l = rbfs.length;
         for (let i = 0; i < l; i++) {

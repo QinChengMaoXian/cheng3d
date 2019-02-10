@@ -11,7 +11,8 @@ import { glObject } from './glObject'
 import { ShaderConst } from '../../graphics/ShaderConst';
 
 export class glProgram extends glObject {
-    protected _program = undefined;
+
+    protected _program: WebGLProgram;
 
     protected _textures = new Map();
     protected _uniforms = new Map();
@@ -19,11 +20,13 @@ export class glProgram extends glObject {
 
     protected _macros = [];
 
+    protected _shaderKey: string;
+
     constructor() {
         super();
     }
 
-    private _createShaderFromeText(gl, type, text) {
+    private _createShaderFromText(gl: WebGLRenderingContext, type: number, text: string) {
         let shader = gl.createShader(type);
         gl.shaderSource(shader, text);
         gl.compileShader(shader);
@@ -72,7 +75,7 @@ export class glProgram extends glObject {
         }
     }
 
-    private _createProgram(gl, vs, fs) {
+    private _createProgram(gl: WebGLRenderingContext, vs: WebGLShader, fs: WebGLShader) {
         let program = gl.createProgram();
         gl.attachShader(program, vs);
         gl.attachShader(program, fs);
@@ -89,8 +92,8 @@ export class glProgram extends glObject {
     }
 
     private _createProgramFromText(gl, vsText, fsText) {
-        let vs = this._createShaderFromeText(gl, gl.VERTEX_SHADER, vsText);              
-        let fs = this._createShaderFromeText(gl, gl.FRAGMENT_SHADER, fsText); 
+        let vs = this._createShaderFromText(gl, gl.VERTEX_SHADER, vsText);              
+        let fs = this._createShaderFromText(gl, gl.FRAGMENT_SHADER, fsText); 
 
         if (vs === undefined || fs === undefined) {
             return undefined;
@@ -107,16 +110,15 @@ export class glProgram extends glObject {
         return program;
     }
 
-    public generateFromShader(gl, shader) {
-        // let version = shader.getUpdateVersion();
-        let program = this._createProgramFromText(gl, shader.getVertexShaderText(), shader.getFragmentShaderText());
+    public generateFromText(gl, vertText, fragText) {
+        let program = this._createProgramFromText(gl, vertText, fragText);
 
-        if (program === undefined) {
-            return undefined;
+        if (!program) {
+            return null;
         }
 
         this._update = false;
-        // this.setLocalVersion(version);
+
         return this;
     }
 
@@ -124,7 +126,7 @@ export class glProgram extends glObject {
         gl.useProgram(this._program);
     }
 
-    public setUniformData(gl, type, location, data) {
+    public setUniformData(gl: WebGLRenderingContext, type, location, data) {
         // TODO: 写的是个毛; 但是没办法
         switch(type) {
             case FLOAT_VEC2:
@@ -157,5 +159,13 @@ export class glProgram extends glObject {
 
     public getUniforms() {
         return this._uniforms;
+    }
+
+    public set shaderKey(key: string) {
+        this._shaderKey = key;
+    }
+
+    public get shaderKey() {
+        return this._shaderKey;
     }
 }

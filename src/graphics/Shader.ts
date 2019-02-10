@@ -1,31 +1,9 @@
 import { GraphicsObject } from './GraphicsObject'
 
 export class Shader extends GraphicsObject {
-    protected _vertexShaderText = '';
-    protected _fragmentShaderText = '';
-
-    protected _isLoaded: boolean = false;
 
     constructor() {
         super();
-    }
-
-    loadShaderFile(vsUrl: string, fsUrl: string) {
-         
-    }
-
-    setShaderText(vsText: string, fsText: string) {
-        this._vertexShaderText = Shader.replaceCode(vsText);
-        this._fragmentShaderText = Shader.replaceCode(fsText);
-        this._isLoaded = true;
-    }
-
-    getVertexShaderText(): string {
-        return this._vertexShaderText;
-    }
-
-    getFragmentShaderText(): string {
-        return this._fragmentShaderText;
     }
 
     private static readonly func = {

@@ -19,11 +19,9 @@ import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
 import { ScreenGeometry } from '../util/GeometryUtil';
-import { Shader } from '../graphics/Shader';
 
 import { RenderTargetLocation } from '../graphics/GraphicsTypes';
 import { FullScreenMaterial } from '../material/FullScreenMaterial';
-import { FXAAMaterial } from './postEffect/FXAA';
 
 import { glGeometry } from './glObject/glGeometry'
 import { glRenderExt } from './glObject/glRenderExt'
@@ -32,7 +30,8 @@ import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { Platform } from '../platform/Platform';
-import { Buffer } from '../graphics/Buffer';
+import { ShaderCaches } from './shaders/ShaderCaches';
+import { Material } from '../material/Material';
 
 export class WebGLRenderer extends Renderer implements IRenderer {
     private static RendererNum = 0;
@@ -60,6 +59,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     private _renderToHalfFloatTexture: boolean = false;
 
     private _rendererId = WebGLRenderer.RendererNum++;
+
+    private _shaderCache = new ShaderCaches(this);
 
     constructor() {
         super();
@@ -118,24 +119,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         return glgeo;
     }
 
-    public initShader(shader: Shader) {
-        let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
-        if (!glprogram) {
-            glprogram = new glProgram();
-            shader.setRenderObjectRef(this, glprogram);
-        }
-
-        if (!glprogram.getUpdate()) {
-            return glprogram
-        }
-
-        if (!glprogram.generateFromShader(this._gl, shader)) {
-            glprogram = null;
-            shader.setRenderObjectRef(this, null);
-        }
-        return glprogram;
-    }
-
     public initTexture(texture: Texture) {
         let _gl = this._gl;
         let gltexture:any = texture.getRenderObjectRef(this);
@@ -171,6 +154,57 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         return glframe;
+    }
+
+    public initMaterial(mat: Material) {
+        let shaderCache = this._shaderCache;
+        let glprogram = shaderCache.genShaderProgram(mat);
+
+        // let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
+        // if (!glprogram) {
+        //     glprogram = new glProgram();
+        //     shader.setRenderObjectRef(this, glpr  ogram);
+        // }
+
+        // if (!glprogram.getUpdate()) {
+        //     return glprogram
+        // }
+
+        // if (!glprogram.generateFromShader(this._gl, shader)) {
+        //     glprogram = null;
+        //     shader.setRenderObjectRef(this, null);
+        // }
+
+        return glprogram;
+    }
+
+    retainMesh(mesh: Mesh) {
+        let gl = this._gl;
+        let glGeo = this.initGeometry(mesh.getGeometry());
+        if (!glGeo) {
+            return undefined;
+        }
+
+        let mat = mesh.getMaterial();
+        let glProgram = this.initMaterial(mesh.getMaterial());
+        if (!glProgram) {
+            return undefined;
+        }
+
+        //TODO: 加载的纹理还没加载好怎么办？
+        mat.getTextures().forEach((texture, type) => {
+            let glTexture = this.initTexture(texture);
+            if (glTexture) {
+                let texIndex = glProgram.getTextureIndex(type);
+                if (texIndex !== undefined) {
+                    glTexture.apply(gl, texIndex);
+                }
+            }
+        });
+    }
+
+    releaseMesh(mesh: Mesh) {
+
     }
 
     public useFrameState(frameState: FrameState) {
@@ -245,9 +279,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     protected _renderMesh = (mesh: Mesh, camera) => {
         let geo = mesh.getGeometry();
         let mat = mesh.getMaterial();
-        let shader = mat.getShader();
         let images = mat.getTextures();
-        return this._glRenderExt.draw(this, this._gl, mesh, shader, images, camera);
+        return this._glRenderExt.draw(this, this._gl, mesh, mat, images, camera);
     }
 
     protected _renderScene(scene: Object3D) {
