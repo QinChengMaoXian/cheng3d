@@ -2,6 +2,7 @@
 var path = require("path");
 
 module.exports = {
+  mode: 'development',
   entry: {
     app: ['./test.ts'],
   },
@@ -12,10 +13,10 @@ module.exports = {
   },
   devtool: 'source-map',
   module: {
-		loaders: [
+		rules: [
       {
         test: /\.(ts)$/,
-        loader: 'ts-loader'
+        use: 'ts-loader'
       },
       {
         test: /\.(jpg|png|svg|ttf|eot)$/,
@@ -36,6 +37,6 @@ module.exports = {
     // new webpack.HotModuleReplacementPlugin()
   // ],
   resolve:{
-    extensions:['.ts','.js','.json']
+    extensions:['.glsl.ts','.ts','.js','.json']
   },
 };

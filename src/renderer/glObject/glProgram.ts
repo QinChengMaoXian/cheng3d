@@ -10,7 +10,30 @@ import { Logger } from '../../core/Logger'
 import { glObject } from './glObject'
 import { ShaderConst } from '../../graphics/ShaderConst';
 
+import { MatrixType } from '../../graphics/GraphicsTypes';
+import { Vector3 } from '../../math/Vector3';
+import { Vector4 } from '../../math/Vector4';
+import { Matrix4 } from '../../math/Matrix4';
+
+import { Geometry } from '../../graphics/Geometry';
+import { Mesh } from '../../object/Mesh';
+
+import { Camera } from '../../object/Camera';
+
+const _matrix = new Matrix4();
+const _vpmatrix = new Matrix4();
+const _mvmatrix = new Matrix4();
+const _mvpmatrix = new Matrix4();
+const _f32 = new Float32Array(16);
+
+const lightColor: Vector4 = new Vector4();
+const lightDir: Vector3 = new Vector3();
+
 export class glProgram extends glObject {
+
+    static vMatrix  = new Matrix4();
+    static pMatrix  = new Matrix4();
+    static vpMatrix = new Matrix4();
 
     protected _program: WebGLProgram;
 
@@ -147,6 +170,75 @@ export class glProgram extends glObject {
             default:
                 break;
         }
+    }
+
+    public applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, camera: Camera) {
+        let glprog = this;
+        let material = mesh.getMaterial();
+        let properties = material.getProperties();
+        let uniforms = glprog.getUniforms();
+        
+        if (uniforms.size === 0) {
+            return;
+        }
+        let tempMatrix = _matrix;
+
+        let worldMatrix = mesh.getMatrix();
+
+        let vMat = glProgram.vMatrix;
+        let pMat = glProgram.pMatrix;
+        let vpMat = glProgram.vpMatrix;
+
+        let MVMatrix = undefined;
+        let getMVMatrix = function() {
+            MVMatrix = MVMatrix || _mvmatrix.copy(vMat).applyMatrix4(worldMatrix);
+            return MVMatrix;
+        };
+
+        let VPMatrix = undefined;
+        let getVPMatrix = function() {
+            VPMatrix = VPMatrix || _vpmatrix.copy(pMat).applyMatrix4(vMat);
+            return VPMatrix;
+        };
+
+        let MVPMatrix = undefined;
+        let getMVPMatrix = function() {
+            MVPMatrix = MVPMatrix || _mvpmatrix.copy(vpMat).applyMatrix4(worldMatrix);
+            return MVPMatrix;
+        };
+
+        let f32 = _f32;
+
+        uniforms.forEach((uniformObject, uniformType) => {
+            let location = uniformObject.location;
+            let type = uniformObject.type;
+            let data: Matrix4 | Vector3 | Vector4; //matrix = glMesh._matrix;
+            // TODO: maybe need re-build? but looks good for use;
+            switch (uniformType) {
+                case ShaderConst.mMat:              data = worldMatrix; break;
+                case ShaderConst.mIMat:             data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
+                case ShaderConst.vMat:              data = vMat; break;
+                case ShaderConst.pMat:              data = pMat; break;
+                case ShaderConst.vpMat:             data = getVPMatrix(); break;
+                case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
+                case ShaderConst.mvMat:             data = getMVMatrix(); break;
+                case ShaderConst.cameraPos:         data = camera.getPosition(); break;
+                case ShaderConst.lightColor:        data = lightColor; break;
+                case ShaderConst.lightDir:          data = lightDir; break;
+                case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
+                case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
+                case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
+                case MatrixType.InverseWMatrix:     data = tempMatrix.copy(worldMatrix).invert(); break;
+                case MatrixType.InverseVMatrix:     data = tempMatrix.copy(vMat).invert(); break;
+                default:                            data = properties.get(uniformType); break;
+            }
+            if (data.data.length === 16) {
+                f32.set(data.data);
+                glprog.setUniformData(gl, type, location, f32);
+            } else {
+                glprog.setUniformData(gl, type, location, data.data);
+            }
+        });
     }
 
     public getTextureIndex(type) {

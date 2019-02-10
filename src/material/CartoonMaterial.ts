@@ -48,6 +48,10 @@ export class CartoonMaterial extends Material {
         this.param.v[2] = value;
     }
 
+    public get type(): string {
+        return 'cartoon';
+    }
+
     private static _cartoonLUTMap: Texture2D;
     public static getCartoonStyleLUT(): Texture2D {
         if (!this._cartoonLUTMap) {

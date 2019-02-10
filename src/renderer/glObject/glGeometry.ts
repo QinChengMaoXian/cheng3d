@@ -2,6 +2,7 @@ import { glObject } from './glObject';
 import { glDraw, glDrawWithIndex } from './glDraw';
 import { Geometry } from '../../graphics/Geometry';
 import { glBuffer } from './glBuffer'; 
+import { glProgram } from './glProgram';
 
 export class glGeometry extends glObject {
     // protected _vbos: WebGLBuffer[] = [];
@@ -14,6 +15,35 @@ export class glGeometry extends glObject {
 
     constructor() {
         super();
+    }
+
+    public bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
+        let glGeo: glGeometry = this;
+        let vbuffers = glGeo.getvBuffers();
+        let buffers = geometry.getBuffers();
+
+        let length = buffers.length;
+        for (let i = 0; i < length; i++) {
+            let buffer = buffers[i];
+            let binded = false
+            let attributes = buffer.getAttributes();
+            attributes.forEach( attribute => {
+                let location = glProgram.getAttribLocation(attribute.attribType);
+                if (location === undefined || location === -1) {
+                    return;
+                } else {
+                    if (!binded) {
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbuffers[i].getNativeBuffer());
+                        binded = true;
+                    }
+                }
+                gl.vertexAttribPointer(location, attribute.num, attribute.type, false, buffer.getStride(), attribute.offset);
+            })
+        }
+
+        glGeo.bindIbo(gl);
+
+        return this;
     }
 
     public generateFromGeometry(gl: WebGLRenderingContext, geometry: Geometry) {

@@ -18,12 +18,13 @@
   "author": "QinChengMaoXian",
   "license": "LGPL-3.0",
   "devDependencies": {
-    "css-loader": "^0.28.4",
-    "file-loader": "^0.11.2",
-    "ts-loader": "^2.3.2",
-    "typescript": "^2.4.2",
-    "webpack": "^3.4.1",
-    "webpack-dev-server": "^2.6.1"
+    "css-loader": "^2.1.0",
+    "file-loader": "^3.0.1",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.3",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {}
 }

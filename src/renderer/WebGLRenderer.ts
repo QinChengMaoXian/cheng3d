@@ -1,17 +1,13 @@
 import * as CGE from '../graphics/RendererParameter';
 import { Logger } from '../core/Logger';
-import { MatrixType } from '../graphics/GraphicsTypes';
 
 import { FrameState } from '../graphics/FrameState';
-import { Base } from '../core/Base';
-import { Matrix4 } from '../math/Matrix4';
 import { Vector4 } from '../math/Vector4';
 import { Scene } from '../object/Scene';
 import { Mesh } from '../object/Mesh';
 import { Object3D } from '../object/Object3D';
 import { Camera } from '../object/Camera';
 import { Frame } from '../graphics/Frame';
-import { FXAA } from './postEffect/FXAA';
 import { Renderer, IRenderer } from './Renderer';
 
 import { Texture } from '../graphics/Texture';
@@ -24,14 +20,13 @@ import { RenderTargetLocation } from '../graphics/GraphicsTypes';
 import { FullScreenMaterial } from '../material/FullScreenMaterial';
 
 import { glGeometry } from './glObject/glGeometry'
-import { glRenderExt } from './glObject/glRenderExt'
 import { glFrame } from './glObject/glFrame'
-import { glProgram } from './glObject/glProgram'
 import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { Platform } from '../platform/Platform';
 import { ShaderCaches } from './shaders/ShaderCaches';
 import { Material } from '../material/Material';
+import { glProgram } from './glObject/glProgram';
 
 export class WebGLRenderer extends Renderer implements IRenderer {
     private static RendererNum = 0;
@@ -49,8 +44,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     private _renderCount: number = 0;
 
     private _mesh: Mesh;
-
-    private _glRenderExt: glRenderExt;
 
     private _curFrame: Frame;
     private _defFrame: Frame;
@@ -80,8 +73,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
         _gl.enable(_gl.BLEND);
-
-        this._glRenderExt = new glRenderExt();
 
         this.setSize(width, height);
     }
@@ -182,13 +173,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         let gl = this._gl;
         let glGeo = this.initGeometry(mesh.getGeometry());
         if (!glGeo) {
-            return undefined;
+            return false;
         }
 
         let mat = mesh.getMaterial();
         let glProgram = this.initMaterial(mesh.getMaterial());
         if (!glProgram) {
-            return undefined;
+            return false;
         }
 
         //TODO: 加载的纹理还没加载好怎么办？
@@ -196,11 +187,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             let glTexture = this.initTexture(texture);
             if (glTexture) {
                 let texIndex = glProgram.getTextureIndex(type);
-                if (texIndex !== undefined) {
+                if (texIndex !== null && texIndex !== undefined) {
                     glTexture.apply(gl, texIndex);
                 }
             }
         });
+
+        return true;
     }
 
     releaseMesh(mesh: Mesh) {
@@ -277,10 +270,27 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     protected _renderMesh = (mesh: Mesh, camera) => {
+        // let geo = mesh.getGeometry();
+        // let mat = mesh.getMaterial();
+        // let images = mat.getTextures();
+        
+        let gl = this._gl;
+
+        if (!this.retainMesh(mesh)) {
+            return;
+        }
+
         let geo = mesh.getGeometry();
+        let glgeo = (geo.getRenderObjectRef(this) as glGeometry);
+        
         let mat = mesh.getMaterial();
-        let images = mat.getTextures();
-        return this._glRenderExt.draw(this, this._gl, mesh, mat, images, camera);
+        let glprog = (mat.shader.getRenderObjectRef(this) as glProgram);
+
+        glprog.apply(gl);
+        glgeo.bindVbo(gl, glprog, geo);
+        glprog.applyUniforms(gl, mesh, camera);
+        glgeo.draw(gl);
+        // return this._glRenderExt.draw(this, this._gl, mesh, mat, images, camera);
     }
 
     protected _renderScene(scene: Object3D) {
@@ -293,15 +303,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         let _renderList = [];
         const gl = this._gl;
 
-        let glRenderExt = this._glRenderExt;
+        glProgram.vMatrix.copy(camera.getMatrix());
+        glProgram.pMatrix.copy(camera.getProjectionMatrix());
+        glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
 
-        glRenderExt.vMatrix.copy(camera.getMatrix());
-        glRenderExt.pMatrix.copy(camera.getProjectionMatrix());
-        glRenderExt.vpMatrix.copy(camera.getViewProjectionMatrix());
-
-        if (scene instanceof Scene) {
-            glRenderExt.dirLight = (<Scene>scene).getMainLight();
-        }
+        // if (scene instanceof Scene) {
+        //     glRenderExt.dirLight = (<Scene>scene).getMainLight();
+        // }
 
         const _render = () => {
             let l = _renderList.length;
