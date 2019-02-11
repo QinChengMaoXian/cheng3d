@@ -1,7 +1,7 @@
 import { WebGLRenderer } from "../WebGLRenderer";
 import { Material } from "../../material/Material";
 import { glProgram } from "../glObject/glProgram";
-import shaders from "./shaderLibs"
+import { shaders, mods } from "./shaderLibs";
 
 export class ShaderCaches {
     
@@ -13,11 +13,11 @@ export class ShaderCaches {
         this._renderer = renderer;
     }
 
-    genShaderProgram(mat: Material): glProgram {
+    genShaderProgram(mat: Material, macros?: string[]): glProgram {
         let renderer = this._renderer;
         let shader = mat.shader;
         let glprogram: glProgram = (shader.getRenderObjectRef(renderer) as glProgram);
-        let matNewKey = this.genMatKey(mat);
+        let matNewKey = this.genMatKey(mat, macros);
         let matCurKey = glprogram ? glprogram.shaderKey : '-1';
 
         if (matCurKey === matNewKey) {
@@ -40,7 +40,10 @@ export class ShaderCaches {
 
         let gl = this._renderer.getContext();
 
-        glprogram = glprogram.generateFromText(gl, data.vert, data.frag);
+        let vertText = this.genStr(data.vert, macros);
+        let fragText = this.genStr(data.frag, macros);
+
+        glprogram = glprogram.generateFromText(gl, vertText, fragText);
         if (glprogram) {
             this._caches.set(matNewKey, glprogram);
             mat.shader.setRenderObjectRef(renderer, glprogram);
@@ -50,9 +53,20 @@ export class ShaderCaches {
         return null;
     }
 
+    genStr(text: string, macros?: string[]) {
+        let src = text;
+        if (macros) {
+            let macroStr = '';
+            macros.forEach(macro => {
+                macroStr += `#define ${macro}\n`;
+            });
+            src = macroStr + src;
+        }
+        src = '#version 100\n' + src;
+        return src;
+    }
+
     genMatKey(mat: Material, macros?: string[]): string {
         return mat.type
     }
-
-
 }

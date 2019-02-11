@@ -1,4 +1,4 @@
-export default `#version 100
+export default `
 precision mediump float;
 uniform vec4 u_baseColor;
 

@@ -1,3 +1,27 @@
+import encodeFloat2rgb from './mods/encodeFloat2RGB';
+import skin_vert from './mods/skinVert'
+
+export const mods = {
+    'encodeFloat2rgb': encodeFloat2rgb,
+    'skin_vert': skin_vert,
+}
+
+const reg = /#include<([a-zA-Z0-9_./]+)>/;
+
+export function repStr(text: string) {
+    let src = text;
+    let result;
+
+    do {
+        result = reg.exec(src);
+        if (result) {
+            src = src.replace(result[0], mods[result[1]]);
+        }
+    } while (result);
+
+    return src;
+}
+
 import fullscreen_vert from './libs/fullscreen_vert_glsl';
 import fullscreen_frag from './libs/fullscreen_frag_glsl';
 import color_vert from './libs/color_vert_glsl';
@@ -7,24 +31,24 @@ import diffuse_frag from './libs/diffuse_frag_glsl';
 import cartoon_vert from './libs/cartoon_vert_glsl';
 import cartoon_frag from './libs/cartoon_frag_glsl';
 
-export default {
+export const shaders = {
     'fullscreen': {
-        vert: fullscreen_vert,
-        frag: fullscreen_frag,
+        vert: repStr(fullscreen_vert),
+        frag: repStr(fullscreen_frag),
     },
 
     'color': {
-        vert: color_vert,
-        frag: color_frag,
+        vert: repStr(color_vert),
+        frag: repStr(color_frag),
     },
     
     'diffuse': {
-        vert: diffuse_vert,
-        frag: diffuse_frag,
+        vert: repStr(diffuse_vert),
+        frag: repStr(diffuse_frag),
     },
 
     'cartoon': {
-        vert: cartoon_vert,
-        frag: cartoon_frag,
+        vert: repStr(cartoon_vert),
+        frag: repStr(cartoon_frag),
     },
 }

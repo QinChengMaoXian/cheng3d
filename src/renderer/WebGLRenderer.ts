@@ -3,7 +3,6 @@ import { Logger } from '../core/Logger';
 
 import { FrameState } from '../graphics/FrameState';
 import { Vector4 } from '../math/Vector4';
-import { Scene } from '../object/Scene';
 import { Mesh } from '../object/Mesh';
 import { Object3D } from '../object/Object3D';
 import { Camera } from '../object/Camera';
@@ -270,10 +269,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     protected _renderMesh = (mesh: Mesh, camera) => {
-        // let geo = mesh.getGeometry();
-        // let mat = mesh.getMaterial();
-        // let images = mat.getTextures();
-        
         let gl = this._gl;
 
         if (!this.retainMesh(mesh)) {
@@ -290,7 +285,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         glgeo.bindVbo(gl, glprog, geo);
         glprog.applyUniforms(gl, mesh, camera);
         glgeo.draw(gl);
-        // return this._glRenderExt.draw(this, this._gl, mesh, mat, images, camera);
     }
 
     protected _renderScene(scene: Object3D) {

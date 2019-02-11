@@ -1,4 +1,4 @@
-export default `#version 100
+export default `
 precision mediump float;
 varying vec2 o_uv;
 uniform sampler2D u_diffuseMap;

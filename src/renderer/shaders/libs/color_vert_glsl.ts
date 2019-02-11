@@ -1,4 +1,4 @@
-export default `#version 100
+export default `
 attribute vec4 a_position;
 uniform mat4 u_mvpMat;
 void main()

@@ -1,4 +1,4 @@
-export default `#version 100
+export default `
 attribute vec4 a_position;
 attribute vec2 a_texcoord;
 attribute vec3 a_normal;

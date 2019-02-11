@@ -1,5 +1,4 @@
 import { 
-    UNSIGNED_INT,
     FLOAT_VEC2,
     FLOAT_VEC3,
     FLOAT_VEC4,
@@ -15,7 +14,6 @@ import { Vector3 } from '../../math/Vector3';
 import { Vector4 } from '../../math/Vector4';
 import { Matrix4 } from '../../math/Matrix4';
 
-import { Geometry } from '../../graphics/Geometry';
 import { Mesh } from '../../object/Mesh';
 
 import { Camera } from '../../object/Camera';
@@ -29,20 +27,26 @@ const _f32 = new Float32Array(16);
 const lightColor: Vector4 = new Vector4();
 const lightDir: Vector3 = new Vector3();
 
+interface IUniform {
+    location: WebGLUniformLocation,
+    type: number,
+    name: string,
+    size: number
+}
+
 export class glProgram extends glObject {
 
-    static vMatrix  = new Matrix4();
-    static pMatrix  = new Matrix4();
-    static vpMatrix = new Matrix4();
+    public static vMatrix  = new Matrix4();
+    public static pMatrix  = new Matrix4();
+    public static vpMatrix = new Matrix4();
 
     protected _program: WebGLProgram;
 
-    protected _textures = new Map();
-    protected _uniforms = new Map();
-    protected _attributes = new Map();
+    protected _textures: Map<string | number, number> = new Map();
+    protected _attributes: Map<string | number, number> = new Map();
+    protected _uniforms: Map<string | number, IUniform> = new Map();
 
     protected _macros = [];
-
     protected _shaderKey: string;
 
     constructor() {
@@ -149,7 +153,7 @@ export class glProgram extends glObject {
         gl.useProgram(this._program);
     }
 
-    public setUniformData(gl: WebGLRenderingContext, type, location, data) {
+    public setUniformData(gl: WebGLRenderingContext, type: number, location: WebGLUniformLocation, data) {
         // TODO: 写的是个毛; 但是没办法
         switch(type) {
             case FLOAT_VEC2:

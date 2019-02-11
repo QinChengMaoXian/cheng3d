@@ -5,8 +5,6 @@ import { glBuffer } from './glBuffer';
 import { glProgram } from './glProgram';
 
 export class glGeometry extends glObject {
-    // protected _vbos: WebGLBuffer[] = [];
-    // protected _ibo: WebGLBuffer = null;
 
     protected _vbuffers: glBuffer[] = [];
     protected _ibuffer: glBuffer = null;
@@ -47,7 +45,6 @@ export class glGeometry extends glObject {
     }
 
     public generateFromGeometry(gl: WebGLRenderingContext, geometry: Geometry) {
-        // let version = geometry.getUpdateVersion();
         let buffers = geometry.getBuffers();
         let indexBuffer = geometry.getIndexBuffer();
         let drawParameter = geometry.getDrawParameter();

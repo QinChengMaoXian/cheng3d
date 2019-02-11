@@ -169,9 +169,9 @@ let mainScene = app.getScene();
 
 let camera = app.getCamera();
 
-// camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
-// camera.lookAt(new CGE.Vector3(0, 1, 10));
-// mainScene.setActiveCamera(camera);
+camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
+camera.lookAt(new CGE.Vector3(0, 1, 10));
+mainScene.setActiveCamera(camera);
 
 let tri_scale = 100;
 
