@@ -1,21 +1,118 @@
 import * as CGE from './src/CGE'
 
-let test_diff = './res/spnza_bricks_a_diff.jpg';
-let test_ddn = './res/spnza_bricks_a_ddn.jpg';
-let test_spec = './res/spnza_bricks_a_spec.png';
+// let test_diff = './res/spnza_bricks_a_diff.jpg';
+// let test_ddn = './res/spnza_bricks_a_ddn.jpg';
+// let test_spec = './res/spnza_bricks_a_spec.png';
 
 let cartoon_color = './res/bronya_color.png';
 let cartoon_light = './res/bronya_lightmap.jpg';
 let cartoon_emission = './res/bronya_emission.jpg';
 let cartoon_obj = './res/bronya.obj';
 
-window['CGE'] = CGE;
+let brdf_basecolor = './resources/brdfTest/rustediron2_basecolor.jpg';
+// let brdf_metallic = './resources/brdfTest/rustediron2_metallic.png';
+let brdf_normal = './resources/brdfTest/rustediron2_normal.jpg';
+// let brdf_roughness = './resources/brdfTest/rustediron2_roughness.png';
+let brdf_specular = './resources/brdfTest/rustediron2_specular.jpg'
+
+// window['CGE'] = CGE;
 
 import { Main } from './projects/kamihikouki/main';
 
 let main = new Main();
 main.init();
 let app = main.getCGEApp();
+
+let stage = app.getStage();
+
+let camera = app.getCamera();
+
+camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
+
+let spr = new CGE.Sprite();
+spr.setSize(200, 200);
+spr.setPosition(50, 100, 0);
+
+// stage.addChild(spr);
+
+// stage.on(Event.MOUSE_DOWN, this, (e: Event) => {
+//     console.log('stage on mouse down');
+// });
+
+// spr.on(CGE.Event.CLICK, this, (e: CGE.Event) => {
+//     console.log('spr on click');
+// });
+
+// spr.on(CGE.Event.MOUSE_OVER, this, (e: CGE.Event) => {
+//     console.log('spr on mouse over');
+// });
+
+// spr.on(CGE.Event.MOUSE_OUT, this, (e: CGE.Event) => {
+//     console.log('spr on mouse out');
+// });
+
+let timer = app.getTimer();
+
+let _d = 0.5;
+
+let cameraRotate = (e: CGE.Event) => {
+    let del = 0.005;
+    let moveX = e.movementX * del;
+    let moveY = e.movementY * del;
+    camera.rotateViewFromForward(moveX, moveY);
+}
+
+stage.on(CGE.Event.KEY_DOWN, this, (e: CGE.Event) => {
+    switch (e.key) {
+        case 'w':
+            timer.frameLoop(1, camera, camera.forwardStep, [_d]);
+            break;
+    
+        case 's':
+            timer.frameLoop(1, camera, camera.forwardStep, [-_d]);
+            break;
+
+        case 'a':
+            timer.frameLoop(1, camera, camera.horizontalStep, [-_d]);
+            break;
+        
+        case 'd':
+            timer.frameLoop(1, camera, camera.horizontalStep, [_d]);
+            break;
+
+        default:
+            break;
+    }
+});
+
+stage.on(CGE.Event.KEY_UP, this, (e: CGE.Event) => {
+    switch (e.key) {
+        case 'w':
+        case 's':
+            timer.remove(camera, camera.forwardStep);
+            break;
+
+
+        case 'a':
+        case 'd':
+            timer.remove(camera, camera.horizontalStep);
+            break;
+
+        default:
+            break;
+    }
+});
+
+stage.on(CGE.Event.MOUSE_DOWN, this, (e: Event) => {
+    stage.on(CGE.Event.MOUSE_MOVE, this, cameraRotate);
+});
+
+stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
+    stage.off(CGE.Event.MOUSE_MOVE, this, cameraRotate);
+});
+
+
+
 
 let game_app = main.getApp();
 
@@ -44,9 +141,12 @@ let objLoader = new CGE.OBJLoader();
 
 // let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
-let standMat = new CGE.StandardMaterial(test_diff, test_ddn, test_spec);
+let standMat = new CGE.StandardMaterial(brdf_basecolor, brdf_normal, brdf_specular, brdf_specular, brdf_specular);
 
-let gltfMaterial = new CGE.DiffuseMaterial(test_diff);
+// let gltfMaterial = new CGE.DiffuseMaterial(test_diff);
+
+let quat = new CGE.Quaternion();
+quat.setAxisAngle(new CGE.Vector3(0, 0, 1), 0.02);
 
 let gltfJson = undefined;
 let gltfCallback = (event, object) => {
@@ -55,18 +155,20 @@ let gltfCallback = (event, object) => {
             gltfJson = object[0];
             CGE.Logger.info(gltfJson);
             
-            
             let mesh = new CGE.Mesh();
-            mesh.setScale(0.1, 0.1, 0.1);
+            mesh.setScale(20, 20, 20);
             mesh.setGeometry(gltfJson);
-            mesh.setMaterial(gltfMaterial);
-            mesh.setPosition(0,0,0);
+            mesh.setMaterial(standMat);
+            mesh.setPosition(0,0,-20);
             let obj = new CGE.Object3D();
             obj.addChild(mesh);
             obj.name = 'gltftest';
             mainScene.addChild(obj);  
             app.getTimer().frameLoop(1, this, () => {
                 obj.setPositionAt(game_app.manager.play.airPlane.getPos());
+                let rot = obj.getRotate();
+                rot.multiply(quat);
+                obj.enableUpdateMat();
             })
             break;
 
@@ -132,30 +234,32 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
-// import { 
-//     teapotPositions,
-//     teapotTexCoords,
-//     teapotNormals,
-//     teapotBinormals,
-//     teapotTangents,
-//     teapotIndices,
-// } from './teapot';
+import { 
+    teapotPositions,
+    teapotTexCoords,
+    teapotNormals,
+    teapotBinormals,
+    teapotTangents,
+    teapotIndices,
+} from './teapot';
+import { Sprite } from './src/ui/Sprite';
 
-// let teapotGeometry = new CGE.Geometry();
-// teapotGeometry.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, teapotPositions);
-// teapotGeometry.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 3, CGE.FLOAT, teapotTexCoords);
-// teapotGeometry.addSingleAttribute('Normal', CGE.ShaderConst.normal, 3, CGE.FLOAT, teapotNormals);
-// teapotGeometry.addSingleAttribute('Binormal', CGE.ShaderConst.binomial, 3, CGE.FLOAT, teapotBinormals);
-// teapotGeometry.addSingleAttribute('Tangent', CGE.ShaderConst.tangent, 3, CGE.FLOAT, teapotTangents);
-// teapotGeometry.setIndexData(teapotIndices);
-// teapotGeometry.setDrawParameter(teapotIndices.length);
+let teapotGeometry = new CGE.Geometry();
+teapotGeometry.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, teapotPositions);
+teapotGeometry.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 3, CGE.FLOAT, teapotTexCoords);
+teapotGeometry.addSingleAttribute('Normal', CGE.ShaderConst.normal, 3, CGE.FLOAT, teapotNormals);
+teapotGeometry.addSingleAttribute('Binormal', CGE.ShaderConst.binomial, 3, CGE.FLOAT, teapotBinormals);
+teapotGeometry.addSingleAttribute('Tangent', CGE.ShaderConst.tangent, 3, CGE.FLOAT, teapotTangents);
+teapotGeometry.setIndexData(teapotIndices);
+teapotGeometry.setDrawParameter(teapotIndices.length);
 
-// let teapotMesh = new CGE.Mesh();
-// teapotMesh.setScale(1, 1, 1);
-// teapotMesh.setPosition(10, 50, 20);
-// teapotMesh.setGeometry(teapotGeometry);
+let teapotMesh = new CGE.Mesh();
+teapotMesh.setScale(0.002, 0.002, 0.002);
+teapotMesh.setPosition(0, 0, 20);
+teapotMesh.setGeometry(teapotGeometry);
 
-// teapotMesh.setMaterial(standMat);
+teapotMesh.setMaterial(standMat);
+
 
 // const app = new CGE.Application();
 
@@ -166,12 +270,17 @@ renderer.enableDepthTest();
 renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
 let mainScene = app.getScene();
-
-let camera = app.getCamera();
-
-camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
-camera.lookAt(new CGE.Vector3(0, 1, 10));
+// camera.lookAt(new CGE.Vector3(0, 1, 10));
 mainScene.setActiveCamera(camera);
+
+
+// mainScene.addChild(teapotMesh);  
+// app.getTimer().frameLoop(1, this, () => {
+//     teapotMesh.setPositionAt(game_app.manager.play.airPlane.getPos());
+//     let rot = teapotMesh.getRotate();
+//     rot.multiply(quat);
+//     teapotMesh.enableUpdateMat();
+// })
 
 let tri_scale = 100;
 
@@ -268,8 +377,9 @@ let triMaterial = new CGE.DiffuseMaterial('./resources/color.jpg');
 let triMesh = new CGE.Mesh();
 triMesh.setGeometry(triGeo);
 triMesh.setMaterial(triMaterial);
-triMesh.setPosition(0, 0, -200);
+triMesh.setPosition(0, 0, -200000);
 
+// 三角形碰撞检测测试
 mainScene.addChild(triMesh);
 
 let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
@@ -278,7 +388,7 @@ objLoader.load(cartoon_obj).then(mesh => {
     mesh.setMaterial(cartoonMat);
     mesh.setScale(0.4, 0.4, 0.4);
     mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
-    mainScene.addChild(mesh);
+    // mainScene.addChild(mesh);
 });
 
 document.body.appendChild(renderer.getCanvas());
@@ -339,6 +449,10 @@ window.onerror = function(event) {
 // window.onkeydown = function(e) {
 //     console.log(e);
 // }
-
+// app.slow = true;
 app.start();
+
+// app.getTimer().once(2000, null, () => {
+//     app.stop();
+// });
 

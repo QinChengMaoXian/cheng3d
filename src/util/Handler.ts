@@ -1,3 +1,6 @@
+/**
+ * 执行的具柄
+ */
 export class Handler {
     private static _gid: number = 1;
     protected _id: number;

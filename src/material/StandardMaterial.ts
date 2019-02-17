@@ -4,17 +4,44 @@ import { Texture2D } from '../graphics/Texture2D';
 import { Vector4 } from '../math/Vector4';
 
 export class StandardMaterial extends Material {
+
     protected _diffuseMap;
     protected _normalMap;
-    protected _specularMap;
+
+    protected _roughnessMap;
+    protected _metallicMap;
+    protected _aoMap;
+
     protected _baseColor: Vector4 = new Vector4();
 
-    constructor(diffuse?: string, normal?: string, specular?: string) {
+    constructor(diffuse?: string, normal?: string, roughness?: string, metallic?: string, ao?: string) {
         super();
 
-        this.setTexture2DFromUrl(s.normalMap, normal);
-        this.setTexture2DFromUrl(s.diffuseMap, diffuse);
-        this.setTexture2DFromUrl(s.specularMap, specular);
+        if (diffuse) {
+            this.setTexture2DFromUrl(s.diffuseMap, diffuse);
+        }
+
+        if (normal) {
+            this.setTexture2DFromUrl(s.normalMap, normal);
+        }
+        
+        if (roughness && roughness === metallic &&  metallic === ao) {
+
+        }
+
+        if (roughness) {
+            this.setTexture2DFromUrl(s.roughnessMap, roughness);
+        }
+
+        if (metallic) {
+            this.setTexture2DFromUrl(s.metallicMap, metallic);
+        }
+        
+        if (ao) {
+            this.setTexture2DFromUrl(s.aoMap, ao);
+        } else {
+            this.setTexture(s.aoMap, Texture2D.White);
+        }
 
         this.setProperty(s.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);

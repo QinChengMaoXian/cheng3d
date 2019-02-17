@@ -3,9 +3,14 @@ import { Material } from "../../material/Material";
 import { glProgram } from "../glObject/glProgram";
 import { shaders, mods } from "./shaderLibs";
 
+interface refProg {
+    program: glProgram;
+    count: number;
+}
+
 export class ShaderCaches {
     
-    protected _caches: Map<string, glProgram> = new Map;
+    protected _caches: Map<string, refProg> = new Map;
 
     protected _renderer: WebGLRenderer;
 
@@ -14,26 +19,32 @@ export class ShaderCaches {
     }
 
     genShaderProgram(mat: Material, macros?: string[]): glProgram {
+        let caches = this._caches;
         let renderer = this._renderer;
         let shader = mat.shader;
-        let glprogram: glProgram = (shader.getRenderObjectRef(renderer) as glProgram);
+        let glprog: glProgram = (shader.getRenderObjectRef(renderer) as glProgram);
         let matNewKey = this.genMatKey(mat, macros);
-        let matCurKey = glprogram ? glprogram.shaderKey : '-1';
+        let matCurKey = glprog ? glprog.shaderKey : '-1';
 
         if (matCurKey === matNewKey) {
-            return glprogram;
+            return glprog;
         }
 
-        glprogram = this._caches.get(matNewKey);
+        if (glprog) {
+            this.removeKey(matCurKey);
+        }
+        
+        let ref = caches.get(matNewKey);
 
-        if (glprogram) {
-            shader.setRenderObjectRef(renderer, glprogram);
-            mat.shader.setRenderObjectRef(renderer, glprogram);
-            return glprogram;
+        if (ref) {
+            glprog = ref.program;
+            shader.setRenderObjectRef(renderer, glprog);
+            ref.count++;
+            return glprog;
         }
 
-        glprogram = new glProgram();
-        glprogram.shaderKey = matNewKey;
+        glprog = new glProgram();
+        glprog.shaderKey = matNewKey;
 
         let type = mat.type;
         let data = shaders[type];
@@ -43,14 +54,37 @@ export class ShaderCaches {
         let vertText = this.genStr(data.vert, macros);
         let fragText = this.genStr(data.frag, macros);
 
-        glprogram = glprogram.generateFromText(gl, vertText, fragText);
-        if (glprogram) {
-            this._caches.set(matNewKey, glprogram);
-            mat.shader.setRenderObjectRef(renderer, glprogram);
-            return glprogram;
+        glprog = glprog.generateFromText(gl, vertText, fragText);
+
+        if (glprog) {
+            caches.set(matNewKey, { program: glprog, count: 1 });
+            shader.setRenderObjectRef(renderer, glprog);
+            return glprog;
         }
 
         return null;
+    }
+
+    releaseMaterial(mat: Material) {
+        let shader = mat.shader;
+        let glprog: glProgram = (shader.getRenderObjectRef(this._renderer) as glProgram);
+        if (!glprog) {
+            return;
+        }
+        let key = glprog.shaderKey;
+        this.removeKey(key);
+    }
+
+    protected removeKey(key: string) {
+        let ref = this._caches.get(key);
+        if (ref) {
+            ref.count--;
+            if (ref.count === 0) {
+                caches.delete(key);
+                return true;
+            }
+        }
+        return false;
     }
 
     genStr(text: string, macros?: string[]) {

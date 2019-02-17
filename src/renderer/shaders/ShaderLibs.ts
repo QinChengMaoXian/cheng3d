@@ -30,6 +30,8 @@ import diffuse_vert from './libs/diffuse_vert_glsl';
 import diffuse_frag from './libs/diffuse_frag_glsl';
 import cartoon_vert from './libs/cartoon_vert_glsl';
 import cartoon_frag from './libs/cartoon_frag_glsl';
+import standard_vert from './libs/standard_vert_glsl';
+import standard_frag from './libs/standard_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -51,4 +53,9 @@ export const shaders = {
         vert: repStr(cartoon_vert),
         frag: repStr(cartoon_frag),
     },
+
+    'standard': {
+        vert: repStr(standard_vert),
+        frag: repStr(standard_frag),
+    }
 }

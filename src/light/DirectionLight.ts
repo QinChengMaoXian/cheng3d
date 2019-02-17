@@ -1,10 +1,10 @@
-import { LightType, Light } from "./Light";
+import { Light } from "./Light";
 import { Vector3 } from "../math/Vector3";
 
 export class DirectionLight extends Light {
-    protected static readonly DefDir = new Vector3(0, 0, -1);
+    protected static readonly DefDir = new Vector3(0, 0, 1);
 
-    protected _dir: Vector3 = new Vector3();
+    protected _dir: Vector3 = new Vector3(0, 0, 1);
 
     constructor() {
         super();
@@ -14,7 +14,7 @@ export class DirectionLight extends Light {
 
     public setPosition(x, y, z) {
         super.setPosition(x, y, z);
-        this._dir.set(x, y, z).normalize();
+        // this._dir.set(x, y, z).normalize();
     }
 
     public setDirection(dir: Vector3) {
@@ -29,6 +29,6 @@ export class DirectionLight extends Light {
     }
 
     public getType() {
-        return LightType.Direction;
+        return 1; //LightType.Direction;
     }
 }

@@ -20,11 +20,11 @@ export class Stage extends Sprite {
     private _data: Float32Array = new Float32Array(65535);
     private _indices: Uint16Array = new Uint16Array(65535 * 2);
 
+    
+
     constructor() {
         super();
-        this.on(Event.MOUSE_DOWN, this, this._onMouseDown);
-        this.on(Event.MOUSE_MOVE, this, this._onMouseMove);
-        this.on(Event.MOUSE_UP, this, this._onMouseUp);
+        this._isThrough = true;
     }
 
     public createRenderMesh() {
@@ -55,18 +55,6 @@ export class Stage extends Sprite {
 
             this._createRenderMesh(child, resultObj);
         }
-    }
-
-    protected _onMouseDown(e: Event) {
-        console.log(e);
-    }
-
-    protected _onMouseMove(e: Event) {
-        
-    }
-
-    protected _onMouseUp(e: Event) {
-        
     }
 }
 

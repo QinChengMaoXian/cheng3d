@@ -9,7 +9,7 @@ export class AirCamera {
 
     protected _target: Airplane;
 
-    protected _dir: CGE.Vector3 = new CGE.Vector3(0, 1, 1).normalize();
+    protected _dir: CGE.Vector3 = new CGE.Vector3(0, 1, 1).normalize().mul(0.5);
 
     constructor(camera?: CGE.Camera) {
         this._camera = camera || App.instance.cgeApp.getCamera();
@@ -20,12 +20,12 @@ export class AirCamera {
             return;
         }
 
-        let pos = this._target.getPos();
-        this._camera.lookAt(pos);
+        // let pos = this._target.getPos();
+        // this._camera.lookAt(pos);
 
-        let d = pos.clone().add(this._dir);
+        // let d = pos.clone().add(this._dir);
 
-        this._camera.setPositionAt(d);
+        // this._camera.setPositionAt(d);
     }
 
     public setTarget(target: Airplane) {

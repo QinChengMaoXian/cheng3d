@@ -26,6 +26,7 @@ import { Platform } from '../platform/Platform';
 import { ShaderCaches } from './shaders/ShaderCaches';
 import { Material } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
+import { Scene } from '../object/Scene';
 
 export class WebGLRenderer extends Renderer implements IRenderer {
     private static RendererNum = 0;
@@ -148,24 +149,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     public initMaterial(mat: Material) {
         let shaderCache = this._shaderCache;
-        let glprogram = shaderCache.genShaderProgram(mat);
-
-        // let glprogram: glProgram = <glProgram>shader.getRenderObjectRef(this);
-        // if (!glprogram) {
-        //     glprogram = new glProgram();
-        //     shader.setRenderObjectRef(this, glpr  ogram);
-        // }
-
-        // if (!glprogram.getUpdate()) {
-        //     return glprogram
-        // }
-
-        // if (!glprogram.generateFromShader(this._gl, shader)) {
-        //     glprogram = null;
-        //     shader.setRenderObjectRef(this, null);
-        // }
-
-        return glprogram;
+        let glprog = shaderCache.genShaderProgram(mat);
+        if (!glprog) {
+            return null;
+        }
+        return glprog;
     }
 
     retainMesh(mesh: Mesh) {
@@ -196,7 +184,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     releaseMesh(mesh: Mesh) {
-
+        let mat = mesh.getMaterial();
+        if (mat) {
+            this._shaderCache.releaseMaterial(mat);
+        }
     }
 
     public useFrameState(frameState: FrameState) {
@@ -301,9 +292,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         glProgram.pMatrix.copy(camera.getProjectionMatrix());
         glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
 
-        // if (scene instanceof Scene) {
-        //     glRenderExt.dirLight = (<Scene>scene).getMainLight();
-        // }
+        if (scene instanceof Scene) {
+            let light = (<Scene>scene).getMainLight();
+            glProgram.lightDir.copy(light.getDirection());
+            glProgram.lightColor.copy(light.getColor());
+        }
 
         const _render = () => {
             let l = _renderList.length;

@@ -1,5 +1,6 @@
 // 'use strict';
 var path = require("path");
+var DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -10,6 +11,8 @@ module.exports = {
     path: path.resolve(__dirname, "build"),
     publicPath: "/build/",
     filename: 'bundle.js',
+    library: "CGE",
+    libraryTarget: "umd",
   },
   devtool: 'source-map',
   module: {
@@ -26,7 +29,13 @@ module.exports = {
         },
       },
 		]
-	},
+  },
+  // plugins: [
+  //   new DeclarationBundlerPlugin({
+  //       moduleName:'cge',
+  //       out:'./build/bundle.d.ts',
+  //   })
+  // ],
   // devServer: {
   //   hot: true
   // },

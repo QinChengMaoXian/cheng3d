@@ -9,9 +9,11 @@ import { Shader } from '../graphics/Shader';
  * 材质基类 
  */
 export class Material extends Base {
+    
     protected _shader: Shader = new Shader;
     protected _alphaTest: boolean = false;
     protected _alphaBlend: boolean = false;
+
     public blendFunc: number;
     public blendColorSrc: number;
     public blendColorDst: number;

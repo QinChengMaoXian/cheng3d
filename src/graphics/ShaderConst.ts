@@ -28,6 +28,9 @@ export class ShaderConst {
     public static readonly diffuseMap = ShaderConst._inTex('u_diffuseMap');
     public static readonly normalMap = ShaderConst._inTex('u_normalMap');
     public static readonly specularMap = ShaderConst._inTex('u_specularMap');
+    public static readonly roughnessMap = ShaderConst._inTex('u_roughnessMap');
+    public static readonly metallicMap = ShaderConst._inTex('u_metallicMap');
+    public static readonly aoMap = ShaderConst._inTex('u_aoMap');
     public static readonly emissiveMap = ShaderConst._inTex('u_emissiveMap');
     public static readonly cartoonLUTMap = ShaderConst._inTex('u_cartoonLUTMap');
 

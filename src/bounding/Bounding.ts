@@ -1,4 +1,3 @@
-import { Base } from '../core/Base';
 import { Vector3 } from '../math/Vector3';
 
 import { OBB } from './OBB';
@@ -7,6 +6,9 @@ import { Sphere } from './Sphere';
 
 import { Matrix4 } from '../math/Matrix4';
 
+/**
+ * 包围盒基类
+ */
 export class Bounding {
     static TYPE_SPHERE = 0;
     static TYPE_AABB = 1;

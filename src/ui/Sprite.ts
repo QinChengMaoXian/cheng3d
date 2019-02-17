@@ -1,6 +1,8 @@
 import { Object3D } from '../object/Object3D';
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
+import { Point2 } from '../math/Point2';
+import { Event } from '../core/Event';
 
 export class Sprite extends Object3D {
 
@@ -9,8 +11,12 @@ export class Sprite extends Object3D {
 
     protected _: Float32Array = new Float32Array(4);
 
+    protected _isThrough: boolean = false;
+
     constructor() {
         super();
+
+        this.mouseEnable = true;
     }
 
     protected _update() {
@@ -103,17 +109,22 @@ export class Sprite extends Object3D {
         return false;
     }
 
+    /**
+     * 点选检测
+     * @param x client坐标x
+     * @param y client坐标y
+     */
     public checkPick(x: number, y: number) {
-
-        let mat = Matrix4.pubTemp.copy(this._matrix).applyMatrix4(this._parent.getMatrix());
+        let pmat = this._parent ? this._parent.getMatrix() : Matrix4.unitMat4;
+        let mat = Matrix4.pubTemp.copy(this._matrix).applyMatrix4(pmat);
         mat.invert();
         let vec = new Vector3(x, y, 0);
         vec.applyMatrix4(mat);
 
         let rectData = this.getRectData();
 
-        let sx = rectData[0];
-        let sy = rectData[1];
+        let sx = 0;
+        let sy = 0;
 
         let ex = sx + rectData[2];
         let ey = sy + rectData[3];
@@ -121,16 +132,41 @@ export class Sprite extends Object3D {
         return vec.x >= sx && vec.x <= ex && vec.y >= sy && vec.y <= ey;
     }
 
-    static checkEvent(base: Sprite, x: number, y: number) {
+    /**
+     * 子节点检测
+     * @param x 
+     * @param y 
+     * @param e 
+     */
+    public checkChildPick(x: number, y: number, e: Event) {
+        // 是否选中自己
+        if (!this.checkPick(x, y) || !this.mouseEnable) {
+            return false;
+        }
+        // 将自己添加到path中 todo: 可以穿透的物体没有事件怎么办？
+        e.path.push(this);
 
-        let rectData = base.getRectData();
+        let children = this._children;
+        let l = children.length;
+        for (let i = 0 ; i < l; i++) {
+            let child = <Sprite>children[i];
+            if (child.checkChildPick(x, y, e)) {
+                return true;
+            }
+        }
 
-        let sx = rectData[0];
-        let sy = rectData[1];
+        this.event(e.type, [e]);
+        if (!this._isThrough || e.stopPropagation) {
+            return true;
+        }
+    }
 
-        let ex = sx + rectData[2];
-        let ey = sy + rectData[3];
-
-        return x >= sx && x <= ex && y >= sy && y <= ey;
+    public screenPointToLocal(pos: Point2) {
+        let pmat = this._parent ? this._parent.getMatrix() : Matrix4.unitMat4;
+        let mat = Matrix4.pubTemp.copy(this._matrix).applyMatrix4(pmat);
+        mat.invert();
+        let vec = new Vector3(pos.x, pos.y, 0);
+        vec.applyMatrix4(mat);
+        return new Point2(vec.x, vec.y)
     }
 }

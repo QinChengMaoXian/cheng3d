@@ -1,8 +1,11 @@
 import { Handler } from '../util/Handler';
 
+/**
+ * 事件监听与响应
+ */
 export class EventDispatcher {
 
-    protected _events: Map<string, Handler[]> = new Map();
+    protected _events: Map<string, Handler[]>;
 
     constructor() {
         
@@ -18,6 +21,9 @@ export class EventDispatcher {
 
     public off(type: string, celler: any, method: Function) {
         let events = this._events;
+        if (!events) {
+            return;
+        }
         let handlers = events.get(type);
         if (handlers) {
             let l = handlers.length;
@@ -39,6 +45,10 @@ export class EventDispatcher {
     }
 
     public removeAll() {
+        let events = this._events;
+        if (!events) {
+            return;
+        }
         this._events.forEach((handlers, key) => {
             if (handlers) {
                 let l = handlers.length;
@@ -51,10 +61,14 @@ export class EventDispatcher {
             }
         });
         this._events.clear();
+        this._events = null;
     }
 
-    public event(type: string, args?: any[]) {
+    public event(type: string, args?: any[]): any {
         let events = this._events;
+        if (!events) {
+            return null;
+        }
         let handlers = events.get(type);
         if (handlers) {
             let l = handlers.length;
@@ -62,11 +76,15 @@ export class EventDispatcher {
                 let handler = handlers[i];
                 return handler.runWith(args);
             }
-        } 
+        }
     }
 
     protected _addEvent(type: string, celler: any, method: Function, args?: any[], once: boolean = false) {
         let events = this._events;
+        if (!events) {
+            events = new Map();
+            this._events = events;
+        }
         let handlers = events.get(type);
         if (handlers) {
             let l = handlers.length;
@@ -85,6 +103,12 @@ export class EventDispatcher {
         handlers.push(new Handler(celler, method, args, once));
     }
 
-
-
+    findEventType(type: string) {
+        let events = this._events;
+        if (!events) {
+            return false;
+        }
+        let handers = events.get(type);
+        return handers && handers.length > 0;
+    }
 }

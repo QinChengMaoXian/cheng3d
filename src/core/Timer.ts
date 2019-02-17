@@ -2,7 +2,7 @@ import { Handler } from "../util/Handler";
 import { ObjectPool } from "../util/ObjectPool";
 
 export class TimerHandler {
-    public static pool = new ObjectPool<TimerHandler>(TimerHandler, 20);
+    public static pool = new ObjectPool<TimerHandler>(TimerHandler, 10);
 
     public handler: Handler = new Handler(null, null);
     public time: number;

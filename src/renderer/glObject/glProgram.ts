@@ -24,8 +24,7 @@ const _mvmatrix = new Matrix4();
 const _mvpmatrix = new Matrix4();
 const _f32 = new Float32Array(16);
 
-const lightColor: Vector4 = new Vector4();
-const lightDir: Vector3 = new Vector3();
+
 
 interface IUniform {
     location: WebGLUniformLocation,
@@ -39,6 +38,9 @@ export class glProgram extends glObject {
     public static vMatrix  = new Matrix4();
     public static pMatrix  = new Matrix4();
     public static vpMatrix = new Matrix4();
+
+    public static lightColor: Vector4 = new Vector4();
+    public static lightDir: Vector3 = new Vector3();
 
     protected _program: WebGLProgram;
 
@@ -227,8 +229,8 @@ export class glProgram extends glObject {
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
                 case ShaderConst.mvMat:             data = getMVMatrix(); break;
                 case ShaderConst.cameraPos:         data = camera.getPosition(); break;
-                case ShaderConst.lightColor:        data = lightColor; break;
-                case ShaderConst.lightDir:          data = lightDir; break;
+                case ShaderConst.lightColor:        data = glProgram.lightColor; break;
+                case ShaderConst.lightDir:          data = glProgram.lightDir; break;
                 case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
                 case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;

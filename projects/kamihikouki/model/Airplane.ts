@@ -17,9 +17,9 @@ export class Airplane {
     }
 
     public update() {
-        let pos = this._view.getPosition();
-        pos.add(this._dir);
-        this._view.enableUpdateMat();
+        // let pos = this._view.getPosition();
+        // pos.add(this._dir);
+        // this._view.enableUpdateMat();
     }
 
     public init(type: number = 1) {
@@ -28,7 +28,7 @@ export class Airplane {
         this._view = new AirplaneView;
         this._view.init(this._type);
 
-        this._dir = new CGE.Vector3(0, 0.1, 0);
+        this._dir = new CGE.Vector3(0, 0.01, 0);
         this._up = new CGE.Vector3(0, 0, 1);
     }
 

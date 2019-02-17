@@ -1,6 +1,5 @@
-import { Object3D } from '../object/Object3D'
-
-import { Vector4 } from '../math/Vector4'
+import { Object3D } from '../object/Object3D';
+import { Vector4 } from '../math/Vector4';
 
 export enum LightType {
     None = 0,
@@ -21,7 +20,7 @@ export class Light extends Object3D {
 
     public setColor(r: number, g: number, b: number) {
         const color = this._color;
-        color.set(r, g, b, color.w);
+        color.set(r, g, b, 1);
     }
 
     public enableShadow() {
@@ -41,6 +40,6 @@ export class Light extends Object3D {
     }
 
     public getType() {
-        return LightType.None;
+        return 0; //LightType.None;
     }
 }
