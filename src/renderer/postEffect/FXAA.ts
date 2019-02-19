@@ -20,8 +20,8 @@ export class FXAA extends PEBase {
         super(renderer);
     }
 
-    public init(texture: Texture2D) {
-        this._initGeometry();
+    public init(texture: Texture2D, geometry?: Geometry) {
+        this._geometry = geometry ? geometry : this._initGeometry();
         this._material = new FXAAMaterial(texture);
         let mesh = new Mesh();
         mesh.setGeometry(this._geometry);
@@ -67,7 +67,7 @@ export class FXAA extends PEBase {
         planeVertexGeometry.setIndexData(indexData);
         planeVertexGeometry.setDrawParameter(indexData.length);
 
-        this._geometry = planeVertexGeometry;
+        return planeVertexGeometry;
     }
 }
 
@@ -97,5 +97,9 @@ export class FXAAMaterial extends Material {
     public setPixelSize(x, y) {
         this._data.data[0] = x;
         this._data.data[1] = y;
+    }
+
+    get type() {
+        return 'fxaa'
     }
 }

@@ -18,7 +18,6 @@ export function repStr(text: string) {
             src = src.replace(result[0], mods[result[1]]);
         }
     } while (result);
-
     return src;
 }
 
@@ -32,6 +31,7 @@ import cartoon_vert from './libs/cartoon_vert_glsl';
 import cartoon_frag from './libs/cartoon_frag_glsl';
 import standard_vert from './libs/standard_vert_glsl';
 import standard_frag from './libs/standard_frag_glsl';
+import fxaa_frag from './libs/fxaa_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -57,5 +57,10 @@ export const shaders = {
     'standard': {
         vert: repStr(standard_vert),
         frag: repStr(standard_frag),
+    },
+
+    'fxaa': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(fxaa_frag),
     }
 }

@@ -1,13 +1,30 @@
 import { GraphicsObject } from './GraphicsObject'
 import { Texture2D } from './Texture2D'
-import { TextureCube } from './TextureCube'
 import * as CGE from './RendererParameter'
 import { FrameState } from './FrameState'
 import { RenderTargetLocation } from './GraphicsTypes';
 import { Vector4 } from "../math/Vector4";
+import { Texture } from './Texture';
+import { TextureCube } from './TextureCube';
+
+/** 渲染目标的贴图类型 */
+export enum TexTarget {
+    TEXTURE_2D,
+    TEXTURE_CUBE_MAP_POSITIVE_X,
+    TEXTURE_CUBE_MAP_NEGATIVE_X,
+    TEXTURE_CUBE_MAP_POSITIVE_Y,
+    TEXTURE_CUBE_MAP_NEGATIVE_Y,
+    TEXTURE_CUBE_MAP_POSITIVE_Z,
+    TEXTURE_CUBE_MAP_NEGATIVE_Z,
+}
+
+export interface ITexTarget {
+    tex: Texture;
+    target: TexTarget;
+}
 
 export class Frame extends GraphicsObject {
-    private _textures: Map<RenderTargetLocation, any> = new Map();
+    private _textures: Map<RenderTargetLocation, ITexTarget> = new Map();
     private _width = 64;
     private _height = 64;
     private _isFollowScreen = false;
@@ -29,17 +46,17 @@ export class Frame extends GraphicsObject {
     public addTexture(targetType: RenderTargetLocation, format, dataType, filterMin, filterMag) {
         let __format = format || CGE.RGBA;
         let __dataType = dataType || CGE.UNSIGNED_BYTE;
-        let texture2d = this._createTexture2d(__format, __dataType);
-        texture2d.setFilter(filterMin, filterMag);
-        this._textures.set(targetType, texture2d);
+        let tex2d = this._createTexture2d(__format, __dataType);
+        tex2d.setFilter(filterMin, filterMag);
+        this._textures.set(targetType, {tex: tex2d, target: TexTarget.TEXTURE_2D});
     }
 
-    public setTexture2D(targetType: RenderTargetLocation, texture2d: Texture2D) {
-        this._textures.set(targetType, texture2d);
+    public setTexture2D(targetType: RenderTargetLocation, tex2d: Texture2D) {
+        this._textures.set(targetType, {tex: tex2d, target: TexTarget.TEXTURE_2D});
     }
 
-    public setTextureCube(targetType: RenderTargetLocation, texture2d: Texture2D, ) {
-
+    public setTextureCube(targetType: RenderTargetLocation, texCube: TextureCube, target: TexTarget) {
+        this._textures.set(targetType, {tex: texCube, target: target});
     }
 
     public setDepthStencilTexture() {
@@ -93,8 +110,11 @@ export class Frame extends GraphicsObject {
         if (this._depthStencilTexture) {
             this._depthStencilTexture.setSize(w, h);
         }
-        this._textures.forEach(function(texture, type) {
-            texture.setSize(w, h);
+        this._textures.forEach(function(texTarget, type) {
+            let tex = texTarget.tex;
+            if (tex instanceof Texture2D) {
+                tex.setSize(w, h);
+            }
         });
     }
 

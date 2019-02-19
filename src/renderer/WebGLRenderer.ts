@@ -27,7 +27,13 @@ import { ShaderCaches } from './shaders/ShaderCaches';
 import { Material } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
+import { FXAAMaterial } from './postEffect/FXAA';
+import { Event } from '../core/Event';
 
+
+/**
+ * webgl 1.0 渲染器；
+ */
 export class WebGLRenderer extends Renderer implements IRenderer {
     private static RendererNum = 0;
 
@@ -63,7 +69,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this._canvas =  Platform.createCanvas();
         const _canvas = this._canvas;
 
-        this._gl = _canvas.getContext('webgl', {antialias: true});
+        this._gl = <WebGLRenderingContext>_canvas.getContext('webgl');
         const _gl = this._gl;
 
         this._initExtensions();
@@ -361,6 +367,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this.initFrame(this._defFrame);
 
         this._defFrameState.setViewport(new Vector4(0, 0, width, height));
+
+        this.event(Event.RENDERER_RESIZE, [width, height]);
     };
 
     public getCanvas(): HTMLCanvasElement {
@@ -384,8 +392,14 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         let mesh = new Mesh();
         let geo = new ScreenGeometry();
         geo.makeTri();
-        // let mat = new FXAAMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
-        let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
+
+        let mat = new FXAAMaterial(<Texture2D>(frame.getTextureFromType(RenderTargetLocation.COLOR).tex));
+
+        this.on(Event.RENDERER_RESIZE, this, (w, h) => {
+            mat.setPixelSize(1.0 / w, 1.0 / h);
+        });
+
+        // let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
         // let mat = new FullScreenMaterial(frame.getDepthStencilTexture());
         mesh.setGeometry(geo);
         mesh.setMaterial(mat);
@@ -440,5 +454,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     public getRendererId(): number {
         return this._rendererId;
+    }
+
+    public getWidth(): number {
+        return this._screenWidth;
+    }
+
+    public getHeight(): number {
+        return this._screenHeight;
     }
 }

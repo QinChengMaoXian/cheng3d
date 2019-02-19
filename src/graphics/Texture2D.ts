@@ -4,14 +4,18 @@ import { Loader } from '../io/Loader';
 import { BuildOrderedDitheringData } from '../util/Util';
 
 export class Texture2D extends Texture {
+    private static _gen1pxColorTexture2D(color: number[]) {
+        let tex = new Texture2D();
+        tex.setFormat(CGE.RGBA, CGE.RGBA);
+        tex.setDataType(CGE.UNSIGNED_BYTE);
+        tex.setData(1, 1, new Uint8Array(color));
+        return tex;
+    }
+
     private static _White: Texture2D;
     public static get White(): Texture2D {
         if (!Texture2D._White) {
-            let tex = new Texture2D();
-            tex.setFormat(CGE.RGBA, CGE.RGBA);
-            tex.setDataType(CGE.UNSIGNED_BYTE);
-            tex.setData(1, 1, new Uint8Array([255, 255, 255, 255]));
-            Texture2D._White = tex;
+            Texture2D._White = this._gen1pxColorTexture2D([255, 255, 255, 255]);
         }
         return Texture2D._White;
     }
@@ -19,13 +23,17 @@ export class Texture2D extends Texture {
     private static _Normal: Texture2D;
     public static get Normal(): Texture2D {
         if (!Texture2D._Normal) {
-            let tex = new Texture2D();
-            tex.setFormat(CGE.RGBA, CGE.RGBA);
-            tex.setDataType(CGE.UNSIGNED_BYTE);
-            tex.setData(1, 1, new Uint8Array([127, 127, 255, 255]));
-            Texture2D._Normal = tex;
+            Texture2D._Normal = this._gen1pxColorTexture2D([127, 127, 255, 255]);
         }
         return Texture2D._Normal;
+    }
+
+    private static _Black: Texture2D;
+    public static get Black(): Texture2D {
+        if (!Texture2D._Black) {
+            Texture2D._Black = this._gen1pxColorTexture2D([0, 0, 0, 255]);
+        }
+        return Texture2D._Black;
     }
 
     private static _ODTex: Texture2D;

@@ -40,6 +40,9 @@ export class Event extends Base {
     /** 重置界面大小 */
     static readonly CLIENT_RESIZE = "client_resize";
 
+    /** 渲染器重置大小 */
+    static readonly RENDERER_RESIZE = "renderer_resize";
+
     /**  */
     static readonly LOOP_FRAME = "loop_frame";
 

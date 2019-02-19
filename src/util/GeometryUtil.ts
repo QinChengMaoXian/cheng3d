@@ -17,10 +17,6 @@ export class ScreenGeometry extends Geometry {
             3, 1, 2, 1,
         ]);
 
-        let indexData = new Uint16Array([
-            0, 1, 2,
-        ]);
-
         let attribs = [
             {
                 name: 'Position',
@@ -37,8 +33,8 @@ export class ScreenGeometry extends Geometry {
         ];
 
         this.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYTES_PER_ELEMENT * 4, vertexPositionData);
-        this.setIndexData(indexData);
-        this.setDrawParameter(indexData.length);
+        // this.setIndexData(indexData);
+        this.setDrawParameter(3);
     }
 }
 

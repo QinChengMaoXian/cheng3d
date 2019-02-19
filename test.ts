@@ -85,6 +85,14 @@ stage.on(CGE.Event.KEY_DOWN, this, (e: CGE.Event) => {
             timer.frameLoop(1, camera, camera.horizontalStep, [_d]);
             break;
 
+        case 'q':
+            timer.frameLoop(1, camera, camera.verticalStep, [-_d]);
+            break;
+
+        case 'e':
+            timer.frameLoop(1, camera, camera.verticalStep, [_d]);
+            break;
+
         default:
             break;
     }
@@ -100,6 +108,11 @@ stage.on(CGE.Event.KEY_UP, this, (e: CGE.Event) => {
         case 'a':
         case 'd':
             timer.remove(camera, camera.horizontalStep);
+            break;
+
+        case 'q':
+        case 'e':
+            timer.remove(camera, camera.verticalStep);
             break;
 
         default:
@@ -207,20 +220,27 @@ window['standMat'] = standMat;
 
 mainScene.addChild(obj3D);
 
-for (let ix = 0; ix < 10; ix++) {
+for (let ix = 0; ix <= 10; ix++) {
 
-    for (let iz = 0; iz < 5; iz++) {
+    for (let iz = 0; iz <= 5; iz++) {
         let mesh = new CGE.Mesh();
         mesh.setGeometry(geo);
-        let mat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+        // let mat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+
+        let mat = new CGE.StandardMaterial();
+        mat.setBaseColor(0.5, 0.5, 0.5, 1.0);
+
+        let r = ix === 0 ? 0.1 : ix;
+        let m = iz === 0 ? 0.01 : iz;
+        
+        mat.setSpecular((r) * 0.1, (m) * 0.2, 1);
 
         mat.setBrdfLUTMap(lutTexture);
 
         mat.setIrradianceMap(cubeTexture);
         mat.setPrefilterMap(cubeTexture);
+    
         
-        // mat.setBaseColor(1.000, 0.782, 0.344, 1.0);
-        // mat.setSpecular((ix + 1) * 0.1, (iz + 1) * 0.2, 1);
         mesh.setMaterial(mat);
 
         mesh.setPosition(ix * 20, 0, -iz * 20);

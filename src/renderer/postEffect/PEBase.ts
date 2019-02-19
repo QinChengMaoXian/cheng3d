@@ -19,4 +19,8 @@ export class PEBase {
     public disable() {
 
     }
+
+    public resize(width: number, height: number) {
+        
+    }
 }

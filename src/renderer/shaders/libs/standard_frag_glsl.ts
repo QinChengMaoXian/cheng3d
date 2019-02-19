@@ -8,7 +8,6 @@ varying vec3 v_tangentToView0;
 varying vec3 v_tangentToView1;
 varying vec3 v_tangentToView2;
 varying vec3 v_normal;
-
 varying vec3 v_worldPos;
 
 uniform sampler2D u_diffuseMap;
@@ -16,7 +15,6 @@ uniform sampler2D u_normalMap;
 uniform sampler2D u_roughnessMap;
 uniform sampler2D u_metallicMap;
 uniform sampler2D u_aoMap;
-
 uniform sampler2D u_brdfLUTMap;
 
 uniform samplerCube u_irradianceMap;
@@ -38,9 +36,9 @@ float dot_plus(vec3 v1, vec3 v2)
 // 法线分布统计
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-    float a2     = roughness*roughness;
+    float a2     = roughness * roughness;
     float NdotH  = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH*NdotH;
+    float NdotH2 = NdotH * NdotH;
 
     float nom    = a2;
     float denom  = (NdotH2 * (a2 - 1.0) + 1.0);
@@ -57,7 +55,7 @@ float GeometrySchlickGGX(float NdotV, float k)
     return nom / denom;
 }
 
-// 几何方程
+// Schlick几何方程
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) 
 {
     float NdotV = max(dot(N, V), 0.00001);
@@ -72,13 +70,13 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
-//菲涅尔方程
+//Schlick菲涅尔方程
 vec3 FresnelSchlick(float NdotL, vec3 F0)
 {
     return F0 + (vec3(1.0) - F0) * pow((1.0 - NdotL), 5.0);
 }  
 
-//菲涅尔方程
+//Schlick菲涅尔方程，带粗糙度
 vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - NdotL), 5.0);
@@ -130,7 +128,7 @@ void main()
 
     float G = GeometrySmith(N, V, L, roughness);
     float D = DistributionGGX(N, H, roughness);
-    vec3 F = FresnelSchlickRoughness(dot_plus(H, L), F0, roughness);
+    vec3 F = FresnelSchlick(dot_plus(H, L), F0);
 
     vec3 nominator = D * G * F;//分子
 
@@ -144,28 +142,27 @@ void main()
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    vec3 texEnv = vec3(N.x, N.z, -N.y);
-    vec3 irradiance = textureCubeLodEXT(u_irradianceMap, texEnv, 8.0).xyz;
-    vec3 diffuse = irradiance * albedo;
+    // 直接光照结果
+    vec3 lo = (kD * (albedo) / PI + brdf) * NdotL;
 
+    // 环境光部分
+    vec3 coordN = vec3(N.x, N.z, -N.y);
+    vec3 irradiance = textureCubeLodEXT(u_irradianceMap, coordN, 8.0).xyz;
+    vec3 diffuse = irradiance * albedo;
     vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kD_a = vec3(1.0) - F_s;
     kD_a *= 1.0 - metallic;
 
     vec2 envBRDF  = texture2D(u_brdfLUTMap, vec2(NdotV, roughness)).rg;
-
     vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb;  
-
     vec3 specular = prefilteredColor * (F_s * envBRDF.x + envBRDF.y);
-
     vec3 ambient = (kD_a * diffuse + specular) * ao;
 
-    vec3 lo = (kD * (albedo) / PI + brdf) * NdotL;
-
+    // 最终颜色
     vec3 color = ambient + lo;
 
-    // gl_FragColor = vec4(color, 1.0);
-    gl_FragColor = vec4(vec3(color), 1.0);
+    gl_FragColor = vec4(color, 1.0);
+    // gl_FragColor = vec4(vec3(color), 1.0);
     // gl_FragColor = vec4(v_normal, 1.0);
 }
 `;

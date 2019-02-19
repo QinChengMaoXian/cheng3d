@@ -25,4 +25,8 @@ export interface IRenderer {
 
     getRendererId(): number;
 
+    getWidth(): number;
+
+    getHeight(): number;
+
 }

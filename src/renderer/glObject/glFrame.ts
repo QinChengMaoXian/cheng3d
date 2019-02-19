@@ -1,8 +1,10 @@
 import { Logger } from '../../core/Logger';
 import { glObject } from './glObject';
 
-import { Frame } from '../../graphics/Frame';
+import { Frame, ITexTarget, TexTarget } from '../../graphics/Frame';
 import { WebGLRenderer } from '../WebGLRenderer';
+import { glTexture2D } from './glTexture2D';
+import { glTextureCube } from './glTextureCube';
 
 export class glFrame extends glObject {
     protected _frame: WebGLFramebuffer = undefined;
@@ -16,8 +18,8 @@ export class glFrame extends glObject {
 
     public checkTextures(renderer: WebGLRenderer, textureMap, depthStencilTexture) {
         let completed = true;
-        textureMap.forEach(function(texture2d, location) {
-            let glTexture = renderer.initTexture(texture2d);
+        textureMap.forEach(function(texTarget: ITexTarget, location: number) {
+            let glTexture = renderer.initTexture(texTarget.tex);
             if (glTexture === undefined) {
                 completed = false;
             }
@@ -43,16 +45,17 @@ export class glFrame extends glObject {
         }
         let frameBuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-        this._drawBufferMap.forEach(function(glTexure2d, location) {
+        this._drawBufferMap.forEach((glTexure, location) => {
             if (location >= maxAttachment) {
                 Logger.error('current just support ' + maxAttachment + ' attachments, but you set ' + location);
                 return undefined;
             }
             let attachment = gl.COLOR_ATTACHMENT0 + location;
             this._drawBuffers.push(attachment);
-            // TODO: cube texture;
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, glTexure2d.getHandler(), 0);
-        }.bind(this));
+            let texTarget = textureMap.get(location);
+            let target = texTarget.target === TexTarget.TEXTURE_2D ? gl.TEXTURE_2D : (gl.TEXTURE_CUBE_MAP_POSITIVE_X + texTarget.target - TexTarget.TEXTURE_CUBE_MAP_POSITIVE_X);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, target, glTexure.getHandler(), 0);
+        });
         if (depthStencilTexture) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.TEXTURE_2D, this._depthStencil.getHandler(), 0);
         }
