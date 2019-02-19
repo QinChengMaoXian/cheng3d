@@ -11,7 +11,7 @@ export class glTexture2D extends glTexture {
         this._wrapT = gl.CLAMP_TO_EDGE;
     }
 
-    protected _applyParameter(gl: WebGLRenderingContext, target, mipmap: boolean) {
+    protected _applyParameter(gl: WebGLRenderingContext, target: number, mipmap: boolean) {
         gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, this._minFilter);
         gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, this._magFilter);
         gl.texParameteri(target, gl.TEXTURE_WRAP_S, this._wrapS);
@@ -24,7 +24,7 @@ export class glTexture2D extends glTexture {
         }
     }
 
-    protected _setTextureData(gl: WebGLRenderingContext, target, texture: Texture2D) {
+    protected _setTextureData(gl: WebGLRenderingContext, target: number, texture: Texture2D) {
         let format = texture.getFormat();
         let internalformat = texture.getInternalformat();
         let type = texture.getDataType();
@@ -56,8 +56,8 @@ export class glTexture2D extends glTexture {
 
     protected _createGLTextureFromTexture(gl, texture) {
         let handler = this._createTextureDatas(gl, texture);
-        if (handler === undefined) {
-            return undefined;
+        if (!handler) {
+            return;
         }
         this.setFilter(texture.getMinFilter(), texture.getMagFilter());
         this.setWarp(texture.getWrapS(), texture.getWrapT());
@@ -65,13 +65,14 @@ export class glTexture2D extends glTexture {
         return handler;
     }
 
-    public generateFromTexture(gl: WebGLRenderingContext, texture: Texture2D) {
+    public generateFromTexture2D(gl: WebGLRenderingContext, texture: Texture2D) {
         let handler = this._createGLTextureFromTexture(gl, texture);
-        if (handler === undefined) {
-            return undefined;
+        if (!handler) {
+            return;
         }
         this._texture = handler;
         this._update = false;
+        gl.bindTexture(gl.TEXTURE_2D, null);
         // this.setLocalVersion(texture.getUpdateVersion());
         return this;
     }

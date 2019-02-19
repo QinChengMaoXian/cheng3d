@@ -8,12 +8,24 @@ export class Texture2D extends Texture {
     public static get White(): Texture2D {
         if (!Texture2D._White) {
             let tex = new Texture2D();
-            tex.setFormat(CGE.RGB, CGE.RGB);
-            tex.setDataType(CGE.UNSIGNED_SHORT_5_6_5);
-            tex.setData(1, 1, new Uint16Array([65535]));
+            tex.setFormat(CGE.RGBA, CGE.RGBA);
+            tex.setDataType(CGE.UNSIGNED_BYTE);
+            tex.setData(1, 1, new Uint8Array([255, 255, 255, 255]));
             Texture2D._White = tex;
         }
         return Texture2D._White;
+    }
+
+    private static _Normal: Texture2D;
+    public static get Normal(): Texture2D {
+        if (!Texture2D._Normal) {
+            let tex = new Texture2D();
+            tex.setFormat(CGE.RGBA, CGE.RGBA);
+            tex.setDataType(CGE.UNSIGNED_BYTE);
+            tex.setData(1, 1, new Uint8Array([127, 127, 255, 255]));
+            Texture2D._Normal = tex;
+        }
+        return Texture2D._Normal;
     }
 
     private static _ODTex: Texture2D;

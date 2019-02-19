@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 export class DirectionLight extends Light {
     protected static readonly DefDir = new Vector3(0, 0, 1);
 
-    protected _dir: Vector3 = new Vector3(0, 0, 1);
+    protected _dir: Vector3 = new Vector3(0.5, 0.5, 0.5).normalize();
 
     constructor() {
         super();

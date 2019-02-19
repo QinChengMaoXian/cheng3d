@@ -6,6 +6,7 @@ uniform sampler2D u_diffuseMap;
 void main()
 {
     vec4 baseColor = texture2D(u_diffuseMap, o_uv);
-    gl_FragColor = vec4(baseColor.xyz, 1.0);
+    // baseColor = pow(color, vec3(1.0/2.2)); 
+    gl_FragColor = vec4(pow(baseColor.xyz, vec3(1.0/2.2)), 1.0);
 }
 `;

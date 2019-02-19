@@ -72,8 +72,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
-        _gl.enable(_gl.BLEND);
-
+        // _gl.enable(_gl.BLEND);
+        _gl.cullFace(_gl.BACK);
         this.setSize(width, height);
     }
 
@@ -118,13 +118,17 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         if (texture instanceof Texture2D) {
-            gltexture = new glTexture2D(_gl);
-            if (gltexture.generateFromTexture(_gl, texture)) {
-                texture.setRenderObjectRef(this, gltexture);
-                return gltexture;
+            let tex = new glTexture2D(_gl);
+            if (tex.generateFromTexture2D(_gl, texture)) {
+                texture.setRenderObjectRef(this, tex);
+                return tex;
             }
         } else if (texture instanceof TextureCube) {
-            gltexture = new glTextureCube(_gl);
+            let tex = new glTextureCube(_gl);
+            if (tex.generateFromTextureCube(_gl, texture)) {
+                texture.setRenderObjectRef(this, tex);
+                return tex;
+            }
         }
     }
 
@@ -371,9 +375,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         let frame = new Frame();
         frame.setSize(this._canvas.width, this._canvas.height);
         // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
-        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
+        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.enableDepthStencil();
-        frame.getState().clearColor.set(1.0, 0.5, 0.5, 0.0);
+        // let rg = Math.pow(0.5, 2.2)
+        frame.getState().clearColor.set(0, 0, 0, 0.0);
         this._defFrame = frame;
 
         let mesh = new Mesh();
@@ -406,6 +411,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         _ext['OES_texture_float'] = getExtension("OES_texture_float");
         _ext['WEBGL_depth_texture'] = getExtension("WEBGL_depth_texture");
         _ext['EXT_texture_filter_anisotropic'] = getExtension("EXT_texture_filter_anisotropic");
+        _ext['EXT_shader_texture_lod'] = getExtension('EXT_shader_texture_lod');
 
         if (!_ext['WEBGL_draw_buffers']
             || !_ext['OES_standard_derivatives']

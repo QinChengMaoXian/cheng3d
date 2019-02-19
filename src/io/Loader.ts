@@ -69,7 +69,6 @@ export class Loader {
                 if (xmlHttp.status == 200) {
                     this._loadedMap.set(url, xmlHttp.response);
                     events.event(url, [xmlHttp.response]);
-                    this._xmlRequests.push(xmlHttp);
                 } else {
                     Logger.error(xmlHttp);
                 }

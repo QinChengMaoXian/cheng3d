@@ -11,9 +11,7 @@ varying vec3 v_tangentToView2;
 varying vec3 v_worldPos;
 varying vec3 v_normal;
 
-uniform mat4 u_vMat;
 uniform mat4 u_mMat;
-uniform mat4 u_mvMat;
 uniform mat4 u_mvpMat;
 
 void main()

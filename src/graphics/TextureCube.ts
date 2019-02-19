@@ -3,8 +3,22 @@ import { Texture } from './Texture'
 import { Texture2D } from './Texture2D';
 
 export class TextureCube extends Texture {
-    _wrapS = CGE.CLAMP_TO_EDGE;
-    _wrapT = CGE.CLAMP_TO_EDGE;
+    private static _White: TextureCube;
+    public static get White(): TextureCube {
+        if (!TextureCube._White) {
+            let tex = new TextureCube();
+            tex.setFormat(CGE.RGBA, CGE.RGBA);
+            tex.setDataType(CGE.UNSIGNED_BYTE);
+            let white2d = Texture2D.White;
+            tex.setTexture2ds(white2d, white2d, white2d, white2d, white2d, white2d);
+            TextureCube._White = tex;
+        }
+        return TextureCube._White;
+    }
+
+    protected _wrapS = CGE.CLAMP_TO_EDGE;
+    protected _wrapT = CGE.CLAMP_TO_EDGE;
+    protected _wrapR = CGE.CLAMP_TO_EDGE;
     _texture2ds: Texture2D[] = [undefined, undefined, undefined, undefined, undefined, undefined];
 
     constructor() {
@@ -35,6 +49,10 @@ export class TextureCube extends Texture {
 
     public getWrapT() {
         return this._wrapT;
+    }
+
+    public getWrapR() {
+        return this._wrapR;
     }
 
     public getType() {

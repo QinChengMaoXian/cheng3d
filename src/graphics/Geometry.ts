@@ -32,7 +32,6 @@ export class Geometry extends GraphicsObject {
         if (attribute === ShaderConst.position) {
             this._posAttrib = attrib;
             this._posBuffer = buffer;
-            this.buildBounding();
         }
     }
 
@@ -50,7 +49,6 @@ export class Geometry extends GraphicsObject {
             if (param.attribute === ShaderConst.position) {
                 this._posAttrib = attrib;
                 this._posBuffer = buffer;
-                this.buildBounding();
             }
         });
     }
@@ -61,7 +59,6 @@ export class Geometry extends GraphicsObject {
         buffer.setParameter(0, usage, type);
         buffer.setIsIndex(true);
         this._indexBuffer = buffer;
-        this.buildBounding();
     }
 
     public getIndexBuffer() {

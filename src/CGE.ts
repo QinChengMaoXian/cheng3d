@@ -66,3 +66,5 @@ export { Application } from './app/Application';
 export { Platform } from './platform/Platform';
 
 export { Sprite } from './ui/Sprite';
+
+export { SphereGeometry } from './util/GeometryUtil';

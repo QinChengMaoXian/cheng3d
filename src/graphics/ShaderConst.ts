@@ -33,11 +33,17 @@ export class ShaderConst {
     public static readonly aoMap = ShaderConst._inTex('u_aoMap');
     public static readonly emissiveMap = ShaderConst._inTex('u_emissiveMap');
     public static readonly cartoonLUTMap = ShaderConst._inTex('u_cartoonLUTMap');
-
+    public static readonly brdfLUTMap = ShaderConst._inTex('u_brdfLUTMap');
     /**
      * Ordered Dithering Map used for alpha test
      */
     public static readonly ODMap = ShaderConst._inTex('u_ODMap');
+
+    /** cube map */
+    public static readonly irradianceMap = ShaderConst._inTex('u_irradianceMap');
+
+    public static readonly prefilterMap = ShaderConst._inTex('u_prefilterMap');
+    
 
     // supported uniform name;
     /**
@@ -58,6 +64,7 @@ export class ShaderConst {
     public static readonly merged1 = ShaderConst._inUni('u_merged1');
     public static readonly merged2 = ShaderConst._inUni('u_merged2');
     public static readonly merged3 = ShaderConst._inUni('u_merged3');
+    public static readonly specular = ShaderConst._inUni('u_specular');
 
     /** world(model) matrix */
     public static readonly mMat = ShaderConst._inUni('u_mMat');

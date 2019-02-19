@@ -15,6 +15,8 @@ let brdf_normal = './resources/brdfTest/rustediron2_normal.jpg';
 // let brdf_roughness = './resources/brdfTest/rustediron2_roughness.png';
 let brdf_specular = './resources/brdfTest/rustediron2_specular.jpg'
 
+let env_lut = './resources/envLUT.png'
+
 // window['CGE'] = CGE;
 
 import { Main } from './projects/kamihikouki/main';
@@ -22,7 +24,7 @@ import { Main } from './projects/kamihikouki/main';
 let main = new Main();
 main.init();
 let app = main.getCGEApp();
-
+let mainScene = app.getScene();
 let stage = app.getStage();
 
 let camera = app.getCamera();
@@ -53,7 +55,10 @@ spr.setPosition(50, 100, 0);
 
 let timer = app.getTimer();
 
-let _d = 0.5;
+
+///////////////////////////////////////////////////////////////////////////
+// 鼠标与键盘控制主相机，TODO以下的代码需要封装在相机控制类中。
+let _d = 2;
 
 let cameraRotate = (e: CGE.Event) => {
     let del = 0.005;
@@ -92,7 +97,6 @@ stage.on(CGE.Event.KEY_UP, this, (e: CGE.Event) => {
             timer.remove(camera, camera.forwardStep);
             break;
 
-
         case 'a':
         case 'd':
             timer.remove(camera, camera.horizontalStep);
@@ -111,7 +115,8 @@ stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
     stage.off(CGE.Event.MOUSE_MOVE, this, cameraRotate);
 });
 
-
+// 相机控制代码块结束
+///////////////////////////////////////////////////////////////////////////
 
 
 let game_app = main.getApp();
@@ -141,9 +146,92 @@ let objLoader = new CGE.OBJLoader();
 
 // let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
-let standMat = new CGE.StandardMaterial(brdf_basecolor, brdf_normal, brdf_specular, brdf_specular, brdf_specular);
+// let standMat = new CGE.StandardMaterial(brdf_basecolor, brdf_normal, brdf_specular, brdf_specular, brdf_specular);
 
+
+let geo = new CGE.SphereGeometry(1, 32, 32);
 // let gltfMaterial = new CGE.DiffuseMaterial(test_diff);
+
+let createTexture2DFromImage = function(imgSrc, mipmap?) {
+    let texture2d = new CGE.Texture2D();
+    texture2d.setImageUrl(imgSrc);
+    if (mipmap === true) {
+        texture2d.setMipmap(true);
+        texture2d.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+    }
+    return texture2d;
+};
+
+let cubeTexture = new CGE.TextureCube();
+cubeTexture.setTexture2ds(
+    createTexture2DFromImage('./resources/skybox/px.jpg'),
+    createTexture2DFromImage('./resources/skybox/nx.jpg'),
+    createTexture2DFromImage('./resources/skybox/py.jpg'),
+    createTexture2DFromImage('./resources/skybox/ny.jpg'),
+    createTexture2DFromImage('./resources/skybox/pz.jpg'),
+    createTexture2DFromImage('./resources/skybox/nz.jpg')
+);
+
+cubeTexture.setMipmap(true);
+cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+
+let lutTexture = new CGE.Texture2D();
+lutTexture.setImageUrl(env_lut);
+
+let diffTex = new CGE.Texture2D();
+diffTex.setImageUrl(brdf_basecolor);
+diffTex.setMipmap(true);
+diffTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+
+let normTex = new CGE.Texture2D();
+normTex.setImageUrl(brdf_normal);
+normTex.setMipmap(true);
+normTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+
+let specTex = new CGE.Texture2D();
+specTex.setImageUrl(brdf_specular);
+specTex.setMipmap(true);
+specTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+
+let obj3D = new CGE.Object3D();
+obj3D.name = '一堆球';
+
+let standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+
+standMat.setIrradianceMap(cubeTexture);
+standMat.setPrefilterMap(cubeTexture);
+
+standMat.setBrdfLUTMap(lutTexture);
+
+window['standMat'] = standMat;
+
+mainScene.addChild(obj3D);
+
+for (let ix = 0; ix < 10; ix++) {
+
+    for (let iz = 0; iz < 5; iz++) {
+        let mesh = new CGE.Mesh();
+        mesh.setGeometry(geo);
+        let mat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+
+        mat.setBrdfLUTMap(lutTexture);
+
+        mat.setIrradianceMap(cubeTexture);
+        mat.setPrefilterMap(cubeTexture);
+        
+        // mat.setBaseColor(1.000, 0.782, 0.344, 1.0);
+        // mat.setSpecular((ix + 1) * 0.1, (iz + 1) * 0.2, 1);
+        mesh.setMaterial(mat);
+
+        mesh.setPosition(ix * 20, 0, -iz * 20);
+        mesh.setScale(8, 8, 8);
+
+        obj3D.addChild(mesh);
+    }
+
+} 
+
+let webgl2: WebGLRenderingContext
 
 let quat = new CGE.Quaternion();
 quat.setAxisAngle(new CGE.Vector3(0, 0, 1), 0.02);
@@ -152,24 +240,24 @@ let gltfJson = undefined;
 let gltfCallback = (event, object) => {
     switch (event) {
         case 'entity':
-            gltfJson = object[0];
-            CGE.Logger.info(gltfJson);
+            // gltfJson = object[0];
+            // CGE.Logger.info(gltfJson);
             
-            let mesh = new CGE.Mesh();
-            mesh.setScale(20, 20, 20);
-            mesh.setGeometry(gltfJson);
-            mesh.setMaterial(standMat);
-            mesh.setPosition(0,0,-20);
-            let obj = new CGE.Object3D();
-            obj.addChild(mesh);
-            obj.name = 'gltftest';
-            mainScene.addChild(obj);  
-            app.getTimer().frameLoop(1, this, () => {
-                obj.setPositionAt(game_app.manager.play.airPlane.getPos());
-                let rot = obj.getRotate();
-                rot.multiply(quat);
-                obj.enableUpdateMat();
-            })
+            // let mesh = new CGE.Mesh();
+            // mesh.setScale(20, 20, 20);
+            // mesh.setGeometry(geo);
+            // mesh.setMaterial(standMat);
+            // mesh.setPosition(0,0,-20);
+            // let obj = new CGE.Object3D();
+            // obj.addChild(mesh);
+            // obj.name = 'gltftest';
+            // mainScene.addChild(obj);  
+            // app.getTimer().frameLoop(1, this, () => {
+            //     obj.setPositionAt(game_app.manager.play.airPlane.getPos());
+            //     let rot = obj.getRotate();
+            //     rot.multiply(quat);
+            //     obj.enableUpdateMat();
+            // })
             break;
 
         case 'error':
@@ -267,9 +355,11 @@ window['app'] = app;
 
 let renderer = app.getRenderer();
 renderer.enableDepthTest();
-renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
+let gb = Math.pow(0.5, 2.2);
+renderer.setClearColor(1.0, gb, gb, 1.0);
+// renderer.setClearColor(0, 0, 0, 1.0);
 
-let mainScene = app.getScene();
+
 // camera.lookAt(new CGE.Vector3(0, 1, 10));
 mainScene.setActiveCamera(camera);
 
@@ -394,11 +484,11 @@ objLoader.load(cartoon_obj).then(mesh => {
 document.body.appendChild(renderer.getCanvas());
 
 let mesh = new CGE.Mesh();
-mesh.setPosition(1, 2, 1);
-mesh.setScale(5, 10, 10);
+mesh.setPosition(0, 0, 20);
+mesh.setScale(20, 20, 20);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(standMat);
-// mainScene.addChild(mesh);
+mainScene.addChild(mesh);
 
 window['camera'] = camera;
 

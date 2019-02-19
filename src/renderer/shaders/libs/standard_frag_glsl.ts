@@ -1,4 +1,6 @@
 export default `
+#extension GL_EXT_shader_texture_lod : enable
+
 precision mediump float;
 
 varying vec2 v_uv;
@@ -15,14 +17,16 @@ uniform sampler2D u_roughnessMap;
 uniform sampler2D u_metallicMap;
 uniform sampler2D u_aoMap;
 
+uniform sampler2D u_brdfLUTMap;
+
+uniform samplerCube u_irradianceMap;
+uniform samplerCube u_prefilterMap;
+
+uniform vec3 u_specular;
 uniform vec3 u_cameraPos;
 uniform vec4 u_baseColor;
 uniform vec3 u_lightDir;
 uniform vec4 u_lightColor;
-
-// const vec4 lightDir = vec4(normalize(vec3(0, 0, -1)), 1.0);
-
-// const vec4 u_lightColor = vec4(1.0);
 
 const float PI = 3.14159265359;
 
@@ -53,6 +57,7 @@ float GeometrySchlickGGX(float NdotV, float k)
     return nom / denom;
 }
 
+// 几何方程
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) 
 {
     float NdotV = max(dot(N, V), 0.00001);
@@ -68,9 +73,15 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 }
 
 //菲涅尔方程
-vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
+vec3 FresnelSchlick(float NdotL, vec3 F0)
 {
     return F0 + (vec3(1.0) - F0) * pow((1.0 - NdotL), 5.0);
+}  
+
+//菲涅尔方程
+vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - NdotL), 5.0);
 }  
 
 // 用于pbr环境光
@@ -83,21 +94,23 @@ float FastDFG(float roughness, float NoV, float NoL)
     return 1.0 / ( G_V * G_L );
 }
 
+// vec3 brdf = FastDFG(roughness, NdotV, NdotL) * metalic;
+
 void main()
 {
-    vec4 spec = texture2D(u_roughnessMap, v_uv);
+    vec4 spec = pow(texture2D(u_roughnessMap, v_uv), vec4(1.0));
     
-    float roughness = texture2D(u_roughnessMap, v_uv).r;
-    float metallic = texture2D(u_metallicMap, v_uv).g;
-    float ao = texture2D(u_aoMap, v_uv).b;
+    float roughness = spec.r * u_specular.r;
+    float metallic = spec.g * u_specular.g;
+    float ao = spec.b * u_specular.b;
 
-    vec4 baseColor = texture2D(u_diffuseMap, v_uv) *  u_baseColor;
+    vec4 baseColor = pow(texture2D(u_diffuseMap, v_uv), vec4(2.2)) * u_baseColor;
 
     vec3 albedo = baseColor.xyz;
 
     vec3 F0 = vec3(0.04);
     
-    F0      = F0 * (1.0 - metallic) + baseColor.xyz * metallic;
+    F0      = F0 * (1.0 - metallic) + albedo * metallic;
 
     vec3 normalTex = texture2D(u_normalMap, v_uv).xyz;
     vec3 normal = normalTex * 2.0 - 1.0;    
@@ -112,6 +125,9 @@ void main()
     vec3 N = normalize(normalMatrix * normal); // normalize(v_normal);//
     vec3 H = normalize(V + L);
 
+    vec3 R = N * dot_plus(N, V) * 2.0 - V; 
+    R = vec3(R.x, R.z, -R.y);
+
     float G = GeometrySmith(N, V, L, roughness);
     float D = DistributionGGX(N, H, roughness);
     vec3 F = FresnelSchlickRoughness(dot_plus(H, L), F0, roughness);
@@ -122,25 +138,34 @@ void main()
     vec3 brdf = nominator / denominator;
 
     float NdotL = dot_plus(N, L); 
-    float NdotV = dot(N, V); 
-
-    // vec3 brdf = FastDFG(roughness, NdotV, NdotL) * metalic;
+    float NdotV = dot_plus(N, V); 
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    vec3 lo = (kD * albedo / PI + brdf) * NdotL;
+    vec3 texEnv = vec3(N.x, N.z, -N.y);
+    vec3 irradiance = textureCubeLodEXT(u_irradianceMap, texEnv, 8.0).xyz;
+    vec3 diffuse = irradiance * albedo;
 
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
+    vec3 kD_a = vec3(1.0) - F_s;
+    kD_a *= 1.0 - metallic;
+
+    vec2 envBRDF  = texture2D(u_brdfLUTMap, vec2(NdotV, roughness)).rg;
+
+    vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb;  
+
+    vec3 specular = prefilteredColor * (F_s * envBRDF.x + envBRDF.y);
+
+    vec3 ambient = (kD_a * diffuse + specular) * ao;
+
+    vec3 lo = (kD * (albedo) / PI + brdf) * NdotL;
 
     vec3 color = ambient + lo;
 
-    // color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2)); 
-
-    gl_FragColor = vec4(color, 1.0);
-    // gl_FragColor = vec4(vec3(nominator), 1.0);
+    // gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(vec3(color), 1.0);
     // gl_FragColor = vec4(v_normal, 1.0);
 }
 `;
