@@ -7,7 +7,7 @@ import { Mesh } from '../object/Mesh';
 import { Object3D } from '../object/Object3D';
 import { Camera } from '../object/Camera';
 import { Frame } from '../graphics/Frame';
-import { Renderer, IRenderer } from './Renderer';
+import { IRenderer } from './Renderer';
 
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
@@ -27,14 +27,16 @@ import { ShaderCaches } from './shaders/ShaderCaches';
 import { Material } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
-import { FXAAMaterial } from './postEffect/FXAA';
+import { FXAA } from './postEffect/FXAA';
 import { Event } from '../core/Event';
-
+import { Base } from '../core/Base';
+import { Matrix4 } from '../math/Matrix4';
+import { PEType, PEBase, PEOrder } from './postEffect/PEBase';
 
 /**
  * webgl 1.0 渲染器；
  */
-export class WebGLRenderer extends Renderer implements IRenderer {
+export class WebGLRenderer extends Base implements IRenderer {
     private static RendererNum = 0;
 
     private _canvas: HTMLCanvasElement;
@@ -49,10 +51,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     private _renderCount: number = 0;
 
-    private _mesh: Mesh;
+    private _defMesh: Mesh;
+    private _defMat: FullScreenMaterial;
+    private _defGeo: Geometry;
 
     private _curFrame: Frame;
-    private _defFrame: Frame;
+    // private _defFrame: Frame;
 
     private _renderToFloatTexture: boolean = false;
     private _renderToHalfFloatTexture: boolean = false;
@@ -60,6 +64,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     private _rendererId = WebGLRenderer.RendererNum++;
 
     private _shaderCache = new ShaderCaches(this);
+
+    private _cacheFrames: Frame[];
+    private _frameIndex: number;
+
+    private _postEffects: PEBase[];
 
     constructor() {
         super();
@@ -74,13 +83,17 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         this._initExtensions();
 
-        this._initFrame();
+        this._initDefFrame();
 
+        this.setSize(width, height);
+
+        this._postEffects = [];
+
+        // TODO: remove this;
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
         // _gl.enable(_gl.BLEND);
         _gl.cullFace(_gl.BACK);
-        this.setSize(width, height);
     }
 
     public enableDepthTest() {
@@ -96,7 +109,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     }
 
     public setClearColor(r, g, b, a) {
-        this._defFrame.getState().clearColor.set(r, g, b, 0.0);
+        // this._defFrame.getState().clearColor.set(r, g, b, 0.0);
         this._defFrameState.setClearColor(true, new Vector4(r, g, b, a));
     }
 
@@ -198,6 +211,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         if (mat) {
             this._shaderCache.releaseMaterial(mat);
         }
+
+        mesh.setGeometry(null);
+        mesh.setMaterial(null);
     }
 
     public useFrameState(frameState: FrameState) {
@@ -244,7 +260,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     }
 
-    public useFrame(frame?: Frame) {
+    public useFrame(frame?: Frame, frameState?: FrameState) {
         const gl = this._gl;
 
         if (!frame) {
@@ -265,11 +281,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         glframe.apply(gl);
-        this.useFrameState(frame.getState());
+        this.useFrameState(frameState? frameState: frame.getState());
         this._curFrame = frame;
     }
 
-    protected _renderMesh = (mesh: Mesh, camera) => {
+    protected _renderMesh = (mesh: Mesh, camera?: Camera) => {
         let gl = this._gl;
 
         if (!this.retainMesh(mesh)) {
@@ -288,19 +304,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         glgeo.draw(gl);
     }
 
-    protected _renderScene(scene: Object3D) {
-
-    }
-
-    public renderScene(scene: Object3D, camera: Camera, frame?: Frame) {
-        let _camera;
-        let _cameraMatrices;
+    public renderScene(scene: Object3D, camera?: Camera, frame?: Frame) {
         let _renderList = [];
-        const gl = this._gl;
 
-        glProgram.vMatrix.copy(camera.getMatrix());
-        glProgram.pMatrix.copy(camera.getProjectionMatrix());
-        glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
+        glProgram.vMatrix.copy(camera ? camera.getMatrix() : Matrix4.unitMat4);
+        glProgram.pMatrix.copy(camera ? camera.getProjectionMatrix() : Matrix4.unitMat4);
+        glProgram.vpMatrix.copy(camera ? camera.getViewProjectionMatrix(): Matrix4.unitMat4);
 
         if (scene instanceof Scene) {
             let light = (<Scene>scene).getMainLight();
@@ -312,7 +321,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             let l = _renderList.length;
             for (let i = 0; i < l; i++) {
                 let mesh = _renderList[i];
-                this._renderMesh(mesh, _camera);
+                this._renderMesh(mesh, camera);
             }
         }
 
@@ -334,27 +343,37 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             }
         }
 
-        const _renderScene = (scene: Object3D, camera: Camera, frame?: Frame) => {
-            _camera = camera;
+        const _renderScene = (scene: Object3D) => {
             _renderList = [];
             _preRenderObjects(scene, scene.visible);
             _render();
         }
 
-        this.useFrame(this._defFrame);
-        _renderScene(scene, camera, frame);
-        this.useFrame(null);
-        _renderScene(this._mesh, camera);
+        if (!frame) {
+            this.useFrame(this.currectTargetFrame, this._defFrameState);
+            _renderScene(scene);
+            
+            this._exchangeFrame();
+            this.renderPostEffects();
+
+            this.useFrame(null);
+            this._defMat.setDiffuseMap(<Texture2D>this.currentColorFrame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+            this._renderMesh(this._defMesh);
+
+        } else {
+            this.useFrame(frame);
+            _renderScene(scene);
+        }
     }
 
-    /**
-     * User do NOT call this function;
-     */
-    public _renderPostEffect(scene: Object3D, camera?: Camera) {
-
+    protected renderPostEffects() {
+        this._postEffects.forEach(pe => {
+            pe.render();
+            this._exchangeFrame();
+        })
     }
 
-    public setSize(width, height) {
+    public setSize(width: number, height: number) {
         const _canvas = this._canvas;
 
         _canvas.width = width;
@@ -363,10 +382,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this._screenWidth = width;
         this._screenHeight = height;
 
-        this._defFrame.setSize(width, height);
-        this.initFrame(this._defFrame);
-
         this._defFrameState.setViewport(new Vector4(0, 0, width, height));
+
+        this._cacheFrames.forEach(frame => {
+            frame.setSize(width, height);
+            this.initFrame(frame);
+        })
 
         this.event(Event.RENDERER_RESIZE, [width, height]);
     };
@@ -379,31 +400,32 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         return this._gl;
     }
 
-    private _initFrame() {
-        let frame = new Frame();
-        frame.setSize(this._canvas.width, this._canvas.height);
-        // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
-        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
-        frame.enableDepthStencil();
-        // let rg = Math.pow(0.5, 2.2)
-        frame.getState().clearColor.set(0, 0, 0, 0.0);
-        this._defFrame = frame;
+    private _initDefFrame() {
+
+        let frames = [];
+        for (let i = 0; i < 2; i++) {
+            let frame = new Frame();
+            frame.setSize(this._canvas.width, this._canvas.height);
+            frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+            frame.enableDepthStencil();
+            frame.getState().clearColor.set(0, 0, 0, 0.0);
+            this.initFrame(frame);
+            frames.push(frame);
+        }
+
+        this._cacheFrames = frames;
+        this._frameIndex = 0;
 
         let mesh = new Mesh();
         let geo = new ScreenGeometry();
         geo.makeTri();
+        this._defGeo = geo;
 
-        let mat = new FXAAMaterial(<Texture2D>(frame.getTextureFromType(RenderTargetLocation.COLOR).tex));
-
-        this.on(Event.RENDERER_RESIZE, this, (w, h) => {
-            mat.setPixelSize(1.0 / w, 1.0 / h);
-        });
-
-        // let mat = new FullScreenMaterial(frame.getTextureFromType(RenderTargetLocation.COLOR));
-        // let mat = new FullScreenMaterial(frame.getDepthStencilTexture());
+        let mat = new FullScreenMaterial();
+        this._defMat = mat;
         mesh.setGeometry(geo);
         mesh.setMaterial(mat);
-        this._mesh = mesh;
+        this._defMesh = mesh;
     }
 
     private _initExtensions() {
@@ -462,5 +484,98 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     public getHeight(): number {
         return this._screenHeight;
+    }
+    
+    protected _exchangeFrame() {
+        this._frameIndex = (this._frameIndex + 1) % this._cacheFrames.length;
+    }
+
+    public get currectTargetFrame(): Frame {
+        return this._cacheFrames[this._frameIndex];
+    }
+
+    public get currentColorFrame(): Frame {
+        return this._cacheFrames[(this._frameIndex + 1) % this._cacheFrames.length];
+    }
+
+    protected _enablePostEffect(pe: PEBase) {
+        let pes = this._postEffects;
+        let l = pes.length;
+        for (let i = 0; i < l; i++) {
+            if (pes[i].order === pe.order) {
+                pes[i] = pe;
+                return;
+            }
+        }
+        pes.push(pe);
+        pes.sort((a, b) => { return b.order - a.order });
+    }
+
+    protected _disablePostEffect(pe: PEBase) {
+        let idx = this._postEffects.indexOf(pe);
+        if (idx > -1) {
+            this._postEffects.splice(idx, 1);
+            pe.destroy();
+        }
+    }
+
+    protected _createPEFromType(type: PEType) {
+        let pe: PEBase;
+        switch (type) {
+            case PEType.FXAA:
+                let fxaa = new FXAA(this);
+                fxaa.init(this._defGeo);
+                pe = fxaa;
+                break;
+        
+            default:
+                break;
+        }
+        return pe;
+    }
+
+    public disablePosEffect(pe: PEType | PEBase) {
+        if (pe instanceof PEBase) {
+            this._disablePostEffect(pe);
+        } else {
+            let pes = this._postEffects;
+            let l = pes.length;
+            for (let i = 0; i < l; i++) {
+                if (pes[i].type === pe) {
+                    this._disablePostEffect(pes[i]);
+                    return;
+                }
+            }
+        }
+    }
+
+    public disablePostEffectByOrder(order: PEOrder) {
+        let pes = this._postEffects;
+        let l = pes.length;
+        for (let i = 0; i < l; i++) {
+            if (pes[i].order === order) {
+                this._disablePostEffect(pes[i]);
+                return;
+            }
+        }
+    }
+
+    public enablePostEffect(pe: PEType | PEBase) {
+        if (pe instanceof PEBase) {
+            this._enablePostEffect(pe);
+        } else {
+            let peObj = this._createPEFromType(pe);
+            if (peObj) {
+                this.enablePostEffect(peObj);
+            }
+        }
+    }
+
+    public getEnablingPostEffect(): PEType[] {
+        let a = [];
+        this._postEffects.forEach(p => {
+            a.push(p.type);
+        })
+        return a;
     }
 }

@@ -2,8 +2,11 @@ import { Object3D } from '../object/Object3D';
 import { Camera } from '../object/Camera';
 import { Frame } from '../graphics/Frame'
 
-import { Base } from '../core/Base';
 import { Mesh } from '../object/Mesh';
+import { Base } from '../core/Base';
+import { Texture2D } from '../graphics/Texture2D';
+
+import { PEType, PEBase } from './postEffect/PEBase'
 
 export class Renderer extends Base {
 
@@ -12,21 +15,19 @@ export class Renderer extends Base {
 export interface IRenderer {
 
     renderScene(scene: Object3D, camera: Camera, frame?: Frame);
-
     init(width: number, height: number);
-
     setSize(width: number, height: number);
-
     retainMesh(mesh: Mesh);
-
     releaseMesh(mesh: Mesh);
-
-    _renderPostEffect(scene: Object3D, camera?: Camera);
-
     getRendererId(): number;
-
     getWidth(): number;
-
     getHeight(): number;
 
+    disablePosEffect(type: PEType | PEBase);
+    
+    enablePostEffect(type: PEType | PEBase);
+    getEnablingPostEffect(): PEType[];
+
+    currentColorFrame: Frame;
+    currectTargetFrame: Frame;
 }

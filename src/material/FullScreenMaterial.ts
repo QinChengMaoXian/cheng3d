@@ -8,12 +8,17 @@ export class FullScreenMaterial extends Material {
     protected _diffuseMap;
     protected _baseColor: Vector4 = new Vector4();
 
-    constructor(diffuse: Texture2D) {
+    constructor(diffuse?: Texture2D) {
         super();
 
-        this.setTexture(ShaderConst.diffuseMap, diffuse);
         this.setProperty(ShaderConst.baseColor, this._baseColor);
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
+
+        if (diffuse) {
+            this.setTexture(ShaderConst.diffuseMap, diffuse);
+        } else {
+            this.setTexture(ShaderConst.diffuseMap, Texture2D.White);
+        }
     }
 
     public setDiffuseMap(texture: Texture2D) {

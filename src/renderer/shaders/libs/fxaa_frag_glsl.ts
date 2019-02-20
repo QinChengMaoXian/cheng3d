@@ -57,6 +57,7 @@ void main(){
         o_fragColor.xyz = rgbB;
     }
  
-    gl_FragColor = vec4(pow(o_fragColor.xyz, vec3(1.0/2.2)), 1.0);
+    gl_FragColor = vec4(o_fragColor.xyz, 1.0);
+    // gl_FragColor = vec4(pow(o_fragColor.xyz, vec3(1.0/2.2)), 1.0);
 }
 `

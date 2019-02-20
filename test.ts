@@ -220,9 +220,9 @@ window['standMat'] = standMat;
 
 mainScene.addChild(obj3D);
 
-for (let ix = 0; ix <= 10; ix++) {
+for (let ix = 0; ix <= 2; ix++) {
 
-    for (let iz = 0; iz <= 5; iz++) {
+    for (let iz = 0; iz <= 2; iz++) {
         let mesh = new CGE.Mesh();
         mesh.setGeometry(geo);
         // let mat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
@@ -368,7 +368,6 @@ teapotMesh.setGeometry(teapotGeometry);
 
 teapotMesh.setMaterial(standMat);
 
-
 // const app = new CGE.Application();
 
 window['app'] = app;
@@ -411,7 +410,6 @@ for (let k = 0; k < tri_num; k++) {
         }
     }
 }
-// console.log(vertexd);
 
 let tri1 = new CGE.Triangle();
 let tri2 = new CGE.Triangle();
@@ -487,7 +485,7 @@ let triMaterial = new CGE.DiffuseMaterial('./resources/color.jpg');
 let triMesh = new CGE.Mesh();
 triMesh.setGeometry(triGeo);
 triMesh.setMaterial(triMaterial);
-triMesh.setPosition(0, 0, -200000);
+triMesh.setPosition(0, 0, -2500);
 
 // 三角形碰撞检测测试
 mainScene.addChild(triMesh);

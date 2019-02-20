@@ -178,12 +178,13 @@ export class glProgram extends glObject {
         }
     }
 
-    public applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, camera: Camera) {
+    public applyUniforms(gl: WebGLRenderingContext, mesh: Mesh, camera?: Camera) {
         let glprog = this;
         let material = mesh.getMaterial();
         let properties = material.getProperties();
         let uniforms = glprog.getUniforms();
-        
+        let cameraPos = camera ? camera.getPosition() : Vector3.Zero;
+
         if (uniforms.size === 0) {
             return;
         }
@@ -228,7 +229,7 @@ export class glProgram extends glObject {
                 case ShaderConst.vpMat:             data = getVPMatrix(); break;
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
                 case ShaderConst.mvMat:             data = getMVMatrix(); break;
-                case ShaderConst.cameraPos:         data = camera.getPosition(); break;
+                case ShaderConst.cameraPos:         data = cameraPos; break;
                 case ShaderConst.lightColor:        data = glProgram.lightColor; break;
                 case ShaderConst.lightDir:          data = glProgram.lightDir; break;
                 case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;

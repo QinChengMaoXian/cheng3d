@@ -1,105 +1,58 @@
-import { PEBase } from "./PEBase";
+import { PEBase, PEOrder, PEType } from "./PEBase";
 import { Texture2D } from "../../graphics/Texture2D";
 import { Frame } from "../../graphics/Frame";
 import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
-import { Material } from "../../material/Material";
-import { ShaderConst } from "../../graphics/ShaderConst";
-import { Shader } from "../../graphics/Shader";
-import { Renderer } from "../Renderer";
-import { FLOAT } from "../../graphics/RendererParameter"
+import { IRenderer } from "../Renderer";
+import { RenderTargetLocation } from "../../graphics/GraphicsTypes";
+import { FXAAMaterial } from "../../material/FXAAMaterial";
 
 export class FXAA extends PEBase {
-    protected _srcColor: Texture2D;
-    protected _dstFrame: Frame;
     protected _mesh: Mesh;
-    protected _geometry: Geometry;
     protected _material: FXAAMaterial;
 
-    constructor(renderer: Renderer) {
+    constructor(renderer: IRenderer) {
         super(renderer);
     }
 
-    public init(texture: Texture2D, geometry?: Geometry) {
-        this._geometry = geometry ? geometry : this._initGeometry();
-        this._material = new FXAAMaterial(texture);
+    public init(geometry: Geometry) {
+        let material = new FXAAMaterial(null);
+        this._material = material;
         let mesh = new Mesh();
-        mesh.setGeometry(this._geometry);
-        mesh.setMaterial(this._material);
+        mesh.setGeometry(geometry);
+        mesh.setMaterial(material);
         this._mesh = mesh;
+        this._isInit = true;
+    }
+
+    public resize(w: number, h: number) {
+        this._material.setPixelSize(1.0 / w, 1.0 / h);
     }
 
     public render() {
-        
+        const renderer = this._renderer;
+
+        let colorFrame: Frame = renderer.currentColorFrame;
+        let targetFrame: Frame = renderer.currectTargetFrame;
+
+        let tex2D = <Texture2D>(colorFrame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        this._material.setSrcTexture(tex2D);
+
+        this._renderer.renderScene(this._mesh, null, targetFrame);
     }
 
-    private _initGeometry() {
-        let vertexPositionData = new Float32Array([
-            -1.0, 1.0, 0.0,  0.0, 1.0,
-            1.0,  1.0, 0.0,  1.0, 1.0,
-            1.0, -1.0, 0.0,  1.0, 0.0,
-            -1.0, -1.0, 0.0, 0.0, 0.0,
-        ]);
-        
-        let indexData = new Uint16Array([
-            0, 2, 1,
-            2, 0, 3, 
-        ]);
-        
-        let planeVertexGeometry = new Geometry();
-        
-        let attribs = [
-            {
-                name: 'Position',
-                attribute: ShaderConst.position, 
-                num: 3,
-                offset: 0,
-            },
-            {
-                name: 'UV',
-                attribute: ShaderConst.texcoord, 
-                num: 2,
-                offset: vertexPositionData.BYTES_PER_ELEMENT * 3,
-            },
-        ];
-        
-        planeVertexGeometry.addMultiAttribute(attribs, FLOAT, vertexPositionData.BYTES_PER_ELEMENT * 5, vertexPositionData);
-        planeVertexGeometry.setIndexData(indexData);
-        planeVertexGeometry.setDrawParameter(indexData.length);
-
-        return planeVertexGeometry;
-    }
-}
-
-export class FXAAMaterial extends Material {
-    protected _data: any;
-    constructor(texture: Texture2D) {
-        super();
-
-        this._data = { data: new Float32Array([1.0, 1.0]) };
-
-        this.setSrcTexture(texture);
-        this.setProperty(ShaderConst.pixelSize, this._data);
+    public destroy() {
+        this._renderer.releaseMesh(this._mesh);
+        this._renderer = null;
+        this._mesh = null;
+        this._material = null;
     }
 
-    public setSrcTexture(texture: Texture2D) {
-        if (!texture) {
-            return;
-        }
-        this.setTexture(ShaderConst.diffuseMap, texture);
-        let w = texture.getWidth();
-        let h = texture.getHeight();
-        if (!!w && !!h) {
-            this.setPixelSize(1.0 / w, 1.0 / h);
-        }
+    get type(): PEType {
+        return PEType.FXAA;
     }
 
-    public setPixelSize(x, y) {
-        this._data.data[0] = x;
-        this._data.data[1] = y;
-    }
-
-    get type() {
-        return 'fxaa'
+    get order() {
+        return PEOrder.AA;
     }
 }

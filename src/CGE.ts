@@ -59,7 +59,11 @@ export { Loader } from './io/Loader';
 
 export { triangleIntersect } from './util/TriangleIntersect';
 
+export { Renderer, IRenderer } from './renderer/Renderer';
 export { WebGLRenderer } from './renderer/WebGLRenderer';
+
+export { PEType, PEBase } from './renderer/postEffect/PEBase';
+export { FXAA } from './renderer/postEffect/FXAA';
 
 export { Application } from './app/Application';
 
