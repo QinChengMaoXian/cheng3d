@@ -143,7 +143,7 @@ void main()
     kD *= 1.0 - metallic;
 
     // 直接光照结果
-    vec3 lo = (kD * (albedo) / PI + brdf) * NdotL;
+    vec3 lo = (kD * (albedo) / PI + brdf) * u_lightColor.xyz * NdotL;
 
     // 环境光部分
     vec3 coordN = vec3(N.x, N.z, -N.y);

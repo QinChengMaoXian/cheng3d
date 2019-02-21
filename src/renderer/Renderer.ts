@@ -23,10 +23,14 @@ export interface IRenderer {
     getWidth(): number;
     getHeight(): number;
 
-    disablePosEffect(type: PEType | PEBase);
-    
+    disablePostEffect(type: PEType | PEBase);
+
     enablePostEffect(type: PEType | PEBase);
     getEnablingPostEffect(): PEType[];
+
+    exchangeFrame();
+
+    deltaTime: number;
 
     currentColorFrame: Frame;
     currectTargetFrame: Frame;

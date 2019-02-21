@@ -32,6 +32,11 @@ import cartoon_frag from './libs/cartoon_frag_glsl';
 import standard_vert from './libs/standard_vert_glsl';
 import standard_frag from './libs/standard_frag_glsl';
 import fxaa_frag from './libs/fxaa_frag_glsl';
+import down_sample4_frag from './libs/down_sampling4_frag_glsl';
+import gaussian_blur from './libs/gaussian_blur_frag_glsl';
+import down_sample_to1 from './libs/down_sampling_to1_frag_glsl';
+import bloom from './libs/bloom_frag_glsl';
+import tone_mapping from './libs/tone_mapping_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -62,5 +67,30 @@ export const shaders = {
     'fxaa': {
         vert: repStr(fullscreen_vert),
         frag: repStr(fxaa_frag),
-    }
+    },
+
+    'down_sample4': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(down_sample4_frag)
+    },
+
+    'gaussian_blur': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(gaussian_blur),
+    },
+
+    'down_sample_to1': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(down_sample_to1),
+    },
+
+    'bloom': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(bloom),
+    },
+
+    'tone_mapping': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(tone_mapping),
+    },
 }

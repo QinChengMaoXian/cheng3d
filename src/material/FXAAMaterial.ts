@@ -3,7 +3,7 @@ import { Texture2D } from "../graphics/Texture2D";
 import { ShaderConst } from "../graphics/ShaderConst";
 
 export class FXAAMaterial extends Material {
-    protected _data: any;
+    protected _data: { data: Float32Array };
     constructor(texture?: Texture2D) {
         super();
 

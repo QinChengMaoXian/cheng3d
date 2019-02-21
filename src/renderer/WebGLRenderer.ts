@@ -32,9 +32,11 @@ import { Event } from '../core/Event';
 import { Base } from '../core/Base';
 import { Matrix4 } from '../math/Matrix4';
 import { PEType, PEBase, PEOrder } from './postEffect/PEBase';
+import { HDR } from './postEffect/HDR';
 
 /**
  * webgl 1.0 渲染器；
+ * TODO: 思考 renderer 是否需要增加分类的释放，比如材质，纹理，几何等
  */
 export class WebGLRenderer extends Base implements IRenderer {
     private static RendererNum = 0;
@@ -70,6 +72,9 @@ export class WebGLRenderer extends Base implements IRenderer {
 
     private _postEffects: PEBase[];
 
+    private _timeNow: number;
+    private _deltaTime: number;
+
     constructor() {
         super();
     }
@@ -83,7 +88,7 @@ export class WebGLRenderer extends Base implements IRenderer {
 
         this._initExtensions();
 
-        this._initDefFrame();
+        this._initDefFrame(width, height);
 
         this.setSize(width, height);
 
@@ -94,6 +99,8 @@ export class WebGLRenderer extends Base implements IRenderer {
         _gl.depthFunc(_gl.LEQUAL);
         // _gl.enable(_gl.BLEND);
         _gl.cullFace(_gl.BACK);
+
+        this._timeNow = Date.now();
     }
 
     public enableDepthTest() {
@@ -305,6 +312,12 @@ export class WebGLRenderer extends Base implements IRenderer {
     }
 
     public renderScene(scene: Object3D, camera?: Camera, frame?: Frame) {
+        if (!frame) {
+            let now = Date.now();
+            this._deltaTime = now - this._timeNow;
+            this._timeNow = now;
+        }
+
         let _renderList = [];
 
         glProgram.vMatrix.copy(camera ? camera.getMatrix() : Matrix4.unitMat4);
@@ -400,12 +413,12 @@ export class WebGLRenderer extends Base implements IRenderer {
         return this._gl;
     }
 
-    private _initDefFrame() {
+    private _initDefFrame(width: number, height: number) {
 
         let frames = [];
         for (let i = 0; i < 2; i++) {
             let frame = new Frame();
-            frame.setSize(this._canvas.width, this._canvas.height);
+            frame.setSize(width, height);
             frame.addTexture(RenderTargetLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
             frame.enableDepthStencil();
             frame.getState().clearColor.set(0, 0, 0, 0.0);
@@ -490,12 +503,20 @@ export class WebGLRenderer extends Base implements IRenderer {
         this._frameIndex = (this._frameIndex + 1) % this._cacheFrames.length;
     }
 
+    public exchangeFrame() {
+        this._exchangeFrame();
+    }
+
     public get currectTargetFrame(): Frame {
         return this._cacheFrames[this._frameIndex];
     }
 
     public get currentColorFrame(): Frame {
         return this._cacheFrames[(this._frameIndex + 1) % this._cacheFrames.length];
+    }
+
+    public get deltaTime(): number {
+        return this._deltaTime;
     }
 
     protected _enablePostEffect(pe: PEBase) {
@@ -527,14 +548,18 @@ export class WebGLRenderer extends Base implements IRenderer {
                 fxaa.init(this._defGeo);
                 pe = fxaa;
                 break;
-        
+
+            case PEType.HDR:
+                let hdr = new HDR(this);
+                hdr.init(this._defGeo);
+                pe = hdr;
             default:
                 break;
         }
         return pe;
     }
 
-    public disablePosEffect(pe: PEType | PEBase) {
+    public disablePostEffect(pe: PEType | PEBase) {
         if (pe instanceof PEBase) {
             this._disablePostEffect(pe);
         } else {

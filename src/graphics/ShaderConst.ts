@@ -34,6 +34,8 @@ export class ShaderConst {
     public static readonly emissiveMap = ShaderConst._inTex('u_emissiveMap');
     public static readonly cartoonLUTMap = ShaderConst._inTex('u_cartoonLUTMap');
     public static readonly brdfLUTMap = ShaderConst._inTex('u_brdfLUTMap');
+    public static readonly lumMap = ShaderConst._inTex('u_lumMap');
+    public static readonly bloomMap = ShaderConst._inTex('u_bloomMap');
     /**
      * Ordered Dithering Map used for alpha test
      */
@@ -53,6 +55,7 @@ export class ShaderConst {
     public static readonly uvOffset = ShaderConst._inUni('u_uvOffset');
     public static readonly baseColor = ShaderConst._inUni('u_baseColor');
     public static readonly pixelSize = ShaderConst._inUni('u_pixelSize');
+    public static readonly pixelDir = ShaderConst._inUni('u_pixelDir');
     public static readonly cameraPos = ShaderConst._inUni('u_cameraPos');
     public static readonly lightColor = ShaderConst._inUni('u_lightColor');
     public static readonly lightPos = ShaderConst._inUni('u_lightPos');
@@ -65,6 +68,7 @@ export class ShaderConst {
     public static readonly merged2 = ShaderConst._inUni('u_merged2');
     public static readonly merged3 = ShaderConst._inUni('u_merged3');
     public static readonly specular = ShaderConst._inUni('u_specular');
+    public static readonly lumPCT = ShaderConst._inUni('u_lumPCT');
 
     /** world(model) matrix */
     public static readonly mMat = ShaderConst._inUni('u_mMat');

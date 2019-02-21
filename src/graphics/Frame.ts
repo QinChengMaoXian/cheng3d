@@ -52,6 +52,7 @@ export class Frame extends GraphicsObject {
     }
 
     public setTexture2D(targetType: RenderTargetLocation, tex2d: Texture2D) {
+
         this._textures.set(targetType, {tex: tex2d, target: TexTarget.TEXTURE_2D});
     }
 
