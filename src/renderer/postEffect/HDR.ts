@@ -37,7 +37,7 @@ export class HDR extends PEBase {
     protected _downTo32Frame: Frame;
     protected _downTo32Frame2: Frame;
     protected _downTo8Frame: Frame;
-    protected _downTo2Frame: Frame;
+    // protected _downTo2Frame: Frame;
 
     protected _downTo1Frame: Frame[];
     protected _downTo1Idx: number = 0;
@@ -99,14 +99,14 @@ export class HDR extends PEBase {
         this._downTo8Frame = new Frame();
         frame = this._downTo8Frame;
         frame.setSize(8, 8);
-        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.LINEAR, CGE.LINEAR);
         frame.getState().clearColor.set(0, 0, 0, 0);
 
-        this._downTo2Frame = new Frame();
-        frame = this._downTo2Frame;
-        frame.setSize(2, 2);
-        frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
-        frame.getState().clearColor.set(0, 0, 0, 0);
+        // this._downTo2Frame = new Frame();
+        // frame = this._downTo2Frame;
+        // frame.setSize(2, 2);
+        // frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        // frame.getState().clearColor.set(0, 0, 0, 0);
 
         this._downTo1Frame = []
         frame = new Frame();
@@ -208,7 +208,7 @@ export class HDR extends PEBase {
         const downTo32Frame = this._downTo32Frame;
         const downTo32Frame2 = this._downTo32Frame2;
         const downTo8Frame = this._downTo8Frame;
-        const downTo2Frame = this._downTo2Frame;
+        // const downTo2Frame = this._downTo2Frame;
 
         const downTo1Src = this.src1Frame;
         const downTo1Dst = this.dst1Frame;
@@ -236,7 +236,7 @@ export class HDR extends PEBase {
         down4Mat.setPixelSize(1.0 / down16Frame.getWidth(), 1.0 / down16Frame.getHeight());
         renderer.renderScene(sampleMesh, null, downTo32Frame);
 
-        // 32x32的log采样
+        // 32x32转为亮度图
         tex2D = <Texture2D>(downTo32Frame.getTextureFromType(RenderTargetLocation.COLOR).tex);
         logMat.setSrcTexture(tex2D);
         renderer.renderScene(logMesh, null, downTo32Frame2);
@@ -247,14 +247,14 @@ export class HDR extends PEBase {
         down4Mat.setPixelSize(1.0 / 32.0, 1.0 / 32.0);
         renderer.renderScene(sampleMesh, null, downTo8Frame);
 
-        // 降到2x2
-        tex2D = <Texture2D>(downTo8Frame.getTextureFromType(RenderTargetLocation.COLOR).tex);
-        down4Mat.setSrcTexture(tex2D);
-        down4Mat.setPixelSize(1.0 / 8.0, 1.0 / 8.0);
-        renderer.renderScene(sampleMesh, null, downTo2Frame);
+        // // 降到2x2
+        // tex2D = <Texture2D>(downTo8Frame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        // down4Mat.setSrcTexture(tex2D);
+        // down4Mat.setPixelSize(1.0 / 8.0, 1.0 / 8.0);
+        // renderer.renderScene(sampleMesh, null, downTo2Frame);
 
         // 降至 到1x1 对Linear的贴图，采4个像素的中心, 参数中包括前一个1px;
-        tex2D = <Texture2D>(downTo2Frame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        tex2D = <Texture2D>(downTo8Frame.getTextureFromType(RenderTargetLocation.COLOR).tex);
         downTo1Mat.setSrcTexture(tex2D);
         tex2D = <Texture2D>(downTo1Src.getTextureFromType(RenderTargetLocation.COLOR).tex);
         downTo1Mat.setLumTexture(tex2D)
@@ -269,10 +269,12 @@ export class HDR extends PEBase {
         bloomMat.setLumTexture(tex2D);
         renderer.renderScene(bloomMesh, null, down4Frame2);
 
+        
+        // 高斯模糊像素尺寸
+        blurMat.setPixelSize(w_4, h_4);
         // 横向高斯模糊
         tex2D = <Texture2D>(down4Frame2.getTextureFromType(RenderTargetLocation.COLOR).tex);
         blurMat.setSrcTexture(tex2D);
-        blurMat.setPixelSize(w_4, h_4);
         blurMat.setPiexlDir(1.0, 0.0);
         renderer.renderScene(blurMesh, null, down4Frame);
 
@@ -281,6 +283,18 @@ export class HDR extends PEBase {
         blurMat.setSrcTexture(tex2D);
         blurMat.setPiexlDir(0.0, 1.0);
         renderer.renderScene(blurMesh, null, down4Frame2);
+
+        // // 横向高斯模糊
+        // tex2D = <Texture2D>(down4Frame2.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        // blurMat.setSrcTexture(tex2D);
+        // blurMat.setPiexlDir(1.0, 0.0);
+        // renderer.renderScene(blurMesh, null, down4Frame);
+
+        // // 纵向高斯模糊
+        // tex2D = <Texture2D>(down4Frame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        // blurMat.setSrcTexture(tex2D);
+        // blurMat.setPiexlDir(0.0, 1.0);
+        // renderer.renderScene(blurMesh, null, down4Frame2);
 
         // tong mapping
         tex2D = <Texture2D>(down4Frame2.getTextureFromType(RenderTargetLocation.COLOR).tex);
