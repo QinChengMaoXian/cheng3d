@@ -8,6 +8,7 @@ export class FrameState {
     public isClearStencil: boolean = false;
     public clearStencil: number = 0;
     public viewport: Vector4 = new Vector4();
+    public needClear = true;
 
     constructor() {
         

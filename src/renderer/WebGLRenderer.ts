@@ -236,6 +236,10 @@ export class WebGLRenderer extends Base implements IRenderer {
             gl.viewport(data[0], data[1], data[2], data[3]);
         }
 
+        if (!frameState.needClear) {
+            return;
+        }
+
         cache.isClearColor = frameState.isClearColor;
         if (cache.isClearColor) {
             clearBit = clearBit | gl.COLOR_BUFFER_BIT;

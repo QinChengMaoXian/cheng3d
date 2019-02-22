@@ -14,15 +14,15 @@ import { BloomMaterial } from "../../material/BloomMaterial";
 import { ToneMappingMaterial } from "../../material/ToneMappingMaterial";
 import { LogSampleMaterial } from "../../material/LogSampleMaterial";
 
-// 
-// TODO：修改着色器, log加和，exp之后再平均；
-
+/**
+ * 
+ */
 export class HDR extends PEBase {
 
-    // 自适应时间，单位毫秒；
+    /** 自适应时间，单位毫秒 */
     protected _adaptationTime: number = 1000;
 
-    // 手动亮度调节参数
+    /** 手动亮度调节参数 */
     protected _lumFact: number = 0.35;
 
     protected _down4Mat: DownSample4Material;
@@ -68,12 +68,14 @@ export class HDR extends PEBase {
         frame.setSize(w_4, h_4);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
 
         this._down4Frame2 = new Frame();
         frame = this._down4Frame2;
         frame.setSize(w_4, h_4);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.LINEAR, CGE.LINEAR);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
 
         let w_16 = Math.floor(w_4 * 0.25);
         let h_16 = Math.floor(h_4 * 0.25);
@@ -83,24 +85,28 @@ export class HDR extends PEBase {
         frame.setSize(w_16, h_16);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.LINEAR, CGE.LINEAR);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
 
         this._downTo32Frame = new Frame();
         frame = this._downTo32Frame;
         frame.setSize(32, 32);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
 
         this._downTo32Frame2 = new Frame();
         frame = this._downTo32Frame2;
         frame.setSize(32, 32);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
 
         this._downTo8Frame = new Frame();
         frame = this._downTo8Frame;
         frame.setSize(8, 8);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.LINEAR, CGE.LINEAR);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
 
         // this._downTo2Frame = new Frame();
         // frame = this._downTo2Frame;
@@ -113,11 +119,13 @@ export class HDR extends PEBase {
         frame.setSize(1, 1);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
         this._downTo1Frame.push(frame);
         frame = new Frame();
         frame.setSize(1, 1);
         frame.addTexture(RenderTargetLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
         frame.getState().clearColor.set(0, 0, 0, 0);
+        frame.getState().needClear = false;
         this._downTo1Frame.push(frame);
 
         let mesh = new Mesh();
@@ -259,7 +267,7 @@ export class HDR extends PEBase {
         tex2D = <Texture2D>(downTo1Src.getTextureFromType(RenderTargetLocation.COLOR).tex);
         downTo1Mat.setLumTexture(tex2D)
         downTo1Mat.setPixelSize(1.0 / 2.0, 1.0 / 2.0); 
-        downTo1Mat.setLumPCT(deltaTime / this._adaptationTime);
+        downTo1Mat.setLumPCT(Math.min(deltaTime / this._adaptationTime, 1.0));
         renderer.renderScene(downTo1Mesh, null, downTo1Dst);
 
         // bloom
