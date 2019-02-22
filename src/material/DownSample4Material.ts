@@ -18,7 +18,9 @@ export class DownSample4Material extends Material {
     }
 
     public setPixelSize(x, y) {
-        this._data.data.set([x, y]);
+        let d = this._data.data;
+        d[0] = x,
+        d[1] = y;
     }
 
     public get type(): string {

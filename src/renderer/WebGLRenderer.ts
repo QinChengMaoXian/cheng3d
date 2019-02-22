@@ -174,6 +174,7 @@ export class WebGLRenderer extends Base implements IRenderer {
             frame.setRenderObjectRef(this, null);
         }
 
+
         return glframe;
     }
 
@@ -458,6 +459,7 @@ export class WebGLRenderer extends Base implements IRenderer {
         _ext['OES_standard_derivatives'] = getExtension("OES_standard_derivatives");
         _ext['OES_texture_half_float'] = getExtension("OES_texture_half_float");
         _ext['OES_texture_float'] = getExtension("OES_texture_float");
+        _ext['OES_texture_float_linear'] = getExtension("OES_texture_float_linear");
         _ext['WEBGL_depth_texture'] = getExtension("WEBGL_depth_texture");
         _ext['EXT_texture_filter_anisotropic'] = getExtension("EXT_texture_filter_anisotropic");
         _ext['EXT_shader_texture_lod'] = getExtension('EXT_shader_texture_lod');

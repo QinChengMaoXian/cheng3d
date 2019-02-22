@@ -9,35 +9,30 @@ uniform sampler2D u_lumMap;
 uniform vec2 u_lumPCT;
 uniform vec2 u_pixelSize;
 
+vec3 ACESToneMapping(vec3 color, float avgLum, float adapted_lum)
+{
+	const float A = 2.51;
+	const float B = 0.03;
+	const float C = 2.43;
+	const float D = 0.59;
+	const float E = 0.14;
+
+	color *= adapted_lum / avgLum;
+	return (color * (A * color + B)) / (color * (C * color + D) + E);
+}
+
 void main()
 {
-    vec4 lum_fact = vec4(0.27, 0.67, 0.06, 0.0);
-    vec4 color = texture2D(u_diffuseMap, o_uv);
+    vec3 lum_fact = vec3(0.27, 0.67, 0.06);
+    vec3 color = texture2D(u_diffuseMap, o_uv).xyz;
 
-    float ave_1_lum = 1.0 / texture2D(u_lumMap, vec2(0.5, 0.5)).x;
-    float cur_lum = dot(lum_fact, color);
+    float ave_lum = texture2D(u_lumMap, vec2(0.5, 0.5)).x;
     
-    color *= u_lumPCT.x * ave_1_lum * cur_lum;
-    color /= vec4(vec4(1.0, 1.0, 1.0, 0.0) + color);
+    color = ACESToneMapping(color, ave_lum, u_lumPCT.x);
 
-    vec4 bloom = vec4(0.0);//texture2D(u_bloomMap, o_uv);
+    vec3 bloom = texture2D(u_bloomMap, o_uv).xyz * 1.3;
+    vec3 final_color = clamp(color + bloom, 0.0, 1.0);
 
-    bloom += texture2D(u_bloomMap, u_pixelSize * vec2(1.0, 1.0) + o_uv);
-    bloom += texture2D(u_bloomMap, u_pixelSize * vec2(1.0, -1.0) + o_uv);
-    bloom += texture2D(u_bloomMap, u_pixelSize * vec2(-1.0, 1.0) + o_uv);
-    bloom += texture2D(u_bloomMap, u_pixelSize * vec2(-1.0, -1.0) + o_uv);
-
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(4, 4) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(-2, 3) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(1, 2) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(-4, 1) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(3, -1) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(-1, -2) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(-3, -3) + o_uv);
-    // bloom += texture2D(u_bloomMap, u_pixelSize * vec2(2, -4) + o_uv);
-
-    bloom *= 1.3 * 0.25;
-
-    gl_FragColor = clamp(color + bloom, 0.0, 1.0);
+    gl_FragColor = vec4(final_color, 1.0);
 }
 `;

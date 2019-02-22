@@ -37,6 +37,7 @@ import gaussian_blur from './libs/gaussian_blur_frag_glsl';
 import down_sample_to1 from './libs/down_sampling_to1_frag_glsl';
 import bloom from './libs/bloom_frag_glsl';
 import tone_mapping from './libs/tone_mapping_frag_glsl';
+import log_sample from './libs/log_sample_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -92,5 +93,10 @@ export const shaders = {
     'tone_mapping': {
         vert: repStr(fullscreen_vert),
         frag: repStr(tone_mapping),
+    },
+
+    'log_sample': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(log_sample),
     },
 }
