@@ -1,5 +1,5 @@
 export default `
-vec3 encodeFloat2rgb(float v)
+vec3 encodeFloat2RGB(float v)
 {
     vec3 enc = vec3(1.0, 255.0, 65025.0) * v;
     enc = fract(enc);
