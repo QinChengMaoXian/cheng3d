@@ -31,6 +31,7 @@ export interface IRenderer {
     exchangeFrame();
 
     deltaTime: number;
+    defCamera: Camera;
 
     currentColorFrame: Frame;
     currectTargetFrame: Frame;

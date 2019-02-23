@@ -38,6 +38,8 @@ import down_sample_to1 from './libs/down_sampling_to1_frag_glsl';
 import bloom from './libs/bloom_frag_glsl';
 import tone_mapping from './libs/tone_mapping_frag_glsl';
 import log_sample from './libs/log_sample_frag_glsl';
+import ssao from './libs/ssao_frag_glsl';
+import gbuffer from './libs/gbuffer_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -63,6 +65,10 @@ export const shaders = {
     'standard': {
         vert: repStr(standard_vert),
         frag: repStr(standard_frag),
+        def: {
+            vert: repStr(standard_vert),
+            frag: repStr(gbuffer),
+        }
     },
 
     'fxaa': {
@@ -99,4 +105,9 @@ export const shaders = {
         vert: repStr(fullscreen_vert),
         frag: repStr(log_sample),
     },
+
+    'ssao': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(ssao),
+    }
 }

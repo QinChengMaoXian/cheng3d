@@ -1,7 +1,7 @@
 export default `
 precision mediump float;
 
-varying vec2 o_uv;
+varying vec2 v_uv;
 
 uniform sampler2D u_diffuseMap;
 uniform vec2 u_pixelSize;
@@ -12,25 +12,25 @@ void main()
 
     vec2 pixelSize = u_pixelSize.xy;
 
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, 0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, 1.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, 0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, 1.5) + o_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, 0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, 1.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, 0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, 1.5) + v_uv);
 
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, 0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, 1.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, 0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, 1.5) + o_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, 0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, 1.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, 0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, 1.5) + v_uv);
 
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, -0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, -1.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, -0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, -1.5) + o_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, -0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(0.5, -1.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, -0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(1.5, -1.5) + v_uv);
 
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, -0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, -1.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, -0.5) + o_uv);
-    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, -1.5) + o_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, -0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-0.5, -1.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, -0.5) + v_uv);
+    result_color += texture2D(u_diffuseMap, pixelSize * vec2(-1.5, -1.5) + v_uv);
 
     result_color *= 1.0 / 16.0;
 

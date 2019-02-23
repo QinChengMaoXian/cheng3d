@@ -27,16 +27,16 @@ import { ShaderCaches } from './shaders/ShaderCaches';
 import { Material } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
-import { FXAA } from './postEffect/FXAA';
 import { Event } from '../core/Event';
 import { Base } from '../core/Base';
 import { Matrix4 } from '../math/Matrix4';
-import { PEType, PEBase, PEOrder } from './postEffect/PEBase';
-import { HDR } from './postEffect/HDR';
+import { PostEffectsPipeline } from './PostEffectsPipeline';
+import { PEType, PEBase, PEReqType } from './postEffect/PEBase';
+
 
 /**
  * webgl 1.0 渲染器；
- * TODO: 思考 renderer 是否需要增加分类的释放，比如材质，纹理，几何等
+ * TODO: 思考 renderer 如何增加分类的释放，比如材质，纹理，几何等;
  */
 export class WebGLRenderer extends Base implements IRenderer {
     private static RendererNum = 0;
@@ -57,6 +57,8 @@ export class WebGLRenderer extends Base implements IRenderer {
     private _defMat: FullScreenMaterial;
     private _defGeo: Geometry;
 
+    private _defCamera: Camera;
+
     private _curFrame: Frame;
     // private _defFrame: Frame;
 
@@ -70,10 +72,12 @@ export class WebGLRenderer extends Base implements IRenderer {
     private _cacheFrames: Frame[];
     private _frameIndex: number;
 
-    private _postEffects: PEBase[];
-
     private _timeNow: number;
     private _deltaTime: number;
+
+    private _postEffectPipline: PostEffectsPipeline;
+
+    private _deferredRendering: boolean = false;
 
     constructor() {
         super();
@@ -90,9 +94,10 @@ export class WebGLRenderer extends Base implements IRenderer {
 
         this._initDefFrame(width, height);
 
-        this.setSize(width, height);
+        this._postEffectPipline = new PostEffectsPipeline(this);
+        this._postEffectPipline.init(this._defGeo);
 
-        this._postEffects = [];
+        this.setSize(width, height);
 
         // TODO: remove this;
         _gl.enable(_gl.DEPTH_TEST);
@@ -112,7 +117,7 @@ export class WebGLRenderer extends Base implements IRenderer {
     }
 
     public setOffset(x, y, w, h) {
-        this._defFrameState.setViewport(new Vector4(x, y, w, h));
+        this._defFrameState.setViewports(x, y, w, h);
     }
 
     public setClearColor(r, g, b, a) {
@@ -316,19 +321,34 @@ export class WebGLRenderer extends Base implements IRenderer {
         glgeo.draw(gl);
     }
 
+    protected _renderDefScene(scene: Object3D, camera: Camera) {
+
+    }
+
+    protected _renderScene2Frame(scene: Object3D, camera: Camera, frame: Frame) {
+
+    }
+
+    protected _useCamera(camera: Camera) {
+        if (camera) {
+            glProgram.vMatrix.copy(camera.getMatrix());
+            glProgram.pMatrix.copy(camera.getProjectionMatrix());
+            glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
+        }
+    }
+
     public renderScene(scene: Object3D, camera?: Camera, frame?: Frame) {
         if (!frame) {
             let now = Date.now();
             this._deltaTime = now - this._timeNow;
             this._timeNow = now;
+            this._defCamera = camera;
         }
 
         let _renderList = [];
 
-        glProgram.vMatrix.copy(camera ? camera.getMatrix() : Matrix4.unitMat4);
-        glProgram.pMatrix.copy(camera ? camera.getProjectionMatrix() : Matrix4.unitMat4);
-        glProgram.vpMatrix.copy(camera ? camera.getViewProjectionMatrix(): Matrix4.unitMat4);
-
+        this._useCamera(camera);
+        
         if (scene instanceof Scene) {
             let light = (<Scene>scene).getMainLight();
             glProgram.lightDir.copy(light.getDirection());
@@ -372,6 +392,7 @@ export class WebGLRenderer extends Base implements IRenderer {
             _renderScene(scene);
             
             this._exchangeFrame();
+            this._useCamera(this._defCamera);
             this.renderPostEffects();
 
             this.useFrame(null);
@@ -385,10 +406,7 @@ export class WebGLRenderer extends Base implements IRenderer {
     }
 
     protected renderPostEffects() {
-        this._postEffects.forEach(pe => {
-            pe.render();
-            this._exchangeFrame();
-        })
+        this._postEffectPipline.render()
     }
 
     public setSize(width: number, height: number) {
@@ -400,12 +418,14 @@ export class WebGLRenderer extends Base implements IRenderer {
         this._screenWidth = width;
         this._screenHeight = height;
 
-        this._defFrameState.setViewport(new Vector4(0, 0, width, height));
+        this._defFrameState.setViewports(0, 0, width, height);
 
         this._cacheFrames.forEach(frame => {
             frame.setSize(width, height);
             this.initFrame(frame);
         })
+
+        this._postEffectPipline.resize(width, height);
 
         this.event(Event.RENDERER_RESIZE, [width, height]);
     };
@@ -525,88 +545,33 @@ export class WebGLRenderer extends Base implements IRenderer {
         return this._deltaTime;
     }
 
-    protected _enablePostEffect(pe: PEBase) {
-        let pes = this._postEffects;
-        let l = pes.length;
-        for (let i = 0; i < l; i++) {
-            if (pes[i].order === pe.order) {
-                pes[i] = pe;
-                return;
-            }
-        }
-        pes.push(pe);
-        pes.sort((a, b) => { return b.order - a.order });
-    }
-
-    protected _disablePostEffect(pe: PEBase) {
-        let idx = this._postEffects.indexOf(pe);
-        if (idx > -1) {
-            this._postEffects.splice(idx, 1);
-            pe.destroy();
-        }
-    }
-
-    protected _createPEFromType(type: PEType) {
-        let pe: PEBase;
-        switch (type) {
-            case PEType.FXAA:
-                let fxaa = new FXAA(this);
-                fxaa.init(this._defGeo);
-                pe = fxaa;
-                break;
-
-            case PEType.HDR:
-                let hdr = new HDR(this);
-                hdr.init(this._defGeo);
-                pe = hdr;
-            default:
-                break;
-        }
-        return pe;
+    public updateBaseFrame() {
+        let srcReqs = this._postEffectPipline.getSrcReqs();
     }
 
     public disablePostEffect(pe: PEType | PEBase) {
-        if (pe instanceof PEBase) {
-            this._disablePostEffect(pe);
-        } else {
-            let pes = this._postEffects;
-            let l = pes.length;
-            for (let i = 0; i < l; i++) {
-                if (pes[i].type === pe) {
-                    this._disablePostEffect(pes[i]);
-                    return;
-                }
-            }
-        }
-    }
-
-    public disablePostEffectByOrder(order: PEOrder) {
-        let pes = this._postEffects;
-        let l = pes.length;
-        for (let i = 0; i < l; i++) {
-            if (pes[i].order === order) {
-                this._disablePostEffect(pes[i]);
-                return;
-            }
-        }
+        this._postEffectPipline.disablePostEffect(pe);
+        this.updateBaseFrame();
     }
 
     public enablePostEffect(pe: PEType | PEBase) {
-        if (pe instanceof PEBase) {
-            this._enablePostEffect(pe);
-        } else {
-            let peObj = this._createPEFromType(pe);
-            if (peObj) {
-                this.enablePostEffect(peObj);
-            }
-        }
+        this._postEffectPipline.enablePostEffect(pe);
+        this.updateBaseFrame();
+    }
+
+    public enableDeferredRendering() {
+        this._deferredRendering = true;
+    }
+
+    public disalbeDeferredRendering() {
+        this._deferredRendering = false;
+    }
+
+    public get defCamera() {
+        return this._defCamera;
     }
 
     public getEnablingPostEffect(): PEType[] {
-        let a = [];
-        this._postEffects.forEach(p => {
-            a.push(p.type);
-        })
-        return a;
+        return this._postEffectPipline.getEnablingPostEffect();
     }
 }

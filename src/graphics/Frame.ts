@@ -126,7 +126,7 @@ export class Frame extends GraphicsObject {
         this._width = width;
         this._height = height;
         this._updateTextureSize();
-        this._state.setViewport(new Vector4(0, 0, width, height));
+        this._state.setViewports(0, 0, width, height);
         this.needsUpdate();
     }
 
@@ -139,7 +139,7 @@ export class Frame extends GraphicsObject {
     }
 
     public setOffset(viewport) {
-        this._state.setViewport(viewport);
+        this._state.setViewportAt(viewport);
     }
 
     public getTextureFromType(targetType) {

@@ -15,6 +15,8 @@ export class ToneMappingMaterial extends Material {
 
         this._lumPCT = { data: new Float32Array([1.0, 1.0]) };
         this.setProperty(ShaderConst.lumPCT, this._lumPCT);
+
+        this.setTexture(ShaderConst.aoMap, Texture2D.White);
     }
 
     public setSrcTexture(texture: Texture2D) {

@@ -25,6 +25,7 @@ export class ShaderConst {
 
     // supported texture name;
     public static readonly baseColorMap = ShaderConst._inTex('u_baseColorMap');
+    public static readonly depthMap = ShaderConst._inTex('u_depthMap');
     public static readonly diffuseMap = ShaderConst._inTex('u_diffuseMap');
     public static readonly normalMap = ShaderConst._inTex('u_normalMap');
     public static readonly specularMap = ShaderConst._inTex('u_specularMap');
@@ -69,6 +70,8 @@ export class ShaderConst {
     public static readonly merged3 = ShaderConst._inUni('u_merged3');
     public static readonly specular = ShaderConst._inUni('u_specular');
     public static readonly lumPCT = ShaderConst._inUni('u_lumPCT');
+    public static readonly multiUsing = ShaderConst._inUni('u_multiUsing');
+    public static readonly aoParam = ShaderConst._inUni('u_aoParam');
 
     /** world(model) matrix */
     public static readonly mMat = ShaderConst._inUni('u_mMat');

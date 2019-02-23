@@ -205,4 +205,20 @@ export class Camera extends Object3D {
         this._rotateView(rightAxis, movementY);
         this.enableUpdateMat();
     }
+
+    get fovy() {
+        return this._fovy;
+    }
+
+    get aspect() {
+        return this._aspect;
+    }
+
+    get far() {
+        return this._far;
+    }
+
+    get near() {
+        return this._near;
+    }
 }

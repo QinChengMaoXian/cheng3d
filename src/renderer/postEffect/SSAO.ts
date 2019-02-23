@@ -5,24 +5,30 @@ import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
 import { IRenderer } from "../Renderer";
 import { RenderTargetLocation } from "../../graphics/GraphicsTypes";
-import { FXAAMaterial } from "../../material/FXAAMaterial";
+import { SSAOMaterial } from "../../material/SSAOMaterial";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
 
-export class FXAA extends PEBase {
+export class SSAO extends PEBase {
     protected static SrcReqs = [
+        PEReqType.DEPTH,
         PEReqType.COLOR
-    ];
+    ]
+
+    protected _scale: number;
+    protected _bias: number;
+    protected _sampleRad: number;
+    protected _intensity: number;
 
     protected _mesh: Mesh;
-    protected _material: FXAAMaterial;
+    protected _mat: SSAOMaterial;
 
     constructor(pipe: PostEffectsPipeline) {
         super(pipe);
     }
 
     public init(geometry: Geometry) {
-        let material = new FXAAMaterial(null);
-        this._material = material;
+        let material = new SSAOMaterial();
+        this._mat = material;
         let mesh = new Mesh();
         mesh.setGeometry(geometry);
         mesh.setMaterial(material);
@@ -31,40 +37,60 @@ export class FXAA extends PEBase {
     }
 
     public resize(w: number, h: number) {
-        this._material.setPixelSize(1.0 / w, 1.0 / h);
+        // this._mat.setPixelSize(1.0 / w, 1.0 / h);
     }
 
     public render() {
-        const pipe = this._pipe
+        const pipe = this._pipe;
         const renderer = pipe.renderer;
+        
+        const ssaoMat = this._mat;
+
+        let camera = renderer.defCamera;
 
         let colorFrame: Frame = renderer.currentColorFrame;
         let targetFrame: Frame = renderer.currectTargetFrame;
 
-        let tex2D = <Texture2D>(colorFrame.getTextureFromType(RenderTargetLocation.COLOR).tex);
-        this._material.setSrcTexture(tex2D);
+        let w = colorFrame.getWidth();
+        let h = colorFrame.getHeight();
+
+        let p_x = 1.0 / w;
+        let p_y = 1.0 / h;
+
+        let aspect = camera.aspect;
+        let tan_2Fov = Math.tan(camera.fovy / 2);
+        let n = camera.near;
+        let f = camera.far;
+
+        let tex2D = <Texture2D>(colorFrame.getDepthStencilTexture());
+        this._mat.setDepthTexture(tex2D);
+        tex2D = <Texture2D>(colorFrame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        this._mat.setDiffuseTexture(tex2D);
+
+        ssaoMat.setPixelSize(p_x, p_y);
+        ssaoMat.setAsptRtoTanHfFov(aspect, tan_2Fov, (-n-f) / (n-f), (2*f*n) / (n-f));
 
         pipe.renderPass(this._mesh, targetFrame);
     }
 
     public srcRequires(): PEReqType[] {
-        return FXAA.SrcReqs;
+        return SSAO.SrcReqs;
     }
 
     public destroy() {
-        const pipe = this._pipe
+        const pipe = this._pipe;
         const renderer = pipe.renderer;
         renderer.releaseMesh(this._mesh);
         this._pipe = null;
         this._mesh = null;
-        this._material = null;
+        this._mat = null;
     }
 
     get type(): PEType {
-        return PEType.FXAA;
+        return PEType.SSAO;
     }
 
     get order() {
-        return PEOrder.AA;
+        return PEOrder.AO;
     }
 }

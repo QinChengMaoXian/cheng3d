@@ -35,7 +35,11 @@ export class FrameState {
         }
     }
 
-    public setViewport(offset: Vector4) {
+    public setViewportAt(offset: Vector4) {
         this.viewport.copy(offset);
+    }
+
+    public setViewports(offsetx: number, offsety: number, width: number, height: number) {
+        this.viewport.set(offsetx, offsety, width, height)
     }
 }
