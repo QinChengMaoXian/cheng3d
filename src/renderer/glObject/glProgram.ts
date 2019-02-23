@@ -16,6 +16,7 @@ import { Matrix4 } from '../../math/Matrix4';
 import { Mesh } from '../../object/Mesh';
 
 import { Camera } from '../../object/Camera';
+import { glTexture } from './glTexture';
 
 const _matrix = new Matrix4();
 const _vpmatrix = new Matrix4();
@@ -23,16 +24,21 @@ const _mvmatrix = new Matrix4();
 const _mvpmatrix = new Matrix4();
 const _f32 = new Float32Array(16);
 
-
-
-interface IUniform {
+export interface IUniform {
     location: WebGLUniformLocation,
     type: number,
     name: string,
     size: number
 }
 
+export interface ITexUniform {
+    loc: number,
+    tex: glTexture
+}
+
 export class glProgram extends glObject {
+
+    private static _curr;
 
     public static vMatrix  = new Matrix4();
     public static pMatrix  = new Matrix4();
@@ -151,7 +157,10 @@ export class glProgram extends glObject {
     }
 
     public apply(gl) {
-        gl.useProgram(this._program);
+        if (glProgram._curr !== this) {
+            gl.useProgram(this._program);
+            glProgram._curr = this;
+        }
     }
 
     public setUniformData(gl: WebGLRenderingContext, type: number, location: WebGLUniformLocation, data) {
@@ -225,7 +234,7 @@ export class glProgram extends glObject {
             // TODO: maybe need re-build? but looks good for use;
             switch (uniformType) {
                 case ShaderConst.mMat:              data = worldMatrix; break;
-                case ShaderConst.mIMat:             data = tempMatrix.copy(worldMatrix).invert(); break;
+                case ShaderConst.mITMat:             data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case ShaderConst.vMat:              data = vMat; break;
                 case ShaderConst.pMat:              data = pMat; break;
                 case ShaderConst.vpIMat:            data = tempMatrix.copy(vpMat).invertTranspose(); break;
@@ -251,7 +260,7 @@ export class glProgram extends glObject {
         });
     }
 
-    public getTextureIndex(type) {
+    public getTextureIndex(type): number {
         return this._textures.get(type);
     }
 

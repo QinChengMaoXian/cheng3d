@@ -2,6 +2,9 @@ import { glObject } from './glObject'
 import { Texture } from '../../graphics/Texture';
 
 export class glTexture extends glObject {
+    /** 纹理索引的cache */
+    private static _texIdx: {[loc: number]: glTexture} = {};
+
     protected _minFilter: number;
     protected _magFilter: number;
     protected _texture;
@@ -19,5 +22,16 @@ export class glTexture extends glObject {
 
     public getHandler() {
         return this._texture;
+    }
+
+    public apply(gl, index) {
+        if (glTexture._texIdx[index] !== this) {
+            this._apply(gl, index);
+            glTexture._texIdx[index] = this
+        }
+    }
+
+    protected _apply(gl, index) {
+
     }
 }

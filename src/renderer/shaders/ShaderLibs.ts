@@ -1,11 +1,13 @@
 import encodeFloat2RGB from './mods/encodeFloat2RGB';
-import decodeRGB2Float from './mods/decodeRGB2Float'
-import skin_vert from './mods/skinVert'
+import decodeRGB2Float from './mods/decodeRGB2Float';
+import skin_vert from './mods/skinVert';
+import ACESToneMapping from './mods/ACESToneMapping';
 
 export const mods = {
     'encodeFloat2RGB': encodeFloat2RGB,
     'decodeRGB2Float': decodeRGB2Float,
     'skin_vert': skin_vert,
+    'ACESToneMapping': ACESToneMapping,
 }
 
 const reg = /#include\s*<([a-zA-Z0-9_./]+)>/;

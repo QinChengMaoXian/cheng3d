@@ -40,7 +40,7 @@ export class Texture2D extends Texture {
     public static get BrdfLUT(): Texture2D {
         if (!Texture2D._BrdfLUT) {
             let tex = new Texture2D();
-            tex.setImageUrl('./resources/envLUT.png');
+            tex.setImageUrl('./resources/envLUT.png', Texture2D.White);
             Texture2D._BrdfLUT = tex;
         }
         return Texture2D._BrdfLUT;
@@ -64,24 +64,27 @@ export class Texture2D extends Texture {
     protected _url: string;
     protected _width = 0;
     protected _height = 0;
+    protected _loaded = true;
+    public _def: Texture2D;
 
     constructor() {
         super();
     }
 
-    public setImageUrl(url:string, image?: HTMLImageElement) {
+    public setImageUrl(url:string, def: Texture2D = Texture2D.White) {
         this._url = url;
-        if (image) {
-            this._data = image;
-        } else {
-            Loader.loadImage(url).then((img: HTMLImageElement) => {
-                this._data = img;
-                this._width = img.width;
-                this._height = img.height;
-                this.needsUpdate();
-                return img;
-            });     
-        }
+        this._loaded = false;
+        this._def = def;
+
+        Loader.loadImage(url).then((img: HTMLImageElement) => {
+            this._data = img;
+            this._width = img.width;
+            this._height = img.height;
+            this.needsUpdate();
+            this._loaded = true;
+            this._def = null;
+            return img;
+        });
     }
 
     public setData(width: number, height: number, data: HTMLImageElement | Uint8Array | Float32Array | Uint16Array) {
@@ -123,6 +126,10 @@ export class Texture2D extends Texture {
         this._width = width;
         this._height = height;
         this.needsUpdate();
+    }
+
+    public get loaded() {
+        return this._loaded;
     }
 
     public getUrl(): string {

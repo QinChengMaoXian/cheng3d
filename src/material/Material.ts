@@ -37,7 +37,7 @@ export class Material extends Base {
         Loader.loadImage(url).then((img: HTMLImageElement) => {
             let tex = new Texture2D();
             tex.setFormat(RGBA, RGBA);
-            tex.setImageUrl(url, img);
+            tex.setData(img.width, img.height, img);
             this._textures.set(type, tex);
         })
     }

@@ -77,7 +77,7 @@ export class glTexture2D extends glTexture {
         return this;
     }
 
-    public apply(gl, index) {
+    protected _apply(gl, index) {
         gl.activeTexture(gl.TEXTURE0 + index);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
     }

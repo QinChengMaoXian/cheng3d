@@ -81,7 +81,8 @@ export class ShaderCaches {
     }
 
     protected removeKey(key: string) {
-        let ref = this._caches.get(key);
+        let caches = this._caches;
+        let ref = caches.get(key);
         if (ref) {
             ref.count--;
             if (ref.count === 0) {

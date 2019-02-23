@@ -92,7 +92,7 @@ void main()
     vec3 normal = rt1.xyz;
     vec3 depth3 = rt2.xyz;
 
-    normal = 2.0 * normal - 1.0;
+    normal = normal * 2.0 - 1.0;
 
     float roughness = rt0.w;
     float metallic = rt1.w;
@@ -100,10 +100,7 @@ void main()
     
     float depth = decodeRGB2Float(depth3);
 
-    // uv.y = 1.0 - uv.y;
-    uv = 2.0 * uv - 1.0;
-
-    vec4 projPos = vec4(uv.x, uv.y, depth, 1.0);
+    vec4 projPos = vec4(uv, depth, 1.0) * 2.0 - 1.0;
     vec4 worldPos = projPos * u_vpIMat;
     worldPos /= worldPos.w;
 
@@ -139,7 +136,7 @@ void main()
 
     // 环境光部分
     vec3 coordN = vec3(N.x, N.z, -N.y);
-    vec3 irradiance = textureCubeLodEXT(u_irradianceMap, coordN, 8.0).xyz;
+    vec3 irradiance = textureCubeLod(u_irradianceMap, coordN).xyz;
     vec3 diffuse = irradiance * albedo;
     vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kD_a = vec3(1.0) - F_s;

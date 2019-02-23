@@ -34,6 +34,7 @@ import { PostEffectsPipeline } from './PostEffectsPipeline';
 import { PEType, PEBase, PEReqType } from './postEffect/PEBase';
 import { WebGLSupports } from './WebGLSupports';
 import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
+import { glTexture } from './glObject/glTexture';
 
 
 /**
@@ -332,10 +333,14 @@ export class WebGLRenderer extends Base implements IRenderer {
         }
 
         if (texture instanceof Texture2D) {
-            let tex = new glTexture2D(_gl);
-            if (tex.generateFromTexture2D(_gl, texture)) {
-                texture.setRenderObjectRef(this, tex);
-                return tex;
+            if (!texture.loaded) {
+                return this.initTexture(texture._def);
+            } else {
+                let tex = new glTexture2D(_gl);
+                if (tex.generateFromTexture2D(_gl, texture)) {
+                    texture.setRenderObjectRef(this, tex);
+                    return tex;
+                }
             }
         } else if (texture instanceof TextureCube) {
             let tex = new glTextureCube(_gl);
@@ -379,6 +384,9 @@ export class WebGLRenderer extends Base implements IRenderer {
         return glprog;
     }
 
+    /** 纹理索引的cache 临时写在这里 */
+    private _texIdx = {};
+
     /** 
      * 新增或者更新Mesh的数据
      * 当前为了着色器的引用计数
@@ -395,14 +403,17 @@ export class WebGLRenderer extends Base implements IRenderer {
         if (!glProgram) {
             return false;
         }
+        let texIdx = this._texIdx;
 
-        //TODO: 加载的纹理还没加载好怎么办？
-        mat.getTextures().forEach((texture, type) => {
-            let glTexture = this.initTexture(texture);
-            if (glTexture) {
-                let texIndex = glProgram.getTextureIndex(type);
-                if (texIndex !== null && texIndex !== undefined) {
-                    glTexture.apply(gl, texIndex);
+        mat.getTextures().forEach((tex, type) => {
+            let glTex: glTexture = this.initTexture(tex);
+            if (glTex) {
+                let texLoc = glProgram.getTextureIndex(type);
+                if (texLoc !== undefined && texLoc !== null) {
+                    if (this._texIdx[texLoc] !== glTex) {
+                        glTex.apply(gl, texLoc);
+                        texIdx[texLoc] = glTex;
+                    }
                 }
             }
         });

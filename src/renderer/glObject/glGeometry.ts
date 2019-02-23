@@ -6,6 +6,8 @@ import { glProgram } from './glProgram';
 
 export class glGeometry extends glObject {
 
+    private static _curr: glGeometry;
+
     protected _vbuffers: glBuffer[] = [];
     protected _ibuffer: glBuffer = null;
 
@@ -16,6 +18,11 @@ export class glGeometry extends glObject {
     }
 
     public bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
+        if (glGeometry._curr === this) {
+            return;
+        }
+        glGeometry._curr = this;
+
         let glGeo: glGeometry = this;
         let vbuffers = glGeo.getvBuffers();
         let buffers = geometry.getBuffers();

@@ -46,7 +46,7 @@ export class glTextureCube extends glTexture2D {
         return this;
     }
 
-    apply(gl, index) {
+    protected _apply(gl, index) {
         gl.activeTexture(gl.TEXTURE0 + index);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this._texture);
     }

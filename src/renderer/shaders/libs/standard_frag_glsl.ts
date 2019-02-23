@@ -4,10 +4,9 @@ export default `
 precision mediump float;
 
 varying vec2 v_uv;
-varying vec3 v_tangentToView0;
-varying vec3 v_tangentToView1;
-varying vec3 v_tangentToView2;
 varying vec3 v_normal;
+varying vec3 v_tangent;
+varying vec3 v_binormal;
 varying vec3 v_worldPos;
 
 uniform sampler2D u_diffuseMap;
@@ -110,17 +109,10 @@ void main()
     
     F0 = F0 * (1.0 - metallic) + albedo * metallic;
 
-    vec3 normalTex = texture2D(u_normalMap, v_uv).xyz;
-    vec3 normal = normalTex * 2.0 - 1.0;    
-    mat3 normalMatrix = mat3(
-        normalize(v_tangentToView0), 
-        normalize(v_tangentToView1), 
-        normalize(v_tangentToView2)
-    );
-
+    vec3 normal = texture2D(u_normalMap, v_uv).xyz * 2.0 - 1.0;
+    vec3 N = normalize(normal.x * v_tangent + normal.y * v_binormal + normal.z * v_normal);
     vec3 L = normalize(u_lightDir.xyz);
     vec3 V = normalize(u_cameraPos - v_worldPos);
-    vec3 N = normalize(normalMatrix * normal);
     vec3 H = normalize(V + L);
 
     vec3 R = N * dot_plus(N, V) * 2.0 - V; 
