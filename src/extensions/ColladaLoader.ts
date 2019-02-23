@@ -2,12 +2,10 @@ import { Texture2D } from '../graphics/Texture2D'
 import { TextureCube } from '../graphics/TextureCube'
 import { Geometry } from '../graphics/Geometry'
 
-import { Entity } from '../object/Entity'
-import { Component } from '../object/Component'
-import { AttribType } from '../graphics/GraphicsTypes'
 import { FLOAT } from '../graphics/RendererParameter'
 
 import { Logger } from '../core/Logger'
+import { ShaderConst } from '../graphics/ShaderConst';
 
 export class ColladaLoader {
     protected _loadState;
@@ -276,15 +274,15 @@ export class ColladaLoader {
             switch (semantic) {
                 case 'POSITION':
                 case 'VERTEX':
-                    attribute_in = AttribType.POSITION;
+                    attribute_in = ShaderConst.position;
                     break;
 
                 case 'NORMAL':
-                    attribute_in = AttribType.NORMAL;
+                    attribute_in = ShaderConst.normal;
                     break;
 
                 case 'TEXCOORD':
-                    attribute_in = AttribType.TEXCOORD0;
+                    attribute_in = ShaderConst.texcoord;
                     for (let j = 0; j < (webgl_data.length / data.stride); j++) {
                         let v = webgl_data[j * data.stride + 1];
                         webgl_data[j * data.stride + 1] = 1.0 - v;

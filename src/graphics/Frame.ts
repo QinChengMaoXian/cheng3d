@@ -2,7 +2,7 @@ import { GraphicsObject } from './GraphicsObject'
 import { Texture2D } from './Texture2D'
 import * as CGE from './RendererParameter'
 import { FrameState } from './FrameState'
-import { RenderTargetLocation } from './GraphicsTypes';
+import { RTLocation } from './GraphicsTypes';
 import { Vector4 } from "../math/Vector4";
 import { Texture } from './Texture';
 import { TextureCube } from './TextureCube';
@@ -24,7 +24,7 @@ export interface ITexTarget {
 }
 
 export class Frame extends GraphicsObject {
-    private _textures: Map<RenderTargetLocation, ITexTarget> = new Map();
+    private _textures: Map<RTLocation, ITexTarget> = new Map();
     private _width = 64;
     private _height = 64;
     private _isFollowScreen = false;
@@ -43,25 +43,22 @@ export class Frame extends GraphicsObject {
         }
     }
 
-    public addTexture(targetType: RenderTargetLocation, format, dataType, filterMin, filterMag) {
+    public addTexture(targetType: RTLocation, format, dataType, filterMin, filterMag) {
         let __format = format || CGE.RGBA;
         let __dataType = dataType || CGE.UNSIGNED_BYTE;
         let tex2d = this._createTexture2d(__format, __dataType);
         tex2d.setFilter(filterMin, filterMag);
         this._textures.set(targetType, {tex: tex2d, target: TexTarget.TEXTURE_2D});
+        this.needsUpdate();
     }
 
-    public setTexture2D(targetType: RenderTargetLocation, tex2d: Texture2D) {
-
+    public setTexture2D(targetType: RTLocation, tex2d: Texture2D) {
         this._textures.set(targetType, {tex: tex2d, target: TexTarget.TEXTURE_2D});
+        this.needsUpdate();
     }
 
-    public setTextureCube(targetType: RenderTargetLocation, texCube: TextureCube, target: TexTarget) {
+    public setTextureCube(targetType: RTLocation, texCube: TextureCube, target: TexTarget) {
         this._textures.set(targetType, {tex: texCube, target: target});
-    }
-
-    public setDepthStencilTexture() {
-        
     }
 
     public getState() {
@@ -84,9 +81,15 @@ export class Frame extends GraphicsObject {
         // TODO: check webgl2 why can't used texture to be render target;
         this._state.setClearDepth(true);
         this._state.setClearStencil(true);
-        let texture2d = this._createTexture2d(CGE.DEPTH_STENCIL, CGE.UNSIGNED_INT_24_8);
-        texture2d.setFilter(CGE.NEAREST, CGE.NEAREST);
-        this._depthStencilTexture = texture2d;
+        let tex = this._createTexture2d(CGE.DEPTH_STENCIL, CGE.UNSIGNED_INT_24_8);
+        tex.setFilter(CGE.NEAREST, CGE.NEAREST);
+        this._depthStencilTexture = tex;
+        this.needsUpdate();
+    }
+
+    public setDepthStencil(tex: Texture2D) {
+        this._depthStencilTexture = tex;
+        this.needsUpdate();
     }
 
     public setNeedsDepthStencil(b) {

@@ -4,7 +4,7 @@ import { Frame } from "../../graphics/Frame";
 import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
 import { IRenderer } from "../Renderer";
-import { RenderTargetLocation } from "../../graphics/GraphicsTypes";
+import { RTLocation } from "../../graphics/GraphicsTypes";
 import { SSAOMaterial } from "../../material/SSAOMaterial";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
 
@@ -64,7 +64,7 @@ export class SSAO extends PEBase {
 
         let tex2D = <Texture2D>(colorFrame.getDepthStencilTexture());
         this._mat.setDepthTexture(tex2D);
-        tex2D = <Texture2D>(colorFrame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        tex2D = <Texture2D>(colorFrame.getTextureFromType(RTLocation.COLOR).tex);
         this._mat.setDiffuseTexture(tex2D);
 
         ssaoMat.setPixelSize(p_x, p_y);

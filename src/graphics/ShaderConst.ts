@@ -72,6 +72,7 @@ export class ShaderConst {
     public static readonly lumPCT = ShaderConst._inUni('u_lumPCT');
     public static readonly multiUsing = ShaderConst._inUni('u_multiUsing');
     public static readonly aoParam = ShaderConst._inUni('u_aoParam');
+    public static readonly matType = ShaderConst._inUni('u_matType');
 
     /** world(model) matrix */
     public static readonly mMat = ShaderConst._inUni('u_mMat');
@@ -79,12 +80,16 @@ export class ShaderConst {
     public static readonly mIMat = ShaderConst._inUni('u_mIMat');
     /** view matrix */
     public static readonly vMat = ShaderConst._inUni('u_vMat');
+    /** inv view matrix */
+    public static readonly vIMat = ShaderConst._inUni('u_vIMat');
     /** projection matrix */
     public static readonly pMat = ShaderConst._inUni('u_pMat');
     /** view projection matrix */
     public static readonly mvMat = ShaderConst._inUni('u_mvMat');
     /** view projection matrix */
     public static readonly vpMat = ShaderConst._inUni('u_vpMat');
+    /** inv view projection matrix */
+    public static readonly vpIMat = ShaderConst._inUni('u_vpIMat');
     /** model view projection matrix */
     public static readonly mvpMat = ShaderConst._inUni('u_mvpMat');
 

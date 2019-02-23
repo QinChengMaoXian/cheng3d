@@ -1,4 +1,6 @@
 export class Vector4 {
+    public static readonly Zero: Vector4 = new Vector4();
+
     public v: Float32Array;
 
     constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 0) {

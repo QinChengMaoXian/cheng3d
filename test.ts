@@ -19,11 +19,14 @@ let env_lut = './resources/envLUT.png'
 
 // window['CGE'] = CGE;
 
-import { Main } from './projects/kamihikouki/main';
+// import { Main } from './projects/kamihikouki/main';
 
-let main = new Main();
-main.init();
-let app = main.getCGEApp();
+// let main = new Main();
+// main.init();
+let app = new CGE.Application();
+
+app.init(CGE.Platform.width, CGE.Platform.height);
+
 let mainScene = app.getScene();
 let stage = app.getStage();
 
@@ -131,9 +134,6 @@ stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
 // 相机控制代码块结束
 ///////////////////////////////////////////////////////////////////////////
 
-
-let game_app = main.getApp();
-
 // let app = new CGE.Application();
 // app.init(CGE.Platform.width, CGE.Platform.height);
 
@@ -188,8 +188,7 @@ cubeTexture.setTexture2ds(
 cubeTexture.setMipmap(true);
 cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
-let lutTexture = new CGE.Texture2D();
-lutTexture.setImageUrl(env_lut);
+let lutTexture = CGE.Texture2D.BrdfLUT;
 
 let diffTex = new CGE.Texture2D();
 diffTex.setImageUrl(brdf_basecolor);
@@ -488,7 +487,7 @@ triMesh.setMaterial(triMaterial);
 triMesh.setPosition(0, 0, -2500);
 
 // 三角形碰撞检测测试
-mainScene.addChild(triMesh);
+// mainScene.addChild(triMesh);
 
 let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
 
@@ -521,46 +520,5 @@ window.onerror = function(event) {
     noError = false;
 }
 
-// let _d = 0.5;
-
-// let forward = CGE.Event.createFromFunc(() => {camera.forwardStep(_d);});
-// let back = CGE.Event.createFromFunc(() => {camera.forwardStep(-_d);});
-// let left = CGE.Event.createFromFunc(() => {camera.horizontalStep(-_d);});
-// let right = CGE.Event.createFromFunc(() => {camera.horizontalStep(_d);});
-
-// let verticalTop = CGE.Event.createFromFunc(() => {camera.verticalStep(_d);});
-// let verticalDown = CGE.Event.createFromFunc(() => {camera.verticalStep(-_d);});
-
-// window.onblur = function(event) {
-//     events.clear();
-// }
-
-// let mouseDown = false;
-
-// window.onmousemove = function(event) {
-//     if (mouseDown) {
-//         let del = 0.005;
-//         let moveX = event.movementX * del;
-//         let moveY = event.movementY * del;
-//         camera.rotateViewFromForward(moveX, moveY);
-//     }
-// }
-
-// window.onmousedown = function(event) {
-//     mouseDown = true;
-// }
-
-// window.onmouseup = function(event) {
-//     mouseDown = false;
-// }
-
-// window.onkeydown = function(e) {
-//     console.log(e);
-// }
-// app.slow = true;
 app.start();
-
-// app.getTimer().once(2000, null, () => {
-//     app.stop();
-// });
 

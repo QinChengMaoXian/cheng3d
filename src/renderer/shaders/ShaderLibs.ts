@@ -1,12 +1,14 @@
-import encodeFloat2rgb from './mods/encodeFloat2RGB';
+import encodeFloat2RGB from './mods/encodeFloat2RGB';
+import decodeRGB2Float from './mods/decodeRGB2Float'
 import skin_vert from './mods/skinVert'
 
 export const mods = {
-    'encodeFloat2rgb': encodeFloat2rgb,
+    'encodeFloat2RGB': encodeFloat2RGB,
+    'decodeRGB2Float': decodeRGB2Float,
     'skin_vert': skin_vert,
 }
 
-const reg = /#include<([a-zA-Z0-9_./]+)>/;
+const reg = /#include\s*<([a-zA-Z0-9_./]+)>/;
 
 export function repStr(text: string) {
     let src = text;
@@ -40,6 +42,7 @@ import tone_mapping from './libs/tone_mapping_frag_glsl';
 import log_sample from './libs/log_sample_frag_glsl';
 import ssao from './libs/ssao_frag_glsl';
 import gbuffer from './libs/gbuffer_frag_glsl';
+import deferred_shading from './libs/deferred_shading_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -65,7 +68,7 @@ export const shaders = {
     'standard': {
         vert: repStr(standard_vert),
         frag: repStr(standard_frag),
-        def: {
+        defer_src: {
             vert: repStr(standard_vert),
             frag: repStr(gbuffer),
         }
@@ -109,5 +112,10 @@ export const shaders = {
     'ssao': {
         vert: repStr(fullscreen_vert),
         frag: repStr(ssao),
+    },
+
+    'deferred_shading': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(deferred_shading),
     }
 }

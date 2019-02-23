@@ -38,4 +38,8 @@ export class Mesh extends Object3D {
             this._bounding.applyMatrix(this._matrix);
         }
     }
+
+    public get isMesh(): boolean {
+        return true;
+    }
 }

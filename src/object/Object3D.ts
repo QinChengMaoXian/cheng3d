@@ -155,10 +155,6 @@ export class Object3D extends Base {
         return false;
     }
 
-    public isLighting(): boolean {
-        return false;
-    }
-
     public getBounding() {
         return this._bounding;
     }
@@ -206,6 +202,18 @@ export class Object3D extends Base {
 
     public get rotateZ() {
         return 
+    }
+
+    public get isLight(): boolean {
+        return false;
+    }
+
+    public get isMesh(): boolean {
+        return false;
+    }
+
+    public get isScene(): boolean {
+        return false;
     }
 
     // TODO

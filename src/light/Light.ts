@@ -31,7 +31,7 @@ export class Light extends Object3D {
         this._shadow = false;
     }
 
-    public isLighting() {
+    public get isLight() {
         return true;
     }
 

@@ -72,6 +72,28 @@ export class Material extends Base {
         return this._properties;
     }
 
+    public disalbeAlpha() {
+        this._alphaTest = this._alphaBlend = false;
+    }
+
+    public enableAlphaTest() {
+        this._alphaTest = true;
+        this._alphaBlend = false;
+    }
+
+    public enableAlphaBlend() {
+        this._alphaBlend = true;
+        this._alphaTest = false;
+    }
+
+    public get alphaTest() {
+        return this._alphaTest;
+    }
+
+    public get alphaBlend() {
+        return this._alphaBlend;
+    }
+
     public getMapProvide() {
         return [];
     }
@@ -86,5 +108,9 @@ export class Material extends Base {
 
     public get shader(): Shader {
         return this._shader;
+    }
+
+    public get supportDeferred(): boolean {
+        return false;
     }
 }

@@ -4,7 +4,6 @@ import { Geometry } from '../graphics/Geometry'
 
 import { Entity } from '../object/Entity'
 import { Component } from '../object/Component'
-import { AttribType } from '../graphics/GraphicsTypes'
 
 import { ShaderConst } from '../graphics/ShaderConst'
 

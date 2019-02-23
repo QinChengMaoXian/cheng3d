@@ -5,6 +5,7 @@ import { Frame, ITexTarget, TexTarget } from '../../graphics/Frame';
 import { WebGLRenderer } from '../WebGLRenderer';
 import { glTexture2D } from './glTexture2D';
 import { glTextureCube } from './glTextureCube';
+import { WebGLSupports } from '../WebGLSupports';
 
 export class glFrame extends glObject {
     protected _frame: WebGLFramebuffer = undefined;
@@ -66,10 +67,10 @@ export class glFrame extends glObject {
         return this;
     }
 
-    public apply(gl: WebGLRenderingContext) {
+    public apply(gl: WebGLRenderingContext, ext: WebGLSupports) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this._frame);
-        if (this._drawBuffers.length > 1 && (<any>gl).drawBuffers) {
-            (<any>gl).drawBuffers(this._drawBuffers);
+        if (this._drawBuffers.length > 1 && ext.drawBuffers) {
+            ext.drawBuffers(this._drawBuffers);
         } 
     }
 }

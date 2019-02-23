@@ -36,6 +36,16 @@ export class Texture2D extends Texture {
         return Texture2D._Black;
     }
 
+    private static _BrdfLUT: Texture2D;
+    public static get BrdfLUT(): Texture2D {
+        if (!Texture2D._BrdfLUT) {
+            let tex = new Texture2D();
+            tex.setImageUrl('./resources/envLUT.png');
+            Texture2D._BrdfLUT = tex;
+        }
+        return Texture2D._BrdfLUT;
+    }
+
     private static _ODTex: Texture2D;
     public static get ODTex(): Texture2D {
         if (!Texture2D._ODTex) {

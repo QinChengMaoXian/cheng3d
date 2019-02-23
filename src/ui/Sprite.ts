@@ -143,9 +143,10 @@ export class Sprite extends Object3D {
         if (!this.checkPick(x, y) || !this.mouseEnable) {
             return false;
         }
-        // 将自己添加到path中 todo: 可以穿透的物体没有事件怎么办？
+        // 将自己添加到path中 TODO: 可以穿透的物体没有事件怎么办？
         e.path.push(this);
 
+        // 遍历子节点的选中情况
         let children = this._children;
         let l = children.length;
         for (let i = 0 ; i < l; i++) {
@@ -155,6 +156,7 @@ export class Sprite extends Object3D {
             }
         }
 
+        // 对自己发送事件
         this.event(e.type, [e]);
         if (!this._isThrough || e.stopPropagation) {
             return true;

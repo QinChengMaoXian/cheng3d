@@ -33,8 +33,6 @@ export class StandardMaterial extends Material {
         this.setProperty(s.baseColor, this._baseColor);
         this.setProperty(s.specular, this._specular);
 
-        
-        // this.setProperty()
         this._baseColor.set(1.0, 1.0, 1.0, 1.0);
     }
 
@@ -68,10 +66,13 @@ export class StandardMaterial extends Material {
 
     public setSpecular(roughness: number, metallic: number, ao: number) {
         this._specular.set(roughness, metallic, ao);
-
     }
 
     public get type(): string {
         return 'standard';
+    }
+
+    public get supportDeferred(): boolean {
+        return true;
     }
 }

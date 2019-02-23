@@ -3,30 +3,26 @@ export default `
 
 precision mediump float;
 
-varying vec2 v_uv;
-varying vec3 v_tangentToView0;
-varying vec3 v_tangentToView1;
-varying vec3 v_tangentToView2;
-varying vec3 v_normal;
-varying vec3 v_worldPos;
-
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_normalMap;
-uniform sampler2D u_roughnessMap;
-uniform sampler2D u_metallicMap;
-uniform sampler2D u_aoMap;
+uniform sampler2D u_depthMap;
+
 uniform sampler2D u_brdfLUTMap;
 
 uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
 
-uniform vec3 u_specular;
+uniform mat4 u_vpIMat;
+// uniform vec4 u_uvOffset;
 uniform vec3 u_cameraPos;
-uniform vec4 u_baseColor;
-uniform vec3 u_lightDir;
 uniform vec4 u_lightColor;
+uniform vec3 u_lightDir;
+// uniform vec4 u_lightPos;
+uniform vec2 u_pixelSize;
 
 const float PI = 3.14159265359;
+
+varying vec2 v_uv;
 
 float dot_plus(vec3 v1, vec3 v2)
 {
@@ -80,47 +76,43 @@ vec3 FresnelSchlick(float NdotL, vec3 F0)
 vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - NdotL), 5.0);
-}  
-
-// 用于pbr环境光
-float FastDFG(float roughness, float NoV, float NoL)
-{
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float G_V = NoV + sqrt( (NoV - NoV * a2) * NoV + a2 );
-    float G_L = NoL + sqrt( (NoL - NoL * a2) * NoL + a2 );
-    return 1.0 / ( G_V * G_L );
 }
 
-// vec3 brdf = FastDFG(roughness, NdotV, NdotL) * metalic;
+#include <decodeRGB2Float>
 
-void main()
+void main() 
 {
-    vec4 spec = pow(texture2D(u_roughnessMap, v_uv), vec4(1.0));
+    vec2 uv = gl_FragCoord.xy * u_pixelSize;
+
+    vec4 rt0 = texture2D(u_diffuseMap, uv);
+    vec4 rt1 = texture2D(u_normalMap, uv);
+    vec4 rt2 = texture2D(u_depthMap, uv);
+
+    vec3 albedo = rt0.xyz;
+    vec3 normal = rt1.xyz;
+    vec3 depth3 = rt2.xyz;
+
+    normal = 2.0 * normal - 1.0;
+
+    float roughness = rt0.w;
+    float metallic = rt1.w;
+    float ao = rt2.w;
     
-    float roughness = spec.r * u_specular.r;
-    float metallic = spec.g * u_specular.g;
-    float ao = spec.b * u_specular.b;
+    float depth = decodeRGB2Float(depth3);
 
-    vec4 baseColor = pow(texture2D(u_diffuseMap, v_uv), vec4(2.2)) * u_baseColor;
+    // uv.y = 1.0 - uv.y;
+    uv = 2.0 * uv - 1.0;
 
-    vec3 albedo = baseColor.xyz;
+    vec4 projPos = vec4(uv.x, uv.y, depth, 1.0);
+    vec4 worldPos = projPos * u_vpIMat;
+    worldPos /= worldPos.w;
 
     vec3 F0 = vec3(0.04);
-    
     F0 = F0 * (1.0 - metallic) + albedo * metallic;
 
-    vec3 normalTex = texture2D(u_normalMap, v_uv).xyz;
-    vec3 normal = normalTex * 2.0 - 1.0;    
-    mat3 normalMatrix = mat3(
-        normalize(v_tangentToView0), 
-        normalize(v_tangentToView1), 
-        normalize(v_tangentToView2)
-    );
-
     vec3 L = normalize(u_lightDir.xyz);
-    vec3 V = normalize(u_cameraPos - v_worldPos);
-    vec3 N = normalize(normalMatrix * normal);
+    vec3 V = normalize(u_cameraPos - worldPos.xyz);
+    vec3 N = normalize(normal);
     vec3 H = normalize(V + L);
 
     vec3 R = N * dot_plus(N, V) * 2.0 - V; 
@@ -162,7 +154,5 @@ void main()
     vec3 color = ambient + lo;
 
     gl_FragColor = vec4(color, 1.0);
-    // gl_FragColor = vec4(vec3(color), 1.0);
-    // gl_FragColor = vec4(v_normal, 1.0);
 }
 `;

@@ -1,5 +1,7 @@
 export default `
 
+#extension GL_EXT_draw_buffers : enable
+
 precision mediump float;
 
 varying vec2 v_uv;
@@ -20,12 +22,10 @@ uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
 
 uniform vec3 u_specular;
-uniform vec3 u_cameraPos;
 uniform vec4 u_baseColor;
-uniform vec3 u_lightDir;
-uniform vec4 u_lightColor;
+uniform vec2 u_matType;
 
-const float PI = 3.14159265359;
+#include <encodeFloat2RGB>
 
 void main()
 {
@@ -49,6 +49,10 @@ void main()
 
     vec3 N = normalize(normalMatrix * normal);
     
-    
+    vec3 depth3 = encodeFloat2RGB(gl_FragCoord.z * 0.5 + 1.0);
+
+    gl_FragData[0] = vec4(albedo, roughness );
+    gl_FragData[1] = vec4(N * 0.5 + 0.5, metallic);
+    gl_FragData[2] = vec4(depth3, ao);
 }
 `;

@@ -4,7 +4,7 @@ import { Frame } from "../../graphics/Frame";
 import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
 import { IRenderer } from "../Renderer";
-import { RenderTargetLocation } from "../../graphics/GraphicsTypes";
+import { RTLocation } from "../../graphics/GraphicsTypes";
 import { FXAAMaterial } from "../../material/FXAAMaterial";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
 
@@ -41,7 +41,7 @@ export class FXAA extends PEBase {
         let colorFrame: Frame = renderer.currentColorFrame;
         let targetFrame: Frame = renderer.currectTargetFrame;
 
-        let tex2D = <Texture2D>(colorFrame.getTextureFromType(RenderTargetLocation.COLOR).tex);
+        let tex2D = <Texture2D>(colorFrame.getTextureFromType(RTLocation.COLOR).tex);
         this._material.setSrcTexture(tex2D);
 
         pipe.renderPass(this._mesh, targetFrame);

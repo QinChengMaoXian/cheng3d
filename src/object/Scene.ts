@@ -24,4 +24,8 @@ export class Scene extends Object3D {
     public getActiveCamera() {
         return this._activeCamera;
     }
+
+    public get isScene(): boolean {
+        return true;
+    }
 }
