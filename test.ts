@@ -191,12 +191,12 @@ cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 let lutTexture = CGE.Texture2D.BrdfLUT;
 
 let diffTex = new CGE.Texture2D();
-diffTex.setImageUrl(brdf_basecolor);
+diffTex.setImageUrl(brdf_basecolor, CGE.Texture2D.White);
 diffTex.setMipmap(true);
 diffTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
 let normTex = new CGE.Texture2D();
-normTex.setImageUrl(brdf_normal);
+normTex.setImageUrl(brdf_normal, CGE.Texture2D.Normal);
 normTex.setMipmap(true);
 normTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
@@ -232,7 +232,7 @@ for (let ix = 0; ix <= 2; ix++) {
         let r = ix === 0 ? 0.1 : ix;
         let m = iz === 0 ? 0.01 : iz;
         
-        mat.setSpecular((r) * 0.1, (m) * 0.2, 1);
+        mat.setSpecular(0.01, 1.0, 1);
 
         mat.setBrdfLUTMap(lutTexture);
 
@@ -242,15 +242,25 @@ for (let ix = 0; ix <= 2; ix++) {
         
         mesh.setMaterial(mat);
 
-        mesh.setPosition(ix * 20, 0, -iz * 20);
-        mesh.setScale(8, 8, 8);
+        mesh.setPosition(ix * 25, 0, -iz * 25);
+        mesh.setScale(10, 10, 10);
 
         obj3D.addChild(mesh);
     }
 
 } 
 
-let webgl2: WebGLRenderingContext
+let skyboxMat = new CGE.SkyboxMaterial();
+skyboxMat.setDiffuseMap(cubeTexture);
+
+let boxGeo = new CGE.BoxGeometry();
+
+let skyboxMesh = new CGE.Mesh();
+
+skyboxMesh.setGeometry(boxGeo);
+skyboxMesh.setMaterial(skyboxMat);
+
+mainScene.addChild(skyboxMesh);
 
 let quat = new CGE.Quaternion();
 quat.setAxisAngle(new CGE.Vector3(0, 0, 1), 0.02);
@@ -502,7 +512,7 @@ document.body.appendChild(renderer.getCanvas());
 
 let mesh = new CGE.Mesh();
 mesh.setPosition(0, 0, 20);
-mesh.setScale(20, 20, 20);
+mesh.setScale(20, 20, 10);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(standMat);
 mainScene.addChild(mesh);

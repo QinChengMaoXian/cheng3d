@@ -1,12 +1,12 @@
 import encodeFloat2RGB from './mods/encodeFloat2RGB';
 import decodeRGB2Float from './mods/decodeRGB2Float';
-import skin_vert from './mods/skinVert';
+import skinVert from './mods/skinVert';
 import ACESToneMapping from './mods/ACESToneMapping';
 
 export const mods = {
     'encodeFloat2RGB': encodeFloat2RGB,
     'decodeRGB2Float': decodeRGB2Float,
-    'skin_vert': skin_vert,
+    'skinVert': skinVert,
     'ACESToneMapping': ACESToneMapping,
 }
 
@@ -37,14 +37,16 @@ import standard_vert from './libs/standard_vert_glsl';
 import standard_frag from './libs/standard_frag_glsl';
 import fxaa_frag from './libs/fxaa_frag_glsl';
 import down_sample4_frag from './libs/down_sampling4_frag_glsl';
-import gaussian_blur from './libs/gaussian_blur_frag_glsl';
-import down_sample_to1 from './libs/down_sampling_to1_frag_glsl';
-import bloom from './libs/bloom_frag_glsl';
-import tone_mapping from './libs/tone_mapping_frag_glsl';
-import log_sample from './libs/log_sample_frag_glsl';
-import ssao from './libs/ssao_frag_glsl';
-import gbuffer from './libs/gbuffer_frag_glsl';
-import deferred_shading from './libs/deferred_shading_frag_glsl';
+import gaussian_blur_frag from './libs/gaussian_blur_frag_glsl';
+import down_sample_to1_frag from './libs/down_sampling_to1_frag_glsl';
+import bloom_frag from './libs/bloom_frag_glsl';
+import tone_mapping_frag from './libs/tone_mapping_frag_glsl';
+import log_sample_frag from './libs/log_sample_frag_glsl';
+import ssao_frag from './libs/ssao_frag_glsl';
+import gbuffer_frag from './libs/gbuffer_frag_glsl';
+import deferred_shading_frag from './libs/deferred_shading_frag_glsl';
+import skybox_vert from './libs/skybox_vert_glsl';
+import skybox_frag from './libs/skybox_frag_glsl'; 
 
 export const shaders = {
     'fullscreen': {
@@ -72,7 +74,7 @@ export const shaders = {
         frag: repStr(standard_frag),
         defer_src: {
             vert: repStr(standard_vert),
-            frag: repStr(gbuffer),
+            frag: repStr(gbuffer_frag),
         }
     },
 
@@ -88,36 +90,41 @@ export const shaders = {
 
     'gaussian_blur': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(gaussian_blur),
+        frag: repStr(gaussian_blur_frag),
     },
 
     'down_sample_to1': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(down_sample_to1),
+        frag: repStr(down_sample_to1_frag),
     },
 
     'bloom': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(bloom),
+        frag: repStr(bloom_frag),
     },
 
     'tone_mapping': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(tone_mapping),
+        frag: repStr(tone_mapping_frag),
     },
 
     'log_sample': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(log_sample),
+        frag: repStr(log_sample_frag),
     },
 
     'ssao': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(ssao),
+        frag: repStr(ssao_frag),
     },
 
     'deferred_shading': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(deferred_shading),
+        frag: repStr(deferred_shading_frag),
+    },
+
+    'skybox': {
+        vert: repStr(skybox_vert),
+        frag: repStr(skybox_frag),
     }
 }

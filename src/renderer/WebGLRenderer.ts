@@ -669,7 +669,7 @@ export class WebGLRenderer extends Base implements IRenderer {
                 this.useFrame(targetFrame, this._notClearDepthState);
 
                 gl.disable(gl.DEPTH_TEST);                
-                gl.stencilFunc(gl.EQUAL, 0x80, 0xFF);
+                gl.stencilFunc(gl.EQUAL, 0x80, 0x80);
                 gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
                 this._renderMesh(this._deferMesh, this._defCamera);
                 gl.disable(gl.STENCIL_TEST);
@@ -679,7 +679,11 @@ export class WebGLRenderer extends Base implements IRenderer {
             } else {
                 // 正常渲染走这条，注意同样没有优化光源
                 this.useFrame(this.currectTargetFrame, this._defFrameState);
-                _renderScene(scene);
+
+                _preRenderObjects(scene, scene.visible);
+                _renderList(_noAlphaList);
+                _renderList(_alphaTestList);
+                _renderList(_alphaBlendList);
             }
 
             this.exchangeFrame();

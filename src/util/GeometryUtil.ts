@@ -38,6 +38,81 @@ export class ScreenGeometry extends Geometry {
     }
 }
 
+export class BoxGeometry extends Geometry {
+
+    protected _size: Vector3 = new Vector3;
+
+    constructor(l: number = 1, w: number = 1, h: number = 1) {
+        super();
+        this.setBoxParameter(l, w, h);
+    }
+
+    setBoxParameter(l: number = 1, w: number = 1, h: number = 1) {
+        this._size.set(l * 0.5, w * 0.5, h * 0.5);
+        this._createGeo();
+    }
+
+    private _createGeo() {
+        let vertices = [
+            -1.0,  1.0, -1.0,
+            -1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+             1.0,  1.0, -1.0,
+            -1.0,  1.0, -1.0,
+        
+            -1.0, -1.0,  1.0,
+            -1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0,  1.0,
+            -1.0, -1.0,  1.0,
+        
+             1.0, -1.0, -1.0,
+             1.0, -1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0, -1.0,
+             1.0, -1.0, -1.0,
+        
+            -1.0, -1.0,  1.0,
+            -1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0, -1.0,  1.0,
+            -1.0, -1.0,  1.0,
+        
+            -1.0,  1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            -1.0,  1.0, -1.0,
+        
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0,
+             1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0
+        ];
+
+        let vertexPositionData = new Float32Array(vertices);
+
+        let attribs = [
+            {
+                name: 'Position',
+                attribute: ShaderConst.position,
+                num: 3,
+                offset: 0,
+            },
+        ];
+
+        this.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYTES_PER_ELEMENT * 3, vertexPositionData);
+        this.setDrawParameter(36);
+    }
+}
+
 export class SphereGeometry extends Geometry {
 
     protected _radius: number = 1;

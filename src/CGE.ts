@@ -28,6 +28,7 @@ export { Material } from './material/Material';
 export { DiffuseMaterial } from './material/DiffuseMaterial';
 export { StandardMaterial } from './material/StandardMaterial';
 export { CartoonMaterial } from './material/CartoonMaterial';
+export { SkyboxMaterial } from './material/SkyboxMaterial';
 
 export { Light } from './light/Light';
 export { DirectionLight } from './light/DirectionLight';
@@ -71,4 +72,4 @@ export { Platform } from './platform/Platform';
 
 export { Sprite } from './ui/Sprite';
 
-export { SphereGeometry } from './util/GeometryUtil';
+export { SphereGeometry, BoxGeometry } from './util/GeometryUtil';
