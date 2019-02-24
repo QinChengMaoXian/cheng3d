@@ -76,11 +76,6 @@ export class WebGLRenderer extends Base implements IRenderer {
     /** 当前的frame */
     private _curFrame: Frame;
     // private _defFrame: Frame;
-
-    /** 是否可以渲染到浮点纹理,TODO：这个检测如何实现？ */
-    private _renderToFloatTexture: boolean = false;
-    /** 是否可以渲染到半浮点纹理 TODO：这个检测如何实现？ */
-    private _renderToHalfFloatTexture: boolean = false;
     
     /** 当前渲染器的id */
     private _rendererId = WebGLRenderer.RendererNum++;
@@ -184,6 +179,10 @@ export class WebGLRenderer extends Base implements IRenderer {
             this._gFrame.setSize(width, height);
         }
 
+        if (this._notClearDepthState) {
+            this._notClearDepthState.setViewports(0, 0, width, height);
+        }
+
         this.event(Event.RENDERER_RESIZE, [width, height]);
     };
 
@@ -231,48 +230,7 @@ export class WebGLRenderer extends Base implements IRenderer {
         const gl = this._gl;
         let ext = new WebGLSupports();
         ext.init(gl, true);
-        this._ext = ext;
-        // let getExtension = function(extName) {
-        //     let ext = _gl.getExtension(extName) || _gl.getExtension('WEBKIT_' + extName) || _gl.getExtension('MOZ_' + extName);
-        //     if (!ext) {
-        //         Logger.warn('Can not use webgl extension ' + extName);
-        //     }
-        //     return ext;
-        // };
-
-        // _ext['OES_vertex_array_object'] = getExtension("OES_vertex_array_object");
-        // _ext['WEBGL_draw_buffers'] = getExtension("WEBGL_draw_buffers");
-        // _ext['OES_standard_derivatives'] = getExtension("OES_standard_derivatives");
-        // _ext['OES_texture_half_float'] = getExtension("OES_texture_half_float");
-        // _ext['OES_texture_float'] = getExtension("OES_texture_float");
-        // _ext['OES_texture_float_linear'] = getExtension("OES_texture_float_linear");
-        // _ext['WEBGL_depth_texture'] = getExtension("WEBGL_depth_texture");
-        // _ext['EXT_texture_filter_anisotropic'] = getExtension("EXT_texture_filter_anisotropic");
-        // _ext['EXT_shader_texture_lod'] = getExtension('EXT_shader_texture_lod');
-
-        // if (!_ext['WEBGL_draw_buffers']
-        //     || !_ext['OES_standard_derivatives']
-        //     || !_ext['OES_texture_half_float']
-        //     || !_ext['OES_texture_float']
-        //     || !_ext['WEBGL_depth_texture']
-        //     || !_ext['EXT_texture_filter_anisotropic']) {
-        //     // Logger.error('Can not use webgl extension');
-        //     return undefined;
-        // }
-
-        // Object.assign(_gl, {
-        //     VERTEX_ARRAY_BINDING: _ext['OES_vertex_array_object'].VERTEX_ARRAY_BINDING_OES,
-        //     MAX_COLOR_ATTACHMENTS: _ext['WEBGL_draw_buffers'].MAX_COLOR_ATTACHMENTS_WEBGL,
-        //     MAX_DRAW_BUFFERS: _ext['WEBGL_draw_buffers'].MAX_DRAW_BUFFERS_WEBGL,
-        //     TEXTURE_MAX_ANISOTROPY: _ext['EXT_texture_filter_anisotropic'].TEXTURE_MAX_ANISOTROPY_EXT,
-
-        //     createVertexArray: _ext['OES_vertex_array_object'].createVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        //     deleteVertexArray: _ext['OES_vertex_array_object'].deleteVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        //     bindVertexArray: _ext['OES_vertex_array_object'].bindVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-        //     isVertexArray: _ext['OES_vertex_array_object'].isVertexArrayOES.bind(_ext['OES_vertex_array_object']),
-            
-        //     drawBuffers: _ext['WEBGL_draw_buffers'].drawBuffersWEBGL.bind(_ext['WEBGL_draw_buffers']),
-        // });
+        this._ext = ext;     
     }
 
     /** 
@@ -384,9 +342,6 @@ export class WebGLRenderer extends Base implements IRenderer {
         return glprog;
     }
 
-    /** 纹理索引的cache 临时写在这里 */
-    private _texIdx = {};
-
     /** 
      * 新增或者更新Mesh的数据
      * 当前为了着色器的引用计数
@@ -403,20 +358,18 @@ export class WebGLRenderer extends Base implements IRenderer {
         if (!glProgram) {
             return false;
         }
-        let texIdx = this._texIdx;
 
-        mat.getTextures().forEach((tex, type) => {
-            let glTex: glTexture = this.initTexture(tex);
-            if (glTex) {
-                let texLoc = glProgram.getTextureIndex(type);
-                if (texLoc !== undefined && texLoc !== null) {
-                    if (this._texIdx[texLoc] !== glTex) {
-                        glTex.apply(gl, texLoc);
-                        texIdx[texLoc] = glTex;
-                    }
-                }
+        glProgram.getTextures().forEach((texLoc, type) => {
+            let tex: Texture = mat.getTexture(type);
+            if (!tex) {
+                return;
             }
-        });
+            let glTex = this.initTexture(tex);
+            if (!glTex) {
+                return;
+            }
+            glTex.apply(gl, texLoc);
+        })
 
         return true;
     }
@@ -809,6 +762,9 @@ export class WebGLRenderer extends Base implements IRenderer {
         return this._postEffectPipline.getEnablingPostEffect();
     }
 
+    /**
+     * 切换延迟渲染
+     */
     protected _swtichDeferredRendering(v: boolean) {
         if (this._deferredRendering === v) {
             return;

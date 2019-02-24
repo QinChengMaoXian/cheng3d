@@ -10,13 +10,15 @@ varying vec3 v_normal;
 varying vec3 v_tangent;
 varying vec3 v_binormal;
 
+uniform vec4 u_uvOffset;
+
 uniform mat4 u_mMat;
 uniform mat4 u_mITMat;
 uniform mat4 u_mvpMat;
 
 void main()
 {
-    v_uv = a_texcoord;
+    v_uv = a_texcoord * u_uvOffset.xy + u_uvOffset.zw;
 
     vec4 worldPos = u_mMat * a_position;
     v_worldPos = worldPos.xyz / worldPos.w;

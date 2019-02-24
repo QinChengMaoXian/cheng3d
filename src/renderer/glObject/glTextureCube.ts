@@ -24,6 +24,9 @@ export class glTextureCube extends glTexture2D {
         let textures = textureCube.getTexture2ds();
         for (let i = 0; i < textures.length; i++) {
             let texture2d = textures[i];
+            if (!texture2d.loaded) {
+                texture2d = texture2d._def;
+            }
             if (texture2d && this._setTextureData(gl, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, texture2d) === undefined) {
                 return undefined;
             }

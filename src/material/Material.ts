@@ -11,8 +11,8 @@ import { Shader } from '../graphics/Shader';
 export class Material extends Base {
     
     protected _shader: Shader = new Shader;
-    protected _alphaTest: boolean = false;
-    protected _alphaBlend: boolean = false;
+    protected _alphaTest: boolean;
+    protected _alphaBlend: boolean;
 
     public blendFunc: number;
     public blendColorSrc: number;
@@ -20,8 +20,8 @@ export class Material extends Base {
     public blendAlphaSrc: number;
     public blendAlphaDst: number;
 
-    protected _textures: Map<string | number, Texture>;
-    protected _properties: Map<string | number, any>;
+    private _textures: Map<string | number, Texture>;
+    private _properties: Map<string | number, any>;
 
     constructor() {
         super();
@@ -46,8 +46,20 @@ export class Material extends Base {
         this._textures.set(type, texture);
     }
 
+    protected removeTexture(type: string | number) {
+        this._textures.delete(type);
+    }
+
     protected setProperty(type: string | number, data: any) {
         this._properties.set(type, data);
+    }
+
+    protected removeProperty(type: string | number) {
+        this._properties.delete(type);
+    }
+
+    public getProperty(type: string | number) {
+        return this._properties.get(type);
     }
 
     public setTextureUrl(type: string | number, url: string) {
@@ -62,14 +74,6 @@ export class Material extends Base {
 
     public getTexture(type: string | number) {
         return this._textures.get(type);
-    }
-
-    public getTextures() {
-        return this._textures;
-    }
-
-    public getProperties() {
-        return this._properties;
     }
 
     public disalbeAlpha() {
@@ -100,6 +104,18 @@ export class Material extends Base {
 
     public getPropertyProvide() {
         return [];
+    }
+
+    public canLighting() {
+        return false;
+    }
+
+    protected clearProperties() {
+        this._properties.clear();
+    }
+
+    protected clearTextures() {
+        this._textures.clear();
     }
 
     public get type(): string {

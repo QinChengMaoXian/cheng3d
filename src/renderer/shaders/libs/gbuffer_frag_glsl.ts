@@ -43,7 +43,7 @@ void main()
     
     vec3 depth3 = encodeFloat2RGB(gl_FragCoord.z * 0.5 + 1.0);
 
-    gl_FragData[0] = vec4(albedo, roughness );
+    gl_FragData[0] = vec4(albedo, roughness);
     gl_FragData[1] = vec4(normal * 0.5 + 0.5, metallic);
     gl_FragData[2] = vec4(depth3, ao);
 }

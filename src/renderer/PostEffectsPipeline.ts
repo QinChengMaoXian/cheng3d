@@ -9,9 +9,8 @@ import { Object3D } from "../object/Object3D";
 import { Frame } from "../graphics/Frame";
 
 /**
- * TODO: post effect统一的管理器。
+ * 
  */
-
 export class PostEffectsPipeline {
 
     protected _postEffects: PEBase[];

@@ -170,58 +170,29 @@ stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
 });
 
 // 以上 相机控制代码块结束
-///////////////////////////////////////////////////////////////////////////
-
-// let app = new CGE.Application();
-// app.init(CGE.Platform.width, CGE.Platform.height);
-
-// let colorTexrure = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-// colorTexrure.setImageUrl(test_diff);
-// colorTexrure.setFilter(CGE.LINEAR, CGE.LINEAR);
-// colorTexrure.setMipmap(true);
-// colorTexrure.setWarp(CGE.REPEAT, CGE.REPEAT);
-
-// let normalTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-// normalTexture.setImageUrl(test_ddn);
-// normalTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-// normalTexture.setMipmap(true);
-// normalTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
-
-// let specTexture = new CGE.Texture2D();// createTexture2DFromImage(test_diff, true);
-// specTexture.setImageUrl(test_spec);
-// specTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-// specTexture.setMipmap(true);
-// specTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
-
-// let objLoader = new CGE.OBJLoader();
-
-// let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
-
-// let standMat = new CGE.StandardMaterial(brdf_basecolor, brdf_normal, brdf_specular, brdf_specular, brdf_specular);
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // 下 Brdf 球体阵列
 let geo = new CGE.SphereGeometry(1, 32, 32);
 
-let createTexture2DFromImage = function(imgSrc, mipmap?) {
+let createTexture2DFromImage = function(imgSrc, func?) {
     let texture2d = new CGE.Texture2D();
-    texture2d.setImageUrl(imgSrc);
-    if (mipmap === true) {
-        texture2d.setMipmap(true);
-        texture2d.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
-    }
+    texture2d.setImageUrl(imgSrc, CGE.Texture2D.White, func);
     return texture2d;
 };
 
 let cubeTexture = new CGE.TextureCube();
+
+let func = () => {
+    cubeTexture.needsUpdate();
+}
+
 cubeTexture.setTexture2ds(
-    createTexture2DFromImage('./resources/skybox/px.jpg'),
-    createTexture2DFromImage('./resources/skybox/nx.jpg'),
-    createTexture2DFromImage('./resources/skybox/py.jpg'),
-    createTexture2DFromImage('./resources/skybox/ny.jpg'),
-    createTexture2DFromImage('./resources/skybox/pz.jpg'),
-    createTexture2DFromImage('./resources/skybox/nz.jpg')
+    createTexture2DFromImage('./resources/skybox/px.jpg', func),
+    createTexture2DFromImage('./resources/skybox/nx.jpg', func),
+    createTexture2DFromImage('./resources/skybox/py.jpg', func),
+    createTexture2DFromImage('./resources/skybox/ny.jpg', func),
+    createTexture2DFromImage('./resources/skybox/pz.jpg', func),
+    createTexture2DFromImage('./resources/skybox/nz.jpg', func)
 );
 
 cubeTexture.setMipmap(true);
@@ -233,28 +204,29 @@ let diffTex = new CGE.Texture2D();
 diffTex.setImageUrl(brdf_basecolor, CGE.Texture2D.White);
 diffTex.setMipmap(true);
 diffTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
-diffTex.setWarp(CGE.MIRRORED_REPEAT, CGE.MIRRORED_REPEAT);
+diffTex.setWarp(CGE.REPEAT, CGE.REPEAT);
 
 let normTex = new CGE.Texture2D();
 normTex.setImageUrl(brdf_normal, CGE.Texture2D.Normal);
 normTex.setMipmap(true);
 normTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
-normTex.setWarp(CGE.MIRRORED_REPEAT, CGE.MIRRORED_REPEAT);
+normTex.setWarp(CGE.REPEAT, CGE.REPEAT);
 
 let specTex = new CGE.Texture2D();
-specTex.setImageUrl(brdf_specular);
+specTex.setImageUrl(brdf_specular, CGE.Texture2D.White);
 specTex.setMipmap(true);
 specTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
-specTex.setWarp(CGE.MIRRORED_REPEAT, CGE.MIRRORED_REPEAT);
+specTex.setWarp(CGE.REPEAT, CGE.REPEAT);
 
 let obj3D = new CGE.Object3D();
 obj3D.name = '一堆球';
 
 let standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
-
+// let standMat = new CGE.StandardMaterial;
 standMat.setIrradianceMap(cubeTexture);
 standMat.setPrefilterMap(cubeTexture);
-standMat.setBrdfLUTMap(lutTexture);
+// standMat.setSpecular(0.04, 0, 1);
+// standMat.setBrdfLUTMap();
 window['standMat'] = standMat;
 mainScene.addChild(obj3D);
 
@@ -263,24 +235,18 @@ for (let ix = 0; ix <= 2; ix++) {
     for (let iz = 0; iz <= 2; iz++) {
         let mesh = new CGE.Mesh();
         mesh.setGeometry(geo);
-        // let mat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 
-        let mat = new CGE.StandardMaterial();
-        mat.setBaseColor(1.0, 1.0, 1.0, 1.0);
+        let mat = new CGE.ReferMaterial(standMat);
 
         let r = ix === 0 ? 0.1 : ix;
         let m = iz === 0 ? 0.01 : iz;
         
-        mat.setSpecular(r * 0.5, m * 0.5, 1);
-
-        mat.setBrdfLUTMap(lutTexture);
-
-        mat.setIrradianceMap(cubeTexture);
-        mat.setPrefilterMap(cubeTexture);
-    
+        mat.overrideTexture(CGE.ShaderConst.diffuseMap, CGE.Texture2D.White);
+        mat.overrideTexture(CGE.ShaderConst.normalMap, CGE.Texture2D.Normal);
+        mat.overrideTexture(CGE.ShaderConst.roughnessMap, CGE.Texture2D.White);
+        mat.overrideProperty(CGE.ShaderConst.specular, new CGE.Vector3(r * 0.5, m * 0.5, 1)); //(r * 0.5, m * 0.5, 1);
         
         mesh.setMaterial(mat);
-
         mesh.setPosition(ix * 25, 0, -iz * 25);
         mesh.setScale(10, 10, 10);
 
@@ -403,11 +369,14 @@ planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
 
+let planeMat = new CGE.ReferMaterial(standMat);
+planeMat.setUVOffset(20, 20, 0, 0); 
 let mesh = new CGE.Mesh();
-mesh.setPosition(0, 0, 20);
-mesh.setScale(20, 20, 10);
+mesh.setPosition(0, 0, -80);
+mesh.setScale(4000, 4000, 10);
 mesh.setGeometry(planeVertexGeometry);
-mesh.setMaterial(standMat);
+mesh.setMaterial(planeMat);
+
 mainScene.addChild(mesh);
 
 // 以上 大平面
@@ -423,6 +392,7 @@ import {
     teapotIndices,
 } from './teapot';
 import { Sprite } from './src/ui/Sprite';
+import { BOOL_VEC3 } from './src/CGE';
 
 let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, teapotPositions);

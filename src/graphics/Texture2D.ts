@@ -71,7 +71,7 @@ export class Texture2D extends Texture {
         super();
     }
 
-    public setImageUrl(url:string, def: Texture2D = Texture2D.White) {
+    public setImageUrl(url:string, def: Texture2D = Texture2D.White, func?: any) {
         this._url = url;
         this._loaded = false;
         this._def = def;
@@ -83,6 +83,9 @@ export class Texture2D extends Texture {
             this.needsUpdate();
             this._loaded = true;
             this._def = null;
+            if (func) {
+                func();
+            }
             return img;
         });
     }

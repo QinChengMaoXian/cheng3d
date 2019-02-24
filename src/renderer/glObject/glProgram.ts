@@ -195,7 +195,6 @@ export class glProgram extends glObject {
         }
 
         let material = mesh.getMaterial();
-        let properties = material.getProperties();
         
         let cameraPos = camera ? camera.getPosition() : Vector3.Zero;
 
@@ -249,7 +248,7 @@ export class glProgram extends glObject {
                 // case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
                 // case MatrixType.InverseWMatrix:     data = tempMatrix.copy(worldMatrix).invert(); break;
                 // case MatrixType.InverseVMatrix:     data = tempMatrix.copy(vMat).invert(); break;
-                default:                            data = properties.get(uniformType); break;
+                default:                            data = material.getProperty(uniformType); break;
             }
             if (data.data.length === 16) {
                 f32.set(data.data);
@@ -258,6 +257,10 @@ export class glProgram extends glObject {
                 glprog.setUniformData(gl, type, location, data.data);
             }
         });
+    }
+
+    public getTextures() {
+        return this._textures;
     }
 
     public getTextureIndex(type): number {

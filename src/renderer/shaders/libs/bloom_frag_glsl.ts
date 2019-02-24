@@ -20,6 +20,6 @@ void main()
 
     float t = dot(ecolor, vec3(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0));
 
-    gl_FragColor = t > 0.8 ? vec4(ecolor, 1.0) : vec4(0.0);
+    gl_FragColor = t > 1.0 ? vec4(ecolor, 1.0) : vec4(0.0);
 }
 `;

@@ -25,6 +25,7 @@ export class glTexture extends glObject {
     }
 
     public apply(gl, index) {
+        // this._apply(gl, index);
         if (glTexture._texIdx[index] !== this) {
             this._apply(gl, index);
             glTexture._texIdx[index] = this

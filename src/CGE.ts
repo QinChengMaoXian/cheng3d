@@ -1,4 +1,5 @@
 
+
 export * from './core/Base';
 
 export { Logger } from './core/Logger';
@@ -29,6 +30,7 @@ export { DiffuseMaterial } from './material/DiffuseMaterial';
 export { StandardMaterial } from './material/StandardMaterial';
 export { CartoonMaterial } from './material/CartoonMaterial';
 export { SkyboxMaterial } from './material/SkyboxMaterial';
+export { ReferMaterial } from './material/ReferMaterial';
 
 export { Light } from './light/Light';
 export { DirectionLight } from './light/DirectionLight';

@@ -7,8 +7,9 @@ import { TextureCube } from '../graphics/TextureCube';
 
 export class StandardMaterial extends Material {
 
-    protected _baseColor: Vector4 = new Vector4();
+    protected _baseColor: Vector4 = new Vector4(1, 1, 1, 1);
     protected _specular: Vector3 = new Vector3(1, 1, 1);
+    protected _uvOffset: Vector4 = new Vector4(1, 1, 0, 0);
 
     constructor(
         diffuse: Texture2D = Texture2D.White, 
@@ -30,10 +31,11 @@ export class StandardMaterial extends Material {
         this.setTexture(s.irradianceMap, irradiance);
         this.setTexture(s.prefilterMap, prefilter);
 
+        this.setTexture(s.brdfLUTMap, Texture2D.BrdfLUT);
+
         this.setProperty(s.baseColor, this._baseColor);
         this.setProperty(s.specular, this._specular);
-
-        this._baseColor.set(1.0, 1.0, 1.0, 1.0);
+        this.setProperty(s.uvOffset, this._uvOffset);
     }
 
     public setDiffuseMap(texture: Texture2D) {
@@ -66,6 +68,10 @@ export class StandardMaterial extends Material {
 
     public setSpecular(roughness: number, metallic: number, ao: number) {
         this._specular.set(roughness, metallic, ao);
+    }
+
+    public canLighting() {
+        return true;
     }
 
     public get type(): string {
