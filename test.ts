@@ -1,5 +1,10 @@
 import * as CGE from './src/CGE'
 
+/**
+ * 这是个庞大的测试用文件。
+ * 没啥太大的意义。
+ */
+
 // let test_diff = './res/spnza_bricks_a_diff.jpg';
 // let test_ddn = './res/spnza_bricks_a_ddn.jpg';
 // let test_spec = './res/spnza_bricks_a_spec.png';
@@ -23,6 +28,10 @@ let env_lut = './resources/envLUT.png'
 
 // let main = new Main();
 // main.init();
+
+///////////////////////////////////////////////////////////////////////////
+// 以下：初始化与参数设置
+
 let app = new CGE.Application();
 
 app.init(CGE.Platform.width, CGE.Platform.height);
@@ -32,11 +41,40 @@ let stage = app.getStage();
 
 let camera = app.getCamera();
 
-camera.setPositionAt(new CGE.Vector3(-20, 20, 20));
+camera.setPosition(-20, 20, 20);
 
 let spr = new CGE.Sprite();
 spr.setSize(200, 200);
 spr.setPosition(50, 100, 0);
+
+window['app'] = app;
+
+let renderer = app.getRenderer();
+renderer.enableDepthTest();
+let gb = Math.pow(0.5, 2.2);
+renderer.setClearColor(1.0, gb, gb, 1.0);
+// renderer.setClearColor(0, 0, 0, 1.0);
+
+// camera.lookAt(new CGE.Vector3(0, 1, 10));
+mainScene.setActiveCamera(camera);
+
+document.body.appendChild(renderer.getCanvas());
+
+window['camera'] = camera;
+
+window.onresize = function() {
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    app.setSize(width, height);
+};
+
+let noError = true;
+window.onerror = function(event) {
+    noError = false;
+}
+
+// 应用启动
+app.start();
 
 // stage.addChild(spr);
 
@@ -56,13 +94,13 @@ spr.setPosition(50, 100, 0);
 //     console.log('spr on mouse out');
 // });
 
-let timer = app.getTimer();
 
 
+// 以上：初始化与参数设置
 ///////////////////////////////////////////////////////////////////////////
-// 鼠标与键盘控制主相机，TODO以下的代码需要封装在相机控制类中。
+// 以下 鼠标与键盘控制主相机，TODO以下的代码需要封装在相机控制类中。
 let _d = 2;
-
+let timer = app.getTimer();
 let cameraRotate = (e: CGE.Event) => {
     let del = 0.005;
     let moveX = e.movementX * del;
@@ -131,7 +169,7 @@ stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
     stage.off(CGE.Event.MOUSE_MOVE, this, cameraRotate);
 });
 
-// 相机控制代码块结束
+// 以上 相机控制代码块结束
 ///////////////////////////////////////////////////////////////////////////
 
 // let app = new CGE.Application();
@@ -155,15 +193,16 @@ stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
 // specTexture.setMipmap(true);
 // specTexture.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-let objLoader = new CGE.OBJLoader();
+// let objLoader = new CGE.OBJLoader();
 
 // let colorShowingMaterial = new CGE.DiffuseMaterial(colorTexrure);
 
 // let standMat = new CGE.StandardMaterial(brdf_basecolor, brdf_normal, brdf_specular, brdf_specular, brdf_specular);
 
 
+///////////////////////////////////////////////////////////////////////////////////////
+// 下 Brdf 球体阵列
 let geo = new CGE.SphereGeometry(1, 32, 32);
-// let gltfMaterial = new CGE.DiffuseMaterial(test_diff);
 
 let createTexture2DFromImage = function(imgSrc, mipmap?) {
     let texture2d = new CGE.Texture2D();
@@ -194,16 +233,19 @@ let diffTex = new CGE.Texture2D();
 diffTex.setImageUrl(brdf_basecolor, CGE.Texture2D.White);
 diffTex.setMipmap(true);
 diffTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+diffTex.setWarp(CGE.MIRRORED_REPEAT, CGE.MIRRORED_REPEAT);
 
 let normTex = new CGE.Texture2D();
 normTex.setImageUrl(brdf_normal, CGE.Texture2D.Normal);
 normTex.setMipmap(true);
 normTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+normTex.setWarp(CGE.MIRRORED_REPEAT, CGE.MIRRORED_REPEAT);
 
 let specTex = new CGE.Texture2D();
 specTex.setImageUrl(brdf_specular);
 specTex.setMipmap(true);
 specTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
+specTex.setWarp(CGE.MIRRORED_REPEAT, CGE.MIRRORED_REPEAT);
 
 let obj3D = new CGE.Object3D();
 obj3D.name = '一堆球';
@@ -212,11 +254,8 @@ let standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, spec
 
 standMat.setIrradianceMap(cubeTexture);
 standMat.setPrefilterMap(cubeTexture);
-
 standMat.setBrdfLUTMap(lutTexture);
-
 window['standMat'] = standMat;
-
 mainScene.addChild(obj3D);
 
 for (let ix = 0; ix <= 2; ix++) {
@@ -227,12 +266,12 @@ for (let ix = 0; ix <= 2; ix++) {
         // let mat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 
         let mat = new CGE.StandardMaterial();
-        mat.setBaseColor(0.5, 0.5, 0.5, 1.0);
+        mat.setBaseColor(1.0, 1.0, 1.0, 1.0);
 
         let r = ix === 0 ? 0.1 : ix;
         let m = iz === 0 ? 0.01 : iz;
         
-        mat.setSpecular(0.01, 1.0, 1);
+        mat.setSpecular(r * 0.5, m * 0.5, 1);
 
         mat.setBrdfLUTMap(lutTexture);
 
@@ -250,6 +289,10 @@ for (let ix = 0; ix <= 2; ix++) {
 
 } 
 
+// 以上 Brdf球体阵列
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 天空盒测试
+
 let skyboxMat = new CGE.SkyboxMaterial();
 skyboxMat.setDiffuseMap(cubeTexture);
 
@@ -261,6 +304,10 @@ skyboxMesh.setGeometry(boxGeo);
 skyboxMesh.setMaterial(skyboxMat);
 
 mainScene.addChild(skyboxMesh);
+
+// 以上 天空盒测试
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 gltf 加载测试
 
 let quat = new CGE.Quaternion();
 quat.setAxisAngle(new CGE.Vector3(0, 0, 1), 0.02);
@@ -305,6 +352,10 @@ let gltfCallback = (event, object) => {
 
 let gltfTest = new CGE.GltfLoader();
 gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
+
+// 以上 gltf 加载测试
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 大平面
 
 let vertexPositionData = new Float32Array([
     -1.0, 1.0, 0.0,  0.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
@@ -351,6 +402,18 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
+
+let mesh = new CGE.Mesh();
+mesh.setPosition(0, 0, 20);
+mesh.setScale(20, 20, 10);
+mesh.setGeometry(planeVertexGeometry);
+mesh.setMaterial(standMat);
+mainScene.addChild(mesh);
+
+// 以上 大平面
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 犹他水壶
+
 import { 
     teapotPositions,
     teapotTexCoords,
@@ -365,41 +428,21 @@ let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, teapotPositions);
 teapotGeometry.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 3, CGE.FLOAT, teapotTexCoords);
 teapotGeometry.addSingleAttribute('Normal', CGE.ShaderConst.normal, 3, CGE.FLOAT, teapotNormals);
-teapotGeometry.addSingleAttribute('Binormal', CGE.ShaderConst.binomial, 3, CGE.FLOAT, teapotBinormals);
+// teapotGeometry.addSingleAttribute('Binormal', CGE.ShaderConst.binomial, 3, CGE.FLOAT, teapotBinormals);
 teapotGeometry.addSingleAttribute('Tangent', CGE.ShaderConst.tangent, 3, CGE.FLOAT, teapotTangents);
 teapotGeometry.setIndexData(teapotIndices);
 teapotGeometry.setDrawParameter(teapotIndices.length);
 
 let teapotMesh = new CGE.Mesh();
-teapotMesh.setScale(0.002, 0.002, 0.002);
-teapotMesh.setPosition(0, 0, 20);
+teapotMesh.setScale(0.5, 0.5, 0.5);
+teapotMesh.setPosition(0, 20, 0);
 teapotMesh.setGeometry(teapotGeometry);
-
 teapotMesh.setMaterial(standMat);
+mainScene.addChild(teapotMesh);
 
-// const app = new CGE.Application();
-
-window['app'] = app;
-
-let renderer = app.getRenderer();
-renderer.enableDepthTest();
-let gb = Math.pow(0.5, 2.2);
-renderer.setClearColor(1.0, gb, gb, 1.0);
-// renderer.setClearColor(0, 0, 0, 1.0);
-
-
-// camera.lookAt(new CGE.Vector3(0, 1, 10));
-mainScene.setActiveCamera(camera);
-
-
-// mainScene.addChild(teapotMesh);  
-// app.getTimer().frameLoop(1, this, () => {
-//     teapotMesh.setPositionAt(game_app.manager.play.airPlane.getPos());
-//     let rot = teapotMesh.getRotate();
-//     rot.multiply(quat);
-//     teapotMesh.enableUpdateMat();
-// })
-
+// 以上 犹他水壶
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 三角形碰撞检测测试
 let tri_scale = 100;
 
 let tri_num = 20;
@@ -498,37 +541,19 @@ triMesh.setPosition(0, 0, -2500);
 
 // 三角形碰撞检测测试
 // mainScene.addChild(triMesh);
+// 以上 三角形碰撞检测测试
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 卡通渲染测试 
+// 
+// let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
+// objLoader.load(cartoon_obj).then(mesh => {
+//     mesh.setMaterial(cartoonMat);
+//     mesh.setScale(0.4, 0.4, 0.4);
+//     mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
+//     mainScene.addChild(mesh);
+// });
+// 以上 卡通渲染测试 
+///////////////////////////////////////////////////////////////////////////////////////
+// app启用
 
-let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
-
-objLoader.load(cartoon_obj).then(mesh => {
-    mesh.setMaterial(cartoonMat);
-    mesh.setScale(0.4, 0.4, 0.4);
-    mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));
-    // mainScene.addChild(mesh);
-});
-
-document.body.appendChild(renderer.getCanvas());
-
-let mesh = new CGE.Mesh();
-mesh.setPosition(0, 0, 20);
-mesh.setScale(20, 20, 10);
-mesh.setGeometry(planeVertexGeometry);
-mesh.setMaterial(standMat);
-mainScene.addChild(mesh);
-
-window['camera'] = camera;
-
-window.onresize = function() {
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    app.setSize(width, height);
-};
-
-let noError = true;
-window.onerror = function(event) {
-    noError = false;
-}
-
-app.start();
 

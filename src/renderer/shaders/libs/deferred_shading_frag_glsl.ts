@@ -136,7 +136,7 @@ void main()
 
     // 环境光部分
     vec3 coordN = vec3(N.x, N.z, -N.y);
-    vec3 irradiance = textureCubeLod(u_irradianceMap, coordN).xyz;
+    vec3 irradiance = textureCube(u_irradianceMap, coordN).xyz;
     vec3 diffuse = irradiance * albedo;
     vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kD_a = vec3(1.0) - F_s;
