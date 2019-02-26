@@ -16,9 +16,9 @@
 #   
 # ui: box,text,label,image,button,hbox,vbox,list
 
-周二的Demo：
-PostEffect用的frame切换将放在PostEffectPipe内控制。
-Renderer不再直接管理。
+
 SSAO写完。
-Point光源加入场景。
+Point, Spot光源加入场景。
+光源处理。
+视锥裁剪。
 构思一个看起来还行的场景
