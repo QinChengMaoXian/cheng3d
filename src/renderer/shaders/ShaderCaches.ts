@@ -19,12 +19,16 @@ export class ShaderCaches {
     }
 
     genShaderProgram(mat: Material, enableDefer?: boolean, macros?: string[]): glProgram {
+        let newMacros = mat.getMacros();
+        if (macros && macros.length > 0) {
+            newMacros = newMacros.concat(macros);
+        }
         let caches = this._caches;
         let renderer = this._renderer;
         let shader = mat.shader;
         let glprog: glProgram = (shader.getRenderObjectRef(renderer) as glProgram);
         let useDefer = mat.supportDeferred && enableDefer;
-        let matNewKey = this.genMatKey(mat, useDefer, macros);
+        let matNewKey = this.genMatKey(mat, useDefer, newMacros);
         let matCurKey = glprog ? glprog.shaderKey : '-1';
 
         if (matCurKey === matNewKey) {
@@ -56,8 +60,8 @@ export class ShaderCaches {
             data = data.defer_src;
         }
 
-        let vertText = this.genStr(data.vert, macros);
-        let fragText = this.genStr(data.frag, macros);
+        let vertText = this.genStr(data.vert, newMacros);
+        let fragText = this.genStr(data.frag, newMacros);
 
         glprog = glprog.generateFromText(gl, vertText, fragText);
 

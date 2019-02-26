@@ -1,5 +1,4 @@
 import * as CGE from '../graphics/RendererParameter';
-import { Logger } from '../core/Logger';
 
 import { FrameState } from '../graphics/FrameState';
 import { Vector4 } from '../math/Vector4';
@@ -29,12 +28,10 @@ import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
 import { Event } from '../core/Event';
 import { Base } from '../core/Base';
-import { Matrix4 } from '../math/Matrix4';
 import { PostEffectsPipeline } from './PostEffectsPipeline';
-import { PEType, PEBase, PEReqType } from './postEffect/PEBase';
+import { PEType, PEBase } from './postEffect/PEBase';
 import { WebGLSupports } from './WebGLSupports';
 import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
-import { glTexture } from './glObject/glTexture';
 
 
 /**
@@ -55,10 +52,20 @@ export class WebGLRenderer extends Base implements IRenderer {
     /** 默认帧缓冲状态 */
     private _defFrameState = new FrameState();
 
-    /** 渲染器宽度 */
+    /** 窗口宽度 */
     private _screenWidth: number = -1;
-    /** 渲染器高度 */
+    /** 窗口高度 */
     private _screenHeight: number = -1;
+
+    /** 渲染器宽度 */
+    private _width: number = -1;
+    /** 渲染器高度 */
+    private _height: number = -1;
+
+    /** 宽度缩放比例 */
+    private _scaleW: number = 1;
+    /** 高度缩放比例 */
+    private _scaleH: number = 1;
 
     /** 渲染帧数计数 */
     private _renderCount: number = 0;
@@ -75,7 +82,9 @@ export class WebGLRenderer extends Base implements IRenderer {
 
     /** 当前的frame */
     private _curFrame: Frame;
-    // private _defFrame: Frame;
+
+    /** 默认的frame */
+    private _defFrame: Frame;
     
     /** 当前渲染器的id */
     private _rendererId = WebGLRenderer.RendererNum++;
@@ -83,9 +92,9 @@ export class WebGLRenderer extends Base implements IRenderer {
     /** 着色器缓存 */
     private _shaderCache = new ShaderCaches(this);
 
-    /** 缓存的离屏帧缓冲对象 */
+    /** 缓存帧组，用于需求上一帧结果时启用 */
     private _cacheFrames: Frame[];
-    /** 缓存的离屏帧缓冲当前索引 */
+    /** 缓存帧组索引 */
     private _frameIndex: number;
 
     /** 当前时间，只在渲染到默认帧缓冲时更新 */
@@ -173,6 +182,8 @@ export class WebGLRenderer extends Base implements IRenderer {
             this.initFrame(frame);
         })
 
+        this._defFrame.setSize(width, height);
+
         this._postEffectPipline.resize(width, height);
 
         if (this._gFrame) {
@@ -208,17 +219,23 @@ export class WebGLRenderer extends Base implements IRenderer {
      * @param height 
      */
     private _initDefFrame(width: number, height: number) {
+        let frame = new Frame();
+        frame.setSize(width, height);
+        frame.addTexture(RTLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        frame.enableDepthStencil();
+        frame.getState().clearColor.set(0, 0, 0, 0.0);
+        this._defFrame = frame;
+
         let frames = [];
         for (let i = 0; i < 2; i++) {
             let frame = new Frame();
             frame.setSize(width, height);
-            frame.addTexture(RTLocation.COLOR, CGE.RGBA, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+            frame.addTexture(RTLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
             frame.enableDepthStencil();
             frame.getState().clearColor.set(0, 0, 0, 0.0);
             this.initFrame(frame);
             frames.push(frame);
         }
-
         this._cacheFrames = frames;
         this._frameIndex = 0;
     }
@@ -546,6 +563,8 @@ export class WebGLRenderer extends Base implements IRenderer {
         let _alphaTestList = [];
         let _alphaBlendList =[];
 
+        let lightsList = [];
+
         this._useCamera(camera);
         
         if (scene.isScene) {
@@ -577,6 +596,10 @@ export class WebGLRenderer extends Base implements IRenderer {
             let display = obj.visible && isRendering;
             if(obj.beRendering() && display) {
                 _addToRenderList(obj);
+            }
+
+            if (obj.isLight) {
+                lightsList.push(obj);
             }
 
             const children = obj.getChildren();
@@ -613,7 +636,7 @@ export class WebGLRenderer extends Base implements IRenderer {
                 // this._deferMat.setDepthMap(gFrame.getDepthStencilTexture());
                 this._deferMat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
 
-                let targetFrame = this.currectTargetFrame;
+                let targetFrame = this._defFrame;
                 
                 let depthTex = targetFrame.getDepthStencilTexture();
                 targetFrame.setDepthStencil(gFrame.getDepthStencilTexture());
@@ -631,7 +654,7 @@ export class WebGLRenderer extends Base implements IRenderer {
                 _renderList(_alphaBlendList);
             } else {
                 // 正常渲染走这条，注意同样没有优化光源
-                this.useFrame(this.currectTargetFrame, this._defFrameState);
+                this.useFrame(this._defFrame, this._defFrameState);
 
                 _preRenderObjects(scene, scene.visible);
                 _renderList(_noAlphaList);
@@ -639,14 +662,21 @@ export class WebGLRenderer extends Base implements IRenderer {
                 _renderList(_alphaBlendList);
             }
 
-            this.exchangeFrame();
             this._useCamera(this._defCamera);
-            this.renderPostEffects();
+            
+
+            let targetFrame: Frame;
+            if (this._postEffectPipline.length > 0) {
+                this.renderPostEffects();
+                targetFrame = this._postEffectPipline.currentFrame;
+            } else {
+                targetFrame = this._defFrame;
+            }
 
             this.useFrame(null);
-            this._defMat.setDiffuseMap(<Texture2D>this.currentColorFrame.getTextureFromType(RTLocation.COLOR).tex);
+            this._defMat.setDiffuseMap(<Texture2D>targetFrame.getTextureFromType(RTLocation.COLOR).tex);
             this._renderMesh(this._defMesh);
-
+            this.exchangeFrame();
         } else {
             this.useFrame(frame);
             _renderScene(scene);
@@ -657,7 +687,7 @@ export class WebGLRenderer extends Base implements IRenderer {
      * 后处理效果渲染
      */
     protected renderPostEffects() {
-        this._postEffectPipline.render();
+        this._postEffectPipline.render(this._defFrame, this._deferredRendering);
     }
 
     /**
@@ -705,14 +735,14 @@ export class WebGLRenderer extends Base implements IRenderer {
     /**
      * 获取渲染目标帧缓冲
      */
-    public get currectTargetFrame(): Frame {
+    public get currectFrame(): Frame {
         return this._cacheFrames[this._frameIndex];
     }
 
     /**
      * 获取颜色源帧缓冲
      */
-    public get currentColorFrame(): Frame {
+    public get lastFrame(): Frame {
         return this._cacheFrames[(this._frameIndex + 1) % this._cacheFrames.length];
     }
 
@@ -760,6 +790,13 @@ export class WebGLRenderer extends Base implements IRenderer {
      */
     public getEnablingPostEffect(): PEType[] {
         return this._postEffectPipline.getEnablingPostEffect();
+    }
+
+    /**
+     * 获取GBuffer的Frame
+     */
+    public getGBufferFrame(): Frame {
+        return this._deferredRendering ? this._gFrame : null;
     }
 
     /**
@@ -822,7 +859,7 @@ export class WebGLRenderer extends Base implements IRenderer {
     /**
      * 禁用延迟渲染
      */
-    public disalbeDeferredRendering() {
+    public disableDeferredRendering() {
         this._swtichDeferredRendering(false);
     }
 

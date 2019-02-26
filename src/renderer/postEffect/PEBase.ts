@@ -1,5 +1,5 @@
-import { IRenderer } from "../Renderer";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { IRenderer } from "../Renderer";
 
 export enum PEType {
     None,
@@ -11,8 +11,8 @@ export enum PEType {
 export enum PEOrder {
     None,
     AA,
-    AO,
     HDR,
+    AO,
 }
 
 export enum PEReqType {
@@ -62,8 +62,15 @@ export class PEBase {
         return [];
     }
 
-    public destroy() {
+    public destroy(renderer: IRenderer) {
 
+    }
+
+    /**
+     * 是否需要上一个后处理的结果
+     */
+    public get render2Target(): boolean {
+        return false;
     }
 
     public get type(): PEType {

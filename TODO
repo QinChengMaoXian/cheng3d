@@ -16,7 +16,9 @@
 #   
 # ui: box,text,label,image,button,hbox,vbox,list
 
-优先级：
-对象池模板
-三角形碰撞 done
-灯光支持
+周二的Demo：
+PostEffect用的frame切换将放在PostEffectPipe内控制。
+Renderer不再直接管理。
+SSAO写完。
+Point光源加入场景。
+构思一个看起来还行的场景

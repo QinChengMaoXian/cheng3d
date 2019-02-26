@@ -1,5 +1,6 @@
 export class Vector4 {
     public static readonly Zero: Vector4 = new Vector4();
+    public static readonly One: Vector4 = new Vector4(1,1,1,1);
 
     public v: Float32Array;
 

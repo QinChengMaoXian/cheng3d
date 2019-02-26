@@ -47,6 +47,7 @@ import gbuffer_frag from './libs/gbuffer_frag_glsl';
 import deferred_shading_frag from './libs/deferred_shading_frag_glsl';
 import skybox_vert from './libs/skybox_vert_glsl';
 import skybox_frag from './libs/skybox_frag_glsl'; 
+import blend_frag from './libs/blend_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -126,5 +127,10 @@ export const shaders = {
     'skybox': {
         vert: repStr(skybox_vert),
         frag: repStr(skybox_frag),
+    },
+
+    'blendAO': {
+        vert: repStr(fullscreen_vert),
+        frag: repStr(blend_frag),
     }
 }

@@ -28,11 +28,12 @@ export interface IRenderer {
     enablePostEffect(type: PEType | PEBase);
     getEnablingPostEffect(): PEType[];
 
-    exchangeFrame();
+    // exchangeFrame();
+    getGBufferFrame(): Frame;
 
     deltaTime: number;
     defCamera: Camera;
 
-    currentColorFrame: Frame;
-    currectTargetFrame: Frame;
+    // currentColorFrame: Frame;
+    // currectTargetFrame: Frame;
 }

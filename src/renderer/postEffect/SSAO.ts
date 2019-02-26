@@ -3,10 +3,14 @@ import { Texture2D } from "../../graphics/Texture2D";
 import { Frame } from "../../graphics/Frame";
 import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
-import { IRenderer } from "../Renderer";
 import { RTLocation } from "../../graphics/GraphicsTypes";
 import { SSAOMaterial } from "../../material/SSAOMaterial";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { IRenderer } from "../Renderer";
+import * as CGE from '../../graphics/RendererParameter';
+import { Vector4 } from "../../math/Vector4";
+import { ShaderConst } from "../../graphics/ShaderConst";
+import { BlendAOMaterial } from "../../material/BlendAOMaterial";
 
 export class SSAO extends PEBase {
     protected static SrcReqs = [
@@ -22,6 +26,13 @@ export class SSAO extends PEBase {
     protected _mesh: Mesh;
     protected _mat: SSAOMaterial;
 
+    protected _blendMesh: Mesh;
+    protected _blendMat: BlendAOMaterial;
+
+    protected _frame: Frame;
+
+    protected _render2Target: boolean = false;
+
     constructor(pipe: PostEffectsPipeline) {
         super(pipe);
     }
@@ -33,23 +44,55 @@ export class SSAO extends PEBase {
         mesh.setGeometry(geometry);
         mesh.setMaterial(material);
         this._mesh = mesh;
+
+        let blendMat = new BlendAOMaterial;
+        this._blendMat = blendMat;
+        mesh = new Mesh();
+        mesh.setGeometry(geometry);
+        mesh.setMaterial(blendMat);
+        this._blendMesh = mesh;
+
+        let pipe = this._pipe;
+        
+        let w = Math.floor(pipe.width / 2);
+        let h = Math.floor(pipe.height / 2);
+
+        let frame = new Frame();
+        frame.setSize(w, h);
+        frame.addTexture(RTLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.LINEAR, CGE.LINEAR);
+        frame.setClearColor(Vector4.One);
+        this._frame = frame;
+
+        pipe.setRequestFrame(PEOrder.AO, this._frame);
+
         this._isInit = true;
     }
 
     public resize(w: number, h: number) {
-        // this._mat.setPixelSize(1.0 / w, 1.0 / h);
+        this._mat.setPixelSize(1.0 / w, 1.0 / h);
+        this._frame.setSize(w, h);
     }
 
     public render() {
         const pipe = this._pipe;
-        const renderer = pipe.renderer;
-        
         const ssaoMat = this._mat;
 
-        let camera = renderer.defCamera;
+        let isRefer = pipe.isDeferredRendering;
 
-        let colorFrame: Frame = renderer.currentColorFrame;
-        let targetFrame: Frame = renderer.currectTargetFrame;
+        if (isRefer) {
+            let gFrame = pipe.gBufferFrame;
+            let normal = <Texture2D>(gFrame.getTextureFromType(RTLocation.RT1).tex);
+            ssaoMat.setNormalTexture(normal);
+        } else {
+            ssaoMat.setNormalTexture(null);
+        }
+
+
+        let camera = pipe.defCamera;
+
+        let colorFrame: Frame = pipe.srcFrame;
+
+        let aoFrame = this._frame;
 
         let w = colorFrame.getWidth();
         let h = colorFrame.getHeight();
@@ -70,16 +113,31 @@ export class SSAO extends PEBase {
         ssaoMat.setPixelSize(p_x, p_y);
         ssaoMat.setAsptRtoTanHfFov(aspect, tan_2Fov, (-n-f) / (n-f), (2*f*n) / (n-f));
 
-        pipe.renderPass(this._mesh, targetFrame);
+        pipe.renderPass(this._mesh, aoFrame);
+
+        if (pipe.isEnablePEOrder(PEOrder.HDR)) {
+            this._render2Target = false;
+        } else {
+            this._render2Target = true;
+            this._blendMat.setSrcTexture(<Texture2D>(aoFrame.getTextureFromType(RTLocation.COLOR).tex));
+            this._blendMat.setDstTexture(<Texture2D>(colorFrame.getTextureFromType(RTLocation.COLOR).tex));
+            pipe.renderPass(this._blendMesh, pipe.targetFrame);
+        }
     }
 
     public srcRequires(): PEReqType[] {
         return SSAO.SrcReqs;
     }
 
-    public destroy() {
-        const pipe = this._pipe;
-        const renderer = pipe.renderer;
+    /**
+     * 是否需要上一个后处理的结果
+     */
+    public get render2Target(): boolean {
+        return this._render2Target;
+    }
+
+    public destroy(renderer: IRenderer) {
+        this._pipe.removeRequsetFrame(PEOrder.AO, this._frame);
         renderer.releaseMesh(this._mesh);
         this._pipe = null;
         this._mesh = null;

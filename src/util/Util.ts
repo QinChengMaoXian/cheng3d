@@ -198,3 +198,11 @@ export function calcTangent(posData: number[], uvData: number[], normalData: num
     return tangentData;
 }
 
+const reg = /\[([a-zA-Z0-9_./]+)\]/;
+
+export function RepRemoveSquareBrackets(str: string) {
+    let result = reg.exec(str);
+    if (result) {
+        return str.replace(result[0], '');
+    }
+}

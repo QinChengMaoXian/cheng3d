@@ -230,9 +230,9 @@ standMat.setPrefilterMap(cubeTexture);
 window['standMat'] = standMat;
 mainScene.addChild(obj3D);
 
-for (let ix = 0; ix <= 2; ix++) {
+for (let ix = 0; ix <= 7; ix++) {
 
-    for (let iz = 0; iz <= 2; iz++) {
+    for (let iz = 0; iz <= 7; iz++) {
         let mesh = new CGE.Mesh();
         mesh.setGeometry(geo);
 
@@ -244,15 +244,15 @@ for (let ix = 0; ix <= 2; ix++) {
         mat.overrideTexture(CGE.ShaderConst.diffuseMap, CGE.Texture2D.White);
         mat.overrideTexture(CGE.ShaderConst.normalMap, CGE.Texture2D.Normal);
         mat.overrideTexture(CGE.ShaderConst.roughnessMap, CGE.Texture2D.White);
-        mat.overrideProperty(CGE.ShaderConst.specular, new CGE.Vector3(r * 0.5, m * 0.5, 1)); //(r * 0.5, m * 0.5, 1);
+        mat.overrideProperty(CGE.ShaderConst.specular, new CGE.Vector3(r * 0.125, 1.0 - m * 0.125, 1));
         
         mesh.setMaterial(mat);
-        mesh.setPosition(ix * 25, 0, -iz * 25);
+        mesh.setPosition(ix * 25, 0, iz * 25);
         mesh.setScale(10, 10, 10);
 
         obj3D.addChild(mesh);
     }
-
+    
 } 
 
 // 以上 Brdf球体阵列

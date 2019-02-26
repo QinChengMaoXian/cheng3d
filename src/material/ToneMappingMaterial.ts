@@ -31,6 +31,10 @@ export class ToneMappingMaterial extends Material {
         this.setTexture(ShaderConst.bloomMap, texture);
     }
 
+    public setAoTexture(texture: Texture2D) {
+        this.setTexture(ShaderConst.aoMap, texture);
+    }
+
     public setPixelSize(x, y) {
         this._pixelSize.data.set([x, y]);
     }

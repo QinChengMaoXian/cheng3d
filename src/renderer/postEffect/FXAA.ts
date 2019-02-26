@@ -3,10 +3,10 @@ import { Texture2D } from "../../graphics/Texture2D";
 import { Frame } from "../../graphics/Frame";
 import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
-import { IRenderer } from "../Renderer";
 import { RTLocation } from "../../graphics/GraphicsTypes";
 import { FXAAMaterial } from "../../material/FXAAMaterial";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { IRenderer } from "../Renderer";
 
 export class FXAA extends PEBase {
     protected static SrcReqs = [
@@ -36,10 +36,9 @@ export class FXAA extends PEBase {
 
     public render() {
         const pipe = this._pipe
-        const renderer = pipe.renderer;
 
-        let colorFrame: Frame = renderer.currentColorFrame;
-        let targetFrame: Frame = renderer.currectTargetFrame;
+        let colorFrame: Frame = pipe.peNumber === 0 ? pipe.srcFrame : pipe.currentFrame;
+        let targetFrame: Frame = pipe.targetFrame;
 
         let tex2D = <Texture2D>(colorFrame.getTextureFromType(RTLocation.COLOR).tex);
         this._material.setSrcTexture(tex2D);
@@ -51,13 +50,16 @@ export class FXAA extends PEBase {
         return FXAA.SrcReqs;
     }
 
-    public destroy() {
+    public destroy(renderer: IRenderer) {
         const pipe = this._pipe
-        const renderer = pipe.renderer;
         renderer.releaseMesh(this._mesh);
         this._pipe = null;
         this._mesh = null;
         this._material = null;
+    }
+
+    public get render2Target(): boolean {
+        return true;
     }
 
     get type(): PEType {

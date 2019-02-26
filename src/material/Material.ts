@@ -23,6 +23,8 @@ export class Material extends Base {
     private _textures: Map<string | number, Texture>;
     private _properties: Map<string | number, any>;
 
+    private _macros: string[] = [];
+
     constructor() {
         super();
         this._textures = new Map();
@@ -68,10 +70,6 @@ export class Material extends Base {
         this._textures.set(type, texture2d);
     }
 
-    public clone() {
-        
-    }
-
     public getTexture(type: string | number) {
         return this._textures.get(type);
     }
@@ -98,14 +96,6 @@ export class Material extends Base {
         return this._alphaBlend;
     }
 
-    public getMapProvide() {
-        return [];
-    }
-
-    public getPropertyProvide() {
-        return [];
-    }
-
     public canLighting() {
         return false;
     }
@@ -118,12 +108,34 @@ export class Material extends Base {
         this._textures.clear();
     }
 
+    protected _addMacro(macro: string) {
+        let idx = this._macros.indexOf(macro);
+        if (idx < 0) {
+            this._macros.push(macro);
+        }
+    }
+
+    protected _removeMacro(macro: string) {
+        let idx = this._macros.indexOf(macro);
+        if (idx > -1) {
+            this._macros.splice(idx, 1);
+        }
+    }
+
     public get type(): string {
         return '';
     }
 
     public get shader(): Shader {
         return this._shader;
+    }
+
+    public clone() {
+        
+    }
+
+    public getMacros() {
+        return this._macros;
     }
 
     public get supportDeferred(): boolean {

@@ -17,6 +17,7 @@ import { Mesh } from '../../object/Mesh';
 
 import { Camera } from '../../object/Camera';
 import { glTexture } from './glTexture';
+import { RepRemoveSquareBrackets } from '../../util/Util';
 
 const _matrix = new Matrix4();
 const _vpmatrix = new Matrix4();
@@ -90,12 +91,22 @@ export class glProgram extends glObject {
                 this._textures.set(texMap[data.name], tCount++);
             } else {
                 let uniMap = ShaderConst._getUniforms();
-                this._uniforms.set(uniMap[data.name], {
-                    location: loc,
-                    type: data.type,
-                    name: data.name,
-                    size: data.size
-                });
+                let type = uniMap[data.name];
+                if (type !== undefined) {
+                    this._uniforms.set(uniMap[data.name], {
+                        location: loc,
+                        type: data.type,
+                        name: data.name,
+                        size: data.size
+                    });
+                } else {
+                    this._uniforms.set(RepRemoveSquareBrackets(data.name), {
+                        location: loc,
+                        type: data.type,
+                        name: data.name,
+                        size: data.size
+                    });
+                }
             }
         }
 
