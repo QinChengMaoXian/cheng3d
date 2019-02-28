@@ -1,7 +1,7 @@
-import { Light } from "./Light";
+import { Light, ILight } from "./Light";
 import { Vector3 } from "../math/Vector3";
 
-export class DirectionLight extends Light {
+export class DirectionLight extends Light implements ILight {
     protected static readonly DefDir = new Vector3(0, 0, 1);
 
     protected _dir: Vector3 = new Vector3(0.5, 0.5, 0.5).normalize();
@@ -24,11 +24,15 @@ export class DirectionLight extends Light {
         this._dir.applyQuaternion(this._rotate).normalize();
     }
 
-    public getDirection() {
+    public get dir() {
         return this._dir;
     }
 
-    public getType() {
+    public get type() {
         return 1; //LightType.Direction;
+    }
+
+    public get isDirectionLight() {
+        return true;
     }
 }

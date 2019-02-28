@@ -2,9 +2,6 @@ import { Texture2D } from '../graphics/Texture2D'
 import { TextureCube } from '../graphics/TextureCube'
 import { Geometry } from '../graphics/Geometry'
 
-import { Entity } from '../object/Entity'
-import { Component } from '../object/Component'
-
 import { ShaderConst } from '../graphics/ShaderConst'
 
 import * as CGE from '../graphics/RendererParameter';

@@ -3,19 +3,22 @@ import { AABB } from './AABB';
 import { OBB } from './OBB'
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
+import { Sphere } from '../math/Sphere';
 
 export class SphereBounding extends Bounding {
-    protected _pos: Vector3 = new Vector3();
-    protected _radius: number = 0;
+    protected _sphere: Sphere = new Sphere();
 
     constructor() {
         super();
     }
 
-    public setFrom(sphere: SphereBounding, mat: Matrix4) {
-        this._pos.copy(sphere._pos);
-        this._pos.applyMatrix4(mat);
-        this._radius = sphere._radius;
+    public setFrom(sb: SphereBounding, mat: Matrix4) {
+        this._sphere.copy(sb._sphere);
+        this._sphere.applyMatrix(mat);
+    }
+
+    public applyMatrix(mat: Matrix4) {
+        this._sphere.applyMatrix(mat);
     }
 
     public intersect(bounding: Bounding) {
@@ -33,37 +36,40 @@ export class SphereBounding extends Bounding {
     }
 
     public setPosition(x: number, y: number, z: number) {
-        this._pos.set(x, y, z);
+        this._sphere.pos.set(x, y, z);
     }
 
     public setPositionAt(vec: Vector3) {
-        this._pos.setAt(vec);
+        this._sphere.pos.setAt(vec);
     }
 
     public setRadius(r: number) {
-        this._radius = r;
+        this._sphere.radius = r;
     }
 
     public getPosition() {
-        return this._pos;
+        return this._sphere.pos;
     }
 
     public getRadius() {
-        return this._radius;
+        return this._sphere.radius;
     }
 
     public getType() {
         return Bounding.TYPE_SPHERE;
     }
 
-    public copy(sphere: SphereBounding) {
-        this._pos.copy(sphere._pos);
-        this._radius = sphere._radius;
+    public copy(sb: SphereBounding) {
+        this._sphere.copy(sb._sphere);
     }
 
     public clone(): SphereBounding {
         const sphere = new SphereBounding();
         sphere.copy(this);
         return sphere;
+    }
+
+    public get sphere(): Sphere {
+        return this._sphere;
     }
 }

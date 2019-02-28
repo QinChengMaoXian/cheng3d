@@ -35,6 +35,9 @@ import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
 import { Frustum } from '../math/Frustum';
 import { Bounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB';
+import { Vector3 } from '../math/Vector3';
+import { Light } from '../light/Light';
+import { SphereBounding } from '../bounding/SphereBounding';
 
 export interface RenderArgs{
     frustumCamera?: Camera;
@@ -570,20 +573,22 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         let lightsList = [];
 
-        let frustum = this._frustum;
+        let frustum: Frustum;
 
         this._useCamera(camera);
 
         if (renderArgs && renderArgs.frustumCamera) {
+            frustum = this._frustum;
             frustum.setFromMatrix(renderArgs.frustumCamera.getViewProjectionMatrix());
-        } else {
-            camera && frustum.setFromMatrix(camera.getViewProjectionMatrix());
+        } else if (camera) {
+            frustum = this._frustum;
+            frustum.setFromMatrix(camera.getViewProjectionMatrix());
         }
 
         if (scene.isScene) {
             let light = (<Scene>scene).getMainLight();
-            glProgram.lightDir.copy(light.getDirection());
-            glProgram.lightColor.copy(light.getColor());
+            glProgram.lightDir.copy(light.dir);
+            glProgram.lightColor.copy(light.color);
         }
 
         const _renderList = (renderList) => {
@@ -597,7 +602,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         const _addToRenderList = (mesh: Mesh) => {
             let mat = (<Mesh>mesh).getMaterial();
 
-            if (camera) {
+            if (frustum && !frame) {
                 let bounding = mesh.getBounding();
                 switch (bounding.getType()) {
                     case Bounding.TYPE_AABB:
@@ -620,6 +625,30 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             }
         }
 
+        const _addToLightList = (light: Light) => {
+            if (frustum && !frame) {
+                let bounding = light.getBounding();
+                if (bounding) {
+                    switch (bounding.getType()) {
+                        case Bounding.TYPE_AABB:
+                            if (!frustum.intersectBox((bounding as AABB).box)) {
+                                return;
+                            }
+                            break;
+                        
+                        case Bounding.TYPE_SPHERE:
+                            if (!frustum.intersectSphere((bounding as SphereBounding).sphere)) {
+                                return;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            lightsList.push(light);
+        }
+
         const _preRenderObjects = (obj: Object3D, isRendering: boolean) => {
             let display = obj.visible && isRendering;
             if(obj.beRendering() && display) {
@@ -627,7 +656,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             }
 
             if (obj.isLight) {
-                lightsList.push(obj);
+                _addToLightList(<Light>obj);
             }
 
             const children = obj.getChildren();
@@ -647,7 +676,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         if (!frame) {
             if (this._deferredRendering) {
-                // 延迟渲染流程走这里，注意灯光优化还没开始。
+                // 延迟渲染流程走这里，注意，没有优化光源。
                 let gFrame = this._gFrame;
                 this.initFrame(gFrame);
 
@@ -681,7 +710,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
                 _renderList(_alphaBlendList);
             } else {
-                // 正常渲染走这条，注意同样没有优化光源
+                // 正常渲染走这条，注意，没有优化光源
                 this.useFrame(this._defFrame, this._defFrameState);
 
                 _preRenderObjects(scene, scene.visible);
@@ -692,7 +721,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
             this._useCamera(this._defCamera);
             
-
             let targetFrame: Frame;
             if (this._postEffectPipline.length > 0) {
                 this.renderPostEffects();

@@ -38,8 +38,6 @@ export class Bounding {
         return null;
     }
 
-    public static _auxVec: Vector3 = new Vector3();
-
     private static _obb1Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];
     private static _obb2Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];
 
@@ -50,7 +48,7 @@ export class Bounding {
         const center = obb.getPosition();
         const rot = obb.getRoatation();
         const size = obb.getSize();
-        const aux = Bounding._auxVec;
+        const aux = Vector3.pubTemp;
         
         dirs[0].set(1, 0, 0);
         dirs[0].applyQuaternion(rot);
@@ -119,7 +117,7 @@ export class Bounding {
         const dir1length = obb1Dir.length;
         const dir2length = obb2Dir.length;
 
-        const aux = Bounding._auxVec;
+        const aux = Vector3.pubTemp;
 
         for (let i = 0; i < dir1length; i++) {
             if (Bounding._intersectCheck(obb1Dir[i], obb1Pos, obb2Pos)) {
@@ -166,11 +164,11 @@ export class Bounding {
     }
 
     public static intersectSphere(sphere1: SphereBounding, sphere2: SphereBounding) {
-        Bounding._auxVec.copy(sphere1.getPosition());
-        Bounding._auxVec.sub(sphere2.getPosition());
+        Vector3.pubTemp.copy(sphere1.getPosition());
+        Vector3.pubTemp.sub(sphere2.getPosition());
         const s1 = sphere1.getRadius();
         const s2 = sphere2.getRadius();
-        return Bounding._auxVec.lengthSquare() <= (s1 * s1 + s2 * s2);
+        return Vector3.pubTemp.lengthSquare() <= (s1 * s1 + s2 * s2);
     }
 
     public static intersectSphereToOBB(sphere: SphereBounding, obb: OBB) {

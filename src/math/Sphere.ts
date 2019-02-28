@@ -1,4 +1,5 @@
 import { Vector3 } from "./Vector3";
+import { Matrix4 } from "./Matrix4";
 
 export class Sphere {
 
@@ -17,6 +18,15 @@ export class Sphere {
     public setAt(pos: Vector3, r: number) {
         this.pos.copy(pos);
         this.radius = r;
+    }
+
+    public applyMatrix(mat: Matrix4) {
+        
+    }
+
+    public copy(s: Sphere) {
+        this.pos.copy(s.pos);
+        this.radius = s.radius;
     }
 
 }

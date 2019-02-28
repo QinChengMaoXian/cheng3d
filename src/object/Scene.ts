@@ -5,7 +5,6 @@ import { DirectionLight } from "../light/DirectionLight";
 export class Scene extends Object3D {
     
     protected _activeCamera: Camera;
-    protected _defCamera: Camera;
 
     protected _mainLight: DirectionLight = new DirectionLight;
 

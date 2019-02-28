@@ -8,6 +8,12 @@ export enum LightType {
     Spot = 3,
 }
 
+export interface ILight {
+    isPointLight?: boolean;
+    isSpotLight?: boolean;
+    isDirectionLight?: boolean;
+}
+
 export class Light extends Object3D {
 
     protected _color: Vector4 = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -35,11 +41,11 @@ export class Light extends Object3D {
         return true;
     }
 
-    public getColor() {
+    public get color() {
         return this._color;
     }
 
-    public getType() {
+    public get type() {
         return 0; //LightType.None;
     }
 }

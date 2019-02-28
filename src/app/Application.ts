@@ -172,11 +172,12 @@ export class Application extends EventDispatcher {
     private _addEventListener(key: string, listener: any) {
         let canvas = this._renderer.getCanvas();
         let document = Platform.document();
-        if (key.indexOf('key') > -1) {
-            document.addEventListener(key, listener);
-        } else {
-            canvas.addEventListener(key, listener);
-        }
+        document.addEventListener(key, listener);
+        // if (key.indexOf('key') > -1) {
+        //     document.addEventListener(key, listener);
+        // } else {
+        //     canvas.addEventListener(key, listener);
+        // }
         this._listenersMap.set(key, listener);
     }
 

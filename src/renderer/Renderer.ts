@@ -10,7 +10,7 @@ import { Logger } from '../core/Logger';
 
 export class Renderer extends Base {
 
-    /** CGE的结构支持多个Renderer共存，但是不会允许超过一定的数量 */
+    /** CGE的结构计划支持多个Renderer共存，但是不会允许超过一定的数量 */
     protected static Renderers: Renderer[] = [];
 
     /** 渲染器计数 */
@@ -21,7 +21,7 @@ export class Renderer extends Base {
 
     constructor() {
         super();
-        if (Renderer.Renderers.length < 4) {
+        if (Renderer.Renderers.length < 1) {
             Renderer.Renderers.push(this);
         } else {
             Logger.error('Too much renderer instance');

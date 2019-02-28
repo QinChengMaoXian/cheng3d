@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "declaration": true,
+        // "declaration": true,
         "sourceMap": true,
         "target": "es2015"
     },
