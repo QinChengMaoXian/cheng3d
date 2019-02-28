@@ -6,6 +6,7 @@ attribute vec3 a_tangent;
 
 varying vec2 v_uv;
 varying vec3 v_worldPos;
+varying vec3 v_viewPos;
 varying vec3 v_normal;
 varying vec3 v_tangent;
 varying vec3 v_binormal;
@@ -13,6 +14,7 @@ varying vec3 v_binormal;
 uniform vec4 u_uvOffset;
 
 uniform mat4 u_mMat;
+uniform mat4 u_mvMat;
 uniform mat4 u_mITMat;
 uniform mat4 u_mvpMat;
 
@@ -22,6 +24,9 @@ void main()
 
     vec4 worldPos = u_mMat * a_position;
     v_worldPos = worldPos.xyz / worldPos.w;
+
+    vec4 viewPos = u_mvMat * a_position;
+    v_viewPos = viewPos.xyz / viewPos.w;
 
     v_tangent = normalize((u_mMat * vec4(a_tangent, 0.0)).xyz);
     v_normal = normalize((u_mITMat * vec4(a_normal, 0.0)).xyz);

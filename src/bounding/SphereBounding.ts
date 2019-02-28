@@ -4,7 +4,7 @@ import { OBB } from './OBB'
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
 
-export class Sphere extends Bounding {
+export class SphereBounding extends Bounding {
     protected _pos: Vector3 = new Vector3();
     protected _radius: number = 0;
 
@@ -12,7 +12,7 @@ export class Sphere extends Bounding {
         super();
     }
 
-    public setFrom(sphere: Sphere, mat: Matrix4) {
+    public setFrom(sphere: SphereBounding, mat: Matrix4) {
         this._pos.copy(sphere._pos);
         this._pos.applyMatrix4(mat);
         this._radius = sphere._radius;
@@ -22,7 +22,7 @@ export class Sphere extends Bounding {
         const type = bounding.getType();
         switch(type) {
             case Bounding.TYPE_SPHERE:
-                return Bounding.intersectSphere(<Sphere>bounding, this);
+                return Bounding.intersectSphere(<SphereBounding>bounding, this);
             case Bounding.TYPE_AABB:
                 return Bounding.intersectSphereToAABB(this, <AABB>bounding);
             case Bounding.TYPE_OBB:
@@ -56,13 +56,13 @@ export class Sphere extends Bounding {
         return Bounding.TYPE_SPHERE;
     }
 
-    public copy(sphere: Sphere) {
+    public copy(sphere: SphereBounding) {
         this._pos.copy(sphere._pos);
         this._radius = sphere._radius;
     }
 
-    public clone(): Sphere {
-        const sphere = new Sphere();
+    public clone(): SphereBounding {
+        const sphere = new SphereBounding();
         sphere.copy(this);
         return sphere;
     }

@@ -19,6 +19,7 @@ uniform vec4 u_lightColor;
 uniform vec3 u_lightDir;
 // uniform vec4 u_lightPos;
 uniform vec2 u_pixelSize;
+uniform vec4 u_cameraRange;
 
 const float PI = 3.14159265359;
 
@@ -80,6 +81,11 @@ vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
 
 #include <decodeRGB2Float>
 
+float linearToDepth(float l, float f, float n) 
+{
+    return (f + n - 2.0 * n * f) / (l * (f - n));
+}
+
 void main() 
 {
     vec2 uv = gl_FragCoord.xy * u_pixelSize;
@@ -90,18 +96,16 @@ void main()
 
     vec3 albedo = rt0.xyz;
     vec3 normal = rt1.xyz;
-    vec3 depth3 = rt2.xyz;
+    float depth = linearToDepth(decodeRGB2Float(rt2.xyz) * 2.0 - 1.0, u_cameraRange.x, u_cameraRange.y);
 
     normal = normal * 2.0 - 1.0;
 
     float roughness = rt0.w;
     float metallic = rt1.w;
     float ao = rt2.w;
-    
-    float depth = decodeRGB2Float(depth3);
 
     vec4 projPos = vec4(uv, depth, 1.0) * 2.0 - 1.0;
-    vec4 worldPos = projPos * u_vpIMat;
+    vec4 worldPos = u_vpIMat * projPos;
     worldPos /= worldPos.w;
 
     vec3 F0 = vec3(0.04);

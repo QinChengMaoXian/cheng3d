@@ -2,9 +2,10 @@ import { Vector3 } from "./Vector3";
 import { triangleIntersect } from "../util/TriangleIntersect";
 
 export class Triangle {
-    point1 = new Vector3();
-    point2 = new Vector3();
-    point3 = new Vector3();
+    
+    public point1 = new Vector3();
+    public point2 = new Vector3();
+    public point3 = new Vector3();
 
     constructor(p1?: Vector3, p2?: Vector3, p3?: Vector3) {
         if (p1) {

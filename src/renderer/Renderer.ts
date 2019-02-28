@@ -4,12 +4,29 @@ import { Frame } from '../graphics/Frame'
 
 import { Mesh } from '../object/Mesh';
 import { Base } from '../core/Base';
-import { Texture2D } from '../graphics/Texture2D';
 
 import { PEType, PEBase } from './postEffect/PEBase'
+import { Logger } from '../core/Logger';
 
 export class Renderer extends Base {
 
+    /** CGE的结构支持多个Renderer共存，但是不会允许超过一定的数量 */
+    protected static Renderers: Renderer[] = [];
+
+    /** 渲染器计数 */
+    private static RendererNum = 0;
+
+    /** 当前渲染器的id */
+    public readonly rendererId = Renderer.RendererNum++;
+
+    constructor() {
+        super();
+        if (Renderer.Renderers.length < 4) {
+            Renderer.Renderers.push(this);
+        } else {
+            Logger.error('Too much renderer instance');
+        }
+    }
 }
 
 export interface IRenderer {

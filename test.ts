@@ -252,7 +252,7 @@ for (let ix = 0; ix <= 7; ix++) {
 
         obj3D.addChild(mesh);
     }
-    
+
 } 
 
 // 以上 Brdf球体阵列
@@ -408,6 +408,7 @@ teapotMesh.setScale(0.5, 0.5, 0.5);
 teapotMesh.setPosition(0, 20, 0);
 teapotMesh.setGeometry(teapotGeometry);
 teapotMesh.setMaterial(standMat);
+teapotMesh.name = '水壶';
 mainScene.addChild(teapotMesh);
 
 // 以上 犹他水壶

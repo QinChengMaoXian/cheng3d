@@ -3,7 +3,8 @@ import {
     FLOAT_VEC3,
     FLOAT_VEC4,
     FLOAT_MAT3,
-    FLOAT_MAT4
+    FLOAT_MAT4,
+    FLOAT
 } from '../../graphics/RendererParameter'
 import { Logger } from '../../core/Logger'
 import { glObject } from './glObject'
@@ -24,6 +25,7 @@ const _vpmatrix = new Matrix4();
 const _mvmatrix = new Matrix4();
 const _mvpmatrix = new Matrix4();
 const _f32 = new Float32Array(16);
+const _f4 = new Float32Array(4);
 
 export interface IUniform {
     location: WebGLUniformLocation,
@@ -174,9 +176,12 @@ export class glProgram extends glObject {
         }
     }
 
-    public setUniformData(gl: WebGLRenderingContext, type: number, location: WebGLUniformLocation, data) {
+    public setUniformData(gl: WebGLRenderingContext, type: number, location: WebGLUniformLocation, data: any) {
         // TODO: 写的是个毛; 但是没办法
         switch(type) {
+            case FLOAT:
+                gl.uniform1f(location, data);
+                break;
             case FLOAT_VEC2:
                 gl.uniform2fv(location, data);
                 break;
@@ -236,6 +241,7 @@ export class glProgram extends glObject {
         };
 
         let f32 = _f32;
+        let f4 = _f4
 
         uniforms.forEach((uniformObject, uniformType) => {
             let location = uniformObject.location;
@@ -244,21 +250,22 @@ export class glProgram extends glObject {
             // TODO: maybe need re-build? but looks good for use;
             switch (uniformType) {
                 case ShaderConst.mMat:              data = worldMatrix; break;
-                case ShaderConst.mITMat:             data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
+                case ShaderConst.mITMat:            data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case ShaderConst.vMat:              data = vMat; break;
                 case ShaderConst.pMat:              data = pMat; break;
-                case ShaderConst.vpIMat:            data = tempMatrix.copy(vpMat).invertTranspose(); break;
+                case ShaderConst.pIMat:             data = tempMatrix.copy(pMat).invert(); break;
+                case ShaderConst.vpIMat:            data = tempMatrix.copy(vpMat).invert(); break;
                 case ShaderConst.vpMat:             data = getVPMatrix(); break;
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
                 case ShaderConst.mvMat:             data = getMVMatrix(); break;
                 case ShaderConst.cameraPos:         data = cameraPos; break;
                 case ShaderConst.lightColor:        data = glProgram.lightColor; break;
                 case ShaderConst.lightDir:          data = glProgram.lightDir; break;
-                // case MatrixType.NormalWMatrix:      data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
-                // case MatrixType.NormalMVMatrix:     data = tempMatrix.copy(getMVMatrix()).invertTranspose(); break;
-                // case MatrixType.NormalMVPMatrix:    data = tempMatrix.copy(getMVPMatrix()).invertTranspose(); break;
-                // case MatrixType.InverseWMatrix:     data = tempMatrix.copy(worldMatrix).invert(); break;
-                // case MatrixType.InverseVMatrix:     data = tempMatrix.copy(vMat).invert(); break;
+                case ShaderConst.cameraRange: {
+                    f4.set([camera.far, camera.near, 1.0 / (camera.far - camera.near), 0]);
+                    glprog.setUniformData(gl, type, location, f4);
+                    return;
+                }
                 default:                            data = material.getProperty(uniformType); break;
             }
             if (data.data.length === 16) {

@@ -37,6 +37,7 @@ export class ShaderConst {
     public static readonly brdfLUTMap = ShaderConst._inTex('u_brdfLUTMap');
     public static readonly lumMap = ShaderConst._inTex('u_lumMap');
     public static readonly bloomMap = ShaderConst._inTex('u_bloomMap');
+    public static readonly randomMap = ShaderConst._inTex('u_randomMap');
     /**
      * Ordered Dithering Map used for alpha test
      */
@@ -73,6 +74,7 @@ export class ShaderConst {
     public static readonly multiUsing = ShaderConst._inUni('u_multiUsing');
     public static readonly aoParam = ShaderConst._inUni('u_aoParam');
     public static readonly matType = ShaderConst._inUni('u_matType');
+    public static readonly cameraRange = ShaderConst._inUni('u_cameraRange');
 
     /** world(model) matrix */
     public static readonly mMat = ShaderConst._inUni('u_mMat');
@@ -84,6 +86,8 @@ export class ShaderConst {
     public static readonly vITMat = ShaderConst._inUni('u_vITMat');
     /** projection matrix */
     public static readonly pMat = ShaderConst._inUni('u_pMat');
+    /** inv projection matrix */
+    public static readonly pIMat = ShaderConst._inUni('u_pIMat');
     /** view projection matrix */
     public static readonly mvMat = ShaderConst._inUni('u_mvMat');
     /** view projection matrix */

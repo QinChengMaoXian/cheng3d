@@ -98,7 +98,7 @@ export class PostEffectsPipeline {
      * @param frame
      */
     public renderPass(obj: Object3D, frame: Frame) {
-        this._renderer.renderScene(obj, null, frame);
+        this._renderer.renderScene(obj, this._renderer.defCamera, frame);
     }
 
     /**
@@ -280,7 +280,7 @@ export class PostEffectsPipeline {
      * 获取生成ao的Frame
      */
     public getAoFrame(): Frame {
-        return this._requestFrames.get(ShaderConst.aoMap);
+        return this._requestFrames.get(PEOrder.AO);
     }
 
     public setRequestFrame(type: PEOrder, frame: Frame) {

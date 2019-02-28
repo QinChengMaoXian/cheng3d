@@ -12,6 +12,10 @@ import { Vector4 } from "../../math/Vector4";
 import { ShaderConst } from "../../graphics/ShaderConst";
 import { BlendAOMaterial } from "../../material/BlendAOMaterial";
 
+/**
+ * SSAO后处理。
+ * TODO：线性深度的问题，采样随机扰动。
+ */
 export class SSAO extends PEBase {
     protected static SrcReqs = [
         PEReqType.DEPTH,
@@ -54,8 +58,8 @@ export class SSAO extends PEBase {
 
         let pipe = this._pipe;
         
-        let w = Math.floor(pipe.width / 2);
-        let h = Math.floor(pipe.height / 2);
+        let w = Math.floor(pipe.width);
+        let h = Math.floor(pipe.height);
 
         let frame = new Frame();
         frame.setSize(w, h);
@@ -68,25 +72,18 @@ export class SSAO extends PEBase {
         this._isInit = true;
     }
 
+    public setSampleNum(num: number) {
+        this._mat.createSampleData(num);
+    }
+
     public resize(w: number, h: number) {
-        this._mat.setPixelSize(1.0 / w, 1.0 / h);
+        this._mat.setPixelSize(w / 4, h / 4);
         this._frame.setSize(w, h);
     }
 
     public render() {
         const pipe = this._pipe;
         const ssaoMat = this._mat;
-
-        let isRefer = pipe.isDeferredRendering;
-
-        if (isRefer) {
-            let gFrame = pipe.gBufferFrame;
-            let normal = <Texture2D>(gFrame.getTextureFromType(RTLocation.RT1).tex);
-            ssaoMat.setNormalTexture(normal);
-        } else {
-            ssaoMat.setNormalTexture(null);
-        }
-
 
         let camera = pipe.defCamera;
 
@@ -105,11 +102,19 @@ export class SSAO extends PEBase {
         let n = camera.near;
         let f = camera.far;
 
-        let tex2D = <Texture2D>(colorFrame.getDepthStencilTexture());
-        this._mat.setDepthTexture(tex2D);
-        tex2D = <Texture2D>(colorFrame.getTextureFromType(RTLocation.COLOR).tex);
-        this._mat.setDiffuseTexture(tex2D);
+        // if (pipe.isDeferredRendering) {
+        //     let gFrame = pipe.gBufferFrame;
+        //     let normal = <Texture2D>(gFrame.getTextureFromType(RTLocation.RT1).tex);
+        //     ssaoMat.setNormalTexture(normal);
+        //     ssaoMat.setDepthTexture(<Texture2D>gFrame.getTextureFromType(RTLocation.RT2).tex);
+        // } else {
+            
+        // }
 
+        ssaoMat.setNormalTexture(null);
+        ssaoMat.setDepthTexture(<Texture2D>(colorFrame.getDepthStencilTexture()));
+
+        ssaoMat.setDiffuseTexture(<Texture2D>(colorFrame.getTextureFromType(RTLocation.COLOR).tex));
         ssaoMat.setPixelSize(p_x, p_y);
         ssaoMat.setAsptRtoTanHfFov(aspect, tan_2Fov, (-n-f) / (n-f), (2*f*n) / (n-f));
 

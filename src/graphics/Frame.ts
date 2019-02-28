@@ -82,7 +82,7 @@ export class Frame extends GraphicsObject {
         this._state.setClearDepth(true);
         this._state.setClearStencil(true);
         let tex = this._createTexture2d(CGE.DEPTH_STENCIL, CGE.UNSIGNED_INT_24_8);
-        tex.setFilter(CGE.NEAREST, CGE.NEAREST);
+        tex.setFilter(CGE.LINEAR, CGE.LINEAR);
         this._depthStencilTexture = tex;
         this.needsUpdate();
     }

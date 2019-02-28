@@ -1,11 +1,8 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
-import { EventDispatcher } from '../core/EventDispatcher';
-import { Component } from './Component';
 import { Bounding } from '../bounding/Bounding'
 import { Base } from '../core/Base';
-import { RenderBase } from '../graphics/RenderBase';
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();

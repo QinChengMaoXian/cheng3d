@@ -4,6 +4,7 @@ import { ObjectPool } from "../util/ObjectPool";
 
 export class Vector3 {
     static readonly Zero: Vector3 = new Vector3(0, 0, 0);
+    static readonly ZUp: Vector3 = new Vector3(0, 0, 1);
 
     static pubTemp: Vector3 = new Vector3();
 

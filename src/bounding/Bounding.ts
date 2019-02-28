@@ -2,7 +2,7 @@ import { Vector3 } from '../math/Vector3';
 
 import { OBB } from './OBB';
 import { AABB } from './AABB';
-import { Sphere } from './Sphere';
+import { SphereBounding } from './SphereBounding';
 
 import { Matrix4 } from '../math/Matrix4';
 
@@ -165,7 +165,7 @@ export class Bounding {
         return true;
     }
 
-    public static intersectSphere(sphere1: Sphere, sphere2: Sphere) {
+    public static intersectSphere(sphere1: SphereBounding, sphere2: SphereBounding) {
         Bounding._auxVec.copy(sphere1.getPosition());
         Bounding._auxVec.sub(sphere2.getPosition());
         const s1 = sphere1.getRadius();
@@ -173,11 +173,11 @@ export class Bounding {
         return Bounding._auxVec.lengthSquare() <= (s1 * s1 + s2 * s2);
     }
 
-    public static intersectSphereToOBB(sphere: Sphere, obb: OBB) {
+    public static intersectSphereToOBB(sphere: SphereBounding, obb: OBB) {
 
     }
 
-    public static intersectSphereToAABB(sphere: Sphere, aabb: AABB) {
+    public static intersectSphereToAABB(sphere: SphereBounding, aabb: AABB) {
 
     }
 

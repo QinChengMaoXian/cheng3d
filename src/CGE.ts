@@ -23,7 +23,7 @@ export { Timer } from './core/Timer';
 export { Bounding } from './bounding/Bounding';
 export { AABB } from './bounding/AABB';
 export { OBB } from './bounding/OBB';
-export { Sphere } from './bounding/Sphere';
+export { SphereBounding } from './bounding/SphereBounding';
 
 export { Material } from './material/Material';
 export { DiffuseMaterial } from './material/DiffuseMaterial';

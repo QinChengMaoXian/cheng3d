@@ -1,6 +1,6 @@
 import { Bounding } from './Bounding';
 import { AABB } from './AABB';
-import { Sphere } from './Sphere';
+import { SphereBounding } from './SphereBounding';
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
@@ -22,7 +22,7 @@ export class OBB extends Bounding {
         const type = bounding.getType();
         switch(type) {
             case Bounding.TYPE_SPHERE:
-                return Bounding.intersectSphereToOBB(<Sphere>bounding, this);
+                return Bounding.intersectSphereToOBB(<SphereBounding>bounding, this);
             case Bounding.TYPE_AABB:
                 return Bounding.intersectOBBToAABB(this, <AABB>bounding);
             case Bounding.TYPE_OBB:

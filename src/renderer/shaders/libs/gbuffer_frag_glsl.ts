@@ -8,7 +8,7 @@ varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 v_tangent;
 varying vec3 v_binormal;
-varying vec3 v_worldPos;
+varying vec3 v_viewPos;
 
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_normalMap;
@@ -23,6 +23,7 @@ uniform samplerCube u_prefilterMap;
 uniform vec3 u_specular;
 uniform vec4 u_baseColor;
 uniform vec2 u_matType;
+uniform vec4 u_cameraRange;
 
 #include <encodeFloat2RGB>
 
@@ -41,7 +42,7 @@ void main()
     vec3 normal = texture2D(u_normalMap, v_uv).xyz * 2.0 - 1.0;
     normal = normalize(normal.x * v_tangent + normal.y * v_binormal + normal.z * v_normal);
     
-    vec3 depth3 = encodeFloat2RGB(gl_FragCoord.z * 0.5 + 1.0);
+    vec3 depth3 = encodeFloat2RGB(clamp((v_viewPos.z - u_cameraRange.y) * u_cameraRange.z, 0.0, 1.0));
 
     gl_FragData[0] = vec4(albedo, roughness);
     gl_FragData[1] = vec4(normal * 0.5 + 0.5, metallic);

@@ -28,7 +28,7 @@ export class Camera extends Object3D {
         let h = (height || 600) * 0.5;
         Object.assign(this, {
             _far: _far || 2000.0,
-            _near: _near || 0.1,
+            _near: _near || 1.0,
             _left: -w, 
             _right: w, 
             _bottom: h, 

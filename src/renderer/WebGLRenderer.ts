@@ -6,7 +6,7 @@ import { Mesh } from '../object/Mesh';
 import { Object3D } from '../object/Object3D';
 import { Camera } from '../object/Camera';
 import { Frame } from '../graphics/Frame';
-import { IRenderer } from './Renderer';
+import { Renderer, IRenderer } from './Renderer';
 
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
@@ -32,15 +32,19 @@ import { PostEffectsPipeline } from './PostEffectsPipeline';
 import { PEType, PEBase } from './postEffect/PEBase';
 import { WebGLSupports } from './WebGLSupports';
 import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
+import { Frustum } from '../math/Frustum';
+import { Bounding } from '../bounding/Bounding';
+import { AABB } from '../bounding/AABB';
 
+export interface RenderArgs{
+    frustumCamera?: Camera;
+}
 
 /**
  * webgl 1.0 渲染器；
  * TODO: 思考 renderer 如何增加分类的释放，比如材质，纹理，几何等;
  */
-export class WebGLRenderer extends Base implements IRenderer {
-    /** 渲染器计数 */
-    private static RendererNum = 0;
+export class WebGLRenderer extends Renderer implements IRenderer {
 
     /** canvas 对象引用 */
     private _canvas: HTMLCanvasElement;
@@ -86,8 +90,6 @@ export class WebGLRenderer extends Base implements IRenderer {
     /** 默认的frame */
     private _defFrame: Frame;
     
-    /** 当前渲染器的id */
-    private _rendererId = WebGLRenderer.RendererNum++;
 
     /** 着色器缓存 */
     private _shaderCache = new ShaderCaches(this);
@@ -122,6 +124,9 @@ export class WebGLRenderer extends Base implements IRenderer {
 
     /** 不清理深度的帧缓冲状态对象 */
     private _notClearDepthState: FrameState;
+
+    /** 裁剪视锥 */
+    private _frustum: Frustum = new Frustum;
 
     constructor() {
         super();
@@ -549,7 +554,7 @@ export class WebGLRenderer extends Base implements IRenderer {
      * @param camera 
      * @param frame 
      */
-    public renderScene(scene: Object3D, camera?: Camera, frame?: Frame) {
+    public renderScene(scene: Object3D, camera?: Camera, frame?: Frame, renderArgs?: RenderArgs) {
         let gl = this._gl;
 
         if (!frame) {
@@ -565,8 +570,16 @@ export class WebGLRenderer extends Base implements IRenderer {
 
         let lightsList = [];
 
+        let frustum = this._frustum;
+
         this._useCamera(camera);
-        
+
+        if (renderArgs && renderArgs.frustumCamera) {
+            frustum.setFromMatrix(renderArgs.frustumCamera.getViewProjectionMatrix());
+        } else {
+            camera && frustum.setFromMatrix(camera.getViewProjectionMatrix());
+        }
+
         if (scene.isScene) {
             let light = (<Scene>scene).getMainLight();
             glProgram.lightDir.copy(light.getDirection());
@@ -581,8 +594,23 @@ export class WebGLRenderer extends Base implements IRenderer {
             }
         }
 
-        const _addToRenderList = (mesh) => {
+        const _addToRenderList = (mesh: Mesh) => {
             let mat = (<Mesh>mesh).getMaterial();
+
+            if (camera) {
+                let bounding = mesh.getBounding();
+                switch (bounding.getType()) {
+                    case Bounding.TYPE_AABB:
+                        if (!frustum.intersectBox((bounding as AABB).box)) {
+                            return;
+                        }
+                        break;
+                
+                    default:
+                        break;
+                }
+            }
+
             if (mat.alphaBlend) {
                 _alphaBlendList.push(mesh);
             } else if (mat.alphaTest) {
@@ -595,7 +623,7 @@ export class WebGLRenderer extends Base implements IRenderer {
         const _preRenderObjects = (obj: Object3D, isRendering: boolean) => {
             let display = obj.visible && isRendering;
             if(obj.beRendering() && display) {
-                _addToRenderList(obj);
+                _addToRenderList(<Mesh>obj);
             }
 
             if (obj.isLight) {
@@ -708,7 +736,7 @@ export class WebGLRenderer extends Base implements IRenderer {
      * 获取渲染器Id
      */
     public getRendererId(): number {
-        return this._rendererId;
+        return this.rendererId;
     }
 
     /**
