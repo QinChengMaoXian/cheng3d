@@ -12,7 +12,7 @@ import { GaussianBlurMaterial } from "../../material/GaussianBlurMaterial";
 import { DownSampleTo1Material } from "../../material/DownSampleTo1Material";
 import { BloomMaterial } from "../../material/BloomMaterial";
 import { ToneMappingMaterial } from "../../material/ToneMappingMaterial";
-import { LogSampleMaterial } from "../../material/LogSampleMaterial";
+import { LumSampleMaterial } from "../../material/LumSampleMaterial";
 import { PostEffectsPipeline } from "../PostEffectsPipeline";
 
 /**
@@ -32,7 +32,7 @@ export class HDR extends PEBase {
     protected _lumFact: number = 0.35;
 
     protected _down4Mat: DownSample4Material;
-    protected _logMat: LogSampleMaterial;
+    protected _lumMat: LumSampleMaterial;
     protected _downTo1Mat: DownSampleTo1Material;
     protected _blurMat: GaussianBlurMaterial;
     protected _bloomMat: BloomMaterial;
@@ -175,10 +175,10 @@ export class HDR extends PEBase {
         this._toneMesh = mesh;
 
         mesh = new Mesh();
-        let logMat = new LogSampleMaterial();
-        this._logMat = logMat;
+        let lumMat = new LumSampleMaterial();
+        this._lumMat = lumMat;
         mesh.setGeometry(geo);
-        mesh.setMaterial(logMat);
+        mesh.setMaterial(lumMat);
         this._logMesh = mesh;
 
         this._isInit = true;
@@ -223,7 +223,7 @@ export class HDR extends PEBase {
         const blurMat = this._blurMat;
         const bloomMat = this._bloomMat;
         const toneMat = this._toneMat;
-        const logMat = this._logMat;
+        const lumMat = this._lumMat;
 
         const down4Frame = this._down4Frame;
         const down4Frame2 = this._down4Frame2;
@@ -259,7 +259,7 @@ export class HDR extends PEBase {
 
         // 32x32转为亮度图
         tex2D = <Texture2D>(downTo32Frame.getTextureFromType(RTLocation.COLOR).tex);
-        logMat.setSrcTexture(tex2D);
+        lumMat.setSrcTexture(tex2D);
         pipe.renderPass(logMesh, downTo32Frame2);
 
         // 降至8x8

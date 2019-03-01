@@ -172,6 +172,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
         // _gl.enable(_gl.BLEND);
+        _gl.enable(_gl.CULL_FACE);
         _gl.cullFace(_gl.BACK);
 
         this._timeNow = Date.now();
@@ -610,19 +611,19 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         const _addToRenderList = (mesh: Mesh) => {
             let mat = (<Mesh>mesh).getMaterial();
 
-            // if (frustum && !frame) {
-            //     let bounding = mesh.getBounding();
-            //     switch (bounding.getType()) {
-            //         case Bounding.TYPE_AABB:
-            //             if (!frustum.intersectBox((bounding as AABB).box)) {
-            //                 return;
-            //             }
-            //             break;
+            if (frustum && !frame) {
+                let bounding = mesh.getBounding();
+                switch (bounding.getType()) {
+                    case Bounding.TYPE_AABB:
+                        if (!frustum.intersectBox((bounding as AABB).box)) {
+                            return;
+                        }
+                        break;
                 
-            //         default:
-            //             break;
-            //     }
-            // }
+                    default:
+                        break;
+                }
+            }
 
             if (mat.alphaBlend) {
                 _alphaBlendList.push(mesh);
@@ -888,6 +889,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     /**
      * 切换延迟渲染
+     * TODO: 延迟渲染找个地方写吧，不要写在渲染器里面了。
      */
     protected _swtichDeferredRendering(v: boolean) {
         if (this._deferredRendering === v) {

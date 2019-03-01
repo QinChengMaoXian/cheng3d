@@ -41,7 +41,7 @@ import gaussian_blur_frag from './libs/gaussian_blur_frag_glsl';
 import down_sample_to1_frag from './libs/down_sampling_to1_frag_glsl';
 import bloom_frag from './libs/bloom_frag_glsl';
 import tone_mapping_frag from './libs/tone_mapping_frag_glsl';
-import log_sample_frag from './libs/log_sample_frag_glsl';
+import lum_sample_frag from './libs/lum_sample_frag_glsl';
 import ssao_frag from './libs/ssao_frag_glsl';
 import gbuffer_frag from './libs/gbuffer_frag_glsl';
 import deferred_shading_frag from './libs/deferred_shading_frag_glsl';
@@ -110,9 +110,9 @@ export const shaders = {
         frag: repStr(tone_mapping_frag),
     },
 
-    'log_sample': {
+    'lum_sample': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(log_sample_frag),
+        frag: repStr(lum_sample_frag),
     },
 
     'ssao': {

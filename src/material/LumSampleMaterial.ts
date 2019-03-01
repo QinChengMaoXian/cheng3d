@@ -2,7 +2,7 @@ import { Material } from './Material';
 import { ShaderConst } from '../graphics/ShaderConst'
 import { Texture2D } from '../graphics/Texture2D';
 
-export class LogSampleMaterial extends Material {
+export class LumSampleMaterial extends Material {
 
     constructor() {
         super();
@@ -13,7 +13,7 @@ export class LogSampleMaterial extends Material {
     }
 
     public get type(): string {
-        return 'log_sample';
+        return 'lum_sample';
     }
 
 }

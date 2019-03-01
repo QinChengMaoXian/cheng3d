@@ -169,6 +169,12 @@ stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
     stage.off(CGE.Event.MOUSE_MOVE, this, cameraRotate);
 });
 
+window.onblur = function() { 
+    timer.remove(camera, camera.forwardStep);
+    timer.remove(camera, camera.horizontalStep);
+    timer.remove(camera, camera.verticalStep);
+}
+
 // 以上 相机控制代码块结束
 ///////////////////////////////////////////////////////////////////////////////////////
 // 下 Brdf 球体阵列
@@ -223,8 +229,8 @@ obj3D.name = '一堆球';
 
 let standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 // let standMat = new CGE.StandardMaterial;
-// standMat.setIrradianceMap(cubeTexture);
-// standMat.setPrefilterMap(cubeTexture);
+standMat.setIrradianceMap(cubeTexture);
+standMat.setPrefilterMap(cubeTexture);
 // standMat.setSpecular(0.04, 0, 1);
 // standMat.setBrdfLUTMap();
 window['standMat'] = standMat;
@@ -263,6 +269,9 @@ let skyboxMat = new CGE.SkyboxMaterial();
 skyboxMat.setDiffuseMap(cubeTexture);
 
 let boxGeo = new CGE.BoxGeometry();
+let bounding = boxGeo.getBounding() as CGE.AABB;
+bounding.setMax(Infinity, Infinity, Infinity);
+bounding.setMin(-Infinity, -Infinity, -Infinity)
 
 let skyboxMesh = new CGE.Mesh();
 

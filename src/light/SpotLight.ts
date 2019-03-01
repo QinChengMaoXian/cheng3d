@@ -7,7 +7,7 @@ export class SpotLight extends Light implements ILight {
 
     protected _dir: Vector3 = new Vector3();
     protected _angle: number = 0.0;
-    protected _radius: number = 16.0;
+    protected _radius: number = 4.0;
 
     constructor() {
         super();
@@ -50,6 +50,10 @@ export class SpotLight extends Light implements ILight {
 
     public get type() {
         return LightType.Spot;
+    }
+
+    get dir() {
+        return this._dir;
     }
 
     get isSpotLight() {

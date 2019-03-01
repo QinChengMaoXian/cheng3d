@@ -20,6 +20,8 @@ export class Material extends Base {
     public blendAlphaSrc: number;
     public blendAlphaDst: number;
 
+    public cullFace;
+
     private _textures: Map<string | number, Texture>;
     private _properties: Map<string | number, any>;
 

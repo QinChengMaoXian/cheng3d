@@ -1,7 +1,7 @@
 export default `
 #extension GL_EXT_shader_texture_lod : enable
 
-precision highp float;
+precision mediump float;
 
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_normalMap;
@@ -21,6 +21,10 @@ uniform vec4 u_lightColor;
 uniform vec4 u_cameraRange;
 
 #ifdef POINT_LIGHT
+    uniform vec3 u_lightPos;
+#endif
+
+#ifdef SPOT_LIGHT
     uniform vec3 u_lightPos;
 #endif
 
@@ -83,11 +87,6 @@ vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
 }
 
 #include <decodeRGB2Float>
-
-float linearToDepth(float l, float f, float n) 
-{
-    return (f + n - 2.0 * n * f) / (l * (f - n));
-}
 
 vec3 getViewPos(vec2 texCoord, float depth, vec4 cameraRange){
     //cameraRange.x: far
@@ -162,8 +161,7 @@ void main()
 
     #ifdef POINT_LIGHT
         vec3 d3 = u_lightPos - worldPos.xyz;
-        float d = 1.0 / dot(d3, d3);
-        lo *= d;
+        lo *= 1.0 / dot(d3, d3);
         gl_FragColor = vec4(vec3(lo), 1.0);
     #else
         vec3 R = N * dot_plus(N, V) * 2.0 - V; 
