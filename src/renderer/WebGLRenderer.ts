@@ -23,7 +23,7 @@ import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { Platform } from '../platform/Platform';
 import { ShaderCaches } from './shaders/ShaderCaches';
-import { Material } from '../material/Material';
+import { Material, AlphaMode } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
 import { Event } from '../core/Event';
@@ -43,6 +43,116 @@ import { Quaternion } from '../math/Quaternion';
 
 export interface RenderArgs{
     frustumCamera?: Camera;
+}
+
+
+// TODO 特征值计算
+export class WebGLStateCache {
+    // color
+    enableClearColor = true;
+    clearColor = [1.0, 1.0, 1.0, 1.0];
+    colorMask = [true, true, true, true];
+
+    // depth
+    enableClearDepth = true;
+    clearDepth = 0;
+    depthFunc = CGE.LESS;
+    depthMask = true;
+
+    // stencil
+    clearStencil = 0;
+    enableClearStencil = false;
+    stencilMask = 1;
+    stencilBackMask = 1
+    stencilFunc = [CGE.ALWAYS, 0, 1];
+    stencilBackFunc = [CGE.ALWAYS, 0, 1];
+    stencilOp = [CGE.KEEP, CGE.KEEP, CGE.KEEP];
+    stencilBackOp = [CGE.KEEP, CGE.KEEP, CGE.KEEP];
+
+    // blend
+    enableBlend = false;
+    blendFunc = [CGE.ONE, CGE.ZERO, CGE.ONE, CGE.ZERO];
+    blendEquation = [CGE.FUNC_ADD, CGE.FUNC_ADD];
+
+    // viewport
+    viewpost = [0, 0, 800, 600];
+
+    // cullFace
+    enableCullFace = false;
+    cullFaceMode = CGE.BACK;
+    frontFace = CGE.CCW;
+
+    // scissor
+    enableScissorTest = false;
+    scissor = [0, 0, 800, 600];
+
+    // polygonOffset
+    enablePolygonOffset = false;
+    polygonOffset = [0, 0];
+
+    setColor(gl: WebGLRenderingContext, v: boolean) {
+        
+    }
+
+    setFaceMode(gl: WebGLRenderingContext, cullFaceMode: number, flipFace: boolean) {
+        let frontFace = flipFace ? CGE.CW : CGE.CCW;
+        if (frontFace !== this.frontFace) {
+            gl.frontFace(frontFace);
+            this.frontFace = frontFace;
+        }
+
+        let enableCullFace = !!cullFaceMode;
+        if (enableCullFace !== this.enableCullFace) {
+            enableCullFace ? gl.enable(gl.CULL_FACE) : gl.disable(gl.CULL_FACE);
+            this.enableCullFace = enableCullFace;
+        }
+
+        if (cullFaceMode && cullFaceMode !== this.cullFaceMode) {
+            gl.cullFace(cullFaceMode);
+            this.cullFaceMode = cullFaceMode;
+        }
+    }
+
+    setStencil() {
+
+    }
+
+    setBlend(gl: WebGLRenderingContext, blendFunc: number[], blendEquation: number[], alphaMode: AlphaMode) {
+        if (alphaMode !== AlphaMode.Blend) {
+            if (this.enableBlend) {
+                gl.disable(gl.BLEND);
+                this.enableBlend = false;
+            }
+            return;
+        }
+
+        if (!this.enableBlend) {
+            gl.enable(gl.BLEND);
+            this.enableBlend = true;
+        }
+
+        let func = this.blendFunc;
+        for (let i = 0; i < 4; i++) {
+            if (blendFunc[i] !== func[i]) {
+                gl.blendFuncSeparate(blendFunc[0], blendFunc[1], blendFunc[2], blendFunc[3]);
+                for (i; i < 4; i++) {
+                    func[i] = blendFunc[i];
+                }
+                break;
+            }
+        }
+
+        let equation = this.blendEquation;
+        if (equation[0] !== blendEquation[0] || equation[1] !== blendEquation[1]) {
+            gl.blendEquationSeparate(equation[0], equation[1]);
+            equation[0] = blendEquation[0];
+            equation[1] = blendEquation[1];
+        }
+    }
+
+    setDepth() {
+
+    }
 }
 
 /**
@@ -139,6 +249,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     /** 延迟着色用点光源材质 */
     private _pointLightMat: DeferredShadingMaterial;
 
+    /** WebGL状态缓存 */
+    private _stateCache: WebGLStateCache;
+
     constructor() {
         super();
     }
@@ -168,11 +281,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         this.setSize(width, height);
 
+        this._stateCache = new WebGLStateCache;
+
         // TODO: remove this;
         _gl.enable(_gl.DEPTH_TEST);
         _gl.depthFunc(_gl.LEQUAL);
         // _gl.enable(_gl.BLEND);
-        _gl.enable(_gl.CULL_FACE);
+        // _gl.enable(_gl.CULL_FACE);
         _gl.cullFace(_gl.BACK);
 
         this._timeNow = Date.now();
@@ -516,10 +631,14 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             return;
         }
 
+
         let geo = mesh.getGeometry();
         let glgeo = (geo.getRenderObjectRef(this) as glGeometry);
         
         let mat = mesh.getMaterial();
+
+        this._useMaterialState(mat);
+
         let glprog = (mat.shader.getRenderObjectRef(this) as glProgram);
 
         glprog.apply(gl);
@@ -557,6 +676,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             glProgram.pMatrix.copy(camera.getProjectionMatrix());
             glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
         }
+    }
+
+    protected _useMaterialState(mat: Material) {
+        let gl = this._gl;
+        let states = this._stateCache;
+        states.setBlend(gl, mat.blendFunc, mat.blendEquation, mat.alphaMode);
+        states.setFaceMode(gl, mat.faceMode, mat.filpFace);
     }
 
     /**
@@ -724,7 +850,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 
 
                 // 线性深度解的世界坐标有问题。
-                // gl.depthMask(false);
+                gl.depthMask(false);
                 mat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
                 for (let i = 0; i < lightsList.length; i++) {
                     let pl = lightsList[i] as PointLight;
@@ -735,6 +861,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     glProgram.lightColor.copy(pl.color);
                     this._renderMesh(mesh, this._defCamera);
                 }
+                gl.depthMask(true);
                 gl.disable(gl.BLEND);
                 gl.enable(gl.DEPTH_TEST);
                 gl.disable(gl.STENCIL_TEST);

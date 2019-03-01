@@ -2,6 +2,15 @@ import * as CGE from './RendererParameter';
 import { Texture } from './Texture'
 import { Texture2D } from './Texture2D';
 
+// 渲染到cude6个面的相机参数
+// position          target             up
+// [(0.0, 0.0, 0.0), (1.0,  0.0,  0.0), (0.0,  0.0,  1.0)],
+// [(0.0, 0.0, 0.0), (-1.0, 0.0,  0.0), (0.0,  0.0,  1.0)],
+// [(0.0, 0.0, 0.0), (0.0,  0.0, -1.0), (0.0,  1.0,  0.0)],
+// [(0.0, 0.0, 0.0), (0.0,  0.0,  1.0), (0.0, -1.0,  0.0)],
+// [(0.0, 0.0, 0.0), (0.0,  1.0,  0.0), (0.0,  0.0,  1.0)],
+// [(0.0, 0.0, 0.0), (0.0, -1.0,  0.0), (0.0,  0.0,  1.0)]
+
 export class TextureCube extends Texture {
     private static _gen1pxColorTextureCube(tex2d: Texture2D) {
         let tex = new TextureCube();
@@ -30,7 +39,7 @@ export class TextureCube extends Texture {
     protected _wrapS = CGE.CLAMP_TO_EDGE;
     protected _wrapT = CGE.CLAMP_TO_EDGE;
     protected _wrapR = CGE.CLAMP_TO_EDGE;
-    _texture2ds: Texture2D[] = [undefined, undefined, undefined, undefined, undefined, undefined];
+    protected _texture2ds: Texture2D[] = [undefined, undefined, undefined, undefined, undefined, undefined];
 
     constructor() {
         super();

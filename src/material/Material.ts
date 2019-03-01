@@ -4,26 +4,42 @@ import { Texture2D } from '../graphics/Texture2D';
 import { Loader } from '../io/Loader';
 import { RGBA } from '../graphics/RendererParameter';
 import { Shader } from '../graphics/Shader';
+import * as CGE from '../graphics/RendererParameter';
+
+
+export enum AlphaMode {
+    None = 0,
+    Test,
+    Blend,
+}
+
+// export enum FaceMode {
+//     Front,
+//     Back,
+//     Double,
+//     None
+// }
 
 /**
  * 材质基类 
  */
 export class Material extends Base {
-    
+    static readonly DefBlendFunc = [CGE.ONE, CGE.ZERO, CGE.ONE, CGE.ZERO];
+    static readonly DefBlendEquation = [CGE.FUNC_ADD, CGE.FUNC_ADD];
+
     protected _shader: Shader = new Shader;
-    protected _alphaTest: boolean;
-    protected _alphaBlend: boolean;
 
-    public blendFunc: number;
-    public blendColorSrc: number;
-    public blendColorDst: number;
-    public blendAlphaSrc: number;
-    public blendAlphaDst: number;
+    protected _alphaMode: AlphaMode;
+    protected _faceMode: number;
+    protected _flipFace: boolean;
 
-    public cullFace;
+    protected _blendFunc: number[];
+    protected _blendEquation: number[];
 
     private _textures: Map<string | number, Texture>;
     private _properties: Map<string | number, any>;
+
+    public alphaTestValue: number;
 
     private _macros: string[] = [];
 
@@ -77,25 +93,71 @@ export class Material extends Base {
     }
 
     public disalbeAlpha() {
-        this._alphaTest = this._alphaBlend = false;
+        this._alphaMode = AlphaMode.None;
     }
 
     public enableAlphaTest() {
-        this._alphaTest = true;
-        this._alphaBlend = false;
+        this._alphaMode = AlphaMode.Test;
     }
 
     public enableAlphaBlend() {
-        this._alphaBlend = true;
-        this._alphaTest = false;
+        this._alphaMode = AlphaMode.Blend;
     }
 
     public get alphaTest() {
-        return this._alphaTest;
+        return this._alphaMode === AlphaMode.Test;
     }
 
     public get alphaBlend() {
-        return this._alphaBlend;
+        return this._alphaMode === AlphaMode.Blend;
+    }
+
+    public get alphaMode() {
+        return this._alphaMode || AlphaMode.None;
+    }
+
+    public setCullFaceMode(v: number) {
+        this._faceMode = v;
+    }
+
+    public get faceMode() {
+        return this._faceMode || CGE.BACK;
+    }
+
+    public setFlipFace(v: boolean) {
+        this._flipFace = v;
+    }
+
+    public get filpFace() {
+        return this._flipFace || false;
+    }
+
+    public setBlendFunc(srcRGB: number, dstRGB: number, srcAlpha: number, dstAlpha: number) {
+        if (!this._blendFunc) {
+            this._blendFunc = [srcRGB, dstRGB, srcAlpha, dstAlpha];
+        } else {
+            this._blendFunc[0] = srcRGB;
+            this._blendFunc[1] = dstRGB;
+            this._blendFunc[2] = srcAlpha;
+            this._blendFunc[3] = dstAlpha;
+        }
+    }
+
+    public get blendFunc(): number[] {
+        return this._blendFunc || Material.DefBlendFunc;
+    }
+
+    public setBlendEquation(modeRGB: number, modeAlpha: number) {
+        if (!this._blendEquation) {
+            this._blendEquation = [modeRGB, modeAlpha];
+        } else {
+            this._blendEquation[0] = modeRGB;
+            this._blendEquation[1] = modeAlpha;
+        }
+    }
+
+    public get blendEquation(): number[] {
+        return this._blendEquation || Material.DefBlendEquation;
     }
 
     public canLighting() {

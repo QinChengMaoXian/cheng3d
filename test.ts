@@ -267,6 +267,8 @@ for (let ix = 0; ix <= 7; ix++) {
 
 let skyboxMat = new CGE.SkyboxMaterial();
 skyboxMat.setDiffuseMap(cubeTexture);
+// skyboxMat.setFlipFace(true);
+skyboxMat.setCullFaceMode(CGE.FRONT);
 
 let boxGeo = new CGE.BoxGeometry();
 let bounding = boxGeo.getBounding() as CGE.AABB;
@@ -388,7 +390,10 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
-
+standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+standMat.enableAlphaBlend();
+standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
+standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
 let planeMat = new CGE.ReferMaterial(standMat);
 planeMat.setUVOffset(20, 20, 0, 0); 
 let mesh = new CGE.Mesh();

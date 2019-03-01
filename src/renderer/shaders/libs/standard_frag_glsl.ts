@@ -101,7 +101,9 @@ void main()
     float metallic = spec.g * u_specular.g;
     float ao = spec.b * u_specular.b;
 
-    vec4 baseColor = pow(texture2D(u_diffuseMap, v_uv), vec4(2.2)) * u_baseColor;
+    vec4 bc = texture2D(u_diffuseMap, v_uv);
+    bc.xyz = pow(bc.xyz, vec3(2.2));
+    vec4 baseColor = bc * u_baseColor;
 
     vec3 albedo = baseColor.xyz;
 
@@ -153,7 +155,7 @@ void main()
     // 最终颜色
     vec3 color = ambient + lo;
 
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, baseColor.w);
     // gl_FragColor = vec4(vec3(color), 1.0);
     // gl_FragColor = vec4(v_normal, 1.0);
 }
