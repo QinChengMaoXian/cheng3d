@@ -81,6 +81,7 @@ export class glProgram extends glObject {
         this.apply(gl);
         let uCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         let tCount = 0;
+        this._uniforms.clear();
         for (let i = 0; i < uCount; i++) {
             let data = gl.getActiveUniform(program, i);
             if (!data) {
@@ -252,6 +253,7 @@ export class glProgram extends glObject {
                 case ShaderConst.mMat:              data = worldMatrix; break;
                 case ShaderConst.mITMat:            data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case ShaderConst.vMat:              data = vMat; break;
+                case ShaderConst.vIMat:             data = tempMatrix.copy(vMat).invert(); break;
                 case ShaderConst.pMat:              data = pMat; break;
                 case ShaderConst.pIMat:             data = tempMatrix.copy(pMat).invert(); break;
                 case ShaderConst.vpIMat:            data = tempMatrix.copy(vpMat).invert(); break;
@@ -262,7 +264,7 @@ export class glProgram extends glObject {
                 case ShaderConst.lightColor:        data = glProgram.lightColor; break;
                 case ShaderConst.lightDir:          data = glProgram.lightDir; break;
                 case ShaderConst.cameraRange: {
-                    f4.set([camera.far, camera.near, 1.0 / (camera.far - camera.near), 0]);
+                    f4.set([camera.far, 1.0 / camera.far, camera.aspect, Math.tan(camera.fovy * 0.5)]);
                     glprog.setUniformData(gl, type, location, f4);
                     return;
                 }

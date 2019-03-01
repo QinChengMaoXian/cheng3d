@@ -82,7 +82,9 @@ export class ShaderConst {
     public static readonly mITMat = ShaderConst._inUni('u_mITMat');
     /** view matrix */
     public static readonly vMat = ShaderConst._inUni('u_vMat');
-    /** inv view matrix */
+    /** view matrix */
+    public static readonly vIMat = ShaderConst._inUni('u_vIMat');
+    /** inv t view matrix */
     public static readonly vITMat = ShaderConst._inUni('u_vITMat');
     /** projection matrix */
     public static readonly pMat = ShaderConst._inUni('u_pMat');

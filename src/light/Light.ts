@@ -1,5 +1,6 @@
 import { Object3D } from '../object/Object3D';
 import { Vector4 } from '../math/Vector4';
+import { Vector3 } from '../math/Vector3';
 
 export enum LightType {
     None = 0,
@@ -15,6 +16,8 @@ export interface ILight {
 }
 
 export class Light extends Object3D {
+
+    static readonly LumFactor = new Vector4(0.27, 0.67, 0.06, 0.0);
 
     protected _color: Vector4 = new Vector4(1.0, 1.0, 1.0, 1.0);
 
@@ -35,6 +38,12 @@ export class Light extends Object3D {
 
     public disableShadow() {
         this._shadow = false;
+    }
+
+    public setScale(x, y, z) {}
+    public setScaleAt(vec: Vector3) {}
+    public getScale() {
+        return Vector3.One;
     }
 
     public get isLight() {

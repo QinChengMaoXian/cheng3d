@@ -2,10 +2,16 @@ import { Material } from './Material';
 import { ShaderConst as s } from '../graphics/ShaderConst'
 import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
+import { LightType, Light } from '../light/Light';
+import { Vector3 } from '../math/Vector3';
 
 export class DeferredShadingMaterial extends Material {
 
     private _pixelSize: { data: Float32Array }
+
+    public _lightPos: Vector3;
+
+    protected _lightType = LightType.Direction;
 
     constructor() {
         super();
@@ -13,8 +19,11 @@ export class DeferredShadingMaterial extends Material {
         this._pixelSize = { data: new Float32Array([1.0, 1.0]) };
         this.setProperty(s.pixelSize, this._pixelSize);
 
-        this.setTexture(s.irradianceMap, TextureCube.White);
-        this.setTexture(s.prefilterMap, TextureCube.White);
+        this._lightPos = new Vector3();
+        this.setProperty(s.lightPos, this._lightPos);
+
+        this.setTexture(s.irradianceMap, TextureCube.Black);
+        this.setTexture(s.prefilterMap, TextureCube.Black);
         this.setTexture(s.brdfLUTMap, Texture2D.BrdfLUT);
     }
 
@@ -40,6 +49,36 @@ export class DeferredShadingMaterial extends Material {
 
     public setPixelSize(x: number, y: number) {
         this._pixelSize.data.set(arguments);
+    }
+
+    public setLightPos(v: Vector3) {
+        this._lightPos.copy(v);
+    }
+
+    public useForDirectionLight() {
+        if (this._lightType === LightType.Point) {
+            this._removeMacro('POINT_LIGHT');
+        } else if(this._lightType === LightType.Spot) {
+            this._removeMacro('SPOT_LIGHT');
+        }
+    }
+
+    public useForPointLight() {
+        if (this._lightType === LightType.Point) {
+            return;
+        } else if(this._lightType === LightType.Spot) {
+            this._removeMacro('SPOT_LIGHT');
+        }
+        this._addMacro('POINT_LIGHT');
+    }
+
+    public uesForSpotLight() {
+        if (this._lightType === LightType.Spot) {
+            return;
+        } else if(this._lightType === LightType.Point) {
+            this._removeMacro('POINT_LIGHT');
+        }
+        this._addMacro('SPOT_LIGHT');
     }
 
     public get type(): string {

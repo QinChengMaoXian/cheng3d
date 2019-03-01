@@ -34,6 +34,8 @@ export { ReferMaterial } from './material/ReferMaterial';
 
 export { Light } from './light/Light';
 export { DirectionLight } from './light/DirectionLight';
+export { PointLight } from './light/PointLight';
+export { SpotLight } from './light/SpotLight';
 
 export * from './graphics/GraphicsTypes';
 export * from './graphics/RendererParameter';

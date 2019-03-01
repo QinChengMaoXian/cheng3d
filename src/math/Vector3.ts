@@ -3,11 +3,11 @@ import { Matrix4 } from "./Matrix4";
 import { ObjectPool } from "../util/ObjectPool";
 
 export class Vector3 {
-    static readonly Zero: Vector3 = new Vector3(0, 0, 0);
-    static readonly ZUp: Vector3 = new Vector3(0, 0, 1);
+    public static readonly Zero: Vector3 = new Vector3(0, 0, 0);
+    public static readonly ZUp: Vector3 = new Vector3(0, 0, 1);
+    public static readonly One: Vector3 = new Vector3(1, 1, 1);
 
-    static pubTemp: Vector3 = new Vector3();
-
+    public static pubTemp: Vector3 = new Vector3();
     public static pool = new ObjectPool<Vector3>(Vector3, 6);
 
     public v: Float32Array;

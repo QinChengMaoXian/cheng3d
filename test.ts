@@ -223,8 +223,8 @@ obj3D.name = '一堆球';
 
 let standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 // let standMat = new CGE.StandardMaterial;
-standMat.setIrradianceMap(cubeTexture);
-standMat.setPrefilterMap(cubeTexture);
+// standMat.setIrradianceMap(cubeTexture);
+// standMat.setPrefilterMap(cubeTexture);
 // standMat.setSpecular(0.04, 0, 1);
 // standMat.setBrdfLUTMap();
 window['standMat'] = standMat;
@@ -272,6 +272,17 @@ skyboxMesh.setMaterial(skyboxMat);
 mainScene.addChild(skyboxMesh);
 
 // 以上 天空盒测试
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 光源测试
+
+for(let i = 0; i < 20; i++) {
+    let p = new CGE.PointLight();
+    p.setColor(Math.random() * 100, Math.random() * 100, Math.random() * 100);
+    p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+    mainScene.addChild(p);
+}
+
+// 以上 光源测试
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 gltf 加载测试
 
@@ -372,8 +383,8 @@ planeVertexGeometry.setDrawParameter(indexData.length);
 let planeMat = new CGE.ReferMaterial(standMat);
 planeMat.setUVOffset(20, 20, 0, 0); 
 let mesh = new CGE.Mesh();
-mesh.setPosition(0, 0, -80);
-mesh.setScale(4000, 4000, 10);
+mesh.setPosition(0, 0, -10);
+mesh.setScale(4000, 4000, 1);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(planeMat);
 

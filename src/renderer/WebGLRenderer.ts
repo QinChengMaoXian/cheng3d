@@ -12,7 +12,7 @@ import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
-import { ScreenGeometry } from '../util/GeometryUtil';
+import { ScreenGeometry, SphereGeometry } from '../util/GeometryUtil';
 
 import { RTLocation } from '../graphics/GraphicsTypes';
 import { FullScreenMaterial } from '../material/FullScreenMaterial';
@@ -38,6 +38,8 @@ import { AABB } from '../bounding/AABB';
 import { Vector3 } from '../math/Vector3';
 import { Light } from '../light/Light';
 import { SphereBounding } from '../bounding/SphereBounding';
+import { PointLight } from '../light/PointLight';
+import { Quaternion } from '../math/Quaternion';
 
 export interface RenderArgs{
     frustumCamera?: Camera;
@@ -130,6 +132,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     /** 裁剪视锥 */
     private _frustum: Frustum = new Frustum;
+
+    /** 延迟着色用点光源模型 */
+    private _pointLightMesh: Mesh;
+
+    /** 延迟着色用点光源材质 */
+    private _pointLightMat: DeferredShadingMaterial;
 
     constructor() {
         super();
@@ -602,19 +610,19 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         const _addToRenderList = (mesh: Mesh) => {
             let mat = (<Mesh>mesh).getMaterial();
 
-            if (frustum && !frame) {
-                let bounding = mesh.getBounding();
-                switch (bounding.getType()) {
-                    case Bounding.TYPE_AABB:
-                        if (!frustum.intersectBox((bounding as AABB).box)) {
-                            return;
-                        }
-                        break;
+            // if (frustum && !frame) {
+            //     let bounding = mesh.getBounding();
+            //     switch (bounding.getType()) {
+            //         case Bounding.TYPE_AABB:
+            //             if (!frustum.intersectBox((bounding as AABB).box)) {
+            //                 return;
+            //             }
+            //             break;
                 
-                    default:
-                        break;
-                }
-            }
+            //         default:
+            //             break;
+            //     }
+            // }
 
             if (mat.alphaBlend) {
                 _alphaBlendList.push(mesh);
@@ -626,26 +634,26 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         const _addToLightList = (light: Light) => {
-            if (frustum && !frame) {
-                let bounding = light.getBounding();
-                if (bounding) {
-                    switch (bounding.getType()) {
-                        case Bounding.TYPE_AABB:
-                            if (!frustum.intersectBox((bounding as AABB).box)) {
-                                return;
-                            }
-                            break;
+            // if (frustum && !frame) {
+            //     let bounding = light.getBounding();
+            //     if (bounding) {
+            //         switch (bounding.getType()) {
+            //             case Bounding.TYPE_AABB:
+            //                 if (!frustum.intersectBox((bounding as AABB).box)) {
+            //                     return;
+            //                 }
+            //                 break;
                         
-                        case Bounding.TYPE_SPHERE:
-                            if (!frustum.intersectSphere((bounding as SphereBounding).sphere)) {
-                                return;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
+            //             case Bounding.TYPE_SPHERE:
+            //                 if (!frustum.intersectSphere((bounding as SphereBounding).sphere)) {
+            //                     return;
+            //                 }
+            //                 break;
+            //             default:
+            //                 break;
+            //         }
+            //     }
+            // }
             lightsList.push(light);
         }
 
@@ -678,7 +686,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             if (this._deferredRendering) {
                 // 延迟渲染流程走这里，注意，没有优化光源。
                 let gFrame = this._gFrame;
-                this.initFrame(gFrame);
+                // this.initFrame(gFrame);
 
                 _preRenderObjects(scene, scene.visible);
 
@@ -705,8 +713,31 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 gl.stencilFunc(gl.EQUAL, 0x80, 0x80);
                 gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
                 this._renderMesh(this._deferMesh, this._defCamera);
-                gl.disable(gl.STENCIL_TEST);
+
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.ONE, gl.ONE);
+                gl.blendEquation(gl.FUNC_ADD);
+
+                let mesh = this._pointLightMesh;
+                let mat = this._pointLightMat;
+                
+
+                // 线性深度解的世界坐标有问题。
+                // gl.depthMask(false);
+                mat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
+                for (let i = 0; i < lightsList.length; i++) {
+                    let pl = lightsList[i] as PointLight;
+                    let r = pl.radius;
+                    mat.setLightPos(pl.getPosition());  
+                    mesh.setScale(r, r, r);
+                    mesh.setPositionAt(pl.getPosition());
+                    glProgram.lightColor.copy(pl.color);
+                    this._renderMesh(mesh, this._defCamera);
+                }
+                gl.disable(gl.BLEND);
                 gl.enable(gl.DEPTH_TEST);
+                gl.disable(gl.STENCIL_TEST);
+                
 
                 _renderList(_alphaBlendList);
             } else {
@@ -890,6 +921,22 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 mesh.setGeometry(this._defGeo);
                 mesh.setMaterial(mat);
                 this._deferMesh = mesh;
+
+                mat = new DeferredShadingMaterial();
+                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT0).tex)
+                mat.setDiffuseMap(tex);
+                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT1).tex)
+                mat.setNormalMap(tex);
+                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT2).tex)
+                mat.setDepthMap(tex);
+                mat.useForPointLight();
+                this._pointLightMat = mat;
+
+                let geo = new SphereGeometry(1, 32, 32);
+                mesh = new Mesh();
+                mesh.setGeometry(geo);
+                mesh.setMaterial(mat);
+                this._pointLightMesh = mesh;
             }
 
             if (!this._notClearDepthState) {

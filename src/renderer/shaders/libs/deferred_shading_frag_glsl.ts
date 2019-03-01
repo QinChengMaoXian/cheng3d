@@ -1,7 +1,7 @@
 export default `
 #extension GL_EXT_shader_texture_lod : enable
 
-precision mediump float;
+precision highp float;
 
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_normalMap;
@@ -12,18 +12,21 @@ uniform sampler2D u_brdfLUTMap;
 uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
 
-uniform mat4 u_vpIMat;
-// uniform vec4 u_uvOffset;
-uniform vec3 u_cameraPos;
-uniform vec4 u_lightColor;
-uniform vec3 u_lightDir;
-// uniform vec4 u_lightPos;
+uniform mat4 u_vIMat;
+
 uniform vec2 u_pixelSize;
+uniform vec3 u_cameraPos;
+
+uniform vec4 u_lightColor;
 uniform vec4 u_cameraRange;
 
-const float PI = 3.14159265359;
+#ifdef POINT_LIGHT
+    uniform vec3 u_lightPos;
+#endif
 
-varying vec2 v_uv;
+uniform vec3 u_lightDir;
+
+const float PI = 3.14159265359;
 
 float dot_plus(vec3 v1, vec3 v2)
 {
@@ -86,6 +89,16 @@ float linearToDepth(float l, float f, float n)
     return (f + n - 2.0 * n * f) / (l * (f - n));
 }
 
+vec3 getViewPos(vec2 texCoord, float depth, vec4 cameraRange){
+    //cameraRange.x: far
+    //cameraRange.y: 1.0 / far
+    //cameraRange.z: aspectRatio
+    //cameraRange.w: tan(fovy * 0.5)
+    float d = depth * cameraRange.x;
+    float temp = d * cameraRange.w;
+    return vec3(texCoord.x * cameraRange.z * temp, texCoord.y * temp, -d);
+}
+
 void main() 
 {
     vec2 uv = gl_FragCoord.xy * u_pixelSize;
@@ -95,29 +108,38 @@ void main()
     vec4 rt2 = texture2D(u_depthMap, uv);
 
     vec3 albedo = rt0.xyz;
-    vec3 normal = rt1.xyz;
-    float depth = linearToDepth(decodeRGB2Float(rt2.xyz) * 2.0 - 1.0, u_cameraRange.x, u_cameraRange.y);
+    vec3 normal = rt1.xyz * 2.0 - 1.0;
+    float depth = decodeRGB2Float(rt2.xyz);
 
-    normal = normal * 2.0 - 1.0;
+    vec3 viewPos = getViewPos(uv * 2.0 - 1.0, depth, u_cameraRange);
+    // vec3 viewPos = rt2.xyz;// getViewPos(uv * 2.0 - 1.0, depth, u_cameraRange);
+
+    vec3 worldPos = (u_vIMat * vec4(viewPos, 1.0)).xyz;
+    // worldPos.xyz /= worldPos.w;
+
+    // vec4 worldPos = vec4(rt2.xyz, 1.0);
 
     float roughness = rt0.w;
     float metallic = rt1.w;
     float ao = rt2.w;
 
-    vec4 projPos = vec4(uv, depth, 1.0) * 2.0 - 1.0;
-    vec4 worldPos = u_vpIMat * projPos;
-    worldPos /= worldPos.w;
-
     vec3 F0 = vec3(0.04);
     F0 = F0 * (1.0 - metallic) + albedo * metallic;
 
-    vec3 L = normalize(u_lightDir.xyz);
+    vec3 L;
+
+    #ifdef POINT_LIGHT
+        // vec3 lightPos = (u_vMat * vec4(u_lightPos, 1.0)).xyz;
+        L = normalize(u_lightPos - worldPos.xyz);
+    #else
+        L = u_lightDir.xyz;
+    #endif
+
+    // vec3 cameraPos = (u_vMat * vec4(u_cameraPos, 1.0)).xyz;
+
     vec3 V = normalize(u_cameraPos - worldPos.xyz);
     vec3 N = normalize(normal);
     vec3 H = normalize(V + L);
-
-    vec3 R = N * dot_plus(N, V) * 2.0 - V; 
-    R = vec3(R.x, R.z, -R.y);
 
     float G = GeometrySmith(N, V, L, roughness);
     float D = DistributionGGX(N, H, roughness);
@@ -125,11 +147,11 @@ void main()
 
     vec3 nominator = D * G * F;//分子
 
-    float denominator = 4.0 * max(dot(V, N), 0.0) * max(dot(L, N), 0.0) + 0.0001;//分母 
-    vec3 brdf = nominator / denominator;
-
     float NdotL = dot_plus(N, L); 
     float NdotV = dot_plus(N, V); 
+
+    float denominator = 4.0 * NdotV * NdotL + 0.0001;//分母 
+    vec3 brdf = nominator / denominator;
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
@@ -138,22 +160,31 @@ void main()
     // 直接光照结果
     vec3 lo = (kD * (albedo) / PI + brdf) * u_lightColor.xyz * NdotL;
 
-    // 环境光部分
-    vec3 coordN = vec3(N.x, N.z, -N.y);
-    vec3 irradiance = textureCube(u_irradianceMap, coordN).xyz;
-    vec3 diffuse = irradiance * albedo;
-    vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
-    vec3 kD_a = vec3(1.0) - F_s;
-    kD_a *= 1.0 - metallic;
+    #ifdef POINT_LIGHT
+        vec3 d3 = u_lightPos - worldPos.xyz;
+        float d = 1.0 / dot(d3, d3);
+        lo *= d;
+        gl_FragColor = vec4(vec3(lo), 1.0);
+    #else
+        vec3 R = N * dot_plus(N, V) * 2.0 - V; 
+        R = vec3(R.x, R.z, -R.y);
+        // 环境光部分
+        vec3 coordN = vec3(N.x, N.z, -N.y);
+        vec3 irradiance = textureCube(u_irradianceMap, coordN).xyz;
+        vec3 diffuse = irradiance * albedo;
+        vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
+        vec3 kD_a = vec3(1.0) - F_s;
+        kD_a *= 1.0 - metallic;
 
-    vec2 envBRDF  = texture2D(u_brdfLUTMap, vec2(NdotV, roughness)).rg;
-    vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb;  
-    vec3 specular = prefilteredColor * (F_s * envBRDF.x + envBRDF.y);
-    vec3 ambient = (kD_a * diffuse + specular) * ao;
+        vec2 envBRDF  = texture2D(u_brdfLUTMap, vec2(NdotV, roughness)).rg;
+        vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb;  
+        vec3 specular = prefilteredColor * (F_s * envBRDF.x + envBRDF.y);
+        vec3 ambient = (kD_a * diffuse + specular) * ao;
 
-    // 最终颜色
-    vec3 color = ambient + lo;
+        // 最终颜色
+        vec3 color = ambient + lo;
 
-    gl_FragColor = vec4(color, 1.0);
+        gl_FragColor = vec4(color, 1.0);
+    #endif
 }
 `;

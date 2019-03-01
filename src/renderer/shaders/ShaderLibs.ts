@@ -45,6 +45,7 @@ import log_sample_frag from './libs/log_sample_frag_glsl';
 import ssao_frag from './libs/ssao_frag_glsl';
 import gbuffer_frag from './libs/gbuffer_frag_glsl';
 import deferred_shading_frag from './libs/deferred_shading_frag_glsl';
+import deferred_shading_vert from './libs/deferred_shading_vert_glsl';
 import skybox_vert from './libs/skybox_vert_glsl';
 import skybox_frag from './libs/skybox_frag_glsl'; 
 import blend_frag from './libs/blend_frag_glsl';
@@ -120,7 +121,7 @@ export const shaders = {
     },
 
     'deferred_shading': {
-        vert: repStr(fullscreen_vert),
+        vert: repStr(deferred_shading_vert),
         frag: repStr(deferred_shading_frag),
     },
 

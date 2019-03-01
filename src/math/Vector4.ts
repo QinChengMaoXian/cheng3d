@@ -42,6 +42,12 @@ export class Vector4 {
         return this;
     }
 
+    public dot(vec4: Vector4) {
+        let vs = this.v;
+        let vd = vec4.v;
+        return vs[0] * vd[0] + vs[1] * vd[1] + vs[2] * vd[2] + vs[3] * vd[3];
+    }
+
     public clone() {
         let vec4 = new Vector4();
         vec4.x = this.v[0];
