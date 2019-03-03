@@ -23,11 +23,10 @@ import { glTexture2D } from './glObject/glTexture2D'
 import { glTextureCube } from './glObject/glTextureCube'
 import { Platform } from '../platform/Platform';
 import { ShaderCaches } from './shaders/ShaderCaches';
-import { Material, AlphaMode } from '../material/Material';
+import { Material } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
 import { Event } from '../core/Event';
-import { Base } from '../core/Base';
 import { PostEffectsPipeline } from './PostEffectsPipeline';
 import { PEType, PEBase } from './postEffect/PEBase';
 import { WebGLSupports } from './WebGLSupports';
@@ -35,124 +34,13 @@ import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
 import { Frustum } from '../math/Frustum';
 import { Bounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB';
-import { Vector3 } from '../math/Vector3';
 import { Light } from '../light/Light';
-import { SphereBounding } from '../bounding/SphereBounding';
 import { PointLight } from '../light/PointLight';
-import { Quaternion } from '../math/Quaternion';
+import { glTexture } from './glObject/glTexture';
+import { WebGLStateCache } from './WebGLStateCache';
 
 export interface RenderArgs{
     frustumCamera?: Camera;
-}
-
-
-// TODO 特征值计算
-export class WebGLStateCache {
-    // color
-    enableClearColor = true;
-    clearColor = [1.0, 1.0, 1.0, 1.0];
-    colorMask = [true, true, true, true];
-
-    // depth
-    enableClearDepth = true;
-    clearDepth = 0;
-    depthFunc = CGE.LESS;
-    depthMask = true;
-
-    // stencil
-    clearStencil = 0;
-    enableClearStencil = false;
-    stencilMask = 1;
-    stencilBackMask = 1
-    stencilFunc = [CGE.ALWAYS, 0, 1];
-    stencilBackFunc = [CGE.ALWAYS, 0, 1];
-    stencilOp = [CGE.KEEP, CGE.KEEP, CGE.KEEP];
-    stencilBackOp = [CGE.KEEP, CGE.KEEP, CGE.KEEP];
-
-    // blend
-    enableBlend = false;
-    blendFunc = [CGE.ONE, CGE.ZERO, CGE.ONE, CGE.ZERO];
-    blendEquation = [CGE.FUNC_ADD, CGE.FUNC_ADD];
-
-    // viewport
-    viewpost = [0, 0, 800, 600];
-
-    // cullFace
-    enableCullFace = false;
-    cullFaceMode = CGE.BACK;
-    frontFace = CGE.CCW;
-
-    // scissor
-    enableScissorTest = false;
-    scissor = [0, 0, 800, 600];
-
-    // polygonOffset
-    enablePolygonOffset = false;
-    polygonOffset = [0, 0];
-
-    setColor(gl: WebGLRenderingContext, v: boolean) {
-        
-    }
-
-    setFaceMode(gl: WebGLRenderingContext, cullFaceMode: number, flipFace: boolean) {
-        let frontFace = flipFace ? CGE.CW : CGE.CCW;
-        if (frontFace !== this.frontFace) {
-            gl.frontFace(frontFace);
-            this.frontFace = frontFace;
-        }
-
-        let enableCullFace = !!cullFaceMode;
-        if (enableCullFace !== this.enableCullFace) {
-            enableCullFace ? gl.enable(gl.CULL_FACE) : gl.disable(gl.CULL_FACE);
-            this.enableCullFace = enableCullFace;
-        }
-
-        if (cullFaceMode && cullFaceMode !== this.cullFaceMode) {
-            gl.cullFace(cullFaceMode);
-            this.cullFaceMode = cullFaceMode;
-        }
-    }
-
-    setStencil() {
-
-    }
-
-    setBlend(gl: WebGLRenderingContext, blendFunc: number[], blendEquation: number[], alphaMode: AlphaMode) {
-        if (alphaMode !== AlphaMode.Blend) {
-            if (this.enableBlend) {
-                gl.disable(gl.BLEND);
-                this.enableBlend = false;
-            }
-            return;
-        }
-
-        if (!this.enableBlend) {
-            gl.enable(gl.BLEND);
-            this.enableBlend = true;
-        }
-
-        let func = this.blendFunc;
-        for (let i = 0; i < 4; i++) {
-            if (blendFunc[i] !== func[i]) {
-                gl.blendFuncSeparate(blendFunc[0], blendFunc[1], blendFunc[2], blendFunc[3]);
-                for (i; i < 4; i++) {
-                    func[i] = blendFunc[i];
-                }
-                break;
-            }
-        }
-
-        let equation = this.blendEquation;
-        if (equation[0] !== blendEquation[0] || equation[1] !== blendEquation[1]) {
-            gl.blendEquationSeparate(equation[0], equation[1]);
-            equation[0] = blendEquation[0];
-            equation[1] = blendEquation[1];
-        }
-    }
-
-    setDepth() {
-
-    }
 }
 
 /**
@@ -432,7 +320,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     /** 
      * 初始化与更新纹理对象
      */
-    public initTexture(texture: Texture) {
+    public initTexture(texture: Texture): glTexture {
         let _gl = this._gl;
         let gltexture:any = texture.getRenderObjectRef(this);
         if (gltexture !== undefined && !gltexture.getUpdate()) {
@@ -456,6 +344,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 return tex;
             }
         }
+        
+        return null;
     }
 
     /** 
@@ -631,15 +521,14 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             return;
         }
 
-
         let geo = mesh.getGeometry();
-        let glgeo = (geo.getRenderObjectRef(this) as glGeometry);
+        let glgeo = <glGeometry>geo.getRenderObjectRef(this);
         
         let mat = mesh.getMaterial();
 
         this._useMaterialState(mat);
 
-        let glprog = (mat.shader.getRenderObjectRef(this) as glProgram);
+        let glprog = <glProgram>mat.shader.getRenderObjectRef(this);
 
         glprog.apply(gl);
         glgeo.bindVbo(gl, glprog, geo);
@@ -681,8 +570,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     protected _useMaterialState(mat: Material) {
         let gl = this._gl;
         let states = this._stateCache;
-        states.setBlend(gl, mat.blendFunc, mat.blendEquation, mat.alphaMode);
+        states.setBlend(gl, mat.alphaType, mat.blend);
         states.setFaceMode(gl, mat.faceMode, mat.filpFace);
+        states.setStencil(gl, mat.enableStencil, mat.stencil);
     }
 
     /**
@@ -813,7 +703,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             if (this._deferredRendering) {
                 // 延迟渲染流程走这里，注意，没有优化光源。
                 let gFrame = this._gFrame;
-                // this.initFrame(gFrame);
 
                 _preRenderObjects(scene, scene.visible);
 

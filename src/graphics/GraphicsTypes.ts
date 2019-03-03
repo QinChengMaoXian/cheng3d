@@ -7,4 +7,19 @@ export const enum RTLocation {
     RT2 = 2,
     RT3 = 3,
     COLOR = 0,
+    NORMAL = 1,
+    DEPTH = 2,
+}
+
+export enum AlphaType {
+    NONE = 0,
+    TEST,
+    BLEND,
+}
+
+export enum FaceType {
+    NONE = 0,
+    FRONT,
+    BACK,
+    DOUBLE,
 }

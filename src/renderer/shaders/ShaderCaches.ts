@@ -23,7 +23,7 @@ export class ShaderCaches {
         if (macros && macros.length > 0) {
             newMacros = newMacros.concat(macros);
         }
-        let caches = this._caches;
+        
         let renderer = this._renderer;
         let shader = mat.shader;
         let glprog: glProgram = (shader.getRenderObjectRef(renderer) as glProgram);
@@ -34,6 +34,8 @@ export class ShaderCaches {
         if (matCurKey === matNewKey) {
             return glprog;
         }
+
+        let caches = this._caches;
 
         if (glprog) {
             this.removeKey(matCurKey);

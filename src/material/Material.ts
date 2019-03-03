@@ -5,42 +5,38 @@ import { Loader } from '../io/Loader';
 import { RGBA } from '../graphics/RendererParameter';
 import { Shader } from '../graphics/Shader';
 import * as CGE from '../graphics/RendererParameter';
-
-
-export enum AlphaMode {
-    None = 0,
-    Test,
-    Blend,
-}
-
-// export enum FaceMode {
-//     Front,
-//     Back,
-//     Double,
-//     None
-// }
+import { Blend } from '../graphics/Blend';
+import { Stencil } from '../graphics/Stencil';
+import { AlphaType, FaceType } from '../graphics/GraphicsTypes';
 
 /**
  * 材质基类 
  */
 export class Material extends Base {
-    static readonly DefBlendFunc = [CGE.ONE, CGE.ZERO, CGE.ONE, CGE.ZERO];
-    static readonly DefBlendEquation = [CGE.FUNC_ADD, CGE.FUNC_ADD];
-
     protected _shader: Shader = new Shader;
 
-    protected _alphaMode: AlphaMode;
+    /** 剔除面模式 CGE.ZERO为不剔除 */
     protected _faceMode: number;
+    /** 反转面方向 */
     protected _flipFace: boolean;
 
-    protected _blendFunc: number[];
-    protected _blendEquation: number[];
-
-    private _textures: Map<string | number, Texture>;
-    private _properties: Map<string | number, any>;
-
+    /** 半透明类型 */
+    protected _alphaType: AlphaType;
+    /** 半透明混合参数 */
+    protected _blend: Blend;
+    /** 半透明测试通过值 */
     public alphaTestValue: number;
 
+    /** 是否启用模板 */
+    protected _enableStencil: boolean;
+    /** 模板参数 */
+    protected _stencil: Stencil;
+
+    /** 纹理组 */
+    private _textures: Map<string | number, Texture>;
+    /** 材质参数组 */
+    private _properties: Map<string | number, any>;
+    /** 宏数组 */
     private _macros: string[] = [];
 
     constructor() {
@@ -92,28 +88,32 @@ export class Material extends Base {
         return this._textures.get(type);
     }
 
+    public set alphaType(v: AlphaType) {
+        this._alphaType = v;
+    }
+
     public disalbeAlpha() {
-        this._alphaMode = AlphaMode.None;
+        this._alphaType = AlphaType.NONE;
     }
 
     public enableAlphaTest() {
-        this._alphaMode = AlphaMode.Test;
+        this._alphaType = AlphaType.TEST;
     }
 
     public enableAlphaBlend() {
-        this._alphaMode = AlphaMode.Blend;
+        this._alphaType = AlphaType.BLEND;
     }
 
     public get alphaTest() {
-        return this._alphaMode === AlphaMode.Test;
+        return this._alphaType === AlphaType.TEST;
     }
 
     public get alphaBlend() {
-        return this._alphaMode === AlphaMode.Blend;
+        return this._alphaType === AlphaType.BLEND;
     }
 
-    public get alphaMode() {
-        return this._alphaMode || AlphaMode.None;
+    public get alphaType() {
+        return this._alphaType || AlphaType.NONE;
     }
 
     public setCullFaceMode(v: number) {
@@ -131,33 +131,91 @@ export class Material extends Base {
     public get filpFace() {
         return this._flipFace || false;
     }
+    
+    public setBlend(blend: Blend, deepCopy: boolean = false) {
+        if (!deepCopy) {
+            this._blend = blend;
+        } else {
+            if (!this._blend) {
+                this._blend = blend.clone();
+            } else {
+                this._blend.copy(blend);
+            }
+        }
+    }
+
+    public get blend() {
+        return this._blend || Blend.DefBlend;
+    }
+
+    protected _checkCreateBlend() {
+        let blend = this._blend;
+        if (!blend) {
+            blend = new Blend();
+            this._blend = blend;
+        }
+        return blend;
+    }
 
     public setBlendFunc(srcRGB: number, dstRGB: number, srcAlpha: number, dstAlpha: number) {
-        if (!this._blendFunc) {
-            this._blendFunc = [srcRGB, dstRGB, srcAlpha, dstAlpha];
-        } else {
-            this._blendFunc[0] = srcRGB;
-            this._blendFunc[1] = dstRGB;
-            this._blendFunc[2] = srcAlpha;
-            this._blendFunc[3] = dstAlpha;
-        }
+        let blend = this._checkCreateBlend();
+        blend.setBlendFunc.apply(blend, arguments);
     }
 
     public get blendFunc(): number[] {
-        return this._blendFunc || Material.DefBlendFunc;
+        return this._blend ? this._blend.blendFunc : Blend.DefBlend.blendFunc;
     }
 
     public setBlendEquation(modeRGB: number, modeAlpha: number) {
-        if (!this._blendEquation) {
-            this._blendEquation = [modeRGB, modeAlpha];
-        } else {
-            this._blendEquation[0] = modeRGB;
-            this._blendEquation[1] = modeAlpha;
-        }
+        let blend = this._checkCreateBlend();
+        blend.setBlendEquation.apply(blend, arguments);
     }
 
     public get blendEquation(): number[] {
-        return this._blendEquation || Material.DefBlendEquation;
+        return this._blend ? this._blend.blendEquation : Blend.DefBlend.blendEquation;
+    }
+
+    public set enableStencil(v: boolean) {
+        this._enableStencil = v;
+    }
+
+    public get enableStencil() {
+        return this._enableStencil;
+    }
+
+    public setStencil(stencil: Stencil, deepCopy: boolean = false) {
+        if (!deepCopy) {
+            this._stencil = stencil;
+        } else {
+            if (!this._stencil) {
+                this._stencil = stencil.clone();
+            } else {
+                this._stencil.copy(stencil);
+            }
+        }
+    }
+
+    public get stencil() {
+        return this._stencil || Stencil.DefStencil;
+    }
+
+    protected _checkCreateStencil() {
+        let stencil = this._stencil;
+        if (!stencil) {
+            stencil = new Stencil();
+            this._stencil = stencil;
+        }
+        return stencil;
+    }
+
+    public setStencilFunc(func: number, ref: number, mask: number, face: FaceType = FaceType.DOUBLE) {
+        let stencil = this._checkCreateStencil();
+        stencil.setStencilFunc.apply(stencil, arguments);
+    }
+
+    public setStencilOp(fail: number, zfail: number, zpass: number, face: FaceType = FaceType.DOUBLE) {
+        let stencil = this._checkCreateStencil();
+        stencil.setStencilOp.apply(stencil, arguments);
     }
 
     public canLighting() {
@@ -184,6 +242,10 @@ export class Material extends Base {
         if (idx > -1) {
             this._macros.splice(idx, 1);
         }
+    }
+
+    public get key(): string {
+        return '';
     }
 
     public get type(): string {
