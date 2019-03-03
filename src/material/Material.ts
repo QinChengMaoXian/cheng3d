@@ -32,6 +32,10 @@ export class Material extends Base {
     /** 模板参数 */
     protected _stencil: Stencil;
 
+    public enableDepth = true;
+    public depthMask = true;
+    protected _depthFunc: number;
+
     /** 纹理组 */
     private _textures: Map<string | number, Texture>;
     /** 材质参数组 */
@@ -216,6 +220,14 @@ export class Material extends Base {
     public setStencilOp(fail: number, zfail: number, zpass: number, face: FaceType = FaceType.DOUBLE) {
         let stencil = this._checkCreateStencil();
         stencil.setStencilOp.apply(stencil, arguments);
+    }
+
+    public set depthFunc(v: number) {
+        this._depthFunc = v;
+    }
+
+    public get depthFunc() {
+        return this._depthFunc || CGE.LESS;
     }
 
     public canLighting() {

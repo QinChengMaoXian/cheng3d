@@ -59,6 +59,26 @@ export class ReferMaterial extends Material {
         }
     }
 
+    public get depthFunc() {
+        return this._depthFunc || this._referMat.depthFunc;
+    }
+
+    public get alphaType() {
+        return this._alphaType === undefined ? this._referMat.alphaType : this._alphaType;
+    }
+
+    public get blend() {
+        return this._blend || this._referMat.blend;
+    }
+
+    public get enableStencil() {
+        return this._enableStencil === undefined ? this._referMat.enableStencil : this._enableStencil;
+    }
+
+    public get stencil() {
+        return this._stencil || this._referMat.stencil;
+    }
+
     public get type(): string {
         return this._referMat.type;
     }

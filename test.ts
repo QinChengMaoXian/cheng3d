@@ -231,6 +231,9 @@ let standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, spec
 // let standMat = new CGE.StandardMaterial;
 standMat.setIrradianceMap(cubeTexture);
 standMat.setPrefilterMap(cubeTexture);
+standMat.enableStencil = true;
+standMat.setStencilFunc(CGE.ALWAYS, 0x80, 0x80);
+standMat.setStencilOp(CGE.KEEP, CGE.KEEP, CGE.REPLACE);
 // standMat.setSpecular(0.04, 0, 1);
 // standMat.setBrdfLUTMap();
 window['standMat'] = standMat;
@@ -266,9 +269,10 @@ for (let ix = 0; ix <= 7; ix++) {
 // 以下 天空盒测试
 
 let skyboxMat = new CGE.SkyboxMaterial();
+skyboxMat.depthMask = false;
 skyboxMat.setDiffuseMap(cubeTexture);
-// skyboxMat.setFlipFace(true);
 skyboxMat.setCullFaceMode(CGE.FRONT);
+skyboxMat.depthFunc = CGE.LEQUAL; 
 
 let boxGeo = new CGE.BoxGeometry();
 let bounding = boxGeo.getBounding() as CGE.AABB;
@@ -390,12 +394,10 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
-standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
-standMat.enableAlphaBlend();
-standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
-standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
-let planeMat = new CGE.ReferMaterial(standMat);
+let planeMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 planeMat.setUVOffset(20, 20, 0, 0); 
+planeMat.enableStencil = true;
+planeMat.setStencil(standMat.stencil);
 let mesh = new CGE.Mesh();
 mesh.setPosition(0, 0, -10);
 mesh.setScale(4000, 4000, 1);
@@ -427,6 +429,12 @@ teapotGeometry.addSingleAttribute('Normal', CGE.ShaderConst.normal, 3, CGE.FLOAT
 teapotGeometry.addSingleAttribute('Tangent', CGE.ShaderConst.tangent, 3, CGE.FLOAT, teapotTangents);
 teapotGeometry.setIndexData(teapotIndices);
 teapotGeometry.setDrawParameter(teapotIndices.length);
+
+standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+standMat.enableAlphaBlend();
+standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
+standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
+standMat.depthMask = false;
 
 let teapotMesh = new CGE.Mesh();
 teapotMesh.setScale(0.5, 0.5, 0.5);

@@ -44,7 +44,7 @@ export class glFrame extends glObject {
         if (this.checkTextures(renderer, textureMap, depthStencilTexture) === false) {
             return undefined;
         }
-        let frameBuffer = gl.createFramebuffer();
+        let frameBuffer =  this._frame || gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
         this._drawBufferMap.forEach((glTexure, location) => {
             if (location >= maxAttachment) {

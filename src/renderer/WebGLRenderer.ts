@@ -156,12 +156,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         const _canvas = this._canvas;
 
         this._gl = <WebGLRenderingContext>_canvas.getContext('webgl');
-        const _gl = this._gl;
 
         this._initExtensions();
 
         this._initDefFrame(width, height);
-        
+
         this._initDefMesh();
 
         this._postEffectPipline = new PostEffectsPipeline(this);
@@ -169,14 +168,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         this.setSize(width, height);
 
-        this._stateCache = new WebGLStateCache;
-
-        // TODO: remove this;
-        _gl.enable(_gl.DEPTH_TEST);
-        _gl.depthFunc(_gl.LEQUAL);
-        // _gl.enable(_gl.BLEND);
-        // _gl.enable(_gl.CULL_FACE);
-        _gl.cullFace(_gl.BACK);
+        this._stateCache = new WebGLStateCache();
+        this._stateCache.init(this._gl);
 
         this._timeNow = Date.now();
     }
@@ -573,6 +566,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         states.setBlend(gl, mat.alphaType, mat.blend);
         states.setFaceMode(gl, mat.faceMode, mat.filpFace);
         states.setStencil(gl, mat.enableStencil, mat.stencil);
+        states.setDepth(gl, mat.enableDepth, mat.depthMask, mat.depthFunc);
     }
 
     /**
@@ -708,9 +702,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
                 this.useFrame(gFrame);
 
-                gl.enable(gl.STENCIL_TEST);
-                gl.stencilFunc(gl.ALWAYS, 0x80, 0xFF);
-                gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+                // gl.enable(gl.STENCIL_TEST);
+                // gl.stencilFunc(gl.ALWAYS, 0x80, 0xFF);
+                // gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
 
                 _renderList(_noAlphaList);
                 _renderList(_alphaTestList);
@@ -725,21 +719,20 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
                 this.useFrame(targetFrame, this._notClearDepthState);
 
-                gl.disable(gl.DEPTH_TEST);                
-                gl.stencilFunc(gl.EQUAL, 0x80, 0x80);
-                gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+                // gl.disable(gl.DEPTH_TEST);                
+                // gl.stencilFunc(gl.EQUAL, 0x80, 0x80);
+                // gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
                 this._renderMesh(this._deferMesh, this._defCamera);
 
-                gl.enable(gl.BLEND);
-                gl.blendFunc(gl.ONE, gl.ONE);
-                gl.blendEquation(gl.FUNC_ADD);
+                // gl.enable(gl.BLEND);
+                // gl.blendFunc(gl.ONE, gl.ONE);
+                // gl.blendEquation(gl.FUNC_ADD);
 
                 let mesh = this._pointLightMesh;
                 let mat = this._pointLightMat;
-                
 
                 // 线性深度解的世界坐标有问题。
-                gl.depthMask(false);
+                // gl.depthMask(false);
                 mat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
                 for (let i = 0; i < lightsList.length; i++) {
                     let pl = lightsList[i] as PointLight;
@@ -750,10 +743,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     glProgram.lightColor.copy(pl.color);
                     this._renderMesh(mesh, this._defCamera);
                 }
-                gl.depthMask(true);
-                gl.disable(gl.BLEND);
-                gl.enable(gl.DEPTH_TEST);
-                gl.disable(gl.STENCIL_TEST);
+                // gl.depthMask(true);
+                // gl.disable(gl.BLEND);
+                // gl.enable(gl.DEPTH_TEST);
+                // gl.disable(gl.STENCIL_TEST);
                 
 
                 _renderList(_alphaBlendList);
@@ -933,6 +926,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 mat.setNormalMap(tex);
                 tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT2).tex)
                 mat.setDepthMap(tex);
+                mat.enableStencil = true;
+                mat.setStencilFunc(CGE.EQUAL, 0x80, 0x80);
+                mat.setStencilOp(CGE.KEEP, CGE.KEEP, CGE.KEEP);
+                mat.enableDepth = false;
                 this._deferMat = mat;
 
                 let mesh = new Mesh();
@@ -948,6 +945,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT2).tex)
                 mat.setDepthMap(tex);
                 mat.useForPointLight();
+                mat.enableStencil = true;
+                mat.setStencil(this._deferMat.stencil);
+                mat.enableAlphaBlend();
+                mat.setBlendFunc(CGE.ONE, CGE.ONE, CGE.ONE, CGE.ONE);
+                mat.setBlendEquation(CGE.FUNC_ADD, CGE.FUNC_ADD);
+                mat.depthMask = false;
                 this._pointLightMat = mat;
 
                 let geo = new SphereGeometry(1, 32, 32);

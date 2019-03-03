@@ -4,8 +4,8 @@ import { FaceType } from './GraphicsTypes';
 export class Stencil {
     static readonly DefStencil: Stencil = new Stencil();
 
-    stencilMask = 1;
-    stencilBackMask = 1
+    stencilMask = 0xFF;
+    stencilBackMask = 0xFF;
     stencilFunc = [CGE.FRONT, CGE.ALWAYS, 0, 1];
     stencilBackFunc = [CGE.BACK, CGE.ALWAYS, 0, 1];
     stencilOp = [CGE.FRONT, CGE.KEEP, CGE.KEEP, CGE.KEEP];

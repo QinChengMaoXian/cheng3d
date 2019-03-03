@@ -70,6 +70,10 @@ export class StandardMaterial extends Material {
         this._specular.set(roughness, metallic, ao);
     }
 
+    public setUVOffset(sx: number, sy: number, ox: number, oy: number) {
+        this._uvOffset.set(sx, sy, ox, oy);
+    }
+
     public canLighting() {
         return true;
     }

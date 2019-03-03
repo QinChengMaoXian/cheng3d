@@ -8,45 +8,38 @@ import { AlphaType } from '../graphics/GraphicsTypes';
  * Webgl状态缓存
  */
 export class WebGLStateCache {
-    // color
+
+    // clear
     enableClearColor = true;
     clearColor = [1.0, 1.0, 1.0, 1.0];
-    colorMask = [true, true, true, true];
 
-    // depth
     enableClearDepth = true;
     clearDepth = 0;
 
+    enableClearStencil = false;
+    clearStencil = 0;
+
+    // viewport
+    viewpost = [0, 0, 800, 600];
+
+    // color
+    colorMask = [true, true, true, true];
+
+    // depth
     enableDepth = true;
 
     depthFunc = CGE.LESS;
     depthMask = true;
 
     // stencil
-    clearStencil = 0;
-    enableClearStencil = false;
-
     enableStencil = false;
-
-    stencilMask = 1;
-    stencilBackMask = 1
-    stencilFunc = [CGE.ALWAYS, 0, 1];
-    stencilBackFunc = [CGE.ALWAYS, 0, 1];
-    stencilOp = [CGE.KEEP, CGE.KEEP, CGE.KEEP];
-    stencilBackOp = [CGE.KEEP, CGE.KEEP, CGE.KEEP];
 
     stencil: Stencil = Stencil.DefStencil;
 
     // blend
     enableBlend = false;
 
-    // blendFunc = [CGE.ONE, CGE.ZERO, CGE.ONE, CGE.ZERO];
-    // blendEquation = [CGE.FUNC_ADD, CGE.FUNC_ADD];
-
     blend: Blend = Blend.DefBlend;
-
-    // viewport
-    viewpost = [0, 0, 800, 600];
 
     // cullFace
     enableCullFace = false;
@@ -54,7 +47,7 @@ export class WebGLStateCache {
     frontFace = CGE.CCW;
 
     // scissor
-    enableScissorTest = false;
+    enableScissor = false;
     scissor = [0, 0, 800, 600];
 
     // polygonOffset
@@ -62,19 +55,64 @@ export class WebGLStateCache {
     polygonOffset = [0, 0];
 
     init(gl: WebGLRenderingContext) {
+        gl.clearColor.apply(gl, this.clearColor);
+        gl.colorMask.apply(gl, this.colorMask);
 
+        this.enableDepth ? gl.enable(gl.DEPTH_TEST) : gl.disable(gl.DEPTH_TEST);
+        gl.depthFunc(this.depthFunc);
+        gl.depthMask(this.depthMask);
+
+        this.enableBlend ? gl.enable(gl.BLEND) : gl.disable(gl.BLEND);
+        let blend = this.blend;
+        gl.blendFuncSeparate.apply(gl, blend.blendFunc);
+        gl.blendEquationSeparate.apply(gl, blend.blendEquation);
+
+        this.enableStencil ? gl.enable(gl.STENCIL_TEST) : gl.disable(gl.STENCIL_TEST);
+        gl.clearStencil(this.clearStencil);
+        let stencil = this.stencil;
+        gl.stencilMaskSeparate(gl.FRONT, stencil.stencilMask);
+        gl.stencilMaskSeparate(gl.BACK, stencil.stencilBackMask);
+        gl.stencilFuncSeparate.apply(gl, stencil.stencilFunc);
+        gl.stencilFuncSeparate.apply(gl, stencil.stencilBackFunc);
+        gl.stencilOpSeparate.apply(gl, stencil.stencilOp);
+        gl.stencilOpSeparate.apply(gl, stencil.stencilBackOp);
+
+        this.enableCullFace ? gl.enable(gl.CULL_FACE): gl.disable(gl.CULL_FACE);
+        gl.cullFace(this.cullFaceMode);
+        gl.frontFace(this.frontFace);
     }
 
     setColor(gl: WebGLRenderingContext) {
         
     }
 
-    setDepth() {
+    setDepth(gl: WebGLRenderingContext, enable: boolean, mask: boolean, func: number = CGE.LESS) {
+        if (!enable) {
+            if (this.enableDepth) {
+                gl.disable(gl.DEPTH_TEST);
+                this.enableDepth = false;
+            }
+            return;
+        }
 
+        if (!this.enableDepth) {
+            gl.enable(gl.DEPTH_TEST);
+            this.enableDepth = true;
+        }
+
+        if (this.depthMask !== mask) {
+            gl.depthMask(mask);
+            this.depthMask = mask;
+        }
+
+        if (this.depthFunc !== func) {
+            gl.depthFunc(func);
+            this.depthFunc = func;
+        }
     }
 
-    setStencil(gl: WebGLRenderingContext, isStencilEnable: boolean, stencil: Stencil, force: boolean = false) {
-        if (!isStencilEnable) {
+    setStencil(gl: WebGLRenderingContext, enalbe: boolean, stencil: Stencil) {
+        if (!enalbe) {
             if (this.enableStencil) {
                 this.enableStencil = false;
                 gl.disable(gl.STENCIL_TEST);
@@ -88,7 +126,7 @@ export class WebGLStateCache {
         }
 
         
-        if (this.stencil === stencil && !force) {
+        if (this.stencil === stencil) {
             return;
         }
 
@@ -104,32 +142,32 @@ export class WebGLStateCache {
 
         let curr = stencil.stencilFunc;
         let self = selfStencil.stencilFunc;
-        if (curr[1] !== self[1], curr[2] !== self[2], curr[3] !== self[3]) {
-            gl.stencilFuncSeparate.call(gl, curr);
+        if (curr[1] !== self[1] || curr[2] !== self[2] || curr[3] !== self[3]) {
+            gl.stencilFuncSeparate.apply(gl, curr);
         }
 
         curr = stencil.stencilBackFunc;
         self = selfStencil.stencilBackFunc;
-        if (curr[1] !== self[1], curr[2] !== self[2], curr[3] !== self[3]) {
-            gl.stencilFuncSeparate.call(gl, curr);
+        if (curr[1] !== self[1] || curr[2] !== self[2] || curr[3] !== self[3]) {
+            gl.stencilFuncSeparate.apply(gl, curr);
         }
 
         curr = stencil.stencilOp;
         self = selfStencil.stencilOp;
-        if (curr[1] !== self[1], curr[2] !== self[2], curr[3] !== self[3]) {
-            gl.stencilOpSeparate.call(gl, curr);
+        if (curr[1] !== self[1] || curr[2] !== self[2] || curr[3] !== self[3]) {
+            gl.stencilOpSeparate.apply(gl, curr);
         }
 
         curr = stencil.stencilBackOp;
         self = selfStencil.stencilBackOp;
-        if (curr[1] !== self[1], curr[2] !== self[2], curr[3] !== self[3]) {
-            gl.stencilOpSeparate.call(gl, curr);
+        if (curr[1] !== self[1] || curr[2] !== self[2] || curr[3] !== self[3]) {
+            gl.stencilOpSeparate.apply(gl, curr);
         }
 
         this.stencil = stencil;
     }
 
-    setBlend(gl: WebGLRenderingContext, alphaType: AlphaType, blend: Blend, force: boolean = false) {
+    setBlend(gl: WebGLRenderingContext, alphaType: AlphaType, blend: Blend) {
         if (alphaType !== AlphaType.BLEND) {
             if (this.enableBlend) {
                 gl.disable(gl.BLEND);
@@ -143,7 +181,7 @@ export class WebGLStateCache {
             this.enableBlend = true;
         }
 
-        if (this.blend === blend && !force) {
+        if (this.blend === blend) {
             return;
         }
 
