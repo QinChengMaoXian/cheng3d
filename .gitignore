@@ -4,4 +4,5 @@
 /dist/*
 /static/*
 /build/*
-./npm-debug.log
+npm-debug.log
+package-lock.json
