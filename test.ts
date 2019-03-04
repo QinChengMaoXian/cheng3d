@@ -431,10 +431,11 @@ teapotGeometry.setIndexData(teapotIndices);
 teapotGeometry.setDrawParameter(teapotIndices.length);
 
 standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
-standMat.enableAlphaBlend();
+standMat.enableAlphaTest();
+// standMat.enableAlphaBlend();
 standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
-standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
-standMat.depthMask = false;
+// standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
+// standMat.depthMask = false;
 
 let teapotMesh = new CGE.Mesh();
 teapotMesh.setScale(0.5, 0.5, 0.5);
@@ -442,6 +443,21 @@ teapotMesh.setPosition(0, 20, 0);
 teapotMesh.setGeometry(teapotGeometry);
 teapotMesh.setMaterial(standMat);
 teapotMesh.name = '水壶';
+mainScene.addChild(teapotMesh);
+
+
+standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+standMat.enableAlphaBlend();
+standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
+standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
+standMat.depthMask = false;
+
+teapotMesh = new CGE.Mesh();
+teapotMesh.setScale(0.5, 0.5, 0.5);
+teapotMesh.setPosition(40, 20, 0);
+teapotMesh.setGeometry(teapotGeometry);
+teapotMesh.setMaterial(standMat);
+teapotMesh.name = '水壶2';
 mainScene.addChild(teapotMesh);
 
 // 以上 犹他水壶

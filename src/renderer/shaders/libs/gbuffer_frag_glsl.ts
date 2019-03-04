@@ -14,10 +14,10 @@ uniform sampler2D u_normalMap;
 uniform sampler2D u_roughnessMap;
 uniform sampler2D u_metallicMap;
 uniform sampler2D u_aoMap;
-uniform sampler2D u_brdfLUTMap;
 
-uniform samplerCube u_irradianceMap;
-uniform samplerCube u_prefilterMap;
+#ifdef ALPHA_TEST
+    uniform sampler2D u_ODMap;
+#endif
 
 uniform mat4 u_vMat;
 uniform vec3 u_specular;
@@ -30,13 +30,19 @@ varying float v_depth;
 
 void main()
 {
+    vec4 baseColor = pow(texture2D(u_diffuseMap, v_uv), vec4(2.2)) * u_baseColor;
+    #ifdef ALPHA_TEST
+        float alpha = texture2D(u_ODMap, fract(gl_FragCoord.xy * vec2(1.0 / 16.0))).a;
+        if (baseColor.a <= alpha) {
+            discard;
+        }
+    #endif
+
     vec4 spec = pow(texture2D(u_roughnessMap, v_uv), vec4(1.0));
     
     float roughness = spec.r * u_specular.r;
     float metallic = spec.g * u_specular.g;
     float ao = spec.b * u_specular.b;
-
-    vec4 baseColor = pow(texture2D(u_diffuseMap, v_uv), vec4(2.2)) * u_baseColor;
 
     vec3 albedo = baseColor.xyz;
 

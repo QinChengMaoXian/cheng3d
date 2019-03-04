@@ -19,6 +19,10 @@ uniform sampler2D u_brdfLUTMap;
 uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
 
+#ifdef ALPHA_TEST
+    uniform sampler2D u_ODMap;
+#endif
+
 uniform vec3 u_specular;
 uniform vec3 u_cameraPos;
 uniform vec4 u_baseColor;
@@ -95,15 +99,21 @@ float FastDFG(float roughness, float NoV, float NoL)
 
 void main()
 {
+    vec4 bc = texture2D(u_diffuseMap, v_uv);
+    bc.xyz = pow(bc.xyz, vec3(2.2));
+    vec4 baseColor = bc * u_baseColor;
+    #ifdef ALPHA_TEST
+        float alpha = texture2D(u_ODMap, fract(gl_FragCoord.xy * vec2(1.0 / 16.0))).a;
+        if (baseColor.a <= alpha) {
+            discard;
+        }
+    #endif
+
     vec4 spec = pow(texture2D(u_roughnessMap, v_uv), vec4(1.0));
     
     float roughness = spec.r * u_specular.r;
     float metallic = spec.g * u_specular.g;
     float ao = spec.b * u_specular.b;
-
-    vec4 bc = texture2D(u_diffuseMap, v_uv);
-    bc.xyz = pow(bc.xyz, vec3(2.2));
-    vec4 baseColor = bc * u_baseColor;
 
     vec3 albedo = baseColor.xyz;
 

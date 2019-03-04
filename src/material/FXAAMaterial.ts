@@ -13,6 +13,8 @@ export class FXAAMaterial extends Material {
         if (texture) {
             this.setSrcTexture(texture);
         }
+
+        this.enableDepth = false;
     }
 
     public setSrcTexture(texture: Texture2D) {

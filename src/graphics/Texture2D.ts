@@ -52,7 +52,7 @@ export class Texture2D extends Texture {
             let tex = new Texture2D();
             tex.setFormat(CGE.ALPHA, CGE.ALPHA);
             tex.setDataType(CGE.UNSIGNED_BYTE);
-            tex.setFilter(CGE.REPEAT, CGE.REPEAT);
+            // tex.setFilter(CGE.REPEAT, CGE.REPEAT);
             tex.setData(16, 16, new Uint8Array(BuildOrderedDitheringData(4)));
             Texture2D._ODTex = tex;
         }
