@@ -75,6 +75,10 @@ export class ReferMaterial extends Material {
         return this._enableStencil === undefined ? this._referMat.enableStencil : this._enableStencil;
     }
 
+    public getMacros() {
+        return this._referMat.getMacros();
+    }
+
     public get stencil() {
         return this._stencil || this._referMat.stencil;
     }
