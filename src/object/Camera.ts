@@ -70,7 +70,7 @@ export class Camera extends Object3D {
         return this._matrix;
     }
 
-    enableOrthographicMode(_left, _right, _bottom, _top, _near, _far) {
+    enableOrthographicMode(_left?, _right?, _bottom?, _top?, _near?, _far?) {
         this._projectionFunc = this._makeOrthographicMatrix;
         this._mode = Camera.Orthographic;
         this._left = _left || this._left;

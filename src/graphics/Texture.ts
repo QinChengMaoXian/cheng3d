@@ -7,8 +7,8 @@ export class Texture extends GraphicsObject {
 
     protected _minFilter: number = CGE.LINEAR;
     protected _magFilter: number = CGE.LINEAR;
-    protected _format: number = CGE.RGB;
-    protected _internalformat: number = CGE.RGB;
+    protected _format: number = CGE.RGBA;
+    protected _internalformat: number = CGE.RGBA;
     protected _dataType: number = CGE.UNSIGNED_BYTE;
     protected _mipmap: boolean = false;
     protected _needMipmap: boolean = false;
@@ -32,8 +32,8 @@ export class Texture extends GraphicsObject {
     }
 
     public setFormat(src, internal) {
-        this._format = src || CGE.RGB;
-        this._internalformat = internal || src || CGE.RGB;
+        this._format = src || CGE.RGBA;
+        this._internalformat = internal || src || CGE.RGBA
     }
 
     public getFormat() {

@@ -251,7 +251,7 @@ export class Matrix4 {
         return this;
     }
 
-    public frustum(left, right, bottom, top, near, far) {
+    public frustum(left: number, right: number, bottom: number, top: number, near: number, far: number) {
         let rl = 1 / (right - left),
             tb = 1 / (top - bottom),
             nf = 1 / (near - far);
@@ -274,7 +274,7 @@ export class Matrix4 {
         return this;
     }
 
-    public orthographic(left, right, bottom, top, near, far) {
+    public orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number) {
         let lr = 1 / (left - right),
             bt = 1 / (bottom - top),
             nf = 1 / (near - far);

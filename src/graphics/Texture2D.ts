@@ -82,6 +82,7 @@ export class Texture2D extends Texture {
             this._def = def;
             this._url = url;
         }
+        this.needsUpdate();
     }
 
     public setData(width: number, height: number, data: HTMLImageElement | ArrayBufferView) {
@@ -92,6 +93,7 @@ export class Texture2D extends Texture {
         this._width = width;
         this._height = height;
         this._data = data;
+        this.needsUpdate();
     }
 
     public getImage() {
@@ -113,6 +115,7 @@ export class Texture2D extends Texture {
     public setWarp(wrapS, wrapT) {
         this._wrapS = wrapS;
         this._wrapT = wrapT;
+        this.needsUpdate();
     }
 
     public getWrapS() {

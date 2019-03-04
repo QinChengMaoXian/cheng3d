@@ -510,7 +510,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param mesh Mesh对象
      * @param camera 相机对象
      */
-    protected _renderMesh(mesh: Mesh, camera?: Camera) {
+    protected _renderMesh(mesh: Mesh, camera?: Camera, forceMaterial?: Material) {
         let gl = this._gl;
 
         if (!this.retainMesh(mesh)) {
@@ -520,7 +520,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         let geo = mesh.getGeometry();
         let glgeo = <glGeometry>geo.getRenderObjectRef(this);
         
-        let mat = mesh.getMaterial();
+        let mat = forceMaterial || mesh.getMaterial();
 
         this._useMaterialState(mat);
 
@@ -705,13 +705,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
                 this.useFrame(gFrame);
 
-                // gl.enable(gl.STENCIL_TEST);
-                // gl.stencilFunc(gl.ALWAYS, 0x80, 0xFF);
-                // gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
-
                 _renderList(_noAlphaList);
                 _renderList(_alphaTestList);
-                // this._deferMat.setDepthMap(gFrame.getDepthStencilTexture());
+
                 this._deferMat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
 
                 let targetFrame = this._defFrame;
@@ -722,20 +718,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
                 this.useFrame(targetFrame, this._notClearDepthState);
 
-                // gl.disable(gl.DEPTH_TEST);                
-                // gl.stencilFunc(gl.EQUAL, 0x80, 0x80);
-                // gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
                 this._renderMesh(this._deferMesh, this._defCamera);
-
-                // gl.enable(gl.BLEND);
-                // gl.blendFunc(gl.ONE, gl.ONE);
-                // gl.blendEquation(gl.FUNC_ADD);
 
                 let mesh = this._pointLightMesh;
                 let mat = this._pointLightMat;
 
-                // 线性深度解的世界坐标有问题。
-                // gl.depthMask(false);
                 mat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
                 for (let i = 0; i < lightsList.length; i++) {
                     let pl = lightsList[i] as PointLight;
@@ -746,12 +733,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     glProgram.lightColor.copy(pl.color);
                     this._renderMesh(mesh, this._defCamera);
                 }
-                // gl.depthMask(true);
-                // gl.disable(gl.BLEND);
-                // gl.enable(gl.DEPTH_TEST);
-                // gl.disable(gl.STENCIL_TEST);
                 
-
                 _renderList(_alphaBlendList);
             } else {
                 // 正常渲染走这条，注意，没有优化光源

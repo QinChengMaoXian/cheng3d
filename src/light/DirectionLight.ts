@@ -1,15 +1,21 @@
 import { Light, ILight } from "./Light";
 import { Vector3 } from "../math/Vector3";
+import { DirectionShadow } from "./DirectionShadow";
 
 export class DirectionLight extends Light implements ILight {
     protected static readonly DefDir = new Vector3(0, 0, 1);
 
-    protected _dir: Vector3 = new Vector3(0.5, 0.5, 0.5).normalize();
+    protected _dir: Vector3 = new Vector3().normalize();
+
+    protected _shadow: DirectionShadow;
 
     constructor() {
         super();
 
         this.setPosition(1,1,1);
+
+        let vec = Vector3.pubTemp.set(0.5, 0.5, 0.5).normalize();
+        this.setDirection(vec);
     }
 
     public setPosition(x, y, z) {
@@ -26,6 +32,30 @@ export class DirectionLight extends Light implements ILight {
 
     public get dir() {
         return this._dir;
+    }
+
+    public enableShadow() {
+        if (!this._shadow) {
+            this._shadow = new DirectionShadow();
+            this._shadow.init();
+        }
+    }
+
+    public disableShadow() {
+        if (!this._shadow) {
+            return;
+        }
+    }
+
+    public clearShadow() {
+        if (this._shadow) {
+            this._shadow.destroy();
+            this._shadow = null;
+        }
+    }
+
+    public get shadow() {
+        return this._shadow;
     }
 
     public get type() {

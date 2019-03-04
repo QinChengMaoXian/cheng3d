@@ -1,6 +1,7 @@
 import { Object3D } from '../object/Object3D';
 import { Vector4 } from '../math/Vector4';
 import { Vector3 } from '../math/Vector3';
+import { Shadow } from './Shadow';
 
 export enum LightType {
     None = 0,
@@ -21,8 +22,6 @@ export class Light extends Object3D {
 
     protected _color: Vector4 = new Vector4(1.0, 1.0, 1.0, 1.0);
 
-    protected _shadow: boolean = false;
-
     constructor() {
         super();
     }
@@ -33,11 +32,19 @@ export class Light extends Object3D {
     }
 
     public enableShadow() {
-        this._shadow = true;
+
     }
 
     public disableShadow() {
-        this._shadow = false;
+        
+    }
+
+    public clearShadow() {
+
+    }
+
+    public get shadow(): Shadow {
+        return null;
     }
 
     public setScale(x, y, z) {}

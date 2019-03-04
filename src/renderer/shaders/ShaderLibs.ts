@@ -49,6 +49,8 @@ import deferred_shading_vert from './libs/deferred_shading_vert_glsl';
 import skybox_vert from './libs/skybox_vert_glsl';
 import skybox_frag from './libs/skybox_frag_glsl'; 
 import blend_frag from './libs/blend_frag_glsl';
+import depth_vert from './libs/depth_vert_glsl';
+import depth_frag from './libs/depth_frag_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -133,5 +135,10 @@ export const shaders = {
     'blendAO': {
         vert: repStr(fullscreen_vert),
         frag: repStr(blend_frag),
-    }
+    },
+
+    'depth': {
+        vert: repStr(depth_vert),
+        frag: repStr(depth_frag),
+    },
 }

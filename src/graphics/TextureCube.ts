@@ -48,6 +48,7 @@ export class TextureCube extends Texture {
     public setWarp(wrapS, wrapT) {
         this._wrapS = wrapS;
         this._wrapT = wrapT;
+        this.needsUpdate();
     }
 
     public setTexture2ds(positiveX, negativeX, positiveY, negativeY, positiveZ, negativeZ) {
@@ -57,6 +58,7 @@ export class TextureCube extends Texture {
         this._texture2ds[3] = negativeY || this._texture2ds[3];
         this._texture2ds[4] = positiveZ || this._texture2ds[4];
         this._texture2ds[5] = negativeZ || this._texture2ds[5];
+        this.needsUpdate();
     }
 
     public getTexture2ds(){

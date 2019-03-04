@@ -70,6 +70,9 @@ export class Application extends EventDispatcher {
         this._obj3d.addChild(this._scene);
 
         this._camera = new Camera(width, height);
+        // let w = Math.floor(width / 2.0);
+        // let h = Math.floor(height / 2.0);
+        // this._camera.enableOrthographicMode(-w, w, -h, h, 1, 2000);
 
         this._renderer = new WebGLRenderer();
         this._renderer.init(width, height);
