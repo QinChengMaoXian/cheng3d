@@ -8,4 +8,8 @@ export class RenderBase {
     public getUpdate() {
         return this._update;
     }
+
+    public remove(idx: number) {
+        
+    }
 }

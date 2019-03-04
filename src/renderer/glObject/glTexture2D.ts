@@ -2,8 +2,11 @@ import { glTexture } from './glTexture'
 import { Texture2D } from '../../graphics/Texture2D';
 
 export class glTexture2D extends glTexture {
+    public static ImageTexMap: WeakMap<HTMLImageElement, glTexture2D> = new WeakMap();
+
     protected _wrapS: number;
     protected _wrapT: number;
+    protected _isUrl: boolean;
     
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -32,6 +35,7 @@ export class glTexture2D extends glTexture {
         if (texture.getUrl() && texture.getImage()) {
             let image = <HTMLImageElement>texture.getImage();
             gl.texImage2D(target, 0, internalformat, format, type, image);
+            this._isUrl = true;
         } else if (texture.getWidth() !== 0 && texture.getHeight() !== 0) {
             let data = <ArrayBufferView>texture.getData();
             gl.texImage2D(target, 0, internalformat, texture.getWidth(), texture.getHeight(), 0, format, type, data);
@@ -85,5 +89,9 @@ export class glTexture2D extends glTexture {
     public setWarp(wrapS, wrapT) {
         this._wrapS = wrapS;
         this._wrapT = wrapT;
+    }
+
+    public get isUrl() {
+        return this._isUrl;
     }
 }

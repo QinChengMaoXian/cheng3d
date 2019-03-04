@@ -142,4 +142,8 @@ export class Geometry extends GraphicsObject {
 
         this._bounding = aabb;
     }
+
+    public destroy() {
+        
+    }
 }

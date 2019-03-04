@@ -2,7 +2,6 @@ import { Base } from '../core/Base'
 import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { Loader } from '../io/Loader';
-import { RGBA } from '../graphics/RendererParameter';
 import { Shader } from '../graphics/Shader';
 import * as CGE from '../graphics/RendererParameter';
 import { Blend } from '../graphics/Blend';
@@ -50,24 +49,31 @@ export class Material extends Base {
     }
 
     protected setTexture2DFromUrl(type: string | number, url: string, defTexture?: Texture2D) {
-        this._textures.set(type, defTexture || Texture2D.White);
         if (!url || url === '') {
-            return;
+            this._textures.set(type, defTexture || Texture2D.White);
         }
-        Loader.loadImage(url).then((img: HTMLImageElement) => {
-            let tex = new Texture2D();
-            tex.setFormat(RGBA, RGBA);
-            tex.setData(img.width, img.height, img);
-            this._textures.set(type, tex);
-        })
+        let tex = new Texture2D();
+        tex.setUrl(url, defTexture);
+        this.setTexture(type, tex);
     }
 
     protected setTexture(type: string | number, texture: Texture = Texture2D.White) {
+        let tex = this._textures.get(type);
+        if (tex && tex.isUrl) {
+            tex.release();
+        }
+        if (texture.isUrl) {
+            texture.retain();
+        }
         this._textures.set(type, texture);
     }
 
     protected removeTexture(type: string | number) {
-        this._textures.delete(type);
+        let tex = this._textures.get(type);
+        if (tex && tex.isUrl) {
+            tex.release();
+            this._textures.delete(type);
+        }
     }
 
     protected setProperty(type: string | number, data: any) {
@@ -80,12 +86,6 @@ export class Material extends Base {
 
     public getProperty(type: string | number) {
         return this._properties.get(type);
-    }
-
-    public setTextureUrl(type: string | number, url: string) {
-        let texture2d = new Texture2D();
-        texture2d.setImageUrl(url);
-        this._textures.set(type, texture2d);
     }
 
     public getTexture(type: string | number) {
@@ -239,6 +239,9 @@ export class Material extends Base {
     }
 
     protected clearTextures() {
+        this._textures.forEach(tex => {
+            tex.release();
+        });
         this._textures.clear();
     }
 
@@ -278,5 +281,12 @@ export class Material extends Base {
 
     public get supportDeferred(): boolean {
         return false;
+    }
+
+    public destroy() {
+        this._shader.release();
+        this._textures.forEach(tex => {
+            tex.release();
+        })
     }
 }

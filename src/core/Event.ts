@@ -43,6 +43,8 @@ export class Event extends Base {
     /** 渲染器重置大小 */
     static readonly RENDERER_RESIZE = "renderer_resize";
 
+    static readonly DESTROTY = "destroy";
+
     /**  */
     static readonly LOOP_FRAME = "loop_frame";
 

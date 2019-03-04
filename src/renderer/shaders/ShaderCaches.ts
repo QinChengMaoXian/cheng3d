@@ -86,6 +86,14 @@ export class ShaderCaches {
         this.removeKey(key);
     }
 
+    removeShader(glprog: glProgram) {
+        if (!glprog) {
+            return;
+        }
+        let key = glprog.shaderKey;
+        this.removeKey(key);
+    }
+
     protected removeKey(key: string) {
         let caches = this._caches;
         let ref = caches.get(key);

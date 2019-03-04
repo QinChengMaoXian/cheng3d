@@ -7,6 +7,7 @@ import { Base } from '../core/Base';
 
 import { PEType, PEBase } from './postEffect/PEBase'
 import { Logger } from '../core/Logger';
+import { RenderBase } from '../graphics/RenderBase';
 
 export class Renderer extends Base {
 
@@ -15,6 +16,10 @@ export class Renderer extends Base {
 
     /** 渲染器计数 */
     private static RendererNum = 0;
+
+    public static getRenderer(id: number) {
+        return Renderer.Renderers[id];
+    }
 
     /** 当前渲染器的id */
     public readonly rendererId = Renderer.RendererNum++;
@@ -27,6 +32,8 @@ export class Renderer extends Base {
             Logger.error('Too much renderer instance');
         }
     }
+
+    removeShader(obj: RenderBase){}
 }
 
 export interface IRenderer {
@@ -44,6 +51,8 @@ export interface IRenderer {
 
     enablePostEffect(type: PEType | PEBase);
     getEnablingPostEffect(): PEType[];
+
+    removeShader(obj: RenderBase);
 
     // exchangeFrame();
     getGBufferFrame(): Frame;

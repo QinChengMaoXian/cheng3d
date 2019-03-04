@@ -4,6 +4,7 @@ import { ShaderConst } from "../graphics/ShaderConst";
 import { Vector3 } from "../math/Vector3";
 
 import * as CGE from '../graphics/RendererParameter';
+import { Loader } from "../io/Loader";
 
 export class SSAOMaterial extends Material {
 
@@ -24,8 +25,8 @@ export class SSAOMaterial extends Material {
 
         this.createSampleData(16);
 
-        let randomMap = new Texture2D()
-        randomMap.setImageUrl('./resources/randomMap.gif', Texture2D.Normal);
+        let randomMap = new Texture2D();
+        randomMap.setUrl('./resources/randomMap.gif', Texture2D.Normal);
         randomMap.setFilter(CGE.NEAREST, CGE.NEAREST);
         randomMap.setWarp(CGE.REPEAT, CGE.REPEAT);
         this.setTexture(ShaderConst.randomMap, randomMap);

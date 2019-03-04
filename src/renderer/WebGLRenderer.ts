@@ -38,6 +38,7 @@ import { Light } from '../light/Light';
 import { PointLight } from '../light/PointLight';
 import { glTexture } from './glObject/glTexture';
 import { WebGLStateCache } from './WebGLStateCache';
+import { RenderBase } from '../graphics/RenderBase';
 
 export interface RenderArgs{
     frustumCamera?: Camera;
@@ -54,8 +55,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     /** webgl 对象引用 */
     private _gl: WebGLRenderingContext;
 
-    /** 当前帧缓冲状态 */
-    private _curFrameState = new FrameState();
     /** 默认帧缓冲状态 */
     private _defFrameState = new FrameState();
 
@@ -320,20 +319,40 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             return gltexture;
         }
 
-        if (texture instanceof Texture2D) {
-            if (!texture.loaded) {
-                return this.initTexture(texture._def);
-            } else {
-                let tex = new glTexture2D(_gl);
-                if (tex.generateFromTexture2D(_gl, texture)) {
-                    texture.setRenderObjectRef(this, tex);
+        if (texture.getType() === Texture.TEXTURE2D) {
+            let tex2D = <Texture2D>texture;
+            if (tex2D.isUrl) {
+                if (!tex2D.loaded) {
+                    return this.initTexture(tex2D._def);
+                }
+                let imgMap = glTexture2D.ImageTexMap;
+                let img = tex2D.getImage() as HTMLImageElement;
+                let tex = imgMap.get(img);
+                if (tex) {
+                    tex2D.setRenderObjectRef(this, tex);
+                    return tex;
+                }
+                tex = new glTexture2D(_gl);
+                if (tex.generateFromTexture2D(_gl, tex2D)) {
+                    tex2D.setRenderObjectRef(this, tex);
+                    imgMap.set(img, tex);
+                    return tex;
+                }
+            } else if (tex2D.getWidth() > 0 && tex2D.getHeight() > 0) {
+                let tex = <glTexture2D>(tex2D.getRenderObjectRef(this));
+                if (!tex || tex.isUrl) {
+                    tex = new glTexture2D(_gl);
+                }
+                if (tex.generateFromTexture2D(_gl, tex2D)) {
+                    tex2D.setRenderObjectRef(this, tex);
                     return tex;
                 }
             }
-        } else if (texture instanceof TextureCube) {
+        } else if (texture.getType() === Texture.TEXTURECUBE) {
+            let texCube = <TextureCube>texture;
             let tex = new glTextureCube(_gl);
-            if (tex.generateFromTextureCube(_gl, texture)) {
-                texture.setRenderObjectRef(this, tex);
+            if (tex.generateFromTextureCube(_gl, texCube)) {
+                texCube.setRenderObjectRef(this, tex);
                 return tex;
             }
         }
@@ -427,45 +446,29 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     public useFrameState(frameState: FrameState) {
         const gl = this._gl;
 
-        let cache = this._curFrameState;
+        let stateCache = this._stateCache;
         let clearBit = 0;
 
-        if (!cache.viewport.equal(frameState.viewport)) {
-            cache.viewport.setAt(frameState.viewport);
-            let data = cache.viewport.data;
-            gl.viewport(data[0], data[1], data[2], data[3]);
-        }
+        stateCache.setViewport(gl, frameState.viewport.data);
 
         if (!frameState.needClear) {
             return;
         }
 
-        cache.isClearColor = frameState.isClearColor;
-        if (cache.isClearColor) {
+        if (frameState.isClearColor) {
             clearBit = clearBit | gl.COLOR_BUFFER_BIT;
-            if (!cache.clearColor.equal(frameState.clearColor)) {
-                cache.clearColor.setAt(frameState.clearColor);
-                let data = cache.clearColor.data;
-                gl.clearColor(data[0], data[1], data[2], data[3]);
-            }
+            stateCache.setClearColor(gl, frameState.clearColor.data);
         }
 
-        cache.isClearDepth = frameState.isClearDepth;
-        if (cache.isClearDepth) {
+        frameState.isClearDepth
+        if (frameState.isClearDepth) {
             clearBit = clearBit | gl.DEPTH_BUFFER_BIT;
-            if (cache.clearDepth !== frameState.clearDepth) {
-                cache.clearDepth = frameState.clearDepth;
-                gl.clearDepth(cache.clearDepth);
-            }
+            stateCache.setClearDepth(gl, frameState.clearDepth);
         }
         
-        cache.isClearStencil = frameState.isClearStencil;
-        if (cache.isClearStencil) {
+        if (frameState.isClearStencil) {
             clearBit = clearBit | gl.STENCIL_BUFFER_BIT;
-            if (cache.clearStencil !== frameState.clearStencil) {
-                cache.clearStencil = frameState.clearStencil;
-                gl.clearStencil(cache.clearStencil);
-            }
+            stateCache.setClearStencil(gl, frameState.clearStencil);
         }
 
         gl.clear(clearBit);
@@ -992,5 +995,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      */
     public get isEnableDeferredRender() {
         return this._deferredRendering;
+    }
+
+    public removeShader(obj: RenderBase) {
+        let glProg = <glProgram>obj;
+        this._shaderCache.removeShader(glProg);
     }
 }

@@ -23,15 +23,15 @@ export class ReferMaterial extends Material {
     }
     
     public overrideProperty(type: string | number, data: any) {
-        if (this._referMat.getProperty(type)) {
+        // if (this._referMat.getProperty(type)) {
             super.setProperty(type, data);
-        }
+        // }
     }
 
     public overrideTexture(type: string | number, tex: Texture) {
-        if (this._referMat.getTexture(type)) {
+        // if (this._referMat.getTexture(type)) {
             super.setTexture(type, tex);
-        }
+        // }
     }
 
     public getProperty(type: string | number) {

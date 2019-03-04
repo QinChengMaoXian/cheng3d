@@ -39,8 +39,8 @@ export class Texture2D extends Texture {
     private static _BrdfLUT: Texture2D;
     public static get BrdfLUT(): Texture2D {
         if (!Texture2D._BrdfLUT) {
-            let tex = new Texture2D();
-            tex.setImageUrl('./resources/envLUT.png', Texture2D.White);
+            let tex = new Texture2D;
+            tex.setUrl('./resources/envLUT.png');
             Texture2D._BrdfLUT = tex;
         }
         return Texture2D._BrdfLUT;
@@ -60,37 +60,29 @@ export class Texture2D extends Texture {
 
     protected _wrapS: number = CGE.CLAMP_TO_EDGE;
     protected _wrapT: number = CGE.CLAMP_TO_EDGE;
-    protected _data: Uint8Array | Float32Array | Uint16Array | HTMLImageElement;
+    protected _data: ArrayBufferView | HTMLImageElement;
     protected _url: string;
     protected _width = 0;
     protected _height = 0;
-    protected _loaded = true;
     public _def: Texture2D;
 
     constructor() {
         super();
     }
 
-    public setImageUrl(url:string, def: Texture2D = Texture2D.White, func?: any) {
-        this._url = url;
-        this._loaded = false;
-        this._def = def;
+    public setUrl(url?:string, def: Texture2D = Texture2D.White, func?) {
+        if (this.isUrl) {
+            Loader.removeImage(this._url);
+        } 
 
-        Loader.loadImage(url).then((img: HTMLImageElement) => {
-            this._data = img;
-            this._width = img.width;
-            this._height = img.height;
-            this.needsUpdate();
-            this._loaded = true;
-            this._def = null;
-            if (func) {
-                func();
-            }
-            return img;
-        });
+        if (url && url !== '') {
+            this._data = Loader.loadImage(url, func);
+            this._def = def;
+            this._url = url;
+        }
     }
 
-    public setData(width: number, height: number, data: HTMLImageElement | Uint8Array | Float32Array | Uint16Array) {
+    public setData(width: number, height: number, data: HTMLImageElement | ArrayBufferView) {
         this._width = width;
         this._height = height;
         this._data = data;
@@ -132,14 +124,25 @@ export class Texture2D extends Texture {
     }
 
     public get loaded() {
-        return this._loaded;
+        return this._url ? (<HTMLImageElement>this._data).complete : true;
     }
 
     public getUrl(): string {
         return this._url;
     }
 
+    public get isUrl(): boolean {
+        return this._url && this._url !== '';
+    }
+
     public getType() {
         return Texture.TEXTURE2D;
+    }
+
+    public destroy() {
+        super.destroy();
+        if (this._url) {
+            Loader.removeImage(this._url);
+        }
     }
 }

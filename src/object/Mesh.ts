@@ -10,6 +10,9 @@ export class Mesh extends Object3D {
     }
 
     public setGeometry(geo: Geometry) {
+        if (this._geometry) {
+            this._geometry.destroy();
+        }
         this._geometry = geo;
     }
 
@@ -18,6 +21,9 @@ export class Mesh extends Object3D {
     }
 
     public setMaterial(mat: Material) {
+        if (this._material) {
+            this._material.destroy();
+        }
         this._material = mat;
     }
 
@@ -41,5 +47,15 @@ export class Mesh extends Object3D {
 
     public get isMesh(): boolean {
         return true;
+    }
+
+    protected _destroy() {
+        if (this._material) {
+            this._material.destroy();
+        }
+
+        if (this._geometry) {
+            this._geometry.destroy();
+        }
     }
 }

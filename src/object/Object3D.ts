@@ -3,6 +3,7 @@ import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
 import { Bounding } from '../bounding/Bounding'
 import { Base } from '../core/Base';
+import { Event } from '../core/Event';
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
@@ -11,7 +12,6 @@ export class Object3D extends Base {
     protected _matrix: Matrix4 = new Matrix4();
     
     protected _visible: boolean = true;
-    // protected _components: Component[] = [];
     
     protected _parent: Object3D = null;
     protected _children: Object3D[] = [];
@@ -157,7 +157,11 @@ export class Object3D extends Base {
     }
 
     private _preCleanup() {
+        this._destroy();
+    }
 
+    protected _destroy() {
+        this.event(Event.DESTROTY, [this]);
     }
 
     public set x(v: number) {

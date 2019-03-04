@@ -3,6 +3,7 @@ import { Base } from '../core/Base'
 
 export class GraphicsObject extends Base {
     protected _renderObjectRef: RenderBase[] = [];
+    protected _count: number = 0;
     constructor() {
         super();
     }
@@ -19,11 +20,30 @@ export class GraphicsObject extends Base {
         
     }
 
-    public needsUpdate() { 
-        let rbfs = this._renderObjectRef
+    public retain() {
+        this._count++;
+    }
+
+    public release() {
+        this._count--
+        if (this._count === 0) {
+            this.destroy();
+        }
+    }
+    
+    protected destroy() {
+        let rbfs = this._renderObjectRef;
         let l = rbfs.length;
         for (let i = 0; i < l; i++) {
-            rbfs[i].needsUpdate();
+            rbfs[i] && rbfs[i].remove(i);
+        } 
+    }
+
+    public needsUpdate() { 
+        let rbfs = this._renderObjectRef;
+        let l = rbfs.length;
+        for (let i = 0; i < l; i++) {
+            rbfs[i] && rbfs[i].needsUpdate();
         } 
     }
 }

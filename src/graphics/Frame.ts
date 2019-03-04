@@ -69,6 +69,17 @@ export class Frame extends GraphicsObject {
         return this._depthStencilTexture;
     }
 
+    // protected _setTexture(targetType: RTLocation, tex: Texture, type: TexTarget) {
+    //     let texObj = this._textures.get(targetType);
+    //     tex.retain();
+    //     if (texObj) {
+    //         texObj.tex.release();
+    //         texObj.tex = tex;
+    //     } else {
+    //         this._textures.set(targetType, {tex: tex, target: type});
+    //     }
+    // }
+
     protected _createTexture2d(format, dataType) {
         let texture2d = new Texture2D();
         texture2d.setSize(this._width, this._height);

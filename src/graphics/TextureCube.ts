@@ -78,4 +78,13 @@ export class TextureCube extends Texture {
     public getType() {
         return Texture.TEXTURECUBE;
     }
+
+    public destroy() {
+        super.destroy();
+        this._texture2ds.forEach(tex => {
+            if (tex) {
+                tex.destroy();
+            }
+        })
+    }
 }

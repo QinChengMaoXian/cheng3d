@@ -1,33 +1,49 @@
 import { Logger } from '../core/Logger'
 import { EventDispatcher } from '../core/EventDispatcher';
+import { Texture2D } from '../graphics/Texture2D';
 
 const events: EventDispatcher = new EventDispatcher();
 
+interface Image2D {
+    count: number;
+    image: HTMLImageElement;
+}
+
 export class Loader {
-    private static _imgsMap: Map<string, HTMLImageElement> = new Map();
+    private static _imgsMap: Map<string, Image2D> = new Map();
     private static _loadedMap: Map<string, any> = new Map();
 
     private static _loadList: Map<string, XMLHttpRequestResponseType> = new Map();
     private static _xmlRequests = [new XMLHttpRequest(), new XMLHttpRequest(), new XMLHttpRequest(), new XMLHttpRequest(), new XMLHttpRequest()];
 
-    static loadImage(url: string) {
-        let img = this._imgsMap.get(url);
-        if (img) {
-            return Promise.resolve(img);
+    static loadImage(url: string, func?): HTMLImageElement {
+        let obj = this._imgsMap.get(url);
+        if (obj) {
+            obj.count++;
+            func && func();
+            return obj.image;
         }
 
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-            let img = new Image();
-            img.onload = () => {
-                resolve(img);
-            };
-            img.onerror = () => {
-                reject(img);
+        let img = new Image();
+        this._imgsMap.set(url, {count: 1, image: img});
+        img.onload = () => {
+            func && func();
+        };
+        img.onerror = () => {
+            Logger.error(img.baseURI, 'can not loaded');
+        }
+        img.src = url;
+        return img;
+    }
+
+    static removeImage(url: string) {
+        let obj = this._imgsMap.get(url);
+        if (obj) {
+            obj.count--;
+            if (obj.count === 0) {
+                this._imgsMap.delete(url);
             }
-            img.src = url;
-        }).catch((error)=> {
-            Logger.error(error);
-        })
+        }
     }
 
     static loadUrl(url: string, type: XMLHttpRequestResponseType = 'text') {

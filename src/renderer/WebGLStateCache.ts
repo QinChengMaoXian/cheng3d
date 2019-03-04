@@ -10,17 +10,15 @@ import { AlphaType } from '../graphics/GraphicsTypes';
 export class WebGLStateCache {
 
     // clear
-    enableClearColor = true;
+    // enableClearColor = true;
+    // enableClearDepth = true;
+    // enableClearStencil = false;
     clearColor = [1.0, 1.0, 1.0, 1.0];
-
-    enableClearDepth = true;
     clearDepth = 0;
-
-    enableClearStencil = false;
     clearStencil = 0;
 
     // viewport
-    viewpost = [0, 0, 800, 600];
+    viewport = [0, 0, 800, 600];
 
     // color
     colorMask = [true, true, true, true];
@@ -46,10 +44,12 @@ export class WebGLStateCache {
     cullFaceMode = CGE.BACK;
     frontFace = CGE.CCW;
 
+    // TODO:
     // scissor
     enableScissor = false;
     scissor = [0, 0, 800, 600];
 
+    // TODO:
     // polygonOffset
     enablePolygonOffset = false;
     polygonOffset = [0, 0];
@@ -80,6 +80,46 @@ export class WebGLStateCache {
         this.enableCullFace ? gl.enable(gl.CULL_FACE): gl.disable(gl.CULL_FACE);
         gl.cullFace(this.cullFaceMode);
         gl.frontFace(this.frontFace);
+    }
+
+    setViewport(gl: WebGLRenderingContext, viewport: number[] | Float32Array) {
+        let vp = this.viewport;
+        for (let i = 0; i < 4; i++) {
+            if (vp[i] !== viewport[i]) {
+                gl.viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+                for (i; i < 4; i++) {
+                    vp[i] = viewport[i];
+                }
+                return;
+            }
+        }        
+    }
+
+    setClearColor(gl: WebGLRenderingContext, color: number[] | Float32Array) {
+        let vp = this.clearColor;
+        for (let i = 0; i < 4; i++) {
+            if (vp[i] !== color[i]) {
+                gl.clearColor(color[0], color[1], color[2], color[3]);
+                for (i; i < 4; i++) {
+                    vp[i] = color[i];
+                }
+                return;
+            }
+        }
+    }
+
+    setClearDepth(gl: WebGLRenderingContext, depth: number) {
+        if (this.clearDepth !== depth) {
+            gl.clearDepth(depth);
+            this.clearDepth = depth;
+        }
+    }
+
+    setClearStencil(gl: WebGLRenderingContext, stencil: number) {
+        if (this.clearStencil !== stencil) {
+            gl.clearStencil(stencil);
+            this.clearStencil = stencil
+        }
     }
 
     setColor(gl: WebGLRenderingContext) {

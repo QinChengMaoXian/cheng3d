@@ -63,4 +63,8 @@ export class Texture extends GraphicsObject {
     public getType() {
         return -1;
     }
+
+    public get isUrl() {
+        return false;
+    }
 }

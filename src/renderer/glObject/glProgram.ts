@@ -19,6 +19,7 @@ import { Mesh } from '../../object/Mesh';
 import { Camera } from '../../object/Camera';
 import { glTexture } from './glTexture';
 import { RepRemoveSquareBrackets } from '../../util/Util';
+import { Renderer } from '../Renderer';
 
 const _matrix = new Matrix4();
 const _vpmatrix = new Matrix4();
@@ -301,5 +302,10 @@ export class glProgram extends glObject {
 
     public get shaderKey() {
         return this._shaderKey;
+    }
+
+    public remove(idx: number) {
+        let renderer = Renderer.getRenderer(idx);
+        renderer.removeShader(this);
     }
 }

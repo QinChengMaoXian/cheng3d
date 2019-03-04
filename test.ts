@@ -22,7 +22,7 @@ let brdf_specular = './resources/brdfTest/rustediron2_specular.jpg'
 
 let env_lut = './resources/envLUT.png'
 
-// window['CGE'] = CGE;
+window['cge'] = CGE;
 
 // import { Main } from './projects/kamihikouki/main';
 
@@ -180,9 +180,9 @@ window.onblur = function() {
 // 下 Brdf 球体阵列
 let geo = new CGE.SphereGeometry(1, 32, 32);
 
-let createTexture2DFromImage = function(imgSrc, func?) {
+let createTexture2DFromImage = function(imgSrc: string, func?) {
     let texture2d = new CGE.Texture2D();
-    texture2d.setImageUrl(imgSrc, CGE.Texture2D.White, func);
+    texture2d.setUrl(imgSrc, CGE.Texture2D.White, func);
     return texture2d;
 };
 
@@ -206,20 +206,20 @@ cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
 let lutTexture = CGE.Texture2D.BrdfLUT;
 
-let diffTex = new CGE.Texture2D();
-diffTex.setImageUrl(brdf_basecolor, CGE.Texture2D.White);
+let diffTex = new CGE.Texture2D;
+diffTex.setUrl(brdf_basecolor, CGE.Texture2D.White);
 diffTex.setMipmap(true);
 diffTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 diffTex.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-let normTex = new CGE.Texture2D();
-normTex.setImageUrl(brdf_normal, CGE.Texture2D.Normal);
+let normTex = new CGE.Texture2D;
+normTex.setUrl(brdf_normal, CGE.Texture2D.Normal);
 normTex.setMipmap(true);
 normTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 normTex.setWarp(CGE.REPEAT, CGE.REPEAT);
 
-let specTex = new CGE.Texture2D();
-specTex.setImageUrl(brdf_specular, CGE.Texture2D.White);
+let specTex = new CGE.Texture2D;
+specTex.setUrl(brdf_specular, CGE.Texture2D.White);
 specTex.setMipmap(true);
 specTex.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 specTex.setWarp(CGE.REPEAT, CGE.REPEAT);
