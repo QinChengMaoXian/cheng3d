@@ -7,6 +7,7 @@ import * as CGE from '../graphics/RendererParameter';
 import { Blend } from '../graphics/Blend';
 import { Stencil } from '../graphics/Stencil';
 import { AlphaType, FaceType } from '../graphics/GraphicsTypes';
+import { ShaderConst } from '../graphics/ShaderConst';
 
 /**
  * 材质基类 
@@ -40,7 +41,10 @@ export class Material extends Base {
     /** 材质参数组 */
     private _properties: Map<string | number, any>;
     /** 宏数组 */
-    private _macros: string[] = [];
+    private _macros: {[key: string]: number};
+
+    /** 特征值 */
+    private _key: string;
 
     constructor() {
         super();
@@ -58,6 +62,9 @@ export class Material extends Base {
     }
 
     protected setTexture(type: string | number, texture: Texture = Texture2D.White) {
+        if (!texture) {
+            return;
+        }
         let tex = this._textures.get(type);
         if (tex && tex.isUrl) {
             tex.release();
@@ -97,14 +104,20 @@ export class Material extends Base {
     }
 
     public disalbeAlpha() {
+        this.removeTexture(ShaderConst.ODMap);
+        this._removeMacro('ALPHA_TEST');
         this._alphaType = AlphaType.NONE;
     }
 
     public enableAlphaTest() {
+        this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
+        this._addMacro('ALPHA_TEST');
         this._alphaType = AlphaType.TEST;
     }
 
     public enableAlphaBlend() {
+        this.removeTexture(ShaderConst.ODMap);
+        this._removeMacro('ALPHA_TEST');
         this._alphaType = AlphaType.BLEND;
     }
 
@@ -245,22 +258,44 @@ export class Material extends Base {
         this._textures.clear();
     }
 
-    protected _addMacro(macro: string) {
-        let idx = this._macros.indexOf(macro);
-        if (idx < 0) {
-            this._macros.push(macro);
+    protected _addMacro(macro: string, value?: number) {
+        let macros = this._macros;
+        if (!macros) {
+            macros = {}
+            this._macros = macros;
         }
+        macros[macro] = value;
+        this._computeKey();
     }
 
     protected _removeMacro(macro: string) {
-        let idx = this._macros.indexOf(macro);
-        if (idx > -1) {
-            this._macros.splice(idx, 1);
+        let macros = this._macros;
+        if (!macros) {
+            return;
         }
+        delete macros[macro];
+        if (Object.keys(macros).length === 0) {
+            delete this._macros;
+        }
+        this._computeKey();
+    }
+
+    protected _computeKey() {
+        let macros = this._macros;
+        if (!macros) {
+            this._key = null;
+            return;
+        }
+        let result = '' + this.type;
+        for (let key in macros) {
+            let value = macros[key];
+            result += value !== undefined ? `_${key} ${value}` : `_${key}`;
+        }
+        this._key = result;
     }
 
     public get key(): string {
-        return '';
+        return this._key || this.type;
     }
 
     public get type(): string {

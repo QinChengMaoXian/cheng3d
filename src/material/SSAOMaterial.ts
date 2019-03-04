@@ -34,8 +34,7 @@ export class SSAOMaterial extends Material {
 
     public createSampleData(sampleNum: number = 64) {
         if (!this._samples || this._sampleNum !== sampleNum) {
-            this._removeMacro(`SAMPLE_NUM ${this._sampleNum}`);
-            this._addMacro(`SAMPLE_NUM ${sampleNum}`);
+            this._addMacro(`SAMPLE_NUM`, sampleNum);
             this._sampleNum = sampleNum;
             this._samples = { data: new Float32Array(sampleNum * 3) };
             this.setProperty('u_samples', this._samples);
@@ -67,10 +66,11 @@ export class SSAOMaterial extends Material {
     public setNormalTexture(tex: Texture2D) {
         if (tex) {
             this._addMacro('NORMAL_MAP');
+            this.setTexture(ShaderConst.normalMap, tex);
         } else {
             this._removeMacro('NORMAL_MAP');
+            this.removeTexture(ShaderConst.normalMap);
         }
-        this.setTexture(ShaderConst.normalMap, tex);
     }
 
     public setPixelSize(x, y) {

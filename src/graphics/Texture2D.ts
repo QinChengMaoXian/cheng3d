@@ -52,6 +52,7 @@ export class Texture2D extends Texture {
             let tex = new Texture2D();
             tex.setFormat(CGE.ALPHA, CGE.ALPHA);
             tex.setDataType(CGE.UNSIGNED_BYTE);
+            tex.setFilter(CGE.REPEAT, CGE.REPEAT);
             tex.setData(16, 16, new Uint8Array(BuildOrderedDitheringData(4)));
             Texture2D._ODTex = tex;
         }
@@ -73,7 +74,8 @@ export class Texture2D extends Texture {
     public setUrl(url?:string, def: Texture2D = Texture2D.White, func?) {
         if (this.isUrl) {
             Loader.removeImage(this._url);
-        } 
+            this._url = null;
+        }
 
         if (url && url !== '') {
             this._data = Loader.loadImage(url, func);
@@ -83,6 +85,10 @@ export class Texture2D extends Texture {
     }
 
     public setData(width: number, height: number, data: HTMLImageElement | ArrayBufferView) {
+        if (this.isUrl) {
+            Loader.removeImage(this._url);
+            this._url = null;
+        }
         this._width = width;
         this._height = height;
         this._data = data;

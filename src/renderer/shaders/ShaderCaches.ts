@@ -18,17 +18,12 @@ export class ShaderCaches {
         this._renderer = renderer;
     }
 
-    genShaderProgram(mat: Material, enableDefer?: boolean, macros?: string[]): glProgram {
-        let newMacros = mat.getMacros();
-        if (macros && macros.length > 0) {
-            newMacros = newMacros.concat(macros);
-        }
-        
+    genShaderProgram(mat: Material, enableDefer?: boolean, macros?: string[]): glProgram {    
         let renderer = this._renderer;
         let shader = mat.shader;
         let glprog: glProgram = (shader.getRenderObjectRef(renderer) as glProgram);
         let useDefer = mat.supportDeferred && enableDefer;
-        let matNewKey = this.genMatKey(mat, useDefer, newMacros);
+        let matNewKey = this.genMatKey(mat, useDefer, macros);
         let matCurKey = glprog ? glprog.shaderKey : '-1';
 
         if (matCurKey === matNewKey) {
@@ -62,8 +57,10 @@ export class ShaderCaches {
             data = data.defer_src;
         }
 
-        let vertText = this.genStr(data.vert, newMacros);
-        let fragText = this.genStr(data.frag, newMacros);
+        let newMacros = mat.getMacros();   
+
+        let vertText = this.genStr(data.vert, newMacros, macros);
+        let fragText = this.genStr(data.frag, newMacros, macros);
 
         glprog = glprog.generateFromText(gl, vertText, fragText);
 
@@ -107,8 +104,18 @@ export class ShaderCaches {
         return false;
     }
 
-    genStr(text: string, macros?: string[]) {
+    genStr(text: string, matMacros: {[key: string]: number}, macros?: string[]) {
         let src = text;
+        
+        if (matMacros) {
+            let macroStr = '';
+            for (let key in matMacros) {
+                let value = matMacros[key];
+                macroStr += value !== undefined ? `#define ${key} ${value}\n` : `#define ${key}\n`;
+            }
+            src = macroStr + src;
+        }
+
         if (macros) {
             let macroStr = '';
             macros.forEach(macro => {
@@ -121,7 +128,7 @@ export class ShaderCaches {
     }
 
     genMatKey(mat: Material, enableDefer?: boolean, macros?: string[]): string {
-        let result = mat.type;
+        let result = mat.key;
         if (enableDefer) {
             result += '_def';
         }
