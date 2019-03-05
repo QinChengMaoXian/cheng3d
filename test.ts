@@ -234,6 +234,8 @@ standMat.setPrefilterMap(cubeTexture);
 standMat.enableStencil = true;
 standMat.setStencilFunc(CGE.ALWAYS, 0x80, 0x80);
 standMat.setStencilOp(CGE.KEEP, CGE.KEEP, CGE.REPLACE);
+// standMat.setUVOffset(2, 2, 0, 0);
+
 // standMat.setSpecular(0.04, 0, 1);
 // standMat.setBrdfLUTMap();
 window['standMat'] = standMat;
@@ -275,9 +277,9 @@ skyboxMat.setCullFaceMode(CGE.FRONT);
 skyboxMat.depthFunc = CGE.LEQUAL; 
 
 let boxGeo = new CGE.BoxGeometry();
-let bounding = boxGeo.getBounding() as CGE.AABB;
-bounding.setMax(Infinity, Infinity, Infinity);
-bounding.setMin(-Infinity, -Infinity, -Infinity)
+boxGeo.removeBounding();
+// bounding.setMax(Infinity, Infinity, Infinity);
+// bounding.setMin(-Infinity, -Infinity, -Infinity)
 
 let skyboxMesh = new CGE.Mesh();
 

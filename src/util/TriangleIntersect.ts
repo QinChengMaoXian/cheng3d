@@ -92,7 +92,7 @@ function line_triangle_intersert_inSamePlane(tri: Triangle, v1: Vector3, v2: Vec
 function is_point_within_triangle_3(tri: Triangle, vec: Vector3) {
     let v0 = Vector3.pool.create().subBy(tri.point3, tri.point1).mul(3);
     let v1 = Vector3.pool.create().subBy(tri.point2, tri.point1).mul(3);
-    let v2 = Vector3.pool.create().copy(tri.point1).negate().mul(3).add(vec);
+    let v2 = Vector3.pool.create().copy(tri.point1).negate().mul(3).addAt(vec);
 
     let dot00 = v0.dot(v0);
     let dot01 = v0.dot(v1);

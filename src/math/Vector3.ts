@@ -28,14 +28,28 @@ export class Vector3 {
         return this;
     }
 
-    public add(vec: Vector3): Vector3 {
+    public add(x: number, y: number, z: number): Vector3 {
+        this.v[0] += x;
+        this.v[1] += y;
+        this.v[2] += z;
+        return this;
+    }
+
+    public addAt(vec: Vector3): Vector3 {
         this.v[0] += vec.x;
         this.v[1] += vec.y;
         this.v[2] += vec.z;
         return this;
     }
 
-    public sub(vec: Vector3): Vector3 {
+    public sub(x: number, y: number, z: number): Vector3 {
+        this.v[0] -= x;
+        this.v[1] -= y;
+        this.v[2] -= z;
+        return this;
+    }
+    
+    public subAt(vec: Vector3): Vector3 {
         this.v[0] -= vec.x;
         this.v[1] -= vec.y;
         this.v[2] -= vec.z;

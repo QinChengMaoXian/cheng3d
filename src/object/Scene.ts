@@ -10,6 +10,7 @@ export class Scene extends Object3D {
 
     constructor() {
         super();
+        this._mainLight.enableShadow();
     }
 
     public getMainLight() {

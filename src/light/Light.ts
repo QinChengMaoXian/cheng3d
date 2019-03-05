@@ -2,6 +2,7 @@ import { Object3D } from '../object/Object3D';
 import { Vector4 } from '../math/Vector4';
 import { Vector3 } from '../math/Vector3';
 import { Shadow } from './Shadow';
+import { Camera } from '../object/Camera';
 
 export enum LightType {
     None = 0,

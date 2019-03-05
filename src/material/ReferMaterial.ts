@@ -79,6 +79,14 @@ export class ReferMaterial extends Material {
         return this._referMat.getMacros();
     }
 
+    public enableShadow() {
+        this._referMat['_addMacro']('SHADOW_MAP');
+    }
+
+    public disableShadow() {
+        this._referMat['_removeMacro']('SHADOW_MAP');
+    }
+
     public get stencil() {
         return this._stencil || this._referMat.stencil;
     }

@@ -261,4 +261,25 @@ export class WebGLStateCache {
             this.cullFaceMode = cullFaceMode;
         }
     }
+
+    setPolygonOffset(gl: WebGLRenderingContext, enable: boolean, values: number[]) {
+        if (!enable) {
+            if (this.enablePolygonOffset) {
+                gl.disable(gl.POLYGON_OFFSET_FILL);
+                this.enablePolygonOffset = false;
+            }
+            return;
+        }
+
+        if (!this.enablePolygonOffset) {
+            gl.enable(gl.POLYGON_OFFSET_FILL);
+            this.enablePolygonOffset = false;
+        }
+
+        if (this.polygonOffset[0] !== values[0] || this.polygonOffset[1] !== values[1]) {
+            gl.polygonOffset(values[0], values[1]);
+            this.polygonOffset[0] = values[0];
+            this.polygonOffset[1] = values[1];
+        }
+    }
 }

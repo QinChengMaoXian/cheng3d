@@ -265,7 +265,11 @@ export class glProgram extends glObject {
                 case ShaderConst.lightColor:        data = glProgram.lightColor; break;
                 case ShaderConst.lightDir:          data = glProgram.lightDir; break;
                 case ShaderConst.cameraRange: {
-                    f4.set([camera.far, 1.0 / camera.far, camera.aspect, Math.tan(camera.fovy * 0.5)]);
+                    if (camera.mode === Camera.Orthographic) {
+                        f4.set([1.0, 1.0, 1.0, 1.0]);
+                    } else {
+                        f4.set([camera.far, 1.0 / camera.far, camera.aspect, Math.tan(camera.fovy * 0.5)]);
+                    }
                     glprog.setUniformData(gl, type, location, f4);
                     return;
                 }

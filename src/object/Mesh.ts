@@ -5,6 +5,10 @@ import { Material } from "../material/Material";
 export class Mesh extends Object3D {
     protected _geometry: Geometry;
     protected _material: Material;
+
+    public caseShadow: boolean = true;
+    public receiveShadow: boolean = true;
+
     constructor() {
         super();
     }
@@ -36,11 +40,15 @@ export class Mesh extends Object3D {
     }
 
     protected _updateBounding() {
-        if (this._bounding && this._bounding.getType() === this._geometry.getBounding().getType()) {
-            this._bounding.copy(this._geometry.getBounding());
+        let bounding = this._geometry.getBounding();
+        if (!bounding) {
+            return;
+        }
+        if (this._bounding && this._bounding.getType() === bounding.getType()) {
+            this._bounding.copy(bounding);
             this._bounding.applyMatrix(this._matrix);
         } else {
-            this._bounding = this._geometry.getBounding().clone();
+            this._bounding = bounding.clone();
             this._bounding.applyMatrix(this._matrix);
         }
     }

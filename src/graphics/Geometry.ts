@@ -90,10 +90,14 @@ export class Geometry extends GraphicsObject {
     }
 
     public getBounding() {
-        if (!this._bounding) {
+        if (this._bounding === undefined) {
             this.buildBounding();
         }
         return this._bounding;
+    }
+
+    public removeBounding() {
+        this._bounding = null;
     }
 
     public buildBounding() {

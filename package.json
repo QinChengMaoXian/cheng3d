@@ -1,6 +1,6 @@
 {
   "name": "cheng3d",
-  "description": "A NEW WEB 3D ENGINE BASED ON WEBGL",
+  "description": "A WEB 3D ENGINE BASED ON WEBGL",
   "version": "0.3.0",
   "main": "test.ts",
   "scripts": {

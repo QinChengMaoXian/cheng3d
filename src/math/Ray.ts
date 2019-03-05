@@ -19,7 +19,7 @@ export class Ray {
             console.warn('CGE.Ray: .at() target is now required');
             target = new Vector3();
         }
-        return target.copy(this._dir).mul(t).add(this._origin);
+        return target.copy(this._dir).mul(t).addAt(this._origin);
     }
 
     /**
@@ -37,8 +37,8 @@ export class Ray {
         let edge2: Vector3 = Ray._edge2;
         let normal: Vector3 = Ray._normal;
 
-        edge1.copy(b).sub(a);
-        edge2.copy(c).sub(a);
+        edge1.copy(b).subAt(a);
+        edge2.copy(c).subAt(a);
         normal.crossBy(edge1, edge2);
 
         // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,

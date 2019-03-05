@@ -65,11 +65,11 @@ export class Bounding {
                     let pos = poses[k * 4 + j * 2 + i];
                     pos.setAt(center);
                     aux.copy(dirs[0]);
-                    pos.add(i === 1 ? aux.negate().mul(size.x) : aux.mul(size.x));
+                    pos.addAt(i === 1 ? aux.negate().mul(size.x) : aux.mul(size.x));
                     aux.copy(dirs[1]);
-                    pos.add(j === 1 ? aux.negate().mul(size.y) : aux.mul(size.y));
+                    pos.addAt(j === 1 ? aux.negate().mul(size.y) : aux.mul(size.y));
                     aux.copy(dirs[2]);
-                    pos.add(k === 1 ? aux.negate().mul(size.z) : aux.mul(size.z));
+                    pos.addAt(k === 1 ? aux.negate().mul(size.z) : aux.mul(size.z));
                 }
             }
         }
@@ -165,7 +165,7 @@ export class Bounding {
 
     public static intersectSphere(sphere1: SphereBounding, sphere2: SphereBounding) {
         Vector3.pubTemp.copy(sphere1.getPosition());
-        Vector3.pubTemp.sub(sphere2.getPosition());
+        Vector3.pubTemp.subAt(sphere2.getPosition());
         const s1 = sphere1.getRadius();
         const s2 = sphere2.getRadius();
         return Vector3.pubTemp.lengthSquare() <= (s1 * s1 + s2 * s2);

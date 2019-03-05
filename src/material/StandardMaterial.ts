@@ -4,6 +4,7 @@ import { Texture2D } from '../graphics/Texture2D';
 import { Vector4 } from '../math/Vector4';
 import { Vector3 } from '../math/Vector3';
 import { TextureCube } from '../graphics/TextureCube';
+import { Matrix4 } from '../math/Matrix4';
 
 export class StandardMaterial extends Material {
 
@@ -72,6 +73,10 @@ export class StandardMaterial extends Material {
 
     public setUVOffset(sx: number, sy: number, ox: number, oy: number) {
         this._uvOffset.set(sx, sy, ox, oy);
+    }
+
+    public setDepthMap(tex: Texture2D) {
+        this.setTexture(s.depthMap, tex);
     }
 
     public canLighting() {

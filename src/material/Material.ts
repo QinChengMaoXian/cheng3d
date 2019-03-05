@@ -7,7 +7,8 @@ import * as CGE from '../graphics/RendererParameter';
 import { Blend } from '../graphics/Blend';
 import { Stencil } from '../graphics/Stencil';
 import { AlphaType, FaceType } from '../graphics/GraphicsTypes';
-import { ShaderConst } from '../graphics/ShaderConst';
+import { ShaderConst as s } from '../graphics/ShaderConst';
+import { Matrix4 } from '../math/Matrix4';
 
 /**
  * 材质基类 
@@ -15,7 +16,7 @@ import { ShaderConst } from '../graphics/ShaderConst';
 export class Material extends Base {
     protected _shader: Shader = new Shader;
 
-    /** 剔除面模式 CGE.ZERO为不剔除 */
+    /** 剔除面模式 CGE.ZERO为不剔除 TODO：变量名容易混淆 */
     protected _faceMode: number;
     /** 反转面方向 */
     protected _flipFace: boolean;
@@ -35,6 +36,9 @@ export class Material extends Base {
     public enableDepth = true;
     public depthMask = true;
     protected _depthFunc: number;
+
+    public enablePolygonOffset = false;
+    public polygonOffset = [0, 0];
 
     /** 纹理组 */
     private _textures: Map<string | number, Texture>;
@@ -104,19 +108,19 @@ export class Material extends Base {
     }
 
     public disalbeAlpha() {
-        this.removeTexture(ShaderConst.ODMap);
+        this.removeTexture(s.ODMap);
         this._removeMacro('ALPHA_TEST');
         this._alphaType = AlphaType.NONE;
     }
 
     public enableAlphaTest() {
-        this.setTexture(ShaderConst.ODMap, Texture2D.ODTex);
+        this.setTexture(s.ODMap, Texture2D.ODTex);
         this._addMacro('ALPHA_TEST');
         this._alphaType = AlphaType.TEST;
     }
 
     public enableAlphaBlend() {
-        this.removeTexture(ShaderConst.ODMap);
+        this.removeTexture(s.ODMap);
         this._removeMacro('ALPHA_TEST');
         this._alphaType = AlphaType.BLEND;
     }
@@ -192,6 +196,7 @@ export class Material extends Base {
         return this._blend ? this._blend.blendEquation : Blend.DefBlend.blendEquation;
     }
 
+    /** enable表现不一致 */
     public set enableStencil(v: boolean) {
         this._enableStencil = v;
     }
@@ -312,6 +317,22 @@ export class Material extends Base {
 
     public getMacros() {
         return this._macros;
+    }
+
+    public setDepthMap(tex: Texture) {
+        this.setTexture(s.depthMap, tex);
+    }
+
+    public setDepthMatData(mat: Matrix4) {
+        this.setProperty(s.depthMat, mat);
+    }
+
+    public enableShadow() {
+        this._addMacro('SHADOW_MAP');
+    }
+
+    public disableShadow() {
+        this._removeMacro('SHADOW_MAP');
     }
 
     public get supportDeferred(): boolean {

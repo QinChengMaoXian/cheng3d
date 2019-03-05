@@ -12,12 +12,16 @@ varying vec3 v_worldPos;
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_normalMap;
 uniform sampler2D u_roughnessMap;
-uniform sampler2D u_metallicMap;
-uniform sampler2D u_aoMap;
 uniform sampler2D u_brdfLUTMap;
+
 
 uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
+
+#ifdef SHADOW_MAP
+    uniform sampler2D u_depthMap;
+    uniform mat4 u_depthMat;
+#endif
 
 #ifdef ALPHA_TEST
     uniform sampler2D u_ODMap;
@@ -28,6 +32,7 @@ uniform vec3 u_cameraPos;
 uniform vec4 u_baseColor;
 uniform vec3 u_lightDir;
 uniform vec4 u_lightColor;
+
 
 const float PI = 3.14159265359;
 
@@ -95,6 +100,7 @@ float FastDFG(float roughness, float NoV, float NoL)
     return 1.0 / ( G_V * G_L );
 }
 
+#include <decodeRGB2Float>
 // vec3 brdf = FastDFG(roughness, NdotV, NdotL) * metalic;
 
 void main()
@@ -164,6 +170,15 @@ void main()
 
     // 最终颜色
     vec3 color = ambient + lo;
+
+    #ifdef SHADOW_MAP
+        vec4 depthVec = u_depthMat * vec4(v_worldPos, 1.0);
+        depthVec.xyz = depthVec.xyz * 0.5 + 0.5;
+        float depth = depthVec.z;
+        float bias = 0.005;
+        float depth2 = decodeRGB2Float(texture2D(u_depthMap, depthVec.xy).rgb) + bias;
+        color *= (depth > depth2 ? 0.5 : 1.0);
+    #endif
 
     gl_FragColor = vec4(color, baseColor.w);
     // gl_FragColor = vec4(vec3(color), 1.0);

@@ -27,6 +27,7 @@ export class Frustum {
         for (let i = 0; i < 6; i++) {
             arguments[i] && planes[i].copy(arguments[i]);
         }
+        return this;
     } 
 
     public setFromMatrix(mat: Matrix4) {
@@ -97,4 +98,12 @@ export class Frustum {
 
     }
 
+    public copy(frustum: Frustum) {
+        let selfPlanes = this._planes;
+        let orderPlanes = frustum._planes;
+        for(let i = 0; i < 6; i++) {
+            selfPlanes[i].copy(orderPlanes[i]);
+        }
+        return this;
+    }
 }

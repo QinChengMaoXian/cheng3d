@@ -22,7 +22,7 @@ export class Camera extends Object3D {
     protected _up = new Vector3(0, 0, 1);
     protected _projectionFunc: Function;
 
-    constructor(width: number, height: number, _fovy?: number, _near?: number, _far?: number) {
+    constructor(width?: number, height?: number, _fovy?: number, _near?: number, _far?: number) {
         super();
         let w = (width || 800) * 0.5;
         let h = (height || 600) * 0.5;
@@ -45,7 +45,7 @@ export class Camera extends Object3D {
     }
 
     protected _resetUp() {
-        let forward = this._center.clone().sub(this._position).normalize();
+        let forward = this._center.clone().subAt(this._position).normalize();
         let rightAxis = forward.cross(this._up.clone().normalize());
         if (forward.equal(rightAxis)) 
             return;
@@ -92,7 +92,7 @@ export class Camera extends Object3D {
         this.resize(width, height);
     }
 
-    getMode() {
+    get mode() {
         return this._mode;
     }
 
@@ -164,12 +164,12 @@ export class Camera extends Object3D {
     }
 
     forwardStep(delta) {
-        let dir = this._center.clone().sub(this._position).normalize().mul(delta);
+        let dir = this._center.clone().subAt(this._position).normalize().mul(delta);
         this._addPosCenter(dir);
     }
 
     horizontalStep(delta) {
-        let dir = this._center.clone().sub(this._position).cross(this._up).normalize().mul(delta);
+        let dir = this._center.clone().subAt(this._position).cross(this._up).normalize().mul(delta);
         this._addPosCenter(dir);
     }
 
@@ -180,27 +180,27 @@ export class Camera extends Object3D {
     }
 
     _addPosCenter(dir) {
-        this._position.add(dir);
-        this._center.add(dir);
+        this._position.addAt(dir);
+        this._center.addAt(dir);
         this.enableUpdateMat();
     }
 
     _rotateView(axis, rad) {
         let quat = new Quaternion();
         quat.setAxisAngle(axis, -rad);
-        let temp = this._center.clone().sub(this._position)
+        let temp = this._center.clone().subAt(this._position)
         let length = temp.length();
         let dir = temp.normalize();
 
         dir.applyQuaternion(quat);
-        this._center = this._position.clone().add(dir.mul(length));
+        this._center = this._position.clone().addAt(dir.mul(length));
         this._up.applyQuaternion(quat);   
     }
 
     rotateViewFromForward(movementX, movementY) {
         // enhance this.
         this._rotateView(new Vector3(0,0,1), movementX);
-        let forward = this._center.clone().sub(this._position).normalize();
+        let forward = this._center.clone().subAt(this._position).normalize();
         let rightAxis = forward.cross(this._up.clone().normalize());
         this._rotateView(rightAxis, movementY);
         this.enableUpdateMat();

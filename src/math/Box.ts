@@ -1,19 +1,47 @@
 import { Vector3 } from "./Vector3";
 import { Matrix4 } from "./Matrix4";
+import { Sphere } from "./Sphere";
 
 export class Box {
+
+    public static pubTemp: Box = new Box();
 
     public min: Vector3;
     public max: Vector3;
 
     constructor(min?: Vector3, max?: Vector3) {
-        this.min = min ? min.clone(): new Vector3(Infinity, Infinity, Infinity);
-        this.max = min ? max.clone(): new Vector3(-Infinity, -Infinity, -Infinity);
+        this.min = min ? min.clone() : new Vector3(Infinity, Infinity, Infinity);
+        this.max = min ? max.clone() : new Vector3(-Infinity, -Infinity, -Infinity);
+    }
+
+    public reset() {
+        this.min.set(Infinity, Infinity, Infinity);
+        this.max.set(-Infinity, -Infinity, -Infinity);
+        return this;
     }
 
     public setAt(min: Vector3 = Vector3.Zero, max: Vector3 = Vector3.Zero) {
         this.min.copy(min);
         this.max.copy(max);
+        return this;
+    }
+
+    public expandAtPoint(vec: Vector3) {
+        this.min.min(vec);
+        this.max.max(vec);
+    }
+
+    public expandAtBox(box: Box) {
+        this.expandAtPoint(box.min);
+        this.expandAtPoint(box.max);
+    }
+
+    public expandAtSphere(sphere: Sphere) {
+        let r = sphere.radius;
+        let vec = Vector3.pubTemp.copy(sphere.pos).add(r, r, r);
+        this.expandAtPoint(vec);
+        vec.copy(sphere.pos).sub(r, r, r);
+        this.expandAtPoint(vec);
     }
 
     public applyMatrix(mat: Matrix4) {
@@ -32,8 +60,8 @@ export class Box {
             for (let j = 0; j < 2; j++) {
                 for (let i = 0; i < 2; i++) {
                     aux.set(
-                        i === 1 ? maxx : minx, 
-                        j === 1 ? maxy : miny, 
+                        i === 1 ? maxx : minx,
+                        j === 1 ? maxy : miny,
                         k === 1 ? maxz : minz
                     );
 
@@ -48,10 +76,39 @@ export class Box {
 
         vec3pool.recovery(new_min);
         vec3pool.recovery(new_max);
+        return this;
+    }
+
+    public isEmpty() {
+        return (this.max.x < this.min.x) || (this.max.y < this.min.y) || (this.max.z < this.min.z);
+    }
+
+    public cross(box: Box) {
+        this.min.max(box.min);
+        this.max.min(box.max);
+        if (this.isEmpty()) {
+            this.reset;
+        }
+    }
+
+    public union(box: Box) {
+        this.min.min(box.min);
+        this.max.max(box.max);
+    }
+
+    public setFromMatrix(mat: Matrix4) {
+
     }
 
     public copy(box: Box) {
         this.min.copy(box.min);
         this.max.copy(box.max);
+        return this;
+    }
+
+    public clone() {
+        let box = new Box();
+        box.copy(this);
+        return box;
     }
 }

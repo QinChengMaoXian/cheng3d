@@ -98,6 +98,8 @@ export class ShaderConst {
     public static readonly vpIMat = ShaderConst._inUni('u_vpIMat');
     /** model view projection matrix */
     public static readonly mvpMat = ShaderConst._inUni('u_mvpMat');
+    /** shadow map matrix */
+    public static readonly depthMat = ShaderConst._inUni('u_depthMat');
 
     /**
      * get texture map;

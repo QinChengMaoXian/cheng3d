@@ -1,5 +1,8 @@
 import { Shadow } from "./Shadow";
 import { Texture2D } from "../graphics/Texture2D";
+import { Matrix4 } from "../math/Matrix4";
+
+import * as CGE from '../graphics/RendererParameter';
 
 export class DirectionShadow extends Shadow {
 
@@ -9,15 +12,19 @@ export class DirectionShadow extends Shadow {
 
     constructor() {
         super();
+
+        this.matrix = new Matrix4();
     }
 
-    public init(size: number = 512) {
+    public init(size: number = 1024) {
         this._size = size;
         let tex = this._depthTex;
         if (!tex) {
             tex = new Texture2D();
-            tex.setSize(size, size);
+            tex.setFilter(CGE.LINEAR, CGE.LINEAR);
+            this._depthTex = tex;
         }
+        tex.setSize(size, size);
     }
 
     public get depthTex(): Texture2D {

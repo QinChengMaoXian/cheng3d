@@ -191,7 +191,7 @@ export class Matrix4 {
     }
 
     public lookAt(eye: Vector3, center: Vector3, up: Vector3) {
-        let vec_z = eye.clone().sub(center);
+        let vec_z = eye.clone().subAt(center);
         vec_z.normalize();
 
         let vec_x = up.cross(vec_z);

@@ -20,7 +20,7 @@ void main()
     #endif
 
     vec4 pos = u_mvpMat * a_position;
-    v_depth = pos.w * u_cameraRange.y;
+    v_depth = pos.w == 1.0 ? pos.z * 0.5 + 0.5 : pos.w * u_cameraRange.y;
     gl_Position = pos;
 }
 `;
