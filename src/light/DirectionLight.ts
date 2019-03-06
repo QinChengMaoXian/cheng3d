@@ -12,15 +12,20 @@ export class DirectionLight extends Light implements ILight {
     constructor() {
         super();
 
-        this.setPosition(1,1,1);
+        this.setPosition(150, 200, 200);
 
-        let vec = Vector3.pubTemp.set(0.5, 0.5, 0.5).normalize();
+        let vec = Vector3.pubTemp.set(1, 1, 0.5).normalize();
         this.setDirection(vec);
     }
 
     public setPosition(x, y, z) {
         super.setPosition(x, y, z);
         // this._dir.set(x, y, z).normalize();
+    }
+
+    public setDir(x:number, y: number, z: number) {
+        let vec = Vector3.pubTemp.set(x, y, z).normalize();
+        this.setDirection(vec);
     }
 
     public setDirection(dir: Vector3) {

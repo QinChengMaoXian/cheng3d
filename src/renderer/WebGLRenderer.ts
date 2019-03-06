@@ -732,15 +732,15 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         if (!shadowFrame) {
             shadowFrame = new Frame();
             shadowFrame.enableDepthStencil();
-            shadowFrame.getState().clearColor.set(0.0, 0.0, 0.0, 0.0);
+            shadowFrame.getState().clearColor.set(1, 1, 1, 1);
             this._shadowFrame = shadowFrame;
         }
         let depthMat = this._depthMat;
         if (!depthMat) {
             depthMat = new DepthMaterial;
-            depthMat.enablePolygonOffset = true;
-            depthMat.polygonOffset[0] = -1.0;
-            depthMat.polygonOffset[1] = -1.0;
+            // depthMat.enablePolygonOffset = true;
+            // depthMat.polygonOffset[0] = 1.0;
+            // depthMat.polygonOffset[1] = 1.0;
             this.initMaterial(depthMat);
             this._depthMat = depthMat;
         }
@@ -788,9 +788,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             let y = max.y - min.y;
             let z = max.z + 1;
 
-            let range = Math.ceil((x > y ? x : y) / 2);
-            dirShadow.range =range
-            let far = max.z - min.z + 1;
+            let range = dirShadow.range; //Math.ceil((x > y ? x : y) / 2);
+            // dirShadow.range =range
+            let far = dirShadow.far;//max.z - min.z + 1;
             let near = 1;
 
             // vec3.copy(boxCenter).add(dir.x * z, dir.y * z, dir.z * z);
@@ -800,10 +800,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
             
             // camera.resize(range * 2, range * 2);
-            camera.setPosition(281.3311462402344, 47.751216888427734, 283.7066345214844);
-            camera.lookAt(vec3.set(0, 0, 0));
+            camera.setPositionAt(dirLight.getPosition());
+            camera.lookAt(vec3.copy(dirLight.getPosition()).subAt(dir));
             camera.setUp(Vector3.ZUp);
-            camera.enableOrthographicMode(-200, 200, -200, 200, 1, 400);
+            camera.enableOrthographicMode(-range, range, -range, range, 1, far);
             camera.update(0);
 
             dirShadow.matrix.copy(camera.getViewProjectionMatrix());

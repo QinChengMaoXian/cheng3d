@@ -8,7 +8,8 @@ export class DirectionShadow extends Shadow {
 
     protected _depthTex: Texture2D;
     protected _size: number = 512;
-    public range: number = 800;
+    public range: number = 200;
+    public far: number = 2000;
 
     constructor() {
         super();
@@ -16,12 +17,12 @@ export class DirectionShadow extends Shadow {
         this.matrix = new Matrix4();
     }
 
-    public init(size: number = 1024) {
+    public init(size: number = 512) {
         this._size = size;
         let tex = this._depthTex;
         if (!tex) {
             tex = new Texture2D();
-            tex.setFilter(CGE.LINEAR, CGE.LINEAR);
+            tex.setFilter(CGE.NEAREST, CGE.NEAREST);
             this._depthTex = tex;
         }
         tex.setSize(size, size);
