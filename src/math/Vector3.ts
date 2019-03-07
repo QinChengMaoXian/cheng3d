@@ -181,6 +181,14 @@ export class Vector3 {
         return this.v[0] === vec3.x && this.v[1] === vec3.y && this.v[2] === vec3.z;
     }
 
+    public lequal(vec3: Vector3): boolean {
+        return this.v[0] <= vec3.x && this.v[1] <= vec3.y && this.v[2] <= vec3.z;
+    }
+
+    public gequal(vec3: Vector3): boolean {
+        return this.v[0] >= vec3.x && this.v[1] >= vec3.y && this.v[2] >= vec3.z;
+    }
+
     public set x(value: number) {
         this.v[0] = value;
     }

@@ -62,7 +62,7 @@ export class glFrame extends glObject {
         }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         this._frame = frameBuffer;
-        this._update = false;
+        this.updated();
         // this.setLocalVersion(frame.getUpdateVersion());
         return this;
     }

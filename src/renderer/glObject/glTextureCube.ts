@@ -44,7 +44,7 @@ export class glTextureCube extends glTexture2D {
             return;
         }
         this._texture = handler;
-        this._update = false;
+        this.updated();
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null)   ;
         return this;
     }

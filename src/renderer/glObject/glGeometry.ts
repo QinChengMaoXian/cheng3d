@@ -79,7 +79,7 @@ export class glGeometry extends glObject {
             this._draw = new glDraw(drawParameter.mode, drawParameter.offset, drawParameter.count, 0);
         }
 
-        this._update = false;
+        this.updated();
         return this;
     }
 

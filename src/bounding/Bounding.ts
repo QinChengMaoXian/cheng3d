@@ -6,14 +6,17 @@ import { SphereBounding } from './SphereBounding';
 
 import { Matrix4 } from '../math/Matrix4';
 
+export enum BoundingType {
+    TYPE_SPHERE = 0,
+    TYPE_AABB = 1,
+    TYPE_OBB = 2,
+}
+
 /**
  * 包围盒基类
  */
 export class Bounding {
-    static TYPE_SPHERE = 0;
-    static TYPE_AABB = 1;
-    static TYPE_OBB = 2;
-
+   
     constructor() {
         
     }

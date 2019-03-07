@@ -166,7 +166,7 @@ export class glProgram extends glObject {
             return null;
         }
 
-        this._update = false;
+        this.updated();
 
         return this;
     }

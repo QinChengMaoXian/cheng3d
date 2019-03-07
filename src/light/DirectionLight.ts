@@ -20,7 +20,6 @@ export class DirectionLight extends Light implements ILight {
 
     public setPosition(x, y, z) {
         super.setPosition(x, y, z);
-        // this._dir.set(x, y, z).normalize();
     }
 
     public setDir(x:number, y: number, z: number) {

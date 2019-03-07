@@ -118,12 +118,11 @@ export class ShadowMapPipeline {
         // camera.lookAt(boxCenter);
         // camera.enableOrthographicMode(-range, range, -range, range, near, far);
 
-
         // camera.resize(range * 2, range * 2);
         camera.setPositionAt(dirLight.getPosition());
         camera.lookAt(vec3.copy(dirLight.getPosition()).subAt(dir));
         camera.setUp(Vector3.ZUp);
-        camera.enableOrthographicMode(-range, range, -range, range, 1, far);
+        camera.enableOrthographicMode(-range, range, -range, range, near, far);
         camera.update(0);
 
         dirShadow.matrix.copy(camera.getViewProjectionMatrix());

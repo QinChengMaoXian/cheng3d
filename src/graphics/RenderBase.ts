@@ -1,8 +1,12 @@
 export class RenderBase {
-    protected _update: boolean = true;
+    private _update: boolean = true;
 
     public needsUpdate() {
         this._update = true;
+    }
+
+    public updated() {
+        this._update = false;
     }
 
     public getUpdate() {

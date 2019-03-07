@@ -1,6 +1,7 @@
 import { Vector3 } from "./Vector3";
 import { Matrix4 } from "./Matrix4";
 import { Sphere } from "./Sphere";
+import { Bounding } from "../bounding/Bounding";
 
 export class Box {
 
@@ -94,6 +95,29 @@ export class Box {
     public union(box: Box) {
         this.min.min(box.min);
         this.max.max(box.max);
+    }
+
+    public containBox(box: Box) {
+        return this.min.lequal(box.min) || this.max.gequal(box.max);
+    }
+
+    public containSphere(sphere: Sphere) {
+        let vec = Vector3.pubTemp;
+        let pos = sphere.pos;
+        let r = sphere.radius;
+        vec.copy(pos).sub(r, r, r);
+        if (!this.min.lequal(vec)) {
+            return false;
+        }
+        vec.copy(pos).add(r, r, r);
+        if (!this.max.gequal(vec)) {
+            return false;
+        }
+        return true;
+    }
+
+    public containBounding(bounding: Bounding) {
+        return false;
     }
 
     public setFromMatrix(mat: Matrix4) {

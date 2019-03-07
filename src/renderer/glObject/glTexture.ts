@@ -4,6 +4,11 @@ import { Texture } from '../../graphics/Texture';
 export class glTexture extends glObject {
     /** 纹理索引的cache */
     private static _texIdx: {[loc: number]: glTexture} = {};
+    public static clear() {
+        for(let key in glTexture._texIdx) {
+            glTexture._texIdx[key] = null;
+        }
+    }
 
     protected _minFilter: number;
     protected _magFilter: number;
@@ -25,11 +30,10 @@ export class glTexture extends glObject {
     }
 
     public apply(gl, index) {
-        // this._apply(gl, index);
-        // if (glTexture._texIdx[index] !== this) {
+        if (glTexture._texIdx[index] !== this) {
             this._apply(gl, index);
-            // glTexture._texIdx[index] = this
-        // }
+            glTexture._texIdx[index] = this
+        }
     }
 
     protected _apply(gl, index) {

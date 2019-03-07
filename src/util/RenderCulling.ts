@@ -4,7 +4,7 @@ import { Light } from "../light/Light";
 import { Box } from "../math/Box";
 import { Object3D } from "../object/Object3D";
 import { Matrix4 } from "../math/Matrix4";
-import { Bounding } from "../bounding/Bounding";
+import { BoundingType } from "../bounding/Bounding";
 import { AABB } from "../bounding/AABB";
 
 /**
@@ -20,14 +20,20 @@ export class RenderCulling {
     public noDeferOpacities: Mesh[] = new Array(8);
     public noDeferOpacitySize: number;
 
-    public alphaTests: Mesh[] = new Array(32);
+    public alphaTests: Mesh[] = new Array(16);
     public alphaTestSize: number = 0;
 
-    public alphaBlends: Mesh[] = new Array(32);
+    public noDeferAlphaTests: Mesh[] = new Array(4);
+    public noDeferAlphaTestSize: number = 0;
+
+    public alphaBlends: Mesh[] = new Array(16);
     public alphaBlendSize: number = 0;
 
-    public lights: Light[] = new Array(32);
+    public lights: Light[] = new Array(16);
     public lightSize: number = 0;
+
+    public shadowLights: Light[] = new Array(4);
+    public shadowLightSize: number = 0;
 
     public visibleBox: Box = new Box();
 
@@ -42,6 +48,7 @@ export class RenderCulling {
         this.opacitySize = 
         this.noDeferOpacitySize =
         this.alphaTestSize = 
+        this.noDeferAlphaTestSize = 
         this.alphaBlendSize = 
         this.lightSize = 0;
 
@@ -52,6 +59,7 @@ export class RenderCulling {
         this._clearTail(this.opacities, this.opacitySize);
         this._clearTail(this.noDeferOpacities, this.noDeferOpacitySize);
         this._clearTail(this.alphaTests, this.alphaTestSize);
+        this._clearTail(this.noDeferAlphaTests, this.noDeferAlphaTestSize);
         this._clearTail(this.alphaBlends, this.alphaBlendSize);
         this._clearTail(this.lights, this.lightSize);
     }
@@ -93,7 +101,7 @@ export class RenderCulling {
 
         if (bounding) {
             switch (bounding.getType()) {
-                case Bounding.TYPE_AABB:
+                case BoundingType.TYPE_AABB:
                     let box = (bounding as AABB).box;
                     if (box) {
                         if (!frustum.intersectBox(box)) {
@@ -111,7 +119,11 @@ export class RenderCulling {
         if (mat.alphaBlend) {
             this.alphaBlends[this.alphaBlendSize++] = mesh;
         } else if (mat.alphaTest) {
-            this.alphaTests[this.alphaTestSize++] = mesh;
+            if (isDefer && !mat.supportDeferred) {
+                this.noDeferAlphaTests[this.noDeferAlphaTestSize++] = mesh;
+            } else {
+                this.alphaTests[this.alphaTestSize++] = mesh;
+            }
         } else {
             if (isDefer && !mat.supportDeferred) {
                 this.noDeferOpacities[this.noDeferOpacitySize++] = mesh;
@@ -122,7 +134,11 @@ export class RenderCulling {
     }
 
     protected _cutLight(light: Light) {
-        this.lights[this.lightSize] = light;
-        this.lightSize++;
+        this.lights[this.lightSize++] = light;
+
+        if(light.shadow) {
+            this.shadowLights[this.shadowLightSize++] = light;
+        }
+
     }
 }

@@ -305,8 +305,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      */
     public initTexture(texture: Texture): glTexture {
         let _gl = this._gl;
-        let gltexture:any = texture.getRenderObjectRef(this);
+        let gltexture = <glTexture>texture.getRenderObjectRef(this);
         if (gltexture !== undefined && !gltexture.getUpdate()) {
+            gltexture.updated();
             return gltexture;
         }
 
@@ -406,6 +407,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             if (!tex) {
                 return;
             }
+            
             let glTex = this.initTexture(tex);
             if (!glTex) {
                 return;
@@ -635,6 +637,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             this._deltaTime = now - this._timeNow;
             this._timeNow = now;
             this._defCamera = camera;
+            glTexture.clear();
         }
 
         if (scene.isScene) {

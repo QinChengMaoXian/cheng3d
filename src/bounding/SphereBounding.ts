@@ -1,4 +1,4 @@
-import { Bounding } from './Bounding';
+import { Bounding, BoundingType } from './Bounding';
 import { AABB } from './AABB';
 import { OBB } from './OBB'
 import { Vector3 } from '../math/Vector3';
@@ -24,11 +24,11 @@ export class SphereBounding extends Bounding {
     public intersect(bounding: Bounding) {
         const type = bounding.getType();
         switch(type) {
-            case Bounding.TYPE_SPHERE:
+            case BoundingType.TYPE_SPHERE:
                 return Bounding.intersectSphere(<SphereBounding>bounding, this);
-            case Bounding.TYPE_AABB:
+            case BoundingType.TYPE_AABB:
                 return Bounding.intersectSphereToAABB(this, <AABB>bounding);
-            case Bounding.TYPE_OBB:
+            case BoundingType.TYPE_OBB:
                 return Bounding.intersectSphereToOBB(this, <OBB>bounding);
             default:
                 return false;
@@ -56,7 +56,7 @@ export class SphereBounding extends Bounding {
     }
 
     public getType() {
-        return Bounding.TYPE_SPHERE;
+        return BoundingType.TYPE_SPHERE;
     }
 
     public copy(sb: SphereBounding) {

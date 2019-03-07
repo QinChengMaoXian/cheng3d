@@ -10,6 +10,7 @@ export class DirectionShadow extends Shadow {
     protected _size: number = 512;
     public range: number = 200;
     public far: number = 2000;
+    public autoRange: boolean = false;
 
     constructor() {
         super();
@@ -40,6 +41,4 @@ export class DirectionShadow extends Shadow {
     public get size(): number {
         return this._size;
     }
-
-
 }

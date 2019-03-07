@@ -14,8 +14,6 @@ import { Camera } from '../../object/Camera';
 import { PointLight } from '../../light/PointLight';
 import { glProgram } from '../glObject/glProgram';
 
-
-
 export class DeferredPipeline {
 
     protected _renderer: IRenderer;
@@ -153,6 +151,7 @@ export class DeferredPipeline {
         }
 
         renderer.directRenderList(culling.noDeferOpacities, culling.noDeferOpacitySize);
+        renderer.directRenderList(culling.noDeferAlphaTests, culling.noDeferAlphaTestSize);
         renderer.directRenderList(culling.alphaBlends, culling.alphaBlendSize);
     }
 
