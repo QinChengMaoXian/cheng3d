@@ -13,7 +13,7 @@ import { DownSampleTo1Material } from "../../material/DownSampleTo1Material";
 import { BloomMaterial } from "../../material/BloomMaterial";
 import { ToneMappingMaterial } from "../../material/ToneMappingMaterial";
 import { LumSampleMaterial } from "../../material/LumSampleMaterial";
-import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { PostEffectsPipeline } from "../pipeline/PostEffectsPipeline";
 
 /**
  * 

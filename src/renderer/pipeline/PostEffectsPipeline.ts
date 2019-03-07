@@ -1,18 +1,18 @@
-import { IRenderer } from "./Renderer";
+import { IRenderer } from "../Renderer";
 
-import { FXAA } from './postEffect/FXAA';
-import { PEType, PEBase, PEOrder, PEReqType } from './postEffect/PEBase';
-import { HDR } from './postEffect/HDR';
-import { SSAO } from './postEffect/SSAO';
-import { Geometry } from "../graphics/Geometry";
-import { Object3D } from "../object/Object3D";
-import { Frame } from "../graphics/Frame";
+import { FXAA } from '../postEffect/FXAA';
+import { PEType, PEBase, PEOrder, PEReqType } from '../postEffect/PEBase';
+import { HDR } from '../postEffect/HDR';
+import { SSAO } from '../postEffect/SSAO';
+import { Geometry } from "../../graphics/Geometry";
+import { Object3D } from "../../object/Object3D";
+import { Frame } from "../../graphics/Frame";
 
-import * as CGE from '../graphics/RendererParameter';
-import { RTLocation } from "../graphics/GraphicsTypes";
-import { Texture2D } from "../graphics/Texture2D";
-import { Camera } from "../object/Camera";
-import { ShaderConst } from "../graphics/ShaderConst";
+import * as CGE from '../../graphics/RendererParameter';
+import { RTLocation } from "../../graphics/GraphicsTypes";
+import { Texture2D } from "../../graphics/Texture2D";
+import { Camera } from "../../object/Camera";
+import { ShaderConst } from "../../graphics/ShaderConst";
 
 /**
  * 后处理管线

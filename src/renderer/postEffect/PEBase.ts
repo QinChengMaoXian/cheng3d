@@ -1,4 +1,4 @@
-import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { PostEffectsPipeline } from "../pipeline/PostEffectsPipeline";
 import { IRenderer } from "../Renderer";
 
 export enum PEType {

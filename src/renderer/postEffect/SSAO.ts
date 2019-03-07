@@ -5,7 +5,7 @@ import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
 import { RTLocation } from "../../graphics/GraphicsTypes";
 import { SSAOMaterial } from "../../material/SSAOMaterial";
-import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { PostEffectsPipeline } from "../pipeline/PostEffectsPipeline";
 import { IRenderer } from "../Renderer";
 import * as CGE from '../../graphics/RendererParameter';
 import { Vector4 } from "../../math/Vector4";

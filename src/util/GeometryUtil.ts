@@ -8,6 +8,7 @@ export class ScreenGeometry extends Geometry {
 
     constructor() {
         super();
+        this.makeTri();
     }
 
     public makeTri() {

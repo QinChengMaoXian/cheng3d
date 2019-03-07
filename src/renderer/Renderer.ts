@@ -8,6 +8,8 @@ import { Base } from '../core/Base';
 import { PEType, PEBase } from './postEffect/PEBase'
 import { Logger } from '../core/Logger';
 import { RenderBase } from '../graphics/RenderBase';
+import { Material } from '../material/Material';
+import { FrameState } from '../graphics/FrameState';
 
 export class Renderer extends Base {
 
@@ -39,6 +41,12 @@ export class Renderer extends Base {
 export interface IRenderer {
 
     renderScene(scene: Object3D, camera: Camera, frame?: Frame);
+    directRenderList(meshes: Mesh[], size: number, material?: Material);
+    directRenderMesh(mesh: Mesh, material?: Material);
+    
+    useCamera(camera: Camera);
+    useFrame(frame: Frame, frameState?: FrameState);
+
     init(width: number, height: number);
     setSize(width: number, height: number);
     retainMesh(mesh: Mesh);
@@ -53,6 +61,8 @@ export interface IRenderer {
     getEnablingPostEffect(): PEType[];
 
     removeShader(obj: RenderBase);
+
+    getDefFrameState(): FrameState;
 
     // exchangeFrame();
     getGBufferFrame(): Frame;

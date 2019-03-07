@@ -5,7 +5,7 @@ import { Mesh } from "../../object/Mesh";
 import { Geometry } from "../../graphics/Geometry";
 import { RTLocation } from "../../graphics/GraphicsTypes";
 import { FXAAMaterial } from "../../material/FXAAMaterial";
-import { PostEffectsPipeline } from "../PostEffectsPipeline";
+import { PostEffectsPipeline } from "../pipeline/PostEffectsPipeline";
 import { IRenderer } from "../Renderer";
 
 export class FXAA extends PEBase {

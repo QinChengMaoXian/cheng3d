@@ -27,13 +27,10 @@ import { Material } from '../material/Material';
 import { glProgram } from './glObject/glProgram';
 import { Scene } from '../object/Scene';
 import { Event } from '../core/Event';
-import { PostEffectsPipeline } from './PostEffectsPipeline';
+import { PostEffectsPipeline } from './pipeline/PostEffectsPipeline';
 import { PEType, PEBase } from './postEffect/PEBase';
 import { WebGLSupports } from './WebGLSupports';
 import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
-import { Frustum } from '../math/Frustum';
-import { Bounding } from '../bounding/Bounding';
-import { AABB } from '../bounding/AABB';
 import { Light, LightType } from '../light/Light';
 import { PointLight } from '../light/PointLight';
 import { glTexture } from './glObject/glTexture';
@@ -41,133 +38,14 @@ import { WebGLStateCache } from './WebGLStateCache';
 import { RenderBase } from '../graphics/RenderBase';
 import { Matrix4 } from '../math/Matrix4';
 import { Box } from '../math/Box';
-import { DirectionLight } from '../light/DirectionLight';
-import { DirectionShadow } from '../light/DirectionShadow';
-import { Vector3 } from '../math/Vector3';
-import { DepthMaterial } from '../material/DepthMaterial';
 import { Shadow } from '../light/Shadow';
+import { RenderCulling } from '../util/RenderCulling';
+import { ShadowMapPipeline } from './pipeline/ShadowMapPipeline';
+import { DeferredPipeline } from './pipeline/DeferredPipeline';
+
 
 export interface RenderArgs{
     frustumCamera?: Camera;
-}
-
-/**
- * 渲染剔除
- */
-export class RenderCulling {
-
-    public frustum: Frustum = new Frustum();
-
-    public opacities: Mesh[] = new Array(64);
-    public opacitySize: number = 0;
-
-    public noDeferOpacities: Mesh[] = new Array(32);
-    public noDeferOpacitySize: number = 0;
-
-    public alphaTests: Mesh[] = new Array(32);
-    public alphaTestSize: number = 0;
-
-    public alphaBlends: Mesh[] = new Array(32);
-    public alphaBlendSize: number = 0;
-
-    public lights: Light[] = new Array(32);
-    public lightSize: number = 0;
-
-    public visibleBox: Box = new Box();
-
-    constructor() {
-        
-    }
-
-    public culling(scene: Object3D, mat4: Matrix4, isDefer: boolean, isShadow: boolean) {
-        this.frustum.setFromMatrix(mat4);
-
-        this.opacitySize = 
-        this.noDeferOpacitySize = 
-        this.alphaTestSize = 
-        this.alphaBlendSize = 
-        this.lightSize = 0;
-
-        this.visibleBox.reset();
-
-        this._cutObject3D(scene, scene.visible, isDefer, isShadow);
-
-        this._clearTail(this.opacities, this.opacitySize);
-        this._clearTail(this.noDeferOpacities, this.noDeferOpacitySize);
-        this._clearTail(this.alphaTests, this.alphaTestSize);
-        this._clearTail(this.alphaBlends, this.alphaBlendSize);
-        this._clearTail(this.lights, this.lightSize);
-    }
-
-    protected _clearTail(ar: any[], i: number) {
-        let l = ar.length;
-        for (i; i < l; i++) {
-            if (!ar[i]) {
-                return;
-            }
-            ar[i] = null;
-        }
-    }
-
-    protected _cutObject3D(obj: Object3D, isRendering: boolean, isDefer: boolean, isShadow: boolean) {
-        let display = obj.visible && isRendering;
-        if (obj.isMesh && display) {
-            this._cutMesh(<Mesh>obj, isDefer, isShadow);
-        } else if (obj.isLight) {
-            this._cutLight(<Light>obj);
-        }
-
-        let children = obj.getChildren();
-        let l = children.length;
-        for (let i = 0; i < l; i++) {
-            this._cutObject3D(children[i], display, isDefer, isShadow);
-        }
-    }
-
-    protected _cutMesh(mesh: Mesh, isDefer: boolean, isShadow: boolean) {
-        if (!mesh.beRendering() || isShadow && !mesh.caseShadow) {
-            return;
-        }
-
-        let visibleBox = this.visibleBox;
-        let frustum = this.frustum;
-        let bounding = mesh.getBounding();
-        let mat = (<Mesh>mesh).getMaterial();
-
-        if (bounding) {
-            switch (bounding.getType()) {
-                case Bounding.TYPE_AABB:
-                    let box = (bounding as AABB).box;
-                    if (box) {
-                        if (!frustum.intersectBox(box)) {
-                            return;
-                        }
-                        visibleBox.expandAtBox(box);
-                    }
-                    break;
-            
-                default:
-                    break;
-            }    
-        }
-        
-        if (mat.alphaBlend) {
-            this.alphaBlends[this.alphaBlendSize++] = mesh;
-        } else if (mat.alphaTest) {
-            this.alphaTests[this.alphaTestSize++] = mesh;
-        } else {
-            if (isDefer && !mat.supportDeferred) {
-                this.noDeferOpacities[this.noDeferOpacitySize++] = mesh;
-            } else {
-                this.opacities[this.opacitySize++] = mesh;
-            }
-        }
-    }
-
-    protected _cutLight(light: Light) {
-        this.lights[this.lightSize] = light;
-        this.lightSize++;
-    }
 }
 
 /**
@@ -181,8 +59,26 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     /** webgl 对象引用 */
     private _gl: WebGLRenderingContext;
 
+    /** WebGL状态缓存 */
+    private _stateCache: WebGLStateCache;
+
     /** 默认帧缓冲状态 */
     private _defFrameState = new FrameState();
+        
+    /** 着色器缓存 */
+    private _shaderCache = new ShaderCaches(this);
+
+    /** 后处理管线管理 */
+    private _postEffectPipeline: PostEffectsPipeline;
+
+    /** 阴影渲染管线 */
+    private _shadowMapPipeline: ShadowMapPipeline;
+
+    /** 延迟渲染管线 */
+    private _deferredPipeling: DeferredPipeline;
+
+    /** gl支持的扩展组 */
+    private _ext: WebGLSupports;
 
     /** 窗口宽度 */
     private _screenWidth: number = -1;
@@ -211,15 +107,13 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     /** 渲染到默认frame时传入的相机 */
     private _defCamera: Camera;
+    /** 当前应用的相机 */
+    private _curCamera: Camera;
 
     /** 当前的frame */
     private _curFrame: Frame;
-
     /** 默认的frame */
     private _defFrame: Frame;
-    
-    /** 着色器缓存 */
-    private _shaderCache = new ShaderCaches(this);
 
     /** 缓存帧组，用于需求上一帧结果时启用 */
     private _cacheFrames: Frame[];
@@ -231,50 +125,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     /** 间隔时间，只在渲染到默认帧缓冲时更新*/
     private _deltaTime: number;
 
-    /** 后处理管线管理 */
-    private _postEffectPipline: PostEffectsPipeline;
-
-    /** gl支持的扩展组 */
-    private _ext: WebGLSupports;
-
     /** 是否是延迟渲染 */
     private _deferredRendering: boolean = false;
 
-    /** gBuffer Frame */
-    private _gFrame: Frame;
-    
-    /** 延迟着色用的Mesh */
-    private _deferMesh: Mesh;
-
-    /** 延迟着色用的材质 */
-    private _deferMat: DeferredShadingMaterial
-
-    /** 不清理深度的帧缓冲状态对象 */
-    private _notClearDepthState: FrameState;
-
     /** 可见裁剪对象 */
     private _renderCulling: RenderCulling = new RenderCulling();
-
-    /** 阴影图可渲染裁剪 */
-    private _shadowCulling: RenderCulling = new RenderCulling();
-
-    /** 渲染阴影图用的帧缓冲对象 */
-    private _shadowFrame: Frame;
-
-    /** 渲染深度用的材质 */
-    private _depthMat: DepthMaterial; 
-
-    /** 深度用的相机 */
-    private _depthCamera: Camera;
-
-    /** 延迟着色用点光源模型 */
-    private _pointLightMesh: Mesh;
-
-    /** 延迟着色用点光源材质 */
-    private _pointLightMat: DeferredShadingMaterial;
-
-    /** WebGL状态缓存 */
-    private _stateCache: WebGLStateCache;
 
     constructor() {
         super();
@@ -299,8 +154,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         this._initDefMesh();
 
-        this._postEffectPipline = new PostEffectsPipeline(this);
-        this._postEffectPipline.init(this._defGeo);
+        this._postEffectPipeline = new PostEffectsPipeline(this);
+        this._postEffectPipeline.init(this._defGeo);
 
         this.setSize(width, height);
 
@@ -314,36 +169,36 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * 设置渲染器大小，
      * 注意，这个会更改掉canvas大小
      */
-    public setSize(width: number, height: number) {
+    public setSize(w: number, h: number) {
         const _canvas = this._canvas;
 
-        _canvas.width = width;
-        _canvas.height = height;
+        _canvas.width = w;
+        _canvas.height = h;
 
-        this._screenWidth = width;
-        this._screenHeight = height;
+        this._screenWidth = w;
+        this._screenHeight = h;
 
-        this._defFrameState.setViewports(0, 0, width, height);
+        this._defFrameState.setViewports(0, 0, w, h);
         this._defFrameState.setClearStencil(true);
 
         this._cacheFrames.forEach(frame => {
-            frame.setSize(width, height);
+            frame.setSize(w, h);
             this.initFrame(frame);
         })
 
-        this._defFrame.setSize(width, height);
+        this._defFrame.setSize(w, h);
 
-        this._postEffectPipline.resize(width, height);
+        this._postEffectPipeline.resize(w, h);
 
-        if (this._gFrame) {
-            this._gFrame.setSize(width, height);
+        if (this._deferredPipeling) {
+            this._deferredPipeling.setSize(w, h);
         }
 
-        if (this._notClearDepthState) {
-            this._notClearDepthState.setViewports(0, 0, width, height);
+        if (this._shadowMapPipeline) {
+            this._shadowMapPipeline.setSize(w, h)
         }
 
-        this.event(Event.RENDERER_RESIZE, [width, height]);
+        this.event(Event.RENDERER_RESIZE, [w, h]);
     };
 
     /**
@@ -352,7 +207,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     private _initDefMesh() {
         let mesh = new Mesh();
         let geo = new ScreenGeometry();
-        geo.makeTri();
         this._defGeo = geo;
 
         let mat = new FullScreenMaterial();
@@ -571,9 +425,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         if (mat) {
             this._shaderCache.releaseMaterial(mat);
         }
-
-        mesh.setGeometry(null);
-        mesh.setMaterial(null);
     }
 
     /**
@@ -608,8 +459,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             stateCache.setClearStencil(gl, frameState.clearStencil);
         }
 
-        gl.clear(clearBit);
-
+        if (clearBit !== 0) {
+            gl.clear(clearBit);
+        }
     }
 
     /**
@@ -647,7 +499,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param mesh Mesh对象
      * @param camera 相机对象
      */
-    protected _renderMesh(mesh: Mesh, camera?: Camera, forceMaterial?: Material, shadow?: Shadow) {
+    protected _renderMesh(mesh: Mesh, forceMaterial?: Material, shadow?: Shadow) {
         let gl = this._gl;
 
         let mat = forceMaterial || mesh.getMaterial();
@@ -671,7 +523,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         glprog.apply(gl);
         glgeo.bindVbo(gl, glprog, geo);
-        glprog.applyUniforms(gl, mesh, camera);
+        glprog.applyUniforms(gl, mesh, this._curCamera);
         glgeo.draw(gl);
     }
 
@@ -698,11 +550,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * 将相机对象数据存入矩阵
      * @param camera 
      */
-    protected _useCamera(camera: Camera) {
+    public useCamera(camera: Camera) {
         if (camera) {
             glProgram.vMatrix.copy(camera.getMatrix());
             glProgram.pMatrix.copy(camera.getProjectionMatrix());
             glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
+            this._curCamera = camera;
         }
     }
 
@@ -726,104 +579,46 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param light 
      */
     protected _renderShadow(scene: Object3D, light: Light, visibleBox: Box, srcCamera: Camera) {
-        let shadowCulling = this._shadowCulling;
+        let shadowPipe = this._shadowMapPipeline;
 
-        let shadowFrame = this._shadowFrame;
-        if (!shadowFrame) {
-            shadowFrame = new Frame();
-            shadowFrame.enableDepthStencil();
-            shadowFrame.getState().clearColor.set(1, 1, 1, 1);
-            this._shadowFrame = shadowFrame;
-        }
-        let depthMat = this._depthMat;
-        if (!depthMat) {
-            depthMat = new DepthMaterial;
-            // depthMat.enablePolygonOffset = true;
-            // depthMat.polygonOffset[0] = 1.0;
-            // depthMat.polygonOffset[1] = 1.0;
-            this.initMaterial(depthMat);
-            this._depthMat = depthMat;
+        if (!shadowPipe) {
+            shadowPipe = new ShadowMapPipeline(this);
+            this._shadowMapPipeline = shadowPipe;
         }
 
-        let camera = this._depthCamera;
-        if (!camera) {
-            camera = new Camera();
-            this._depthCamera = camera;
-        }
-
-        if (light.type === LightType.Direction) {
-            let dirLight = <DirectionLight>light;
-            let dirShadow = dirLight.shadow;
-            let dir = dirLight.dir;
-
-            let vmin = visibleBox.min;
-            let vmax = visibleBox.max;
-
-            let boxCenter = Vector3.pool.create();
-            let vec3 = Vector3.pubTemp;
-            
-            boxCenter.copy(vmax).subAt(vmin).mul(0.5).addAt(vmin);
-            let mat4 = Matrix4.pubTemp;
-            vec3.copy(boxCenter).addAt(dir);
-            
-            mat4.lookAt(boxCenter, dir, Vector3.ZUp);
-
-            let box = Box.pubTemp;
-            box.reset();
-
-            for (let i = 0; i < 2; i++) {
-                for (let j = 0; j < 2; j++) {
-                    for (let k = 0; k < 2; k++) {
-                        vec3.set(i ? vmin.x: vmax.x, j ? vmin.y: vmax.y, k ? vmin.z: vmax.z);
-                        vec3.applyMatrix4(mat4);
-                        box.expandAtPoint(vec3);
-                    }
-                }
-            }
-
-            let min = box.min;
-            let max = box.max;
-
-            let x = max.x - min.x;
-            let y = max.y - min.y;
-            let z = max.z + 1;
-
-            let range = dirShadow.range; //Math.ceil((x > y ? x : y) / 2);
-            // dirShadow.range =range
-            let far = dirShadow.far;//max.z - min.z + 1;
-            let near = 1;
-
-            // vec3.copy(boxCenter).add(dir.x * z, dir.y * z, dir.z * z);
-            // camera.setPositionAt(vec3);
-            // camera.lookAt(boxCenter);
-            // camera.enableOrthographicMode(-range, range, -range, range, near, far);
-
-            
-            // camera.resize(range * 2, range * 2);
-            camera.setPositionAt(dirLight.getPosition());
-            camera.lookAt(vec3.copy(dirLight.getPosition()).subAt(dir));
-            camera.setUp(Vector3.ZUp);
-            camera.enableOrthographicMode(-range, range, -range, range, 1, far);
-            camera.update(0);
-
-            dirShadow.matrix.copy(camera.getViewProjectionMatrix());
-
-            this._useCamera(camera);
-
-            shadowCulling.culling(scene, camera.getViewProjectionMatrix(), false, true);
-
-            shadowFrame.setSize(dirShadow.size, dirShadow.size);
-            shadowFrame.setTexture2D(RTLocation.COLOR, dirShadow.depthTex);
-
-            this.useFrame(shadowFrame);
-            this._renderList(shadowCulling.opacities, shadowCulling.opacitySize, camera, depthMat);
-        }
+        shadowPipe.renderShadow(scene, light, visibleBox, srcCamera);
     }
 
-    protected _renderList(renderList: Mesh[], length: number, camera: Camera, forceMat?: Material, shadow?: Shadow) {
+    /**
+     * 直接渲染一组Mesh，到当前的Frame
+     * @param meshes 
+     * @param size 
+     * @param material 
+     */
+    public directRenderList(meshes: Mesh[], size: number, material?: Material) {
+        this._renderList(meshes, size, material);
+    }
+
+    /**
+     * 直接渲染一个Mesh，到当前的Frame
+     * @param meshes 
+     * @param size 
+     * @param material 
+     */
+    public directRenderMesh(mesh: Mesh, material?: Material) {
+        this._renderMesh(mesh, material, null);
+    }
+
+    /**
+     * 渲染一组mesh
+     * @param renderList 
+     * @param length 
+     * @param forceMat 
+     * @param shadow 
+     */
+    protected _renderList(renderList: Mesh[], length: number, forceMat?: Material, shadow?: Shadow) {
         for (let i = 0; i < length; i++) {
-            let mesh = renderList[i];
-            this._renderMesh(mesh, camera, forceMat, shadow);
+            this._renderMesh(renderList[i], forceMat, shadow);
         }
     }
 
@@ -850,7 +645,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         let renderCulling = this._renderCulling;
 
-        this._useCamera(camera);
+        this.useCamera(camera);
 
         let mat4: Matrix4;
 
@@ -863,49 +658,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         if (!frame) {
             if (this._deferredRendering) {
                 // 延迟渲染流程走这里，注意，没有优化光源。
-                let gFrame = this._gFrame;
-
                 renderCulling.culling(scene, mat4, true, false);
-
-                this.useFrame(gFrame);
-
-                this._renderList(renderCulling.opacities, renderCulling.opacitySize, camera);
-                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, camera);
-
-                this._deferMat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
-
-                let targetFrame = this._defFrame;
-                
-                let depthTex = targetFrame.getDepthStencilTexture();
-                targetFrame.setDepthStencil(gFrame.getDepthStencilTexture());
-                gFrame.setDepthStencil(depthTex);
-
-                this.useFrame(targetFrame, this._notClearDepthState);
-
-                this._renderMesh(this._deferMesh, this._defCamera);
-
-                let mesh = this._pointLightMesh;
-                let mat = this._pointLightMat;
-
-                mat.setPixelSize(1.0 / this._screenWidth, 1.0 / this._screenHeight);
-                let l = renderCulling.lightSize;
-                let lightsList = renderCulling.lights;
-
-                for (let i = 0; i < l; i++) {
-                    let pl = lightsList[i] as PointLight;
-                    let r = pl.radius;
-                    mat.setLightPos(pl.getPosition());  
-                    mesh.setScale(r, r, r);
-                    mesh.setPositionAt(pl.getPosition());
-                    glProgram.lightColor.copy(pl.color);
-                    this._renderMesh(mesh, this._defCamera);
-                }
-                
-                this._renderList(renderCulling.noDeferOpacities, renderCulling.noDeferOpacitySize, camera);
-                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, camera);
+                this._deferredPipeling.render(renderCulling, camera, this._defFrame);
             } else {
                 // 正常渲染走这条，注意，没有优化光源
                 renderCulling.culling(scene, mat4, false, false);
+
                 let shadow: Shadow;
                 if (scene.isScene) {
                     let light = (<Scene>scene).getMainLight();
@@ -915,20 +673,20 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     }
                 }
 
-                this._useCamera(this._defCamera);
+                this.useCamera(this._defCamera);
                 this.useFrame(this._defFrame, this._defFrameState);
 
-                this._renderList(renderCulling.opacities, renderCulling.opacitySize, camera, null, shadow);
-                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, camera, null, shadow);
-                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, camera, null, shadow);
+                this._renderList(renderCulling.opacities, renderCulling.opacitySize, null, shadow);
+                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadow);
+                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadow);
             }
 
-            this._useCamera(this._defCamera);
+            this.useCamera(this._defCamera);
             
             let targetFrame: Frame;
-            if (this._postEffectPipline.length > 0) {
+            if (this._postEffectPipeline.length > 0) {
                 this.renderPostEffects();
-                targetFrame = this._postEffectPipline.currentFrame;
+                targetFrame = this._postEffectPipeline.currentFrame;
             } else {
                 targetFrame = this._defFrame;
             }
@@ -939,11 +697,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             this.exchangeFrame();
         } else {
             this.useFrame(frame);
-
+            this.useCamera(camera);
             renderCulling.culling(scene, mat4, true, false);
-            this._renderList(renderCulling.opacities, renderCulling.opacitySize, camera);
-            this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, camera);
-            this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, camera);
+            this._renderList(renderCulling.opacities, renderCulling.opacitySize);
+            this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize);
+            this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize);
         }
     }
 
@@ -951,7 +709,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * 后处理效果渲染
      */
     protected renderPostEffects() {
-        this._postEffectPipline.render(this._defFrame, this._deferredRendering);
+        this._postEffectPipeline.render(this._defFrame, this._deferredRendering);
     }
 
     /**
@@ -1028,7 +786,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * 根据后处理管线需求与延迟渲染，更新默认帧缓冲的结构。
      */
     public updateDefFrame() {
-        let srcReqs = this._postEffectPipline.getSrcReqs();
+        let srcReqs = this._postEffectPipeline.getSrcReqs();
     }
 
     /**
@@ -1036,7 +794,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param pe 
      */
     public disablePostEffect(pe: PEType | PEBase) {
-        this._postEffectPipline.disablePostEffect(pe);
+        this._postEffectPipeline.disablePostEffect(pe);
         this.updateDefFrame();
     }
 
@@ -1045,7 +803,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param pe 
      */
     public enablePostEffect(pe: PEType | PEBase) {
-        this._postEffectPipline.enablePostEffect(pe);
+        this._postEffectPipeline.enablePostEffect(pe);
         this.updateDefFrame();
     }
 
@@ -1053,14 +811,14 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * 获取当前启用的后处理类型组
      */
     public getEnablingPostEffect(): PEType[] {
-        return this._postEffectPipline.getEnablingPostEffect();
+        return this._postEffectPipeline.getEnablingPostEffect();
     }
 
     /**
      * 获取GBuffer的Frame
      */
     public getGBufferFrame(): Frame {
-        return this._deferredRendering ? this._gFrame : null;
+        return this._deferredRendering ? this._deferredPipeling.gFrame : null;
     }
 
     /**
@@ -1073,68 +831,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         if (v) {
-            if (!this._gFrame) {
-                let frame = new Frame;
-                frame.setSize(this._screenWidth, this._screenHeight);
-                frame.addTexture(RTLocation.RT0, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
-                frame.addTexture(RTLocation.RT1, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
-                frame.addTexture(RTLocation.RT2, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
-                frame.enableDepthStencil();
-                frame.getState().setClearColor(true, Vector4.Zero);
-                this._gFrame = frame;
-            }
-
-            if (!this._deferMesh) {
-                let frame = this._gFrame;
-                let mat = new DeferredShadingMaterial();
-                let tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT0).tex)
-                mat.setDiffuseMap(tex);
-                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT1).tex)
-                mat.setNormalMap(tex);
-                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT2).tex)
-                mat.setDepthMap(tex);
-                mat.enableStencil = true;
-                mat.setStencilFunc(CGE.EQUAL, 0x80, 0x80);
-                mat.setStencilOp(CGE.KEEP, CGE.KEEP, CGE.KEEP);
-                mat.enableDepth = false;
-                this._deferMat = mat;
-
-                let mesh = new Mesh();
-                mesh.setGeometry(this._defGeo);
-                mesh.setMaterial(mat);
-                this._deferMesh = mesh;
-
-                mat = new DeferredShadingMaterial();
-                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT0).tex)
-                mat.setDiffuseMap(tex);
-                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT1).tex)
-                mat.setNormalMap(tex);
-                tex = <Texture2D>(frame.getTextureFromType(RTLocation.RT2).tex)
-                mat.setDepthMap(tex);
-                mat.useForPointLight();
-                mat.enableStencil = true;
-                mat.setStencil(this._deferMat.stencil);
-                mat.enableAlphaBlend();
-                mat.setBlendFunc(CGE.ONE, CGE.ONE, CGE.ONE, CGE.ONE);
-                mat.setBlendEquation(CGE.FUNC_ADD, CGE.FUNC_ADD);
-                mat.enableDepth = false;
-                mat.setFlipFace(true);
-                this._pointLightMat = mat;
-
-                let geo = new SphereGeometry(1, 32, 32);
-                mesh = new Mesh();
-                mesh.setGeometry(geo);
-                mesh.setMaterial(mat);
-                this._pointLightMesh = mesh;
-            }
-
-            if (!this._notClearDepthState) {
-                let state = new FrameState();
-                state.setClearDepth(false);
-                state.setClearColor(true, this._defFrameState.clearColor);
-                state.setClearStencil(false, this._defFrameState.clearStencil);
-                state.setViewportAt(this._defFrameState.viewport);
-                this._notClearDepthState = state;
+            if (!this._deferredPipeling) {
+                this._deferredPipeling = new DeferredPipeline(this);
             }
         }
 
@@ -1169,5 +867,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
     public removeShader(obj: RenderBase) {
         let glProg = <glProgram>obj;
         this._shaderCache.removeShader(glProg);
+    }
+
+    public getDefFrameState(): FrameState {
+        return this._defFrameState;
     }
 }
