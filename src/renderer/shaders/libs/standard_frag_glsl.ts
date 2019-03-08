@@ -22,7 +22,7 @@ uniform samplerCube u_prefilterMap;
 #endif
 
 #ifdef SHADOW_MAP
-    varying vec3 v_depth;
+    varying vec3 v_depth3;
     uniform sampler2D u_depthMap;
 #endif
 
@@ -30,19 +30,34 @@ uniform samplerCube u_prefilterMap;
     uniform sampler2D u_ODMap;
 #endif
 
-uniform vec3 u_specular;
-uniform vec3 u_cameraPos;
-uniform vec4 u_baseColor;
-uniform vec3 u_lightDir;
-uniform vec4 u_lightColor;
+#ifdef DIRECTION_LIGHT
+    uniform vec3 u_directionDirs[DIRECTION_LIGHT];
+    uniform vec4 u_directionColors[DIRECTION_LIGHT];
+#endif
 
+#ifdef POINT_LIGHT
+    uniform vec3 u_pointPos[POINT_LIGHT];
+    uniform vec4 u_pointColors[POINT_LIGHT];
+#endif
+
+#ifdef SPOT_LIGHT
+    uniform vec3 u_spotPos[SPOT_LIGHT];
+    uniform vec4 u_spotDirs[SPOT_LIGHT];
+    uniform vec4 u_spotColors[SPOT_LIGHT];
+#endif
 
 const float PI = 3.14159265359;
-
+const float inv_PI = 1.0 / PI;
 float dot_plus(vec3 v1, vec3 v2)
 {
     return max(dot(v1, v2), 0.0);
 }
+
+uniform vec3 u_specular;
+uniform vec3 u_cameraPos;
+uniform vec4 u_baseColor;
+
+uniform vec3 u_lightDir;
 
 #include <distributionGGX>
 #include <geometrySmith>
@@ -51,6 +66,31 @@ float dot_plus(vec3 v1, vec3 v2)
 
 #include <decodeRGB2Float>
 
+vec3 directionLight(float NdotV, float roughness, float metallic, vec3 albedo, vec3 F0, vec3 N, vec3 V, vec3 dir, vec4 color) {
+    vec3 L = dir;
+    vec3 H = normalize(V + L);
+
+    float NdotL = dot_plus(N, L); 
+    float NdotH = dot_plus(N, H); 
+    float HdotV = dot_plus(H, V);
+
+    float G = geometrySmith(NdotV, NdotL, roughness);
+    float D = distributionGGX(NdotH, roughness);
+    vec3 F = fresnelSchlick(HdotV, F0);
+
+    vec3 nominator = D * G * F;//分子
+    float denominator = 4.0 * NdotV * NdotL + 0.0001;//分母 
+    vec3 brdf = nominator / denominator;
+
+    vec3 kD = vec3(1.0) - F;
+    kD *= 1.0 - metallic;
+
+    return (kD * (albedo) * inv_PI + brdf) * color.xyz * NdotL;
+}
+
+float shadow() {
+    return 0.0;
+}
 
 void main()
 {
@@ -83,32 +123,40 @@ void main()
         vec3 N = normalize(v_normal);
     #endif
 
-    
-    vec3 L = normalize(u_lightDir.xyz);
     vec3 V = normalize(u_cameraPos - v_worldPos);
-    vec3 H = normalize(V + L);
 
-    vec3 R = N * dot_plus(N, V) * 2.0 - V; 
-    R = vec3(R.x, R.z, -R.y);
-
-    float G = geometrySmith(N, V, L, roughness);
-    float D = distributionGGX(N, H, roughness);
-    vec3 F = fresnelSchlick(dot_plus(H, L), F0);
-
-    vec3 nominator = D * G * F;//分子
-
-    float denominator = 4.0 * max(dot(V, N), 0.0) * max(dot(L, N), 0.0) + 0.0001;//分母 
-    vec3 brdf = nominator / denominator;
-
-    float NdotL = dot_plus(N, L); 
     float NdotV = dot_plus(N, V); 
 
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metallic;
+    vec3 L = normalize(u_lightDir.xyz);
 
-    // 直接光照结果
-    vec3 lo = (kD * (albedo) / PI + brdf) * u_lightColor.xyz * NdotL;
+    vec3 lo = vec3(0.0);
+
+    #ifdef DIRECTION_LIGHT
+        for (int i = 0; i < DIRECTION_LIGHT; i++) {
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionDirs[i], u_directionColors[i]);
+        }
+    #endif
+
+    #ifdef POINT_LIGHT
+        for (int i = 0; i < POINT_LIGHT; i++) {
+            vec3 pos = u_pointPos[i];
+            vec4 color = u_pointColors[i];
+            vec3 d3 = pos - v_worldPos;
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(d3), color) / dot(d3, d3);
+        }
+    #endif
+
+    #ifdef SPOT_LIGHT
+        for (int i = 0; i < SPOT_LIGHT; i++) {
+            vec3 pos = u_spotPos[i];
+            vec4 color = u_spotColors[i];
+            vec4 dir = u_spotDirs[i];
+            vec3 d3 = pos - v_worldPos;
+            vec3 d3_norm = normalize(d3);
+            float ag = step(dir.w, dot(dir.xyz, d3_norm));
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, d3_norm, color) / dot(d3, d3) * ag;
+        }
+    #endif
 
     // 环境光部分
     vec3 coordN = vec3(N.x, N.z, -N.y);
@@ -117,6 +165,9 @@ void main()
     vec3 F_s = fresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kD_a = vec3(1.0) - F_s;
     kD_a *= 1.0 - metallic;
+
+    vec3 R = N * dot_plus(N, V) * 2.0 - V; 
+    R = vec3(R.x, R.z, -R.y);
 
     vec2 envBRDF  = texture2D(u_brdfLUTMap, vec2(NdotV, roughness)).rg;
     vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb;  
@@ -138,11 +189,11 @@ void main()
         uvoffset[6] = vec2(-fenmu, fenmu);
         uvoffset[7] = vec2(fenmu, -fenmu);
         uvoffset[8] = vec2(-fenmu, -fenmu);
-        float depth = v_depth.z;
+        float depth = v_depth3.z;
         float bias = max(0.05 * (1.0 - dot(N, L)), 0.005);
         float shadow = 0.0;
         for (int i = 0; i < 9; i++) {
-            vec2 s_uv = v_depth.xy + uvoffset[i];
+            vec2 s_uv = v_depth3.xy + uvoffset[i];
             if (any(lessThan(s_uv, vec2(0.0))) || any(greaterThan(s_uv, vec2(1.0)))) {
                 shadow += 1.0;
             } else {
@@ -150,7 +201,7 @@ void main()
                 shadow += (depth - bias > depth2 ? 0.5 : 1.0);
             }
         }
-        // float depth2 = decodeRGB2Float(texture2D(u_depthMap, v_depth.xy).rgb) + bias;
+        // float depth2 = decodeRGB2Float(texture2D(u_depthMap, v_depth3.xy).rgb) + bias;
         // float shadow = (depth > depth2 ? 0.5 : 1.0);
         color *= depth > 1.0 ? 1.0 : (shadow / 9.0);
     #endif

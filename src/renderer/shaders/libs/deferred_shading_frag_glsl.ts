@@ -88,12 +88,14 @@ void main()
     vec3 N = normalize(normal);
     vec3 H = normalize(V + L);
 
-    float G = geometrySmith(N, V, L, roughness);
-    float D = distributionGGX(N, H, roughness);
-    vec3 F = fresnelSchlick(dot_plus(H, L), F0);
-
     float NdotL = dot_plus(N, L); 
-    float NdotV = dot_plus(N, V); 
+    float NdotH = dot_plus(N, H); 
+    float HdotV = dot_plus(H, V);
+    float NdotV = dot_plus(N, V);
+
+    float G = geometrySmith(NdotV, NdotL, roughness);
+    float D = distributionGGX(NdotH, roughness);
+    vec3 F = fresnelSchlick(HdotV, F0);
 
     vec3 nominator = D * G * F;//分子
     float denominator = 4.0 * NdotV * NdotL + 0.0001;//分母 

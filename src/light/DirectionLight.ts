@@ -3,7 +3,6 @@ import { Vector3 } from "../math/Vector3";
 import { DirectionShadow } from "./DirectionShadow";
 
 export class DirectionLight extends Light implements ILight {
-    protected static readonly DefDir = new Vector3(0, 0, 1);
 
     protected _dir: Vector3 = new Vector3().normalize();
 
@@ -28,7 +27,7 @@ export class DirectionLight extends Light implements ILight {
     }
 
     public setDirection(dir: Vector3) {
-        this._rotate.rotationTo(DirectionLight.DefDir, dir);
+        this._rotate.rotationTo(Light.DefDir, dir);
 
         this._dir.set(0, 0, 1);
         this._dir.applyQuaternion(this._rotate).normalize();

@@ -19,6 +19,8 @@ export interface ILight {
 
 export class Light extends Object3D {
 
+    protected static readonly DefDir = new Vector3(0, 0, 1);
+
     static readonly LumFactor = new Vector4(0.27, 0.67, 0.06, 0.0);
 
     protected _color: Vector4 = new Vector4(1.0, 1.0, 1.0, 1.0);

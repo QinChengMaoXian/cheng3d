@@ -335,6 +335,46 @@ export class Material extends Base {
         this._removeMacro('SHADOW_MAP');
     }
 
+    public setPointLights(num: number, pos: any, colors: any) {
+        if (num <= 0) {
+            this._removeMacro('POINT_LIGHT');
+            this.removeProperty('u_pointPos');
+            this.removeProperty('u_pointColors');
+            return;
+        }
+
+        this._addMacro('POINT_LIGHT', num);
+        this.setProperty('u_pointPos', pos);
+        this.setProperty('u_pointColors', colors);
+    }
+
+    public setDirLights(num: number, dir: any, colors: any) {
+        if (num <= 0) {
+            this._removeMacro('DIRECTION_LIGHT');
+            this.removeProperty('u_directionDirs');
+            this.removeProperty('u_directionColors');
+            return;
+        }
+
+        this._addMacro('DIRECTION_LIGHT', num);
+        this.setProperty('u_directionDirs', dir);
+        this.setProperty('u_directionColors', colors);
+    }
+
+    public setSpotLights(num: number, pos: any, dir: any, colors: any) {
+        if (num <= 0) {
+            this._removeMacro('SPOT_LIGHT');
+            this.removeProperty('u_spotPos');
+            this.removeProperty('u_spotDirs');
+            this.removeProperty('u_spotColors');
+            return;
+        }
+        this._addMacro('SPOT_LIGHT', num);
+        this.setProperty('u_spotPos', pos);
+        this.setProperty('u_spotDirs', dir);
+        this.setProperty('u_spotColors', colors);
+    }
+
     public get supportDeferred(): boolean {
         return false;
     }

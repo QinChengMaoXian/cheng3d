@@ -1,9 +1,8 @@
 export const distributionGGX = `
 // 法线分布统计
-float distributionGGX(vec3 N, vec3 H, float roughness)
+float distributionGGX(float NdotH, float roughness)
 {
     float a2     = roughness * roughness;
-    float NdotH  = max(dot(N, H), 0.0);
     float NdotH2 = NdotH * NdotH;
 
     float nom    = a2;
@@ -24,11 +23,8 @@ float geometrySchlickGGX(float NdotV, float k)
 }
 
 // Schlick几何方程
-float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) 
+float geometrySmith(float NdotV, float NdotL, float roughness) 
 {
-    float NdotV = max(dot(N, V), 0.00001);
-    float NdotL = max(dot(N, L), 0.00001);
-
     float r = (roughness + 1.0);
     float k = (r * r) / 8.0;
 
@@ -41,17 +37,17 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
 export const fresnelSchlick = `
 //Schlick菲涅尔方程
-vec3 fresnelSchlick(float NdotL, vec3 F0)
+vec3 fresnelSchlick(float HdotV, vec3 F0)
 {
-    return F0 + (vec3(1.0) - F0) * pow((1.0 - NdotL), 5.0);
+    return F0 + (vec3(1.0) - F0) * pow((1.0 - HdotV), 5.0);
 }
 `;
 
 export const fresnelSchlickRoughness = `
 //Schlick菲涅尔方程，带粗糙度
-vec3 fresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
+vec3 fresnelSchlickRoughness(float HdotV, vec3 F0, float roughness)
 {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - NdotL), 5.0);
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - HdotV), 5.0);
 }
 `;
 

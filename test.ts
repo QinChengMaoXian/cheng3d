@@ -204,6 +204,8 @@ cubeTexture.setTexture2ds(
 cubeTexture.setMipmap(true);
 cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
+cubeTexture = CGE.TextureCube.Black;
+
 let lutTexture = CGE.Texture2D.BrdfLUT;
 
 let diffTex = new CGE.Texture2D;
@@ -247,15 +249,17 @@ for (let ix = 0; ix <= 7; ix++) {
         let mesh = new CGE.Mesh();
         mesh.setGeometry(geo);
 
-        let mat = new CGE.ReferMaterial(standMat);
+        let mat = new CGE.StandardMaterial();
 
         let r = ix === 0 ? 0.1 : ix;
         let m = iz === 0 ? 0.01 : iz;
-        
-        mat.overrideTexture(CGE.ShaderConst.diffuseMap, CGE.Texture2D.White);
-        mat.overrideTexture(CGE.ShaderConst.normalMap, CGE.Texture2D.Normal);
-        mat.overrideTexture(CGE.ShaderConst.roughnessMap, CGE.Texture2D.White);
-        mat.overrideProperty(CGE.ShaderConst.specular, new CGE.Vector3(r * 0.125, 1.0 - m * 0.125, 1));
+        mat.setIrradianceMap(cubeTexture);
+        mat.setPrefilterMap(cubeTexture);
+        mat.enableStencil = true;
+        mat.setStencilFunc(CGE.ALWAYS, 0x80, 0x80);
+        mat.setStencilOp(CGE.KEEP, CGE.KEEP, CGE.REPLACE);
+
+        mat.setSpecular(r * 0.125, 1.0 - m * 0.125, 1);
         
         mesh.setMaterial(mat);
         mesh.setPosition(ix * 25, 0, iz * 25);
@@ -315,10 +319,21 @@ mainScene.addChild(skyboxMesh);
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 光源测试
 
-for(let i = 0; i < 20; i++) {
+for(let i = 0; i < 0; i++) {
     let p = new CGE.PointLight();
-    p.setColor(Math.random() * 100, Math.random() * 100, Math.random() * 100);
+    p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+    mainScene.addChild(p);
+}
+
+for(let i = 0; i < 16; i++) {
+    let p = new CGE.SpotLight();
+    p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
+    p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+    let vec = CGE.Vector3.pubTemp;
+    vec.set(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, -Math.random()).normalize();
+    p.setDir(vec.x, vec.y, vec.z);
+    p.angle = (Math.random() + 0.0001) * Math.PI * 0.25;
     mainScene.addChild(p);
 }
 
@@ -420,6 +435,8 @@ planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
 let planeMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+planeMat.setIrradianceMap(cubeTexture);
+planeMat.setPrefilterMap(cubeTexture);
 planeMat.setUVOffset(20, 20, 0, 0); 
 planeMat.enableStencil = true;
 planeMat.setStencil(standMat.stencil);
@@ -457,6 +474,8 @@ teapotGeometry.setDrawParameter(teapotIndices.length);
 
 standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 standMat.enableAlphaTest();
+standMat.setIrradianceMap(cubeTexture);
+standMat.setPrefilterMap(cubeTexture);
 // standMat.enableAlphaBlend();
 standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
 // standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
@@ -473,6 +492,8 @@ mainScene.addChild(teapotMesh);
 
 standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 standMat.enableAlphaBlend();
+standMat.setIrradianceMap(cubeTexture);
+standMat.setPrefilterMap(cubeTexture);
 standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
 standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
 standMat.depthMask = false;

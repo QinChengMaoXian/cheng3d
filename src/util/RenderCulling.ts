@@ -50,7 +50,8 @@ export class RenderCulling {
         this.alphaTestSize = 
         this.noDeferAlphaTestSize = 
         this.alphaBlendSize = 
-        this.lightSize = 0;
+        this.lightSize = 
+        this.shadowLightSize = 0;
 
         this.visibleBox.reset();
 
@@ -62,6 +63,7 @@ export class RenderCulling {
         this._clearTail(this.noDeferAlphaTests, this.noDeferAlphaTestSize);
         this._clearTail(this.alphaBlends, this.alphaBlendSize);
         this._clearTail(this.lights, this.lightSize);
+        this._clearTail(this.shadowLights, this.shadowLightSize);
     }
 
     protected _clearTail(ar: any[], i: number) {
@@ -110,6 +112,7 @@ export class RenderCulling {
                         visibleBox.expandAtBox(box);
                     }
                     break;
+                
             
                 default:
                     break;

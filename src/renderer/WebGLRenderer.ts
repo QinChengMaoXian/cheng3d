@@ -42,11 +42,23 @@ import { Shadow } from '../light/Shadow';
 import { RenderCulling } from '../util/RenderCulling';
 import { ShadowMapPipeline } from './pipeline/ShadowMapPipeline';
 import { DeferredPipeline } from './pipeline/DeferredPipeline';
+import { DirectionLight } from '../light/DirectionLight';
+import { SpotLight } from '../light/SpotLight';
 
 
 export interface RenderArgs{
     frustumCamera?: Camera;
 }
+
+const lights = {
+    dirD: { data: new Float32Array(3) },
+    dirC: { data: new Float32Array(3) },
+    pointP: { data: new Float32Array(3) },
+    pointC: { data: new Float32Array(3) },
+    spotP: { data: new Float32Array(3) },
+    spotD: { data: new Float32Array(3) },
+    spotC: { data: new Float32Array(3) },
+} 
 
 /**
  * webgl 1.0 渲染器；
@@ -501,15 +513,26 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param mesh Mesh对象
      * @param camera 相机对象
      */
-    protected _renderMesh(mesh: Mesh, forceMaterial?: Material, shadow?: Shadow) {
+    protected _renderMesh(mesh: Mesh, forceMaterial?: Material, shadows?: Shadow[], light?: any) {
         let gl = this._gl;
 
         let mat = forceMaterial || mesh.getMaterial();
 
-        if (shadow && mesh.receiveShadow) {
-            mat.setDepthMap(shadow.depthTex);
-            mat.setDepthMatData(shadow.matrix);
-            mat.enableShadow();
+        if (shadows && mesh.receiveShadow) {
+            shadows.forEach(shadow => {
+                mat.setDepthMap(shadow.depthTex);
+                mat.setDepthMatData(shadow.matrix);
+                mat.enableShadow();
+            })
+        }
+
+        if (light) {
+            let dirNum = lights.dirC.data.length / 4;
+            let pointNum = lights.pointC.data.length / 4;
+            let spotNum = light.spotC.data.length / 4;
+            mat.setPointLights(pointNum, lights.pointP, lights.pointC);
+            mat.setDirLights(dirNum, lights.dirD, lights.dirC);
+            mat.setSpotLights(spotNum, lights.spotP, lights.spotD, lights.spotC);
         }
 
         if (!this.retainMesh(mesh, forceMaterial)) {
@@ -618,9 +641,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param forceMat 
      * @param shadow 
      */
-    protected _renderList(renderList: Mesh[], length: number, forceMat?: Material, shadow?: Shadow) {
+    protected _renderList(renderList: Mesh[], length: number, forceMat?: Material, shadows?: Shadow[], lights?: any) {
         for (let i = 0; i < length; i++) {
-            this._renderMesh(renderList[i], forceMat, shadow);
+            this._renderMesh(renderList[i], forceMat, shadows, lights);
         }
     }
 
@@ -667,21 +690,93 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 // 正常渲染走这条，注意，没有优化光源
                 renderCulling.culling(scene, mat4, false, false);
 
-                let shadow: Shadow;
-                if (scene.isScene) {
-                    let light = (<Scene>scene).getMainLight();
-                    if (light.shadow) {
-                        this._renderShadow(scene, light, renderCulling.visibleBox, camera);
-                        shadow = light.shadow;
+                let shadows = [];
+                for (let i = 0; i < renderCulling.shadowLightSize; i++) {
+                    let light = renderCulling.shadowLights[i];
+                    this._renderShadow(scene, light, renderCulling.visibleBox, camera);
+                    shadows.push(light.shadow);
+                }
+
+
+                let pointLights = [];
+                let dirLights = [];
+                let spotLights = [];
+
+                let renderLights = renderCulling.lights;
+                for (let i = 0; i < renderCulling.lightSize; i++) {
+                    if (renderLights[i].type === LightType.Point) {
+                        pointLights.push(renderLights[i]);
+                    } else if (renderLights[i].type === LightType.Direction) {
+                        dirLights.push(renderLights[i]);
+                    } else if (renderLights[i].type === LightType.Spot) {
+                        spotLights.push(renderLights[i]);
                     }
                 }
+
+                lights.dirC.data = new Float32Array(4 * dirLights.length);
+                lights.dirD.data = new Float32Array(3 * dirLights.length);
+                lights.pointC.data = new Float32Array(4 * pointLights.length);
+                lights.pointP.data = new Float32Array(3 * pointLights.length);
+                lights.spotC.data = new Float32Array(4 * spotLights.length);
+                lights.spotD.data = new Float32Array(4 * spotLights.length);
+                lights.spotP.data = new Float32Array(3 * spotLights.length);
+
+                pointLights.forEach((p, idx) => {
+                    let pl = <PointLight>p;
+                    let pos = pl.getPosition();
+                    let color = pl.color;
+                    for (let i = 0; i < 4; i++) {
+                        lights.pointC.data[idx * 4 + i] = color.v[i];
+                    }
+                    for (let i = 0; i < 3; i++) {
+                        lights.pointP.data[idx * 3 + i] = pos.v[i];
+                    }
+                })
+
+                dirLights.forEach((d, idx) => {
+                    let dl = <DirectionLight>d;
+                    let dir = dl.dir;
+                    let color = dl.color;
+                    for (let i = 0; i < 4; i++) {
+                        lights.dirC.data[idx * 4 + i] = color.v[i];
+                    }
+                    for (let i = 0; i < 3; i++) {
+                        lights.dirD.data[idx * 3 + i] = dir.v[i];
+                    }
+                })
+
+                spotLights.forEach((s, idx) => {
+                    let sl = <SpotLight>s;
+                    let dir = sl.dir;
+                    let color = sl.color;
+                    let pos = sl.getPosition();
+                    for (let i = 0; i < 4; i++) {
+                        lights.spotC.data[idx * 4 + i] = color.v[i];
+                    }
+                    for (let i = 0; i < 3; i++) {
+                        lights.spotD.data[idx * 4 + i] = dir.v[i];
+                    }
+                    lights.spotD.data[idx * 4 + 3] = Math.cos(sl.angle);
+                    for (let i = 0; i < 3; i++) {
+                        lights.spotP.data[idx * 3 + i] = pos.v[i];
+                    }
+                })
+
+                // let shadow: Shadow;
+                // if (scene.isScene) {
+                //     let light = (<Scene>scene).getMainLight();
+                //     if (light.shadow) {
+                //         this._renderShadow(scene, light, renderCulling.visibleBox, camera);
+                //         shadow = light.shadow;
+                //     }
+                // }
 
                 this.useCamera(this._defCamera);
                 this.useFrame(this._defFrame, this._defFrameState);
 
-                this._renderList(renderCulling.opacities, renderCulling.opacitySize, null, shadow);
-                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadow);
-                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadow);
+                this._renderList(renderCulling.opacities, renderCulling.opacitySize, null, shadows, lights);
+                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadows, lights);
+                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadows, lights);
             }
 
             this.useCamera(this._defCamera);
