@@ -56,6 +56,10 @@ export class Light extends Object3D {
         return Vector3.One;
     }
 
+    public get pos() {
+        return this._position;
+    }
+
     public get isLight() {
         return true;
     }

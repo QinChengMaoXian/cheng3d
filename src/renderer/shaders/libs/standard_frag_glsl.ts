@@ -190,7 +190,7 @@ void main()
         uvoffset[7] = vec2(fenmu, -fenmu);
         uvoffset[8] = vec2(-fenmu, -fenmu);
         float depth = v_depth3.z;
-        float bias = max(0.05 * (1.0 - dot(N, L)), 0.005);
+        float bias = max(0.005 * (1.0 - dot(N, L)), 0.0005);
         float shadow = 0.0;
         for (int i = 0; i < 9; i++) {
             vec2 s_uv = v_depth3.xy + uvoffset[i];

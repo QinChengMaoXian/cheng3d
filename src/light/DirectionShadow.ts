@@ -18,7 +18,7 @@ export class DirectionShadow extends Shadow {
         this.matrix = new Matrix4();
     }
 
-    public init(size: number = 512) {
+    public init(size: number = 1024) {
         this._size = size;
         let tex = this._depthTex;
         if (!tex) {

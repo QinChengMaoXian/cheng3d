@@ -13,7 +13,7 @@ export class DirectionLight extends Light implements ILight {
 
         this.setPosition(150, 200, 200);
 
-        let vec = Vector3.pubTemp.set(1, 1, 0.5).normalize();
+        let vec = Vector3.pubTemp.set(1, 1, 1.5).normalize();
         this.setDirection(vec);
     }
 

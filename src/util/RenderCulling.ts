@@ -67,13 +67,7 @@ export class RenderCulling {
     }
 
     protected _clearTail(ar: any[], i: number) {
-        let l = ar.length;
-        for (i; i < l; i++) {
-            if (!ar[i]) {
-                return;
-            }
-            ar[i] = null;
-        }
+        ar.fill(null, i);
     }
 
     protected _cutObject3D(obj: Object3D, isRendering: boolean, isDefer: boolean, isShadow: boolean) {
@@ -92,7 +86,7 @@ export class RenderCulling {
     }
 
     protected _cutMesh(mesh: Mesh, isDefer: boolean, isShadow: boolean) {
-        if (!mesh.beRendering() || isShadow && !mesh.caseShadow) {
+        if (!mesh.beRendering() || (isShadow && !mesh.castShadow)) {
             return;
         }
 

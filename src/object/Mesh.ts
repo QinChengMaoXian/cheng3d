@@ -6,7 +6,7 @@ export class Mesh extends Object3D {
     protected _geometry: Geometry;
     protected _material: Material;
 
-    public caseShadow: boolean = true;
+    public castShadow: boolean = true;
     public receiveShadow: boolean = true;
 
     constructor() {

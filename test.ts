@@ -204,7 +204,7 @@ cubeTexture.setTexture2ds(
 cubeTexture.setMipmap(true);
 cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
-cubeTexture = CGE.TextureCube.Black;
+// cubeTexture = CGE.TextureCube.Black;
 
 let lutTexture = CGE.Texture2D.BrdfLUT;
 
@@ -300,9 +300,9 @@ mainScene.addChild(skyboxMesh);
 // boxes.name = '更大一堆球';
 // mainScene.addChild(boxes);
 
-// for (let i = 0; i < 10; i++) {
-//     for (let j = 0; j < 10; j++) {
-//         for (let k = 0; k < 10; k++) {
+// for (let i = 0; i < 20; i++) {
+//     for (let j = 0; j < 20; j++) {
+//         for (let k = 0; k < 20; k++) {
 //             let skyboxMesh = new CGE.Mesh();
 
 //             skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);
@@ -319,23 +319,23 @@ mainScene.addChild(skyboxMesh);
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 光源测试
 
-for(let i = 0; i < 0; i++) {
+for(let i = 0; i < 4; i++) {
     let p = new CGE.PointLight();
     p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
     mainScene.addChild(p);
 }
 
-for(let i = 0; i < 16; i++) {
-    let p = new CGE.SpotLight();
-    p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
-    p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
-    let vec = CGE.Vector3.pubTemp;
-    vec.set(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, -Math.random()).normalize();
-    p.setDir(vec.x, vec.y, vec.z);
-    p.angle = (Math.random() + 0.0001) * Math.PI * 0.25;
-    mainScene.addChild(p);
-}
+// for(let i = 0; i < 4; i++) {
+//     let p = new CGE.SpotLight();
+//     p.setColor(Math.random() * 200 + 200, Math.random() * 200 + 200, Math.random() * 200 + 200);
+//     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+//     let vec = CGE.Vector3.pubTemp;
+//     vec.set(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, -Math.random()).normalize();
+//     p.setDir(vec.x, vec.y, vec.z);
+//     p.angle = (Math.random() + 0.0001) * Math.PI * 0.49;
+//     mainScene.addChild(p);
+// }
 
 // 以上 光源测试
 ///////////////////////////////////////////////////////////////////////////////////////

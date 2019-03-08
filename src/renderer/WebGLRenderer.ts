@@ -50,15 +50,82 @@ export interface RenderArgs{
     frustumCamera?: Camera;
 }
 
-const lights = {
-    dirD: { data: new Float32Array(3) },
-    dirC: { data: new Float32Array(3) },
-    pointP: { data: new Float32Array(3) },
-    pointC: { data: new Float32Array(3) },
-    spotP: { data: new Float32Array(3) },
-    spotD: { data: new Float32Array(3) },
-    spotC: { data: new Float32Array(3) },
-} 
+export class LightDatasCache {
+
+    protected _dirs: Map<number, {dir: {data: Float32Array}, colors: {data: Float32Array}}> = new Map();
+    protected _points: Map<number, {pos: {data: Float32Array}, colors: {data: Float32Array}}> = new Map();
+    protected _spots: Map<number, {pos: {data: Float32Array}, dir: {data: Float32Array}, colors: {data: Float32Array}}> = new Map();
+
+    public getDir(num: number) {
+        let obj = this._dirs.get(num);
+        if (obj) {
+            return obj;
+        }
+
+        obj = {
+            dir: {
+                data: new Float32Array(num * 3)
+            },
+            colors: {
+                data: new Float32Array(num * 4)
+            }
+        }
+        this._dirs.set(num, obj);
+
+        return obj;
+    }
+
+    public getPoint(num: number) {
+        let obj = this._points.get(num);
+        if (obj) {
+            return obj;
+        }
+
+        obj = {
+            pos: {
+                data: new Float32Array(num * 3)
+            },
+            colors: {
+                data: new Float32Array(num * 4)
+            }
+        }
+        this._points.set(num, obj);
+
+        return obj;
+    }
+
+    public getSpot(num: number) {
+        let obj = this._spots.get(num);
+        if (obj) {
+            return obj;
+        }
+
+        obj = {
+            pos: {
+                data: new Float32Array(num * 3)
+            },
+            dir: {
+                data: new Float32Array(num * 4)
+            },
+            colors: {
+                data: new Float32Array(num * 4)
+            }
+        }
+        this._spots.set(num, obj);
+
+        return obj;
+    }
+}
+
+// const lights = {
+//     dirD: { data: new Float32Array(3) },
+//     dirC: { data: new Float32Array(3) },
+//     pointP: { data: new Float32Array(3) },
+//     pointC: { data: new Float32Array(3) },
+//     spotP: { data: new Float32Array(3) },
+//     spotD: { data: new Float32Array(3) },
+//     spotC: { data: new Float32Array(3) },
+// } 
 
 /**
  * webgl 1.0 渲染器；
@@ -142,6 +209,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
     /** 可见裁剪对象 */
     private _renderCulling: RenderCulling = new RenderCulling();
+
+    /** 临时的灯光属性缓存 */
+    private _lightDatasCache: LightDatasCache = new LightDatasCache();
 
     constructor() {
         super();
@@ -513,7 +583,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      * @param mesh Mesh对象
      * @param camera 相机对象
      */
-    protected _renderMesh(mesh: Mesh, forceMaterial?: Material, shadows?: Shadow[], light?: any) {
+    protected _renderMesh(mesh: Mesh, forceMaterial?: Material, shadows?: Shadow[], light?: {d: number, p: number, s: number}) {
         let gl = this._gl;
 
         let mat = forceMaterial || mesh.getMaterial();
@@ -524,15 +594,19 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 mat.setDepthMatData(shadow.matrix);
                 mat.enableShadow();
             })
+        } else {
+            mat.disableShadow();
         }
 
         if (light) {
-            let dirNum = lights.dirC.data.length / 4;
-            let pointNum = lights.pointC.data.length / 4;
-            let spotNum = light.spotC.data.length / 4;
-            mat.setPointLights(pointNum, lights.pointP, lights.pointC);
-            mat.setDirLights(dirNum, lights.dirD, lights.dirC);
-            mat.setSpotLights(spotNum, lights.spotP, lights.spotD, lights.spotC);
+            let dData = this._lightDatasCache.getDir(light.d);
+            mat.setDirLights(light.d, dData.dir, dData.colors);
+
+            let pData = this._lightDatasCache.getPoint(light.p);
+            mat.setPointLights(light.p, pData.pos, pData.colors);
+
+            let sData = this._lightDatasCache.getSpot(light.s);
+            mat.setSpotLights(light.s, sData.pos, sData.dir, sData.colors);
         }
 
         if (!this.retainMesh(mesh, forceMaterial)) {
@@ -697,7 +771,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     shadows.push(light.shadow);
                 }
 
-
                 let pointLights = [];
                 let dirLights = [];
                 let spotLights = [];
@@ -713,54 +786,44 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     }
                 }
 
-                lights.dirC.data = new Float32Array(4 * dirLights.length);
-                lights.dirD.data = new Float32Array(3 * dirLights.length);
-                lights.pointC.data = new Float32Array(4 * pointLights.length);
-                lights.pointP.data = new Float32Array(3 * pointLights.length);
-                lights.spotC.data = new Float32Array(4 * spotLights.length);
-                lights.spotD.data = new Float32Array(4 * spotLights.length);
-                lights.spotP.data = new Float32Array(3 * spotLights.length);
+                let dirDatas = this._lightDatasCache.getDir(dirLights.length);
+                let pointDatas = this._lightDatasCache.getPoint(pointLights.length);
+                let spotDatas = this._lightDatasCache.getSpot(spotLights.length);
 
-                pointLights.forEach((p, idx) => {
-                    let pl = <PointLight>p;
-                    let pos = pl.getPosition();
-                    let color = pl.color;
-                    for (let i = 0; i < 4; i++) {
-                        lights.pointC.data[idx * 4 + i] = color.v[i];
-                    }
-                    for (let i = 0; i < 3; i++) {
-                        lights.pointP.data[idx * 3 + i] = pos.v[i];
-                    }
-                })
+                // lights.dirC.data = new Float32Array(4 * dirLights.length);
+                // lights.dirD.data = new Float32Array(3 * dirLights.length);
+                // lights.pointC.data = new Float32Array(4 * pointLights.length);
+                // lights.pointP.data = new Float32Array(3 * pointLights.length);
+                // lights.spotC.data = new Float32Array(4 * spotLights.length);
+                // lights.spotD.data = new Float32Array(4 * spotLights.length);
+                // lights.spotP.data = new Float32Array(3 * spotLights.length);
+                let pData: Float32Array
+                let dData: Float32Array = dirDatas.dir.data;
+                let cData: Float32Array = dirDatas.colors.data;
+                
+                dirLights.forEach((d: DirectionLight, idx) => {
+                    dData.set(d.dir.v, idx * 3);
+                    cData.set(d.color.v, idx * 4);
+                });
 
-                dirLights.forEach((d, idx) => {
-                    let dl = <DirectionLight>d;
-                    let dir = dl.dir;
-                    let color = dl.color;
-                    for (let i = 0; i < 4; i++) {
-                        lights.dirC.data[idx * 4 + i] = color.v[i];
-                    }
-                    for (let i = 0; i < 3; i++) {
-                        lights.dirD.data[idx * 3 + i] = dir.v[i];
-                    }
-                })
+                pData = pointDatas.pos.data;
+                cData = pointDatas.colors.data;
 
-                spotLights.forEach((s, idx) => {
-                    let sl = <SpotLight>s;
-                    let dir = sl.dir;
-                    let color = sl.color;
-                    let pos = sl.getPosition();
-                    for (let i = 0; i < 4; i++) {
-                        lights.spotC.data[idx * 4 + i] = color.v[i];
-                    }
-                    for (let i = 0; i < 3; i++) {
-                        lights.spotD.data[idx * 4 + i] = dir.v[i];
-                    }
-                    lights.spotD.data[idx * 4 + 3] = Math.cos(sl.angle);
-                    for (let i = 0; i < 3; i++) {
-                        lights.spotP.data[idx * 3 + i] = pos.v[i];
-                    }
-                })
+                pointLights.forEach((p: PointLight, idx) => {
+                    pData.set(p.pos.v, idx * 3);
+                    cData.set(p.color.v, idx * 4);
+                });
+
+                pData = spotDatas.pos.data;
+                dData = spotDatas.dir.data;
+                cData = spotDatas.colors.data;
+
+                spotLights.forEach((s: SpotLight, idx) => {
+                    pData.set(s.pos.v, idx * 3);
+                    dData.set(s.dir.v, idx * 4);
+                    dData[idx * 4 + 3] = Math.cos(s.angle);
+                    cData.set(s.color.v, idx * 4);
+                });
 
                 // let shadow: Shadow;
                 // if (scene.isScene) {
@@ -774,9 +837,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 this.useCamera(this._defCamera);
                 this.useFrame(this._defFrame, this._defFrameState);
 
-                this._renderList(renderCulling.opacities, renderCulling.opacitySize, null, shadows, lights);
-                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadows, lights);
-                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadows, lights);
+                let lightNum = {d: dirLights.length, p: pointLights.length, s: spotLights.length};
+
+                this._renderList(renderCulling.opacities, renderCulling.opacitySize, null, shadows, lightNum);
+                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadows, lightNum);
+                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadows, lightNum);
             }
 
             this.useCamera(this._defCamera);
