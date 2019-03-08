@@ -179,7 +179,7 @@ export class glProgram extends glObject {
     }
 
     public setUniformData(gl: WebGLRenderingContext, type: number, location: WebGLUniformLocation, data: any) {
-        // TODO: 写的是个毛; 但是没办法
+        // TODO: 这一段写的是个毛线啊。
         switch(type) {
             case FLOAT:
                 gl.uniform1f(location, data);
@@ -249,7 +249,7 @@ export class glProgram extends glObject {
             let location = uniformObject.location;
             let type = uniformObject.type;
             let data: Matrix4 | Vector3 | Vector4; //matrix = glMesh._matrix;
-            // TODO: maybe need re-build? but looks good for use;
+            // TODO: 这一段写的都是点啥= =
             switch (uniformType) {
                 case ShaderConst.mMat:              data = worldMatrix; break;
                 case ShaderConst.mITMat:            data = tempMatrix.copy(worldMatrix).invertTranspose(); break;

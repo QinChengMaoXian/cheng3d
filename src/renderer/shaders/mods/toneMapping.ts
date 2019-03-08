@@ -1,4 +1,4 @@
-export default `
+export const ACESToneMapping = `
 // 美国电影艺术与科学学会的tone mapping (一堆magic number用来拟合曲线);
 vec3 ACESToneMapping(vec3 color, float avgLum, float adapted_lum)
 {

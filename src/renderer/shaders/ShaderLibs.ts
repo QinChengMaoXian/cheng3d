@@ -1,20 +1,22 @@
 import * as encode from './mods/encode';
 import * as decode from './mods/decode';
-import skinVert from './mods/skinVert';
-import ACESToneMapping from './mods/ACESToneMapping';
+import * as tone from './mods/toneMapping';
+import * as shadow from './mods/shadow';
+import * as brdf from './mods/brdf';
 
-export const mods = {
-    'skinVert': skinVert,
-    'ACESToneMapping': ACESToneMapping,
+export const mods = {};
+
+function addToModes(obj: Object) {
+    for (let key in obj) {
+        mods[key] = obj[key];
+    }   
 }
 
-for (let key in encode) {
-    mods[key] = encode[key];
-}
-
-for (let key in decode) {
-    mods[key] = decode[key];
-}
+addToModes(encode);
+addToModes(decode);
+addToModes(shadow);
+addToModes(brdf);
+addToModes(tone);
 
 const reg = /#include\s*<([a-zA-Z0-9_./]+)>/;
 

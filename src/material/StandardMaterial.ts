@@ -24,7 +24,7 @@ export class StandardMaterial extends Material {
         super();
 
         this.setTexture(s.diffuseMap, diffuse);
-        this.setTexture(s.normalMap, normal);
+        this.setNormalMap(normal);
         this.setTexture(s.roughnessMap, roughness);
         this.setTexture(s.metallicMap, metallic);
         this.setTexture(s.aoMap, ao);
@@ -44,6 +44,11 @@ export class StandardMaterial extends Material {
     }
 
     public setNormalMap(texture: Texture2D) {
+        if (texture && texture !== Texture2D.Normal) {
+            this._addMacro('NORMAL_MAP');
+        } else {
+            this._removeMacro('NORMAL_MAP');
+        }
         this.setTexture(s.normalMap, texture);
     }
 

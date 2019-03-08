@@ -137,5 +137,7 @@ export class ShadowMapPipeline {
         renderer.useFrame(frame);
 
         this._renderer.directRenderList(culling.opacities, culling.opacitySize, material);
+
+        Vector3.pool.recovery(boxCenter);
     }
 }

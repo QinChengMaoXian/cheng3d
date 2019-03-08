@@ -10,7 +10,6 @@ varying vec3 v_viewPos;
 varying vec3 v_normal;
 varying vec3 v_tangent;
 varying vec3 v_binormal;
-varying float v_depth;
 
 uniform vec4 u_uvOffset;
 
@@ -19,6 +18,13 @@ uniform mat4 u_mvMat;
 uniform mat4 u_mITMat;
 uniform mat4 u_mvpMat;
 uniform vec4 u_cameraRange;
+
+#ifdef SHADOW_MAP
+    uniform mat4 u_depthMat;
+    varying vec3 v_depth;  
+#else
+    varying float v_depth;
+#endif
 
 void main()
 {
@@ -34,7 +40,13 @@ void main()
     v_viewPos = (u_mvMat * a_position).xyz;
 
     vec4 pos = u_mvpMat * a_position;
-    v_depth = pos.w * u_cameraRange.y;
+    #ifdef SHADOW_MAP
+        vec4 depthVec = u_depthMat * vec4(v_worldPos, 1.0);
+        v_depth = depthVec.xyz * 0.5 + 0.5;
+    #else
+        v_depth = pos.w * u_cameraRange.y;
+    #endif
+
     gl_Position = pos;
 }
 `;

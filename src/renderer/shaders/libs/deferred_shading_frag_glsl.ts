@@ -37,54 +37,10 @@ float dot_plus(vec3 v1, vec3 v2)
     return max(dot(v1, v2), 0.0);
 }
 
-// 法线分布统计
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a2     = roughness * roughness;
-    float NdotH  = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH * NdotH;
-
-    float nom    = a2;
-    float denom  = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom        = PI * denom * denom;
-
-    return nom / denom;
-}
-
-float GeometrySchlickGGX(float NdotV, float k)
-{
-    float nom   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-
-// Schlick几何方程
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) 
-{
-    float NdotV = max(dot(N, V), 0.00001);
-    float NdotL = max(dot(N, L), 0.00001);
-
-    float r = (roughness + 1.0);
-    float k = (r * r) / 8.0;
-
-    float ggx2  = GeometrySchlickGGX(NdotV, k);
-    float ggx1  = GeometrySchlickGGX(NdotL, k);
-
-    return ggx1 * ggx2;
-}
-
-//Schlick菲涅尔方程
-vec3 FresnelSchlick(float NdotL, vec3 F0)
-{
-    return F0 + (vec3(1.0) - F0) * pow((1.0 - NdotL), 5.0);
-}  
-
-//Schlick菲涅尔方程，带粗糙度
-vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - NdotL), 5.0);
-}
+#include <distributionGGX>
+#include <geometrySmith>
+#include <fresnelSchlick>
+#include <fresnelSchlickRoughness>
 
 #include <decodeRGB2Float>
 
@@ -111,12 +67,7 @@ void main()
     float depth = decodeRGB2Float(rt2.xyz);
 
     vec3 viewPos = getViewPos(uv * 2.0 - 1.0, depth, u_cameraRange);
-    // vec3 viewPos = rt2.xyz;// getViewPos(uv * 2.0 - 1.0, depth, u_cameraRange);
-
     vec3 worldPos = (u_vIMat * vec4(viewPos, 1.0)).xyz;
-    // worldPos.xyz /= worldPos.w;
-
-    // vec4 worldPos = vec4(rt2.xyz, 1.0);
 
     float roughness = rt0.w;
     float metallic = rt1.w;
@@ -128,27 +79,23 @@ void main()
     vec3 L;
 
     #ifdef POINT_LIGHT
-        // vec3 lightPos = (u_vMat * vec4(u_lightPos, 1.0)).xyz;
         L = normalize(u_lightPos - worldPos.xyz);
     #else
         L = u_lightDir.xyz;
     #endif
 
-    // vec3 cameraPos = (u_vMat * vec4(u_cameraPos, 1.0)).xyz;
-
     vec3 V = normalize(u_cameraPos - worldPos.xyz);
     vec3 N = normalize(normal);
     vec3 H = normalize(V + L);
 
-    float G = GeometrySmith(N, V, L, roughness);
-    float D = DistributionGGX(N, H, roughness);
-    vec3 F = FresnelSchlick(dot_plus(H, L), F0);
-
-    vec3 nominator = D * G * F;//分子
+    float G = geometrySmith(N, V, L, roughness);
+    float D = distributionGGX(N, H, roughness);
+    vec3 F = fresnelSchlick(dot_plus(H, L), F0);
 
     float NdotL = dot_plus(N, L); 
     float NdotV = dot_plus(N, V); 
 
+    vec3 nominator = D * G * F;//分子
     float denominator = 4.0 * NdotV * NdotL + 0.0001;//分母 
     vec3 brdf = nominator / denominator;
 
@@ -162,7 +109,7 @@ void main()
     #ifdef POINT_LIGHT
         vec3 d3 = u_lightPos - worldPos.xyz;
         lo *= 1.0 / dot(d3, d3);
-        gl_FragColor = vec4(vec3(lo), 1.0);
+        gl_FragColor = vec4(lo, 1.0);
     #else
         vec3 R = N * dot_plus(N, V) * 2.0 - V; 
         R = vec3(R.x, R.z, -R.y);
@@ -170,7 +117,7 @@ void main()
         vec3 coordN = vec3(N.x, N.z, -N.y);
         vec3 irradiance = textureCube(u_irradianceMap, coordN).xyz;
         vec3 diffuse = irradiance * albedo;
-        vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
+        vec3 F_s = fresnelSchlickRoughness(NdotV, F0, roughness);
         vec3 kD_a = vec3(1.0) - F_s;
         kD_a *= 1.0 - metallic;
 

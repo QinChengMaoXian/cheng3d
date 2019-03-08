@@ -5,22 +5,25 @@ precision mediump float;
 
 varying vec2 v_uv;
 varying vec3 v_normal;
-varying vec3 v_tangent;
-varying vec3 v_binormal;
 varying vec3 v_worldPos;
 
 uniform sampler2D u_diffuseMap;
-uniform sampler2D u_normalMap;
+
 uniform sampler2D u_roughnessMap;
 uniform sampler2D u_brdfLUTMap;
-
 
 uniform samplerCube u_irradianceMap;
 uniform samplerCube u_prefilterMap;
 
+#ifdef NORMAL_MAP
+    varying vec3 v_tangent;
+    varying vec3 v_binormal;
+    uniform sampler2D u_normalMap;
+#endif
+
 #ifdef SHADOW_MAP
+    varying vec3 v_depth;
     uniform sampler2D u_depthMap;
-    uniform mat4 u_depthMat;
 #endif
 
 #ifdef ALPHA_TEST
@@ -41,67 +44,13 @@ float dot_plus(vec3 v1, vec3 v2)
     return max(dot(v1, v2), 0.0);
 }
 
-// 法线分布统计
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a2     = roughness * roughness;
-    float NdotH  = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH * NdotH;
-
-    float nom    = a2;
-    float denom  = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom        = PI * denom * denom;
-
-    return nom / denom;
-}
-
-float GeometrySchlickGGX(float NdotV, float k)
-{
-    float nom   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-
-// Schlick几何方程
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) 
-{
-    float NdotV = max(dot(N, V), 0.00001);
-    float NdotL = max(dot(N, L), 0.00001);
-
-    float r = (roughness + 1.0);
-    float k = (r * r) / 8.0;
-
-    float ggx2  = GeometrySchlickGGX(NdotV, k);
-    float ggx1  = GeometrySchlickGGX(NdotL, k);
-
-    return ggx1 * ggx2;
-}
-
-//Schlick菲涅尔方程
-vec3 FresnelSchlick(float NdotL, vec3 F0)
-{
-    return F0 + (vec3(1.0) - F0) * pow((1.0 - NdotL), 5.0);
-}  
-
-//Schlick菲涅尔方程，带粗糙度
-vec3 FresnelSchlickRoughness(float NdotL, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow((1.0 - NdotL), 5.0);
-}  
-
-// 用于pbr环境光
-float FastDFG(float roughness, float NoV, float NoL)
-{
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float G_V = NoV + sqrt( (NoV - NoV * a2) * NoV + a2 );
-    float G_L = NoL + sqrt( (NoL - NoL * a2) * NoL + a2 );
-    return 1.0 / ( G_V * G_L );
-}
+#include <distributionGGX>
+#include <geometrySmith>
+#include <fresnelSchlick>
+#include <fresnelSchlickRoughness>
 
 #include <decodeRGB2Float>
-// vec3 brdf = FastDFG(roughness, NdotV, NdotL) * metalic;
+
 
 void main()
 {
@@ -127,8 +76,14 @@ void main()
     
     F0 = F0 * (1.0 - metallic) + albedo * metallic;
 
-    vec3 normal = texture2D(u_normalMap, v_uv).xyz * 2.0 - 1.0;
-    vec3 N = normalize(normal.x * v_tangent + normal.y * v_binormal + normal.z * v_normal);
+    #ifdef NORMAL_MAP
+        vec3 normal = texture2D(u_normalMap, v_uv).xyz * 2.0 - 1.0;
+        vec3 N = normalize(normal.x * v_tangent + normal.y * v_binormal + normal.z * v_normal);
+    #else
+        vec3 N = normalize(v_normal);
+    #endif
+
+    
     vec3 L = normalize(u_lightDir.xyz);
     vec3 V = normalize(u_cameraPos - v_worldPos);
     vec3 H = normalize(V + L);
@@ -136,9 +91,9 @@ void main()
     vec3 R = N * dot_plus(N, V) * 2.0 - V; 
     R = vec3(R.x, R.z, -R.y);
 
-    float G = GeometrySmith(N, V, L, roughness);
-    float D = DistributionGGX(N, H, roughness);
-    vec3 F = FresnelSchlick(dot_plus(H, L), F0);
+    float G = geometrySmith(N, V, L, roughness);
+    float D = distributionGGX(N, H, roughness);
+    vec3 F = fresnelSchlick(dot_plus(H, L), F0);
 
     vec3 nominator = D * G * F;//分子
 
@@ -159,7 +114,7 @@ void main()
     vec3 coordN = vec3(N.x, N.z, -N.y);
     vec3 irradiance = textureCubeLodEXT(u_irradianceMap, coordN, 8.0).xyz;
     vec3 diffuse = irradiance * albedo;
-    vec3 F_s = FresnelSchlickRoughness(NdotV, F0, roughness);
+    vec3 F_s = fresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kD_a = vec3(1.0) - F_s;
     kD_a *= 1.0 - metallic;
 
@@ -183,13 +138,11 @@ void main()
         uvoffset[6] = vec2(-fenmu, fenmu);
         uvoffset[7] = vec2(fenmu, -fenmu);
         uvoffset[8] = vec2(-fenmu, -fenmu);
-        vec4 depthVec = u_depthMat * vec4(v_worldPos, 1.0);
-        depthVec.xyz = depthVec.xyz * 0.5 + 0.5;
-        float depth = depthVec.z;
+        float depth = v_depth.z;
         float bias = max(0.05 * (1.0 - dot(N, L)), 0.005);
         float shadow = 0.0;
         for (int i = 0; i < 9; i++) {
-            vec2 s_uv = depthVec.xy + uvoffset[i];
+            vec2 s_uv = v_depth.xy + uvoffset[i];
             if (any(lessThan(s_uv, vec2(0.0))) || any(greaterThan(s_uv, vec2(1.0)))) {
                 shadow += 1.0;
             } else {
@@ -197,7 +150,7 @@ void main()
                 shadow += (depth - bias > depth2 ? 0.5 : 1.0);
             }
         }
-        // float depth2 = decodeRGB2Float(texture2D(u_depthMap, depthVec.xy).rgb) + bias;
+        // float depth2 = decodeRGB2Float(texture2D(u_depthMap, v_depth.xy).rgb) + bias;
         // float shadow = (depth > depth2 ? 0.5 : 1.0);
         color *= depth > 1.0 ? 1.0 : (shadow / 9.0);
     #endif
