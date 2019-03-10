@@ -178,32 +178,59 @@ void main()
     vec3 color = ambient + lo;
 
     #ifdef SHADOW_MAP
-        vec2 uvoffset[9];
-        const float fenmu = 1.0 / 1024.0;
-        uvoffset[0] = vec2(0.0, 0.0);
-        uvoffset[1] = vec2(0.0, fenmu);
-        uvoffset[2] = vec2(0.0, -fenmu);
-        uvoffset[3] = vec2(fenmu, 0.0);
-        uvoffset[4] = vec2(-fenmu, 0.0);
-        uvoffset[5] = vec2(fenmu, fenmu);
-        uvoffset[6] = vec2(-fenmu, fenmu);
-        uvoffset[7] = vec2(fenmu, -fenmu);
-        uvoffset[8] = vec2(-fenmu, -fenmu);
-        float depth = v_depth3.z;
-        float bias = max(0.005 * (1.0 - dot(N, L)), 0.0005);
-        float shadow = 0.0;
-        for (int i = 0; i < 9; i++) {
-            vec2 s_uv = v_depth3.xy + uvoffset[i];
-            if (any(lessThan(s_uv, vec2(0.0))) || any(greaterThan(s_uv, vec2(1.0)))) {
-                shadow += 1.0;
-            } else {
-                float depth2 = decodeRGB2Float(texture2D(u_depthMap, s_uv).rgb);
-                shadow += (depth - bias > depth2 ? 0.5 : 1.0);
-            }
-        }
-        // float depth2 = decodeRGB2Float(texture2D(u_depthMap, v_depth3.xy).rgb) + bias;
+        // vec2 uvoffset[9];
+        // const float fenmu = 1.0 / 1024.0;
+        // uvoffset[0] = vec2(0.0, 0.0);
+        // uvoffset[1] = vec2(0.0, fenmu);
+        // uvoffset[2] = vec2(0.0, -fenmu);
+        // uvoffset[3] = vec2(fenmu, 0.0);
+        // uvoffset[4] = vec2(-fenmu, 0.0);
+        // uvoffset[5] = vec2(fenmu, fenmu);
+        // uvoffset[6] = vec2(-fenmu, fenmu);
+        // uvoffset[7] = vec2(fenmu, -fenmu);
+        // uvoffset[8] = vec2(-fenmu, -fenmu);
+        
+        // float bias = max(0.005 * (1.0 - dot(N, L)), 0.0005);
+        // float shadow = 0.0;
+        // for (int i = 0; i < 9; i++) {
+        //     vec2 s_uv = v_depth3.xy + uvoffset[i];
+        //     if (any(lessThan(s_uv, vec2(0.0))) || any(greaterThan(s_uv, vec2(1.0)))) {
+        //         shadow += 1.0;
+        //     } else {
+        //         float depth2 = decodeRGB2Float(texture2D(u_depthMap, s_uv).rgb);
+        //         shadow += clamp(exp(200.0 * (depth2 - depth)), 0.5, 1.0); 
+        //         // shadow += (depth - bias > depth2 ? 0.5 : 1.0);
+        //     }
+        // }
+
         // float shadow = (depth > depth2 ? 0.5 : 1.0);
-        color *= depth > 1.0 ? 1.0 : (shadow / 9.0);
+
+        vec2 depthPixelSize = vec2(1.0 / 512.0);
+        vec2 fullUV = v_depth3.xy * vec2(512.0, 512.0) - vec2(0.5);
+        vec2 floorUV = floor(fullUV) + vec2(0.5);
+        vec2 ceilUV = ceil(fullUV) + vec2(0.5);
+        vec2 fractUV = fract(fullUV);
+        vec2 invfractUV = vec2(1.0) - fractUV;
+
+        // float z0 = decodeRGB2Float(texture2D(u_depthMap, ceilUV * depthPixelSize).rgb);
+        // float z1 = decodeRGB2Float(texture2D(u_depthMap, vec2(ceilUV.x, floorUV.y) * depthPixelSize).rgb);
+        // float z2 = decodeRGB2Float(texture2D(u_depthMap, vec2(floorUV.x, ceilUV.y) * depthPixelSize).rgb);
+        // float z3 = decodeRGB2Float(texture2D(u_depthMap, floorUV * depthPixelSize).rgb);
+
+        // float nz0 = z3 * invfractUV.x * invfractUV.y;
+        // float nz1 = z2 * invfractUV.x * fractUV.y;
+        // float nz2 = z1 * fractUV.x * invfractUV.y;
+        // float nz3 = z0 * fractUV.x * fractUV.y;
+
+        float d = v_depth3.z;
+        float z = texture2D(u_depthMap, v_depth3.xy).r;//nz0 + nz1 + nz2 + nz3;//decodeRGB2Float(texture2D(u_depthMap, v_depth3.xy).rgb);
+        float shadow;
+        if (any(lessThan(v_depth3.xy, vec2(0.0))) || any(greaterThan(v_depth3.xy, vec2(1.0)))) {
+            shadow = 1.0;
+        } else {
+            shadow = clamp(z * exp((-d) * 80.0), 0.5, 1.0);
+        }
+        color *= d > 1.0 ? 1.0 : shadow;
     #endif
 
     gl_FragColor = vec4(color, baseColor.w);

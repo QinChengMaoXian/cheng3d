@@ -18,12 +18,13 @@ export class DirectionShadow extends Shadow {
         this.matrix = new Matrix4();
     }
 
-    public init(size: number = 1024) {
+    public init(size: number = 512) {
         this._size = size;
         let tex = this._depthTex;
         if (!tex) {
             tex = new Texture2D();
-            tex.setFilter(CGE.NEAREST, CGE.NEAREST);
+            tex.setDataType(CGE.FLOAT);
+            tex.setFilter(CGE.LINEAR, CGE.LINEAR);
             this._depthTex = tex;
         }
         tex.setSize(size, size);

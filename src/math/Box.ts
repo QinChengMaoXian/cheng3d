@@ -97,8 +97,35 @@ export class Box {
         this.max.max(box.max);
     }
 
+    public intersectBox(box: Box) {
+        const min1 = box.min;
+        const max1 = box.max;
+        const min2 = this.min;
+        const max2 = this.max;
+
+        if (min1.x > max2.x || max1.x < min2.x) {
+            return false;
+        }
+
+        if (min1.y > max2.y || max1.y < min2.y) {
+            return false;
+        }
+
+        if (min1.z > max2.z || max1.z < min2.z) {
+            return false;
+        }
+
+        return true;
+    }
+
     public containBox(box: Box) {
         return this.min.lequal(box.min) || this.max.gequal(box.max);
+    }
+
+    public intersectSphere(sphere: Sphere) {
+        let vec = Vector3.pubTemp.copy(sphere.pos);
+        vec.clamp(this.min, this.max);
+        return vec.subAt(sphere.pos).lengthSquare() <= sphere.radius * sphere.radius;
     }
 
     public containSphere(sphere: Sphere) {

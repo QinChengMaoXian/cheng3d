@@ -206,3 +206,9 @@ export function RepRemoveSquareBrackets(str: string) {
         return str.replace(result[0], '');
     }
 }
+
+export function GaussianDistribution(x: number, y: number, rho: number) {
+    let rho2 = 2 * rho * rho;
+    let g = 1.0 / Math.sqrt(rho2 * Math.PI) * Math.exp(-(x * x + y * y) / rho2);
+    return g;
+}

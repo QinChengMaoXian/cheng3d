@@ -26,9 +26,6 @@ void main()
     result_color += texture2D(u_diffuseMap, dir * vec2(-3.0, -3.0) + v_uv) * 0.004432;
     result_color += texture2D(u_diffuseMap, dir * vec2(-4.0, -4.0) + v_uv) * 0.000134;
 
-    // result_color *= 1.0 / 3.0;
-
-    // gl_FragColor = vec4(vec3(v_uv.x, v_uv.y, 0.0), 1.0);
     gl_FragColor = vec4(result_color.xyz, 1.0);
 }
 

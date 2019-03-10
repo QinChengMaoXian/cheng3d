@@ -48,7 +48,7 @@ export class Vector3 {
         this.v[2] -= z;
         return this;
     }
-    
+
     public subAt(vec: Vector3): Vector3 {
         this.v[0] -= vec.x;
         this.v[1] -= vec.y;
@@ -116,11 +116,12 @@ export class Vector3 {
     }
 
     public length(): number {
-        return Math.sqrt(this.lengthSquare()); 
+        return Math.sqrt(this.lengthSquare());
     }
 
     public lengthSquare(): number {
-        return this.v[0] * this.v[0] + this.v[1] * this.v[1] + this.v[2] * this.v[2];
+        let v = this.v;
+        return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
     }
 
     public normalize(): Vector3 {
@@ -164,16 +165,12 @@ export class Vector3 {
 
     public clone(): Vector3 {
         let vec = new Vector3();
-        vec.x = this.v[0];
-        vec.y = this.v[1];
-        vec.z = this.v[2];
+        vec.v.set(this.v);
         return vec;
     }
 
     public copy(vec3: Vector3): Vector3 {
-        this.v[0] = vec3.x;
-        this.v[1] = vec3.y;
-        this.v[2] = vec3.z;
+        this.v.set(vec3.v);
         return this;
     }
 
@@ -192,7 +189,7 @@ export class Vector3 {
     public set x(value: number) {
         this.v[0] = value;
     }
-    
+
     public get x() {
         return this.v[0];
     }
@@ -200,7 +197,7 @@ export class Vector3 {
     public set y(value: number) {
         this.v[1] = value;
     }
-    
+
     public get y() {
         return this.v[1];
     }
@@ -208,7 +205,7 @@ export class Vector3 {
     public set z(value: number) {
         this.v[2] = value;
     }
-    
+
     public get z() {
         return this.v[2];
     }
@@ -218,22 +215,35 @@ export class Vector3 {
     }
 
     public min(vec: Vector3) {
-        this.v[0] = Math.min(this.v[0], vec.v[0]);
-        this.v[1] = Math.min(this.v[1], vec.v[1]);
-        this.v[2] = Math.min(this.v[2], vec.v[2]);
+        let sv = this.v;
+        let mv = vec.v;
+        sv[0] = Math.min(sv[0], mv[0]);
+        sv[1] = Math.min(sv[1], mv[1]);
+        sv[2] = Math.min(sv[2], mv[2]);
+        return this;
     }
 
     public max(vec: Vector3) {
-        this.v[0] = Math.max(this.v[0], vec.v[0]);
-        this.v[1] = Math.max(this.v[1], vec.v[1]);
-        this.v[2] = Math.max(this.v[2], vec.v[2]);
+        let sv = this.v;
+        let mv = vec.v;
+        sv[0] = Math.max(sv[0], mv[0]);
+        sv[1] = Math.max(sv[1], mv[1]);
+        sv[2] = Math.max(sv[2], mv[2]);
+        return this;
+    }
+
+    public clamp(min: Vector3, max: Vector3) {
+        this.x = Math.max(min.x, Math.min(max.x, this.x));
+        this.y = Math.max(min.y, Math.min(max.y, this.y));
+        this.z = Math.max(min.z, Math.min(max.z, this.z));
+        return this;
     }
 
     public toJson() {
         return {
             x: this.x,
             y: this.y,
-            z: this.z
+            z: this.z,
         }
     }
 

@@ -25,7 +25,8 @@ void main()
         }
     #endif
 
-    gl_FragColor = vec4(encodeFloat2RGB(v_depth), 1.0);
-    // gl_FragColor = vec4(v_depth, v_depth, v_depth, 1.0);
+    float depth = exp(v_depth * 80.0);
+    // gl_FragColor = vec4(encodeFloat2RGB(v_depth), 1.0);
+    gl_FragColor = vec4(depth, depth, depth, 1.0);
 }
 `;

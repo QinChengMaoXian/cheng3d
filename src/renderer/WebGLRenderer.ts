@@ -563,9 +563,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             return;
         }
 
-        if (this._curFrame === frame) {
-            return;
-        }
+        // if (this._curFrame === frame) {
+        //     return;
+        // }
 
         let glframe = this.initFrame(frame);
 
@@ -765,8 +765,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 renderCulling.culling(scene, mat4, false, false);
 
                 let shadows = [];
-                for (let i = 0; i < renderCulling.shadowLightSize; i++) {
-                    let light = renderCulling.shadowLights[i];
+                let shadowLights = renderCulling.shadowLights;
+                for (let i = 0, l = renderCulling.shadowLightSize; i < l; i++) {
+                    let light = shadowLights[i];
                     this._renderShadow(scene, light, renderCulling.visibleBox, camera);
                     shadows.push(light.shadow);
                 }
@@ -801,10 +802,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 let dData: Float32Array = dirDatas.dir.data;
                 let cData: Float32Array = dirDatas.colors.data;
                 
-                dirLights.forEach((d: DirectionLight, idx) => {
-                    dData.set(d.dir.v, idx * 3);
-                    cData.set(d.color.v, idx * 4);
-                });
+                for (let i = 0, l = dirLights.length; i < l; i++) {
+                    let d = <DirectionLight>dirLights[i];
+                    dData.set(d.dir.v, i * 3);
+                    cData.set(d.color.v, i * 4);
+                }
 
                 pData = pointDatas.pos.data;
                 cData = pointDatas.colors.data;
