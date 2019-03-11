@@ -64,7 +64,7 @@ uniform vec3 u_lightDir;
 #include <fresnelSchlick>
 #include <fresnelSchlickRoughness>
 
-#include <decodeRGB2Float>
+#include <decodeRGBA2Float>
 
 vec3 directionLight(float NdotV, float roughness, float metallic, vec3 albedo, vec3 F0, vec3 N, vec3 V, vec3 dir, vec4 color) {
     vec3 L = dir;
@@ -197,7 +197,7 @@ void main()
         //     if (any(lessThan(s_uv, vec2(0.0))) || any(greaterThan(s_uv, vec2(1.0)))) {
         //         shadow += 1.0;
         //     } else {
-        //         float depth2 = decodeRGB2Float(texture2D(u_depthMap, s_uv).rgb);
+        //         float depth2 = decodeRGBA2Float(texture2D(u_depthMap, s_uv).rgb);
         //         shadow += clamp(exp(200.0 * (depth2 - depth)), 0.5, 1.0); 
         //         // shadow += (depth - bias > depth2 ? 0.5 : 1.0);
         //     }
@@ -212,23 +212,23 @@ void main()
         vec2 fractUV = fract(fullUV);
         vec2 invfractUV = vec2(1.0) - fractUV;
 
-        // float z0 = decodeRGB2Float(texture2D(u_depthMap, ceilUV * depthPixelSize).rgb);
-        // float z1 = decodeRGB2Float(texture2D(u_depthMap, vec2(ceilUV.x, floorUV.y) * depthPixelSize).rgb);
-        // float z2 = decodeRGB2Float(texture2D(u_depthMap, vec2(floorUV.x, ceilUV.y) * depthPixelSize).rgb);
-        // float z3 = decodeRGB2Float(texture2D(u_depthMap, floorUV * depthPixelSize).rgb);
+        float z0 = decodeRGBA2Float(texture2D(u_depthMap, ceilUV * depthPixelSize));
+        float z1 = decodeRGBA2Float(texture2D(u_depthMap, vec2(ceilUV.x, floorUV.y) * depthPixelSize));
+        float z2 = decodeRGBA2Float(texture2D(u_depthMap, vec2(floorUV.x, ceilUV.y) * depthPixelSize));
+        float z3 = decodeRGBA2Float(texture2D(u_depthMap, floorUV * depthPixelSize));
 
-        // float nz0 = z3 * invfractUV.x * invfractUV.y;
-        // float nz1 = z2 * invfractUV.x * fractUV.y;
-        // float nz2 = z1 * fractUV.x * invfractUV.y;
-        // float nz3 = z0 * fractUV.x * fractUV.y;
+        float nz0 = z3 * invfractUV.x * invfractUV.y;
+        float nz1 = z2 * invfractUV.x * fractUV.y;
+        float nz2 = z1 * fractUV.x * invfractUV.y;
+        float nz3 = z0 * fractUV.x * fractUV.y;
 
         float d = v_depth3.z;
-        float z = texture2D(u_depthMap, v_depth3.xy).r;//nz0 + nz1 + nz2 + nz3;//decodeRGB2Float(texture2D(u_depthMap, v_depth3.xy).rgb);
+        float z = nz0 + nz1 + nz2 + nz3;//decodeRGB2Float(texture2D(u_depthMap, v_depth3.xy).xyz); //texture2D(u_depthMap, v_depth3.xy).r;//
         float shadow;
         if (any(lessThan(v_depth3.xy, vec2(0.0))) || any(greaterThan(v_depth3.xy, vec2(1.0)))) {
             shadow = 1.0;
         } else {
-            shadow = d > z ? 1.0 : clamp(z * exp((-d) * 80.0), 0.5, 1.0);
+            shadow = clamp(exp((z - d) * 300.0), 0.5, 1.0); //d > z ? 1.0 : 
         }
         color *= d > 1.0 ? 1.0 : shadow;
     #endif

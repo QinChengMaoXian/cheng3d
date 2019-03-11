@@ -25,8 +25,6 @@ uniform vec4 u_cameraRange;
     varying vec3 v_depth3;  
 #endif
 
-
-
 void main()
 {
     v_uv = a_texcoord * u_uvOffset.xy + u_uvOffset.zw;

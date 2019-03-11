@@ -10,7 +10,7 @@ precision mediump float;
 
 varying float v_depth;
 
-#include <encodeFloat2RGB>
+#include <encodeFloat2RGBA>
 
 void main()
 {
@@ -25,8 +25,8 @@ void main()
         }
     #endif
 
-    float depth = exp(v_depth * 80.0);
-    // gl_FragColor = vec4(encodeFloat2RGB(v_depth), 1.0);
-    gl_FragColor = vec4(depth, depth, depth, 1.0);
+    float depth = v_depth; //exp(v_depth * 80.0);
+    gl_FragColor = vec4(encodeFloat2RGBA(v_depth));
+    // gl_FragColor = vec4(depth);
 }
 `;

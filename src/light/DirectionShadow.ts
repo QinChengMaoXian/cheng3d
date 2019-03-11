@@ -23,8 +23,8 @@ export class DirectionShadow extends Shadow {
         let tex = this._depthTex;
         if (!tex) {
             tex = new Texture2D();
-            tex.setDataType(CGE.FLOAT);
-            tex.setFilter(CGE.LINEAR, CGE.LINEAR);
+            tex.setDataType(CGE.UNSIGNED_BYTE);
+            tex.setFilter(CGE.NEAREST, CGE.NEAREST);
             this._depthTex = tex;
         }
         tex.setSize(size, size);

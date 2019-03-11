@@ -43,6 +43,11 @@ export class WebGLSupports {
             this.drawBuffers = null;
         }
 
+
+        // 这两个为浮点纹理写
+        //"EXT_color_buffer_half_float"
+        //"WEBGL_color_buffer_float" 
+
         this._shaderTexLod = gl.getExtension('EXT_shader_texture_lod');
         this._texFloat = gl.getExtension("OES_texture_float");
         this._texFloatLinear = gl.getExtension("OES_texture_float_linear");

@@ -40,7 +40,7 @@ export class ShadowMapPipeline {
     private _camera: Camera;
 
     /** ESM模糊材质 */
-    private _blurMat: GaussianBlurMaterial;
+    private _blurMat: ESMBlurMaterial;
 
     /** ESM模糊用的Frame */
     private _blurFrame: Frame;
@@ -60,7 +60,7 @@ export class ShadowMapPipeline {
 
         this._camera = new Camera();
 
-        let mat = new GaussianBlurMaterial();
+        let mat = new ESMBlurMaterial();
         this._blurMat = mat;
 
         let geo = new ScreenGeometry();
@@ -105,7 +105,7 @@ export class ShadowMapPipeline {
 
         tex = new Texture2D();
         tex.setSize(size, size);
-        tex.setDataType(CGE.FLOAT);
+        tex.setDataType(CGE.UNSIGNED_BYTE);
         tex.setFilter(CGE.NEAREST, CGE.NEAREST);
         this._shadowMaps.set(size, tex);
         return tex;
