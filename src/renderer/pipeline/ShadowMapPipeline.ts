@@ -17,6 +17,7 @@ import { Mesh } from "../../object/Mesh";
 import { ScreenGeometry } from "../../util/GeometryUtil";
 import { Texture2D } from '../../graphics/Texture2D';
 import { GaussianBlurMaterial } from '../../material/GaussianBlurMaterial';
+import { DownSample4Material } from '../../material/DownSample4Material';
 
 
 export class ShadowMapPipeline {
@@ -104,7 +105,7 @@ export class ShadowMapPipeline {
 
         tex = new Texture2D();
         tex.setSize(size, size);
-        tex.setDataType(CGE.UNSIGNED_BYTE);
+        tex.setDataType(CGE.FLOAT);
         tex.setFilter(CGE.NEAREST, CGE.NEAREST);
         this._shadowMaps.set(size, tex);
         return tex;
@@ -191,8 +192,10 @@ export class ShadowMapPipeline {
         let blurMat = this._blurMat;
         blurMat.setPixelSize(1.0 / dirShadow.size, 1.0 / dirShadow.size);
 
+        // dirShadow.depthTex.setMipmap(true);
 
-        for (let i = 0; i < 0; i++) {
+
+        for (let i = 0; i < 2; i++) {
             blurMat.setSrcTexture(dirShadow.depthTex);
             blurMat.setPiexlDir(1.0, 0.0);
 

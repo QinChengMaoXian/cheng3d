@@ -54,6 +54,7 @@ export class Texture extends GraphicsObject {
 
     public setMipmap(value:boolean) {
         this._needMipmap = value;
+        this.needsUpdate();
     }
 
     public getMipmap() {

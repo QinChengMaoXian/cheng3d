@@ -228,7 +228,7 @@ void main()
         if (any(lessThan(v_depth3.xy, vec2(0.0))) || any(greaterThan(v_depth3.xy, vec2(1.0)))) {
             shadow = 1.0;
         } else {
-            shadow = clamp(z * exp((-d) * 80.0), 0.5, 1.0);
+            shadow = d > z ? 1.0 : clamp(z * exp((-d) * 80.0), 0.5, 1.0);
         }
         color *= d > 1.0 ? 1.0 : shadow;
     #endif

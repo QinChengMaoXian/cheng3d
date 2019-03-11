@@ -8,6 +8,9 @@ uniform sampler2D u_diffuseMap;
 uniform vec2 u_pixelSize;
 uniform vec2 u_pixelDir;
 uniform vec4 u_cameraRange;
+#ifdef KERNEL_RADIUS 
+    uniform float u_weight[KERNEL_RADIUS];
+#endif
 
 #include <encodeFloat2RGB>
 #include <decodeRGB2Float>
