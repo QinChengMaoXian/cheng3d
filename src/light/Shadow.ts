@@ -1,9 +1,10 @@
 import { Matrix4 } from "../math/Matrix4";
 import { Texture } from "../graphics/Texture";
+import { LightType } from "./Light";
 
 export class Shadow {
 
-    public matrix: Matrix4;
+    public enalbed = true;
 
     public get depthTex(): Texture {
         return null;
@@ -11,6 +12,10 @@ export class Shadow {
 
     public init() {
 
+    }
+
+    public get type() {
+        return LightType.None;
     }
 
     public destroy() {

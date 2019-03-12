@@ -1,14 +1,18 @@
 import { Frustum } from "../math/Frustum";
 import { Mesh } from "../object/Mesh";
-import { Light } from "../light/Light";
+import { Light, LightType } from "../light/Light";
 import { Box } from "../math/Box";
 import { Object3D } from "../object/Object3D";
 import { Matrix4 } from "../math/Matrix4";
 import { BoundingType } from "../bounding/Bounding";
 import { AABB } from "../bounding/AABB";
+import { DirectionLight } from "../light/DirectionLight";
+import { PointLight } from "../light/PointLight";
+import { SpotLight } from "../light/SpotLight";
 
 /**
  * 渲染剔除
+ * TODO想办法优化这一对东西；
  */
 export class RenderCulling {
 
@@ -29,11 +33,23 @@ export class RenderCulling {
     public alphaBlends: Mesh[] = new Array(16);
     public alphaBlendSize: number = 0;
 
-    public lights: Light[] = new Array(16);
-    public lightSize: number = 0;
+    public dirLights: DirectionLight[] = new Array(4);
+    public dirLightSize: number = 0;
 
-    public shadowLights: Light[] = new Array(4);
-    public shadowLightSize: number = 0;
+    public dirShadowLights: DirectionLight[] = new Array(2);
+    public dirShadowLightSize: number = 0;
+
+    public pointLights: PointLight[] = new Array(4);
+    public pointLightSize: number = 0;
+
+    public pointShadowLights: PointLight[] = new Array(2);
+    public pointShadowLightSize: number = 0;
+
+    public spotLights: SpotLight[] = new Array(4);
+    public spotLightSize: number = 0;
+
+    public spotShadowLights: SpotLight[] = new Array(2);
+    public spotShadowLightSize: number = 0;
 
     public visibleBox: Box = new Box();
 
@@ -50,8 +66,13 @@ export class RenderCulling {
         this.alphaTestSize = 
         this.noDeferAlphaTestSize = 
         this.alphaBlendSize = 
-        this.lightSize = 
-        this.shadowLightSize = 0;
+        this.dirLightSize = 
+        this.dirShadowLightSize = 
+        this.pointLightSize = 
+        this.pointShadowLightSize = 
+        this.spotLightSize = 
+        this.spotShadowLightSize = 
+        0;
 
         this.visibleBox.reset();
 
@@ -62,8 +83,12 @@ export class RenderCulling {
         this._clearTail(this.alphaTests, this.alphaTestSize);
         this._clearTail(this.noDeferAlphaTests, this.noDeferAlphaTestSize);
         this._clearTail(this.alphaBlends, this.alphaBlendSize);
-        this._clearTail(this.lights, this.lightSize);
-        this._clearTail(this.shadowLights, this.shadowLightSize);
+        this._clearTail(this.dirLights, this.dirLightSize);
+        this._clearTail(this.dirShadowLights, this.dirShadowLightSize);
+        this._clearTail(this.pointLights, this.pointLightSize);
+        this._clearTail(this.pointShadowLights, this.pointShadowLightSize);
+        this._clearTail(this.spotLights, this.spotLightSize);
+        this._clearTail(this.spotShadowLights, this.spotShadowLightSize);
     }
 
     protected _clearTail(ar: any[], i: number) {
@@ -131,11 +156,36 @@ export class RenderCulling {
     }
 
     protected _cutLight(light: Light) {
-        this.lights[this.lightSize++] = light;
 
-        if(light.shadow) {
-            this.shadowLights[this.shadowLightSize++] = light;
+        switch (light.type) {
+            case LightType.Direction:
+                if(light.shadow && light.shadow.enalbed) {
+                    this.dirShadowLights[this.dirShadowLightSize++] = <DirectionLight>light;
+                } else {
+                    this.dirLights[this.dirLightSize++] =  <DirectionLight>light;
+                }
+                break;
+            
+            case LightType.Spot:
+                if(light.shadow && light.shadow.enalbed) {
+                    this.spotShadowLights[this.spotShadowLightSize++] = <SpotLight>light;
+                } else {
+                    this.spotLights[this.spotLightSize++] = <SpotLight>light;
+                }
+                break;
+
+            case LightType.Point:
+                if(light.shadow && light.shadow.enalbed) {
+                    this.pointShadowLights[this.pointShadowLightSize++] = <PointLight>light;
+                } else {
+                    this.pointLights[this.pointLightSize++] = <PointLight>light;
+                }
+                break;
+
+            default:
+                break;
         }
+        
 
     }
 }

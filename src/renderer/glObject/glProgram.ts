@@ -1,11 +1,4 @@
-import { 
-    FLOAT_VEC2,
-    FLOAT_VEC3,
-    FLOAT_VEC4,
-    FLOAT_MAT3,
-    FLOAT_MAT4,
-    FLOAT
-} from '../../graphics/RendererParameter'
+import * as CGE from '../../graphics/RendererParameter'
 import { Logger } from '../../core/Logger'
 import { glObject } from './glObject'
 import { ShaderConst } from '../../graphics/ShaderConst';
@@ -37,7 +30,6 @@ export interface IUniform {
 
 export interface ITexUniform {
     loc: number,
-    tex: glTexture
 }
 
 export class glProgram extends glObject {
@@ -90,9 +82,20 @@ export class glProgram extends glObject {
             }
             let loc = gl.getUniformLocation(program, data.name);
             if (data.type === gl.SAMPLER_2D || data.type === gl.SAMPLER_CUBE) {
-                gl.uniform1i(loc, tCount);
                 let texMap = ShaderConst._getTextures();
-                this._textures.set(texMap[data.name], tCount++);
+                let type = texMap[data.name];
+                if (type !== undefined) {
+                    gl.uniform1i(loc, tCount);
+                    this._textures.set(texMap[data.name], tCount++);
+                } else {
+                    let array = new Int32Array(data.size);
+                    let name = RepRemoveSquareBrackets(data.name);
+                    for (let i = 0, l = data.size; i < l; i++) {
+                        array[i] = tCount;
+                        this._textures.set(`${name}_${i}`, tCount++);
+                    }
+                    gl.uniform1iv(loc, array);
+                }
             } else {
                 let uniMap = ShaderConst._getUniforms();
                 let type = uniMap[data.name];
@@ -181,22 +184,25 @@ export class glProgram extends glObject {
     public setUniformData(gl: WebGLRenderingContext, type: number, location: WebGLUniformLocation, data: any) {
         // TODO: 这一段写的是个毛线啊。
         switch(type) {
-            case FLOAT:
+            case CGE.INT:
+                gl.uniform1iv(location, data);
+                break;
+            case CGE.FLOAT:
                 gl.uniform1f(location, data);
                 break;
-            case FLOAT_VEC2:
+            case CGE.FLOAT_VEC2:
                 gl.uniform2fv(location, data);
                 break;
-            case FLOAT_VEC3:
+            case CGE.FLOAT_VEC3:
                 gl.uniform3fv(location, data);
                 break;
-            case FLOAT_VEC4:
+            case CGE.FLOAT_VEC4:
                 gl.uniform4fv(location, data);
                 break;
-            case FLOAT_MAT3:
+            case CGE.FLOAT_MAT3:
                 gl.uniformMatrix3fv(location, false, data);
                 break;
-            case FLOAT_MAT4:
+            case CGE.FLOAT_MAT4:
                 gl.uniformMatrix4fv(location, false, data);
                 break;
             default:
@@ -288,7 +294,7 @@ export class glProgram extends glObject {
         return this._textures;
     }
 
-    public getTextureIndex(type): number {
+    public getTextureIndex(type) {
         return this._textures.get(type);
     }
 

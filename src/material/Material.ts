@@ -375,6 +375,25 @@ export class Material extends Base {
         this.setProperty('u_spotColors', colors);
     }
 
+    public setDirShadowLights(num: number, dir: any, colors: any, mats: any, texs: Texture[]) {
+        if (num <= 0) {
+            this._removeMacro('DIRECTION_SHADOW_LIGHT');
+            this.removeProperty('u_directionShadowDirs');
+            this.removeProperty('u_directionShadowColors');
+            this.removeProperty('u_directionMats');
+            return;
+        }
+
+        this._addMacro('DIRECTION_SHADOW_LIGHT', num);
+        this.setProperty('u_directionShadowDirs', dir);
+        this.setProperty('u_directionShadowColors', colors);
+        this.setProperty('u_directionMats', mats);
+
+        for (let i = 0; i < num; i++) {
+            this.setTexture(`u_directionShadowMaps_${i}`, texs[i]);
+        }
+    }
+
     public get supportDeferred(): boolean {
         return false;
     }

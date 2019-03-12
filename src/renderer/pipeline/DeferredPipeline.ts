@@ -137,8 +137,9 @@ export class DeferredPipeline {
         let mat = this._pointLightMat;
 
         mat.setPixelSize(ps_x, ps_y);
-        let l = culling.lightSize;
-        let lightsList = culling.lights;
+        
+        let l = culling.pointLightSize;
+        let lightsList = culling.pointLights;
 
         for (let i = 0; i < l; i++) {
             let pl = lightsList[i] as PointLight;

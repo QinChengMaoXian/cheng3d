@@ -20,6 +20,11 @@ uniform mat4 u_mITMat;
 uniform mat4 u_mvpMat;
 uniform vec4 u_cameraRange;
 
+#ifdef DIRECTION_SHADOW_LIGHT
+    uniform mat4 u_directionMats[DIRECTION_SHADOW_LIGHT];
+    varying vec3 u_directionDepths[DIRECTION_SHADOW_LIGHT];  
+#endif
+
 #ifdef SHADOW_MAP
     uniform mat4 u_depthMat;
     varying vec3 v_depth3;  
@@ -43,6 +48,13 @@ void main()
     #ifdef SHADOW_MAP
         vec4 depthVec = u_depthMat * vec4(v_worldPos, 1.0);
         v_depth3 = depthVec.xyz * 0.5 + 0.5;
+    #endif
+
+    #ifdef DIRECTION_SHADOW_LIGHT
+        for (int i = 0; i < DIRECTION_SHADOW_LIGHT; i++) {
+            vec4 depthVec = u_directionMats[i] * vec4(v_worldPos, 1.0);
+            u_directionDepths[i] = depthVec.xyz * 0.5 + 0.5;
+        }
     #endif
 
     gl_Position = pos;

@@ -237,6 +237,7 @@ standMat.enableStencil = true;
 standMat.setStencilFunc(CGE.ALWAYS, 0x80, 0x80);
 standMat.setStencilOp(CGE.KEEP, CGE.KEEP, CGE.REPLACE);
 // standMat.setUVOffset(2, 2, 0, 0);
+let defStandMat = standMat;
 
 // standMat.setSpecular(0.04, 0, 1);
 // standMat.setBrdfLUTMap();
@@ -434,7 +435,7 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
-let planeMat = new CGE.StandardMaterial();
+let planeMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 planeMat.setIrradianceMap(cubeTexture);
 planeMat.setPrefilterMap(cubeTexture);
 planeMat.setUVOffset(20, 20, 0, 0); 
@@ -447,6 +448,41 @@ mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(planeMat);
 
 mainScene.addChild(mesh);
+
+
+planeMat = new CGE.StandardMaterial();
+planeMat.setIrradianceMap(cubeTexture);
+planeMat.setPrefilterMap(cubeTexture);
+planeMat.enableStencil = true;
+planeMat.setStencil(defStandMat.stencil);
+
+let planes = new CGE.Object3D();
+mainScene.addChild(planes);
+planes.name = '一堆平面';
+planes.y = 50;
+
+mesh = new CGE.Mesh();
+mesh.setPosition(0, 0, 10);
+mesh.setScale(20, 20, 1);
+mesh.setGeometry(planeVertexGeometry);
+mesh.setMaterial(planeMat);
+planes.addChild(mesh);
+
+
+mesh = new CGE.Mesh();
+mesh.setPosition(10, 10, 15);
+mesh.setScale(20, 20, 1);
+mesh.setGeometry(planeVertexGeometry);
+mesh.setMaterial(planeMat);
+planes.addChild(mesh);
+
+mesh = new CGE.Mesh();
+mesh.setPosition(20, 20, 20);
+mesh.setScale(20, 20, 1);
+mesh.setGeometry(planeVertexGeometry);
+mesh.setMaterial(planeMat);
+planes.addChild(mesh);
+
 
 // 以上 大平面
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -476,10 +512,9 @@ standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex)
 standMat.enableAlphaTest();
 standMat.setIrradianceMap(cubeTexture);
 standMat.setPrefilterMap(cubeTexture);
-// standMat.enableAlphaBlend();
+// standMat.enableStencil = true;
+// standMat.setStencil(defStandMat.stencil);
 standMat.setBaseColor(1.0, 1.0, 1.0, 0.5);
-// standMat.setBlendFunc(CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA, CGE.SRC_ALPHA, CGE.ONE_MINUS_SRC_ALPHA);
-// standMat.depthMask = false;
 
 let teapotMesh = new CGE.Mesh();
 teapotMesh.setScale(0.5, 0.5, 0.5);
@@ -504,6 +539,23 @@ teapotMesh.setPosition(40, 20, 0);
 teapotMesh.setGeometry(teapotGeometry);
 teapotMesh.setMaterial(standMat);
 teapotMesh.name = '水壶2';
+mainScene.addChild(teapotMesh);
+
+
+standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+standMat.setIrradianceMap(cubeTexture);
+standMat.setPrefilterMap(cubeTexture);
+standMat.setCullFaceMode(CGE.ZERO);
+standMat.enableStencil = true;
+standMat.setStencil(defStandMat.stencil);
+standMat.setBaseColor(1.0, 1.0, 1.0, 1.0);
+
+teapotMesh = new CGE.Mesh();
+teapotMesh.setScale(2, 2, 2);
+teapotMesh.setPosition(150, 100, 50);
+teapotMesh.setGeometry(teapotGeometry);
+teapotMesh.setMaterial(standMat);
+teapotMesh.name = '水壶3';
 mainScene.addChild(teapotMesh);
 
 // 以上 犹他水壶

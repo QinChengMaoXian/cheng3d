@@ -5,13 +5,10 @@ import { Matrix4 } from "../math/Matrix4";
 import * as CGE from '../graphics/RendererParameter';
 import { LightType } from "./Light";
 
-export class DirectionShadow extends Shadow {
+export class SpotShadow extends Shadow {
 
     protected _depthTex: Texture2D;
     protected _size: number = 512;
-    public range: number = 200;
-    public far: number = 2000;
-    public autoRange: boolean = false;
     public matrix: Matrix4;
 
     constructor() {
@@ -26,7 +23,7 @@ export class DirectionShadow extends Shadow {
         if (!tex) {
             tex = new Texture2D();
             tex.setDataType(CGE.UNSIGNED_BYTE);
-            tex.setFilter(CGE.LINEAR, CGE.LINEAR);
+            tex.setFilter(CGE.NEAREST, CGE.NEAREST);
             this._depthTex = tex;
         }
         tex.setSize(size, size);
@@ -46,6 +43,6 @@ export class DirectionShadow extends Shadow {
     }
 
     public get type() {
-        return LightType.Direction;
+        return LightType.Spot;
     }
 }

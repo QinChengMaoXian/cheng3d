@@ -42,12 +42,14 @@ export class DirectionLight extends Light implements ILight {
             this._shadow = new DirectionShadow();
             this._shadow.init();
         }
+        this._shadow.enalbed = true;
     }
 
     public disableShadow() {
         if (!this._shadow) {
             return;
         }
+        this._shadow.enalbed = false;
     }
 
     public clearShadow() {
