@@ -435,6 +435,7 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
+// let planeMat = new CGE.StandardMaterial();
 let planeMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 planeMat.setIrradianceMap(cubeTexture);
 planeMat.setPrefilterMap(cubeTexture);

@@ -12,12 +12,10 @@ export class DirectionShadow extends Shadow {
     public range: number = 200;
     public far: number = 2000;
     public autoRange: boolean = false;
-    public matrix: Matrix4;
+    public matrix: Matrix4 = new Matrix4();
 
     constructor() {
         super();
-
-        this.matrix = new Matrix4();
     }
 
     public init(size: number = 512) {

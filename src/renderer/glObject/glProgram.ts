@@ -75,10 +75,11 @@ export class glProgram extends glObject {
         let uCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         let tCount = 0;
         this._uniforms.clear();
+        this._textures.clear();
         for (let i = 0; i < uCount; i++) {
             let data = gl.getActiveUniform(program, i);
             if (!data) {
-                return;
+                continue;
             }
             let loc = gl.getUniformLocation(program, data.name);
             if (data.type === gl.SAMPLER_2D || data.type === gl.SAMPLER_CUBE) {

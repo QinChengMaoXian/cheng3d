@@ -626,6 +626,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         if (shadows) {
             if (shadows.d > 0) {
                 let dData = this._lightDatasCache.getShadowDir(shadows.d);
+                // mat.setDepthMap(dData.textures[0]);
+                // mat.setDepthMatData(dData.mats);
+                // mat.enableShadow();
                 mat.setDirShadowLights(shadows.d, dData.dir, dData.colors, dData.mats, dData.textures);
             }
         }

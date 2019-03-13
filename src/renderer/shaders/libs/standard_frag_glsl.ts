@@ -7,14 +7,6 @@ varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 v_worldPos;
 
-uniform sampler2D u_diffuseMap;
-
-uniform sampler2D u_roughnessMap;
-uniform sampler2D u_brdfLUTMap;
-
-uniform samplerCube u_irradianceMap;
-uniform samplerCube u_prefilterMap;
-
 #ifdef NORMAL_MAP
     varying vec3 v_tangent;
     varying vec3 v_binormal;
@@ -24,10 +16,6 @@ uniform samplerCube u_prefilterMap;
 #ifdef SHADOW_MAP
     varying vec3 v_depth3;
     uniform sampler2D u_depthMap;
-#endif
-
-#ifdef ALPHA_TEST
-    uniform sampler2D u_ODMap;
 #endif
 
 #ifdef DIRECTION_SHADOW_LIGHT
@@ -52,6 +40,18 @@ uniform samplerCube u_prefilterMap;
     uniform vec4 u_spotDirs[SPOT_LIGHT];
     uniform vec4 u_spotColors[SPOT_LIGHT];
 #endif
+
+#ifdef ALPHA_TEST
+    uniform sampler2D u_ODMap;
+#endif
+
+uniform sampler2D u_diffuseMap;
+
+uniform sampler2D u_roughnessMap;
+uniform sampler2D u_brdfLUTMap;
+
+uniform samplerCube u_irradianceMap;
+uniform samplerCube u_prefilterMap;
 
 const float PI = 3.14159265359;
 const float inv_PI = 1.0 / PI;
@@ -97,8 +97,16 @@ vec3 directionLight(float NdotV, float roughness, float metallic, vec3 albedo, v
     return (kD * (albedo) * inv_PI + brdf) * color.xyz * NdotL;
 }
 
-float shadow() {
-    return 0.0;
+float calcShadow(vec3 depth3, float z) {
+    float d = depth3.z;
+    float shadow;
+    if (any(lessThan(depth3.xy, vec2(0.0))) || any(greaterThan(depth3.xy, vec2(1.0)))) {
+        shadow = 1.0;
+    } else {
+        shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0); //d > z ? 1.0 : 
+        shadow *= shadow;
+    }
+    return d > 1.0 ? 1.0 : shadow;
 }
 
 void main()
@@ -142,19 +150,22 @@ void main()
 
     // 方向光阴影
     #ifdef DIRECTION_SHADOW_LIGHT
-        for (int i = 0; i < DIRECTION_SHADOW_LIGHT; i++) {
-            float d = u_directionDepths[i].z;
-            float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[i], u_directionDepths[i].xy)); 
-            float shadow;
-            if (any(lessThan(u_directionDepths[i].xy, vec2(0.0))) || any(greaterThan(u_directionDepths[i].xy, vec2(1.0)))) {
-                shadow = 1.0;
-            } else {
-                shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0); //d > z ? 1.0 : 
-            }
-            shadow = d > 1.0 ? 1.0 : shadow;
-            // lo += shadow;
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[i], u_directionShadowColors[i]) * shadow;
+        #if DIRECTION_SHADOW_LIGHT > 0
+        {
+            vec3 depth3 = u_directionDepths[0];
+            float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[0], depth3.xy)); 
+            float shadow = calcShadow(u_directionDepths[0], z);
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[0], u_directionShadowColors[0]) * shadow;
         }
+        #endif
+        #if DIRECTION_SHADOW_LIGHT > 1
+        {
+            vec3 depth3 = u_directionDepths[1];
+            float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[1], depth3.xy)); 
+            float shadow = calcShadow(u_directionDepths[1], z);
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[1], u_directionShadowColors[1]) * shadow;
+        }
+        #endif
     #endif
 
     #ifdef DIRECTION_LIGHT
@@ -210,9 +221,6 @@ void main()
     vec3 specular = prefilteredColor * (F_s * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD_a * diffuse + specular) * ao;
 
-    // 最终颜色
-    
-
     #ifdef SHADOW_MAP
         // PCF
         // vec2 uvoffset[9];
@@ -260,25 +268,20 @@ void main()
         // float nz3 = z0 * fractUV.x * fractUV.y;
         // texture2D(u_depthMap, v_depth3.xy).r;// nz0 + nz1 + nz2 + nz3;// 
 
-        float d = v_depth3.z;
-        float z = decodeRGBA2Float(texture2D(u_depthMap, v_depth3.xy)); 
-        float shadow;
-        if (any(lessThan(v_depth3.xy, vec2(0.0))) || any(greaterThan(v_depth3.xy, vec2(1.0)))) {
-            shadow = 1.0;
-        } else {
-            shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0); //d > z ? 1.0 : 
-        }
-        lo *= d > 1.0 ? 1.0 : shadow;
-    #endif
+        // float d = v_depth3.z;
+        // float z = decodeRGBA2Float(texture2D(u_depthMap, v_depth3.xy)); 
+        // float shadow;
+        // if (any(lessThan(v_depth3.xy, vec2(0.0))) || any(greaterThan(v_depth3.xy, vec2(1.0)))) {
+        //     shadow = 1.0;
+        // } else {
+        //     shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0); //d > z ? 1.0 : 
+        // }
+        // shadow = d > 1.0 ? 1.0 : shadow;
+        // lo = mix(lo * 0.75 + vec3(0.0, 0.0, 1.0) * 0.25, vec3(0.0), shadow);
+        // lo *= vec3(1.0 - shadow, 1.0, 1.0);
+    #endif    
 
-    // vec4 test = vec4(0.0);
-    // for (int i = 0; i < 4; i++) {
-    //     test += texture2D(u_testMaps[i], v_uv);
-    // }
-
-    
-
-    vec3 color = ambient + lo;// + test.xyz * 0.01;
+    vec3 color = (ambient + lo);
     gl_FragColor = vec4(color, baseColor.w);
     // #ifdef DIRECTION_SHADOW_LIGHT
     //     gl_FragColor.xyz = vec3(decodeRGBA2Float(texture2D(u_directionShadowMaps[0], u_directionDepths[0].xy))) + color * 0.01;

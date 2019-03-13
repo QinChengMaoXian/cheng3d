@@ -323,7 +323,7 @@ export class Material extends Base {
         this.setTexture(s.depthMap, tex);
     }
 
-    public setDepthMatData(mat: Matrix4) {
+    public setDepthMatData(mat: any) {
         this.setProperty(s.depthMat, mat);
     }
 
