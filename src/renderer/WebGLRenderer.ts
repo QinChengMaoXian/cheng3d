@@ -55,7 +55,8 @@ interface lightData {
     pos?: { data: Float32Array }, 
     dir?: { data: Float32Array }, 
     colors: { data: Float32Array }, 
-    mats?: { data: Float32Array }
+    mats?: { data: Float32Array },
+    ranges?: { data: Float32Array },
     textures?: Texture[],
 }
 
@@ -102,6 +103,7 @@ export class LightDatasCache {
         }
         if (isShadow) {
             obj.textures = new Array(num);
+            obj.ranges = { data: new Float32Array(num * 2) };
         }
         points.set(num, obj);
 
@@ -123,6 +125,7 @@ export class LightDatasCache {
         if (isShadow) {
             obj.textures = new Array(num);
             obj.mats = { data: new Float32Array(num * 16) };
+            obj.ranges = { data: new Float32Array(num * 2) };
         }
         spots.set(num, obj);
 
@@ -140,13 +143,16 @@ export class LightDatasCache {
     public getPoint(num: number) {
         return this._getPoint(num, false);
     }
+
     public getShadowPoint(num: number) {
         return this._getPoint(num, true);
     }
 
+
     public getSpot(num: number) {
         return this._getSpot(num, false);
     }
+
     public getShadowSpot(num: number) {
         return this._getSpot(num, true);
     }
@@ -631,6 +637,11 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 // mat.enableShadow();
                 mat.setDirShadowLights(shadows.d, dData.dir, dData.colors, dData.mats, dData.textures);
             }
+
+            if (shadows.s > 0) {
+                let sData = this._lightDatasCache.getShadowSpot(shadows.s);
+                mat.setSpotShadowLights(shadows.s, sData.pos, sData.dir, sData.colors, sData.ranges, sData.mats, sData.textures);
+            }
         }
         
         if (light) {
@@ -805,7 +816,8 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 let dData: Float32Array;
                 let cData: Float32Array;
                 let texs: Texture[];
-
+                
+                let rData: Float32Array;
                 let mData: Float32Array;
 
                 // light shadow
@@ -825,8 +837,32 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                         texs[i] = d.shadow.depthTex;
                     }
                 }
-                
-                let spotShadows = renderCulling.spotShadowLights;
+
+                if (renderCulling.spotShadowLightSize > 0) {
+                    let spotShadows = renderCulling.spotShadowLights;
+                    let spotShadowDatas = lightDatasCache.getShadowSpot(renderCulling.spotShadowLightSize);
+                    dData = spotShadowDatas.dir.data;
+                    pData = spotShadowDatas.pos.data;
+                    cData = spotShadowDatas.colors.data;
+                    rData = spotShadowDatas.ranges.data;
+                    mData = spotShadowDatas.mats.data;
+                    texs = spotShadowDatas.textures;
+                    for (let i = 0, l = renderCulling.spotShadowLightSize; i < l; i++) {
+                        let s = spotShadows[i];
+                        let ss = s.shadow;
+                        this._renderShadow(scene, s, renderCulling.visibleBox, camera);
+                        dData.set(s.dir.v, i * 4);
+                        dData[i * 4 + 3] = Math.cos(s.angle);
+                        pData.set(s.pos.v, i * 3);
+                        cData.set(s.color.v, i * 4);
+                        mData.set(ss.matrix.data, i * 16);
+                        rData[i * 2] = ss.far;
+                        rData[i * 2 + 1] = 1.0 / ss.far;
+                        texs[i] = ss.depthTex;
+                    }
+                }
+
+
                 let pointShadows = renderCulling.pointShadowLights;
                 
                 // light

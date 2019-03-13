@@ -394,6 +394,29 @@ export class Material extends Base {
         }
     }
 
+    public setSpotShadowLights(num: number, pos: any, dir: any, colors: any, ranges: any, mats: any, texs: Texture[]) {
+        if (num <= 0) {
+            this._removeMacro('SPOT_SHADOW_LIGHT');
+            this.removeProperty('u_spotShadowPos');
+            this.removeProperty('u_spotShadowDirs');
+            this.removeProperty('u_spotShadowColors');
+            this.removeProperty('u_spotRanges');
+            this.removeProperty('u_spotMats');
+            return;
+        }
+
+        this._addMacro('SPOT_SHADOW_LIGHT', num);
+        this.setProperty('u_spotShadowPos', pos);
+        this.setProperty('u_spotShadowDirs', dir);
+        this.setProperty('u_spotShadowColors', colors);
+        this.setProperty('u_spotRanges', ranges);
+        this.setProperty('u_spotMats', mats);
+
+        for (let i = 0; i < num; i++) {
+            this.setTexture(`u_spotShadowMaps_${i}`, texs[i]);
+        }
+    }
+
     public get supportDeferred(): boolean {
         return false;
     }

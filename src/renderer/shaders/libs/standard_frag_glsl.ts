@@ -35,6 +35,19 @@ varying vec3 v_worldPos;
     uniform vec4 u_pointColors[POINT_LIGHT];
 #endif
 
+#ifdef SPOT_SHADOW_LIGHT
+    uniform vec3 u_spotShadowPos[SPOT_SHADOW_LIGHT];
+    uniform vec4 u_spotShadowDirs[SPOT_SHADOW_LIGHT];
+    uniform vec4 u_spotShadowColors[SPOT_SHADOW_LIGHT];
+    uniform sampler2D u_spotShadowMaps[SPOT_SHADOW_LIGHT];
+    uniform mat4 u_spotMats[SPOT_SHADOW_LIGHT];
+    uniform vec2 u_spotRanges[SPOT_SHADOW_LIGHT];
+    #if SPOT_SHADOW_LIGHT > 0
+        // varying highp vec3 v_spotDepths_0;
+    #endif
+     
+#endif
+
 #ifdef SPOT_LIGHT
     uniform vec3 u_spotPos[SPOT_LIGHT];
     uniform vec4 u_spotDirs[SPOT_LIGHT];
@@ -103,10 +116,9 @@ float calcShadow(vec3 depth3, float z) {
     if (any(lessThan(depth3.xy, vec2(0.0))) || any(greaterThan(depth3.xy, vec2(1.0)))) {
         shadow = 1.0;
     } else {
-        shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0); //d > z ? 1.0 : 
-        shadow *= shadow;
+        shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0);
     }
-    return d > 1.0 ? 1.0 : shadow;
+    return (d > 1.0 || d < 0.0) ? 1.0 : shadow;
 }
 
 void main()
@@ -147,6 +159,7 @@ void main()
     vec3 L = normalize(u_lightDir.xyz);
 
     vec3 lo = vec3(0.0);
+    float endShadow = 1.0;
 
     // 方向光阴影
     #ifdef DIRECTION_SHADOW_LIGHT
@@ -155,7 +168,8 @@ void main()
             vec3 depth3 = u_directionDepths[0];
             float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[0], depth3.xy)); 
             float shadow = calcShadow(u_directionDepths[0], z);
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[0], u_directionShadowColors[0]) * shadow;
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[0], u_directionShadowColors[0]);// * shadow;
+            endShadow *= shadow;
         }
         #endif
         #if DIRECTION_SHADOW_LIGHT > 1
@@ -163,7 +177,8 @@ void main()
             vec3 depth3 = u_directionDepths[1];
             float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[1], depth3.xy)); 
             float shadow = calcShadow(u_directionDepths[1], z);
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[1], u_directionShadowColors[1]) * shadow;
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[1], u_directionShadowColors[1]);// * shadow;
+            endShadow *= shadow;
         }
         #endif
     #endif
@@ -190,7 +205,38 @@ void main()
 
     // 聚光灯阴影
     #ifdef SPOT_SHADOW_LIGHT
+        #if SPOT_SHADOW_LIGHT > 0
+            {
+                // vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y);//u_spotDepths[0]; 
+                // depth3.z *= u_spotRanges[0].y;
 
+                vec4 depthVec = u_spotMats[0] * vec4(v_worldPos, 1.0);
+                vec3 depth3 = vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y); //v_spotDepths_0;// 
+                
+                float z = decodeRGBA2Float(texture2D(u_spotShadowMaps[0], depth3.xy));
+                float shadow;
+
+                shadow = depth3.z - 0.005 > z ? 0.0 : 1.0;
+                shadow = (any(lessThan(depth3.xy, vec2(0.0))) || any(greaterThan(depth3.xy, vec2(1.0)))) ? 1.0 : shadow;
+                shadow = (depth3.z > 1.0 || depth3.z < 0.0) ? 1.0 : shadow;
+
+                // shadow = calcShadow(depth3, z); // (depth3.z > 1.0 || depth3.z < 0.0) ? 1.0 : shadow;
+                // = depth3.z > z ? 1.0 : 0.0;// ;
+                // endShadow *= shadow;
+
+                vec3 pos = u_spotShadowPos[0];
+                vec4 color = u_spotShadowColors[0];
+                vec4 dir = u_spotShadowDirs[0];
+                vec3 d3 = pos - v_worldPos;
+                vec3 d3_norm = normalize(d3);
+                float ag = step(dir.w, dot(dir.xyz, d3_norm));
+                lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, d3_norm, color) * ag * shadow;   
+                
+                // lo = depth3;
+            }
+        #endif
+        #if SPOT_SHADOW_LIGHT > 1
+        #endif
     #endif
 
     #ifdef SPOT_LIGHT
@@ -281,7 +327,7 @@ void main()
         // lo *= vec3(1.0 - shadow, 1.0, 1.0);
     #endif    
 
-    vec3 color = (ambient + lo);
+    vec3 color = lo; //(ambient) + 
     gl_FragColor = vec4(color, baseColor.w);
     // #ifdef DIRECTION_SHADOW_LIGHT
     //     gl_FragColor.xyz = vec3(decodeRGBA2Float(texture2D(u_directionShadowMaps[0], u_directionDepths[0].xy))) + color * 0.01;

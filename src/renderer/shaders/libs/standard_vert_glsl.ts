@@ -25,6 +25,16 @@ uniform vec4 u_cameraRange;
     varying vec3 u_directionDepths[DIRECTION_SHADOW_LIGHT];  
 #endif
 
+#ifdef SPOT_SHADOW_LIGHT
+    // uniform mat4 u_spotMats[SPOT_SHADOW_LIGHT];
+    // uniform vec2 u_spotRanges[SPOT_SHADOW_LIGHT];
+    // varying vec3 v_spotDepths[SPOT_SHADOW_LIGHT];  
+    #if SPOT_SHADOW_LIGHT > 0
+        // varying highp vec3 v_spotDepths_0;
+    #endif
+
+#endif
+
 #ifdef SHADOW_MAP
     uniform mat4 u_depthMat;
     varying vec3 v_depth3;  
@@ -55,6 +65,19 @@ void main()
             vec4 depthVec = u_directionMats[i] * vec4(v_worldPos, 1.0);
             u_directionDepths[i] = depthVec.xyz * 0.5 + 0.5;
         }
+    #endif
+
+    #ifdef SPOT_SHADOW_LIGHT
+
+        #if SPOT_SHADOW_LIGHT > 0
+            // vec4 depthVec = u_spotMats[0] * vec4(v_worldPos, 1.0);
+            // v_spotDepths_0 = vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y);
+        #endif
+
+        // for (int i = 0; i < SPOT_SHADOW_LIGHT; i++) {
+        //     vec4 depthVec = u_spotMats[i] * vec4(v_worldPos, 1.0);
+        //     u_spotDepths[i] = vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[i].y);
+        // }
     #endif
 
     gl_Position = pos;

@@ -58,6 +58,5 @@ void main()
 
     float result = clamp((d0 + log(color)) * w, 0.0, 0.999);// (d0 + log(color)) * w; //
     gl_FragColor = vec4(encodeFloat2RGBA(result));
-    // gl_FragColor = vec4(result);
 }
 `;

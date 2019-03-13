@@ -327,16 +327,15 @@ for(let i = 0; i < 4; i++) {
     mainScene.addChild(p);
 }
 
-// for(let i = 0; i < 4; i++) {
-//     let p = new CGE.SpotLight();
-//     p.setColor(Math.random() * 200 + 200, Math.random() * 200 + 200, Math.random() * 200 + 200);
-//     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
-//     let vec = CGE.Vector3.pubTemp;
-//     vec.set(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, -Math.random()).normalize();
-//     p.setDir(vec.x, vec.y, vec.z);
-//     p.angle = (Math.random() + 0.0001) * Math.PI * 0.49;
-//     mainScene.addChild(p);
-// }
+for(let i = 0; i < 1; i++) {
+    let p = new CGE.SpotLight();
+    p.setColor(1, 1, 1);
+    p.setPosition(20, 20, 100);
+    p.setDir(1, 1, 10);
+    p.angle = 0.5 * Math.PI * 0.5;
+    p.enableShadow();
+    mainScene.addChild(p);
+}
 
 // 以上 光源测试
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -443,6 +442,7 @@ planeMat.setUVOffset(20, 20, 0, 0);
 planeMat.enableStencil = true;
 planeMat.setStencil(standMat.stencil);
 let mesh = new CGE.Mesh();
+mesh.castShadow = false;
 mesh.setPosition(0, 0, -10);
 mesh.setScale(4000, 4000, 1);
 mesh.setGeometry(planeVertexGeometry);

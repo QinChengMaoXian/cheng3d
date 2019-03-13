@@ -89,6 +89,8 @@ export class Camera extends Object3D {
         this._aspect = _aspect || this._aspect;
         let height = Math.abs(this._bottom - this._top);
         let width = height * _aspect;
+        this._near = _near;
+        this._far = _far;
         this.resize(width, height);
     }
 

@@ -13,7 +13,7 @@ export class Scene extends Object3D {
 
         this.addChild(this._mainLight);
         this._mainLight.name = 'mainLight';
-        this._mainLight.enableShadow();
+        // this._mainLight.enableShadow();
     }
 
     public getMainLight() {

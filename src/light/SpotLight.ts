@@ -2,12 +2,15 @@ import { Light, LightType, ILight } from "./Light";
 import { Vector3 } from "../math/Vector3";
 import { Quaternion } from "../math/Quaternion";
 import { AABB } from "../bounding/AABB";
+import { SpotShadow } from "./SpotShadow";
 
 export class SpotLight extends Light implements ILight {
 
     protected _dir: Vector3 = new Vector3();
     protected _angle: number = 0.0;
-    protected _radius: number = 4.0;
+    protected _radius: number = 200.0;
+    
+    protected _shadow: SpotShadow;
 
     constructor() {
         super();
@@ -40,7 +43,7 @@ export class SpotLight extends Light implements ILight {
         super.setColor(r, g, b);
         let lum = Light.LumFactor.dot(this._color);
         // 这里计算亮度衰减到1 / 256的时的半径;
-        this._radius = Math.sqrt(lum) * 16.0;
+        // this._radius = Math.sqrt(lum) * 16.0;
     }
     
     protected _updateBounding() {
@@ -64,6 +67,32 @@ export class SpotLight extends Light implements ILight {
         return LightType.Spot;
     }
 
+    public enableShadow() {
+        if (!this._shadow) {
+            this._shadow = new SpotShadow();
+            this._shadow.init();
+        }
+        this._shadow.enalbed = true;
+    }
+
+    public disableShadow() {
+        if (!this._shadow) {
+            return;
+        }
+        this._shadow.enalbed = false;
+    }
+
+    public clearShadow() {
+        if (this._shadow) {
+            this._shadow.destroy();
+            this._shadow = null;
+        }
+    }
+
+    public get shadow() {
+        return this._shadow;
+    }
+
     set angle(v: number) {
         this._angle = v;
     }
@@ -74,6 +103,10 @@ export class SpotLight extends Light implements ILight {
 
     get dir() {
         return this._dir;
+    }
+
+    get radius() {
+        return this._radius;
     }
 
     get isSpotLight() {

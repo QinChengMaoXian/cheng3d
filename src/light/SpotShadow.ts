@@ -10,6 +10,8 @@ export class SpotShadow extends Shadow {
     protected _depthTex: Texture2D;
     protected _size: number = 512;
     public matrix: Matrix4;
+    public near: number;
+    public far: number;
 
     constructor() {
         super();
@@ -17,7 +19,7 @@ export class SpotShadow extends Shadow {
         this.matrix = new Matrix4();
     }
 
-    public init(size: number = 512) {
+    public init(size: number = 256) {
         this._size = size;
         let tex = this._depthTex;
         if (!tex) {
