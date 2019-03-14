@@ -4,6 +4,8 @@ import { Matrix4 } from "../math/Matrix4";
 
 import * as CGE from '../graphics/RendererParameter';
 import { LightType } from "./Light";
+import { Frame } from "../graphics/Frame";
+import { RTLocation } from "../graphics/GraphicsTypes";
 
 export class DirectionShadow extends Shadow {
 
@@ -13,6 +15,7 @@ export class DirectionShadow extends Shadow {
     public far: number = 2000;
     public autoRange: boolean = false;
     public matrix: Matrix4 = new Matrix4();
+    public frame: Frame;
 
     constructor() {
         super();
@@ -28,6 +31,16 @@ export class DirectionShadow extends Shadow {
             this._depthTex = tex;
         }
         tex.setSize(size, size);
+
+        let frame = this.frame;
+        if (!frame) {
+            frame = new Frame();
+            frame.setTexture2D(RTLocation.COLOR, tex);
+            frame.enableDepthStencil();
+            frame.getState().clearColor.set(1, 1, 1, 1);
+            this.frame = frame;
+        }
+        frame.setSize(size, size);
     }
 
     public get depthTex(): Texture2D {

@@ -1,15 +1,26 @@
 import * as CGE from './RendererParameter';
 import { Texture } from './Texture'
 import { Texture2D } from './Texture2D';
+import { Vector3 } from '../math/Vector3';
 
-// 渲染到cude6个面的相机参数
-// position          target             up
-// [(0.0, 0.0, 0.0), (1.0,  0.0,  0.0), (0.0,  0.0,  1.0)],
-// [(0.0, 0.0, 0.0), (-1.0, 0.0,  0.0), (0.0,  0.0,  1.0)],
-// [(0.0, 0.0, 0.0), (0.0,  0.0, -1.0), (0.0,  1.0,  0.0)],
-// [(0.0, 0.0, 0.0), (0.0,  0.0,  1.0), (0.0, -1.0,  0.0)],
-// [(0.0, 0.0, 0.0), (0.0,  1.0,  0.0), (0.0,  0.0,  1.0)],
-// [(0.0, 0.0, 0.0), (0.0, -1.0,  0.0), (0.0,  0.0,  1.0)]
+export const CubeVectors = [
+    { target: new Vector3( 1.0,  0.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
+    { target: new Vector3(-1.0,  0.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
+    { target: new Vector3( 0.0,  0.0,  1.0), up: new Vector3(0.0, -1.0, 0.0) },
+    { target: new Vector3( 0.0,  0.0, -1.0), up: new Vector3(0.0,  1.0, 0.0) },
+    { target: new Vector3( 0.0, -1.0,  0.0), up: new Vector3(0.0,  0.0, 1.0) },
+    { target: new Vector3( 0.0,  1.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
+];
+
+// Y-UP
+// export const CubeVectors = [
+//     { target: new Vector3(1.0,0.0,0.0), up: new Vector3(0.0,-1.0,0.0) },
+//     { target: new Vector3(-1.0,0.0,0.0), up: new Vector3(0.0,-1.0,0.0) },
+//     { target: new Vector3(0.0,1.0,0.0), up: new Vector3(0.0,0.0,1.0) },
+//     { target: new Vector3(0.0,-1.0,0.0), up: new Vector3(0.0,0.0,-1.0) },
+//     { target: new Vector3(0.0,0.0,1.0), up: new Vector3(0.0,-1.0,0.0) },
+//     { target: new Vector3(0.0,0.0,-1.0), up: new Vector3(0.0,-1.0,0.0) },
+// ];
 
 export class TextureCube extends Texture {
     private static _gen1pxColorTextureCube(tex2d: Texture2D) {
@@ -79,6 +90,12 @@ export class TextureCube extends Texture {
 
     public getType() {
         return Texture.TEXTURECUBE;
+    }
+
+    public setAllSize(w: number, h: number) {
+        this._texture2ds.forEach(tex => {
+            tex.setSize(w, h);
+        })
     }
 
     public destroy() {

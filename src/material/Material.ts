@@ -87,6 +87,10 @@ export class Material extends Base {
         }
     }
 
+    protected removeClassTexture(type: string) {
+
+    }
+
     protected setProperty(type: string | number, data: any) {
         this._properties.set(type, data);
     }
@@ -389,6 +393,7 @@ export class Material extends Base {
         this.setProperty('u_directionShadowColors', colors);
         this.setProperty('u_directionMats', mats);
 
+        // TODO: 移除时如何移除贴图；
         for (let i = 0; i < num; i++) {
             this.setTexture(`u_directionShadowMaps_${i}`, texs[i]);
         }
@@ -414,6 +419,25 @@ export class Material extends Base {
 
         for (let i = 0; i < num; i++) {
             this.setTexture(`u_spotShadowMaps_${i}`, texs[i]);
+        }
+    }
+
+    public setPointShadowLights(num: number, pos: any, colors: any, ranges: any, texs: Texture[]) {
+        if (num <= 0) {
+            this._removeMacro('POINT_SHADOW_LIGHT');
+            this.removeProperty('u_pointShadowPos');
+            this.removeProperty('u_pointShadowColors');
+            this.removeProperty('u_pointRanges');
+            return;
+        }
+
+        this._addMacro('POINT_SHADOW_LIGHT', num);
+        this.setProperty('u_pointShadowPos', pos);
+        this.setProperty('u_pointShadowColors', colors);
+        this.setProperty('u_pointRanges', ranges);
+
+        for (let i = 0; i < num; i++) {
+            this.setTexture(`u_pointShadowMaps_${i}`, texs[i]);
         }
     }
 

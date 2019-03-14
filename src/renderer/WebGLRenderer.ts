@@ -636,12 +636,27 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 // mat.setDepthMatData(dData.mats);
                 // mat.enableShadow();
                 mat.setDirShadowLights(shadows.d, dData.dir, dData.colors, dData.mats, dData.textures);
+            } else {
+                mat.setDirShadowLights(0, null, null, null, null);
             }
 
             if (shadows.s > 0) {
                 let sData = this._lightDatasCache.getShadowSpot(shadows.s);
                 mat.setSpotShadowLights(shadows.s, sData.pos, sData.dir, sData.colors, sData.ranges, sData.mats, sData.textures);
+            } else {
+                mat.setSpotShadowLights(0, null, null, null, null, null, null);
             }
+
+            if (shadows.p > 0) {
+                let pData = this._lightDatasCache.getShadowPoint(shadows.p);
+                mat.setPointShadowLights(shadows.p, pData.pos, pData.colors, pData.ranges, pData.textures);
+            } else {
+                mat.setPointShadowLights(0, null, null, null, null);
+            }
+        } else {
+            mat.setDirShadowLights(0, null, null, null, null);
+            mat.setSpotShadowLights(0, null, null, null, null, null, null);
+            mat.setPointShadowLights(0, null, null, null, null);
         }
         
         if (light) {
@@ -862,9 +877,26 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                     }
                 }
 
+                if (renderCulling.pointShadowLightSize > 0) {
+                    let pointShadows = renderCulling.pointShadowLights;
+                    let pointShadowDatas = lightDatasCache.getShadowPoint(renderCulling.pointShadowLightSize);
+                    pData = pointShadowDatas.pos.data;
+                    cData = pointShadowDatas.colors.data;
+                    rData = pointShadowDatas.ranges.data;
+                    texs = pointShadowDatas.textures;
 
-                let pointShadows = renderCulling.pointShadowLights;
-                
+                    for (let i = 0, l = renderCulling.pointShadowLightSize; i < l; i++) {
+                        let p = pointShadows[i];
+                        let ps = p.shadow;
+                        this._renderShadow(scene, p, renderCulling.visibleBox, camera);
+                        pData.set(p.pos.v, i * 3);
+                        cData.set(p.color.v, i * 4);
+                        rData[i * 2] = ps.far;
+                        rData[i * 2 + 1] = 1.0 / ps.far;
+                        texs[i] = ps.depthTex;
+                    }
+                }
+
                 // light
 
                 let pointLights = renderCulling.pointLights;

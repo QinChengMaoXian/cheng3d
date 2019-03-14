@@ -100,6 +100,8 @@ export class Frame extends GraphicsObject {
 
     public setDepthStencil(tex: Texture2D) {
         this._depthStencilTexture = tex;
+        this._state.setClearDepth(true);
+        this._state.setClearStencil(true);
         this.needsUpdate();
     }
 

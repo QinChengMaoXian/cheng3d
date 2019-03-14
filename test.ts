@@ -246,7 +246,7 @@ mainScene.addChild(obj3D);
 
 for (let ix = 0; ix <= 7; ix++) {
 
-    for (let iz = 0; iz <= 7; iz++) {
+    for (let iz = 0; iz <= ix; iz++) {
         let mesh = new CGE.Mesh();
         mesh.setGeometry(geo);
 
@@ -320,21 +320,30 @@ mainScene.addChild(skyboxMesh);
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 光源测试
 
-for(let i = 0; i < 4; i++) {
-    let p = new CGE.PointLight();
-    p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
-    p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
-    mainScene.addChild(p);
-}
+// for(let i = 0; i < 4; i++) {
+//     let p = new CGE.PointLight();
+//     p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
+//     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+//     mainScene.addChild(p);
+// }
+
+// for(let i = 0; i < 1; i++) {
+//     let p = new CGE.SpotLight();
+//     p.setColor(1, 1, 1);
+//     p.setPosition(20, 20, 100);
+//     p.setDir(1, 1, 10);
+//     p.angle = 0.5 * Math.PI * 0.5;
+//     p.enableShadow();
+//     mainScene.addChild(p);
+// }
 
 for(let i = 0; i < 1; i++) {
-    let p = new CGE.SpotLight();
+    let p = new CGE.PointLight();
     p.setColor(1, 1, 1);
     p.setPosition(20, 20, 100);
-    p.setDir(1, 1, 10);
-    p.angle = 0.5 * Math.PI * 0.5;
     p.enableShadow();
     mainScene.addChild(p);
+    window['ppp'] = p;
 }
 
 // 以上 光源测试
@@ -434,15 +443,15 @@ planeVertexGeometry.addMultiAttribute(attribs, CGE.FLOAT, vertexPositionData.BYT
 planeVertexGeometry.setIndexData(indexData);
 planeVertexGeometry.setDrawParameter(indexData.length);
 
-// let planeMat = new CGE.StandardMaterial();
-let planeMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
+let planeMat = new CGE.StandardMaterial();
+// let planeMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 planeMat.setIrradianceMap(cubeTexture);
 planeMat.setPrefilterMap(cubeTexture);
 planeMat.setUVOffset(20, 20, 0, 0); 
 planeMat.enableStencil = true;
 planeMat.setStencil(standMat.stencil);
 let mesh = new CGE.Mesh();
-mesh.castShadow = false;
+// mesh.castShadow = false;
 mesh.setPosition(0, 0, -10);
 mesh.setScale(4000, 4000, 1);
 mesh.setGeometry(planeVertexGeometry);
@@ -553,7 +562,7 @@ standMat.setBaseColor(1.0, 1.0, 1.0, 1.0);
 
 teapotMesh = new CGE.Mesh();
 teapotMesh.setScale(2, 2, 2);
-teapotMesh.setPosition(150, 100, 50);
+teapotMesh.setPosition(100, 100, 0);
 teapotMesh.setGeometry(teapotGeometry);
 teapotMesh.setMaterial(standMat);
 teapotMesh.name = '水壶3';

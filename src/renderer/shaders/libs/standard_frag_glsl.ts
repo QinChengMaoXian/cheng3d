@@ -30,6 +30,13 @@ varying vec3 v_worldPos;
     uniform vec4 u_directionColors[DIRECTION_LIGHT];
 #endif
 
+#ifdef POINT_SHADOW_LIGHT
+    uniform vec3 u_pointShadowPos[POINT_SHADOW_LIGHT];
+    uniform vec4 u_pointShadowColors[POINT_SHADOW_LIGHT];
+    uniform samplerCube u_pointShadowMaps[POINT_SHADOW_LIGHT];
+    uniform vec2 u_pointRanges[POINT_SHADOW_LIGHT];
+#endif
+
 #ifdef POINT_LIGHT
     uniform vec3 u_pointPos[POINT_LIGHT];
     uniform vec4 u_pointColors[POINT_LIGHT];
@@ -168,8 +175,8 @@ void main()
             vec3 depth3 = u_directionDepths[0];
             float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[0], depth3.xy)); 
             float shadow = calcShadow(u_directionDepths[0], z);
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[0], u_directionShadowColors[0]);// * shadow;
-            endShadow *= shadow;
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[0], u_directionShadowColors[0]) * shadow;
+            // endShadow *= shadow; 
         }
         #endif
         #if DIRECTION_SHADOW_LIGHT > 1
@@ -177,8 +184,8 @@ void main()
             vec3 depth3 = u_directionDepths[1];
             float z = decodeRGBA2Float(texture2D(u_directionShadowMaps[1], depth3.xy)); 
             float shadow = calcShadow(u_directionDepths[1], z);
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[1], u_directionShadowColors[1]);// * shadow;
-            endShadow *= shadow;
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, u_directionShadowDirs[1], u_directionShadowColors[1]) * shadow;
+            // endShadow *= shadow;
         }
         #endif
     #endif
@@ -191,7 +198,22 @@ void main()
 
     // 点光源阴影
     #ifdef POINT_SHADOW_LIGHT
+        #if POINT_SHADOW_LIGHT > 0
+        {
+            vec3 pos = u_pointShadowPos[0];
+            vec4 color = u_pointShadowColors[0];
+            vec3 d3 = v_worldPos - pos;
+            float d = length(d3);
+            d3 /= d;
+            float z = decodeRGBA2Float(textureCube(u_pointShadowMaps[0], vec3(d3.x, d3.z, -d3.y)));
+            d *= u_pointRanges[0].y;
 
+            float shadow = d - 0.01 > z ? 0.0 : 1.0;
+            shadow = d > 1.0 ? 1.0 : shadow;
+
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(pos - v_worldPos), color) * shadow;
+        }
+        #endif
     #endif
 
     #ifdef POINT_LIGHT
@@ -206,34 +228,34 @@ void main()
     // 聚光灯阴影
     #ifdef SPOT_SHADOW_LIGHT
         #if SPOT_SHADOW_LIGHT > 0
-            {
-                // vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y);//u_spotDepths[0]; 
-                // depth3.z *= u_spotRanges[0].y;
+        {
+            // vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y);//u_spotDepths[0]; 
+            // depth3.z *= u_spotRanges[0].y;
 
-                vec4 depthVec = u_spotMats[0] * vec4(v_worldPos, 1.0);
-                vec3 depth3 = vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y); //v_spotDepths_0;// 
-                
-                float z = decodeRGBA2Float(texture2D(u_spotShadowMaps[0], depth3.xy));
-                float shadow;
+            vec4 depthVec = u_spotMats[0] * vec4(v_worldPos, 1.0);
+            vec3 depth3 = vec3(depthVec.xy / depthVec.w * 0.5 + 0.5, depthVec.w * u_spotRanges[0].y); //v_spotDepths_0;// 
+            
+            float z = decodeRGBA2Float(texture2D(u_spotShadowMaps[0], depth3.xy));
+            float shadow;
 
-                shadow = depth3.z - 0.005 > z ? 0.0 : 1.0;
-                shadow = (any(lessThan(depth3.xy, vec2(0.0))) || any(greaterThan(depth3.xy, vec2(1.0)))) ? 1.0 : shadow;
-                shadow = (depth3.z > 1.0 || depth3.z < 0.0) ? 1.0 : shadow;
+            shadow = depth3.z - 0.005 > z ? 0.0 : 1.0;
+            shadow = (any(lessThan(depth3.xy, vec2(0.0))) || any(greaterThan(depth3.xy, vec2(1.0)))) ? 1.0 : shadow;
+            shadow = (depth3.z > 1.0 || depth3.z < 0.0) ? 1.0 : shadow;
 
-                // shadow = calcShadow(depth3, z); // (depth3.z > 1.0 || depth3.z < 0.0) ? 1.0 : shadow;
-                // = depth3.z > z ? 1.0 : 0.0;// ;
-                // endShadow *= shadow;
+            // shadow = calcShadow(depth3, z); // (depth3.z > 1.0 || depth3.z < 0.0) ? 1.0 : shadow;
+            // = depth3.z > z ? 1.0 : 0.0;// ;
+            // endShadow *= shadow;
 
-                vec3 pos = u_spotShadowPos[0];
-                vec4 color = u_spotShadowColors[0];
-                vec4 dir = u_spotShadowDirs[0];
-                vec3 d3 = pos - v_worldPos;
-                vec3 d3_norm = normalize(d3);
-                float ag = step(dir.w, dot(dir.xyz, d3_norm));
-                lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, d3_norm, color) * ag * shadow;   
-                
-                // lo = depth3;
-            }
+            vec3 pos = u_spotShadowPos[0];
+            vec4 color = u_spotShadowColors[0];
+            vec4 dir = u_spotShadowDirs[0];
+            vec3 d3 = pos - v_worldPos;
+            vec3 d3_norm = normalize(d3);
+            float ag = step(dir.w, dot(dir.xyz, d3_norm));
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, d3_norm, color) * ag * shadow;   
+            
+            // lo = depth3;
+        }
         #endif
         #if SPOT_SHADOW_LIGHT > 1
         #endif

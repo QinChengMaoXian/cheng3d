@@ -4,7 +4,7 @@ import { PointShadow } from "./PointShadow";
 
 export class PointLight extends Light implements ILight {
 
-    protected _radius: number = 4.0;
+    protected _radius: number = 1000.0;//4.0;
 
     protected _shadow: PointShadow;
 
@@ -23,7 +23,29 @@ export class PointLight extends Light implements ILight {
         super.setColor(r, g, b);
         let lum = Light.LumFactor.dot(this._color);
         // 这里计算亮度衰减到1 / 255的时的半径;
-        this._radius = Math.sqrt(lum) * 4.0;
+        // this._radius = Math.sqrt(lum) * 4.0;
+    }
+
+    public enableShadow() {
+        if (!this._shadow) {
+            this._shadow = new PointShadow();
+            this._shadow.init();
+        }
+        this._shadow.enalbed = true;
+    }
+
+    public disableShadow() {
+        if (!this._shadow) {
+            return;
+        }
+        this._shadow.enalbed = false;
+    }
+
+    public clearShadow() {
+        if (this._shadow) {
+            this._shadow.destroy();
+            this._shadow = null;
+        }
     }
 
     public get shadow() {
