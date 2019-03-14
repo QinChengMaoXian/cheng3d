@@ -320,27 +320,28 @@ mainScene.addChild(skyboxMesh);
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 光源测试
 
-// for(let i = 0; i < 4; i++) {
-//     let p = new CGE.PointLight();
-//     p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
-//     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
-//     mainScene.addChild(p);
-// }
+for(let i = 0; i < 4; i++) {
+    let p = new CGE.PointLight();
+    p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
+    p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+    mainScene.addChild(p);
+}
 
-// for(let i = 0; i < 1; i++) {
-//     let p = new CGE.SpotLight();
-//     p.setColor(1, 1, 1);
-//     p.setPosition(20, 20, 100);
-//     p.setDir(1, 1, 10);
-//     p.angle = 0.5 * Math.PI * 0.5;
-//     p.enableShadow();
-//     mainScene.addChild(p);
-// }
+for(let i = 0; i < 1; i++) {
+    let p = new CGE.SpotLight();
+    p.setColor(1, 1, 1);
+    p.setPosition(20, 20, 100);
+    p.setDir(-1, 1, 1);
+    p.angle = 0.5 * Math.PI * 0.5;
+    p.enableShadow();
+    mainScene.addChild(p);
+    window['sss'] = p;
+}
 
 for(let i = 0; i < 1; i++) {
     let p = new CGE.PointLight();
     p.setColor(1, 1, 1);
-    p.setPosition(20, 20, 100);
+    p.setPosition(150, -30, 80);
     p.enableShadow();
     mainScene.addChild(p);
     window['ppp'] = p;

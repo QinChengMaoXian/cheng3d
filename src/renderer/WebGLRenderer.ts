@@ -891,8 +891,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                         this._renderShadow(scene, p, renderCulling.visibleBox, camera);
                         pData.set(p.pos.v, i * 3);
                         cData.set(p.color.v, i * 4);
-                        rData[i * 2] = ps.far;
-                        rData[i * 2 + 1] = 1.0 / ps.far;
+                        let dd = ps.far * Math.sqrt(3.0);
+                        rData[i * 2] = dd;
+                        rData[i * 2 + 1] = 1.0 / dd;
                         texs[i] = ps.depthTex;
                     }
                 }

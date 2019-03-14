@@ -205,11 +205,11 @@ void main()
             vec3 d3 = v_worldPos - pos;
             float d = length(d3);
             d3 /= d;
-            float z = decodeRGBA2Float(textureCube(u_pointShadowMaps[0], vec3(d3.x, d3.z, -d3.y)));
-            d *= u_pointRanges[0].y;
+            float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], vec3(d3.x, d3.z, -d3.y)));
+            // d *= u_pointRanges[0].y;
 
-            float shadow = d - 0.01 > z ? 0.0 : 1.0;
-            shadow = d > 1.0 ? 1.0 : shadow;
+            float shadow = d - 0.5 > z ? 0.0 : 1.0;
+            shadow = d > u_pointRanges[0].x ? 1.0 : shadow;
 
             lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(pos - v_worldPos), color) * shadow;
         }
@@ -349,7 +349,7 @@ void main()
         // lo *= vec3(1.0 - shadow, 1.0, 1.0);
     #endif    
 
-    vec3 color = lo; //(ambient) + 
+    vec3 color = (ambient) + lo; //
     gl_FragColor = vec4(color, baseColor.w);
     // #ifdef DIRECTION_SHADOW_LIGHT
     //     gl_FragColor.xyz = vec3(decodeRGBA2Float(texture2D(u_directionShadowMaps[0], u_directionDepths[0].xy))) + color * 0.01;

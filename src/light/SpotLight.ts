@@ -8,7 +8,7 @@ export class SpotLight extends Light implements ILight {
 
     protected _dir: Vector3 = new Vector3();
     protected _angle: number = 0.0;
-    protected _radius: number = 200.0;
+    protected _radius: number = 1000.0;
     
     protected _shadow: SpotShadow;
 

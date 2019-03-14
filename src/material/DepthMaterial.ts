@@ -22,6 +22,18 @@ export class DepthMaterial extends Material {
         this._baseColor.set(r, g, b, a);
     }
 
+    public setRange(x: number, y: number) {
+
+    }
+
+    public enablePointShadow() {
+        this._addMacro('POINT_SHADOW');
+    }
+
+    public disablePointShadow() {
+        this._removeMacro('POINT_SHADOW');
+    }
+
     public get type(): string {
         return 'depth';
     }

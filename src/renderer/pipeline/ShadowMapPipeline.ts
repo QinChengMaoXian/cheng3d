@@ -35,6 +35,9 @@ export class ShadowMapPipeline {
     /** 渲染深度用的材质 */
     private _material: DepthMaterial;
 
+    /** 点光源深度用的材质 */
+    private _pointMat: DepthMaterial;
+
     /** 深度用的相机 */
     private _camera: Camera;
 
@@ -56,6 +59,9 @@ export class ShadowMapPipeline {
 
         let mat = new ESMBlurMaterial();
         this._blurMat = mat;
+
+        this._pointMat = new DepthMaterial;
+        this._pointMat.enablePointShadow();
 
         let geo = new ScreenGeometry();
 
@@ -278,7 +284,7 @@ export class ShadowMapPipeline {
     protected _pointShadow(scene: Object3D, light: PointLight) {
         let culling = this._culling;
         let camera = this._camera;
-        let material = this._material;
+        let material = this._pointMat;
 
         let cubeVectors = CubeVectors;
         let shadow = light.shadow;

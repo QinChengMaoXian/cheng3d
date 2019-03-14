@@ -6,8 +6,8 @@ import { Vector3 } from '../math/Vector3';
 export const CubeVectors = [
     { target: new Vector3( 1.0,  0.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
     { target: new Vector3(-1.0,  0.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
-    { target: new Vector3( 0.0,  0.0,  1.0), up: new Vector3(0.0, -1.0, 0.0) },
-    { target: new Vector3( 0.0,  0.0, -1.0), up: new Vector3(0.0,  1.0, 0.0) },
+    { target: new Vector3( 0.0,  0.0,  1.0), up: new Vector3(0.0, -1.0,  0.0) },
+    { target: new Vector3( 0.0,  0.0, -1.0), up: new Vector3(0.0,  1.0,  0.0) },
     { target: new Vector3( 0.0, -1.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
     { target: new Vector3( 0.0,  1.0,  0.0), up: new Vector3(0.0,  0.0, -1.0) },
 ];

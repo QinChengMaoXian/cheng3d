@@ -4,7 +4,7 @@ import { PointShadow } from "./PointShadow";
 
 export class PointLight extends Light implements ILight {
 
-    protected _radius: number = 1000.0;//4.0;
+    protected _radius: number = 2000.0;//4.0;
 
     protected _shadow: PointShadow;
 
