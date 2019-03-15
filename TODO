@@ -1,24 +1,5 @@
-# Document
-# More Sample
-# WebGL20
-# For details: 
-#   StateObject
-#       renderState
-#           blend\depth\stencil\cullface
-#       rendererState
-#           clearColor\clearDepth\clearStencil
-#   Lighting
-#   Bounding box
-#   Bone/Joint
-#   Loader/ResourceManager
-#   Shader enhance (An ALL Overrided Shader)
-#   Animation
-#   
-# ui: box,text,label,image,button,hbox,vbox,list
-
-
-SSAO写完。
-Point, Spot光源加入场景。
-光源处理。
-视锥裁剪。
-构思一个看起来还行的场景
+# TODO List
+# Shadowed spot light and point light lum attenuation
+# Animation
+# Mesh componentized
+# WebGL 2.0 support

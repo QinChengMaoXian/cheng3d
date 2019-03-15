@@ -12,7 +12,7 @@ import { Vector3 } from "../../math/Vector3";
 import { Matrix4 } from "../../math/Matrix4";
 import { RTLocation } from "../../graphics/GraphicsTypes";
 import { SpotLight } from "../../light/SpotLight";
-import { ESMBlurMaterial } from "../../material/ESMBlurMaterial";
+import { LogBlurMaterial } from "../../material/LogBlurMaterial";
 import { Mesh } from "../../object/Mesh";
 import { ScreenGeometry } from "../../util/GeometryUtil";
 import { Texture2D } from '../../graphics/Texture2D';
@@ -42,7 +42,7 @@ export class ShadowMapPipeline {
     private _camera: Camera;
 
     /** ESM模糊材质 */
-    private _blurMat: ESMBlurMaterial;
+    private _blurMat: LogBlurMaterial;
 
     /** ESM模糊用的Frame */
     private _blurFrame: Frame;
@@ -57,7 +57,7 @@ export class ShadowMapPipeline {
 
         this._camera = new Camera();
 
-        let mat = new ESMBlurMaterial();
+        let mat = new LogBlurMaterial();
         this._blurMat = mat;
 
         this._pointMat = new DepthMaterial;

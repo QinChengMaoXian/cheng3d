@@ -2,7 +2,7 @@ import { Material } from "./Material";
 import { Texture2D } from "../graphics/Texture2D";
 import { ShaderConst } from "../graphics/ShaderConst";
 
-export class ESMBlurMaterial extends Material {
+export class LogBlurMaterial extends Material {
     protected _size: { data: Float32Array };
     protected _dir: { data: Float32Array };
 
@@ -28,7 +28,7 @@ export class ESMBlurMaterial extends Material {
     }
 
     public get type(): string {
-        return 'esm_blur';
+        return 'log_blur';
     }
 
 }

@@ -297,24 +297,24 @@ mainScene.addChild(skyboxMesh);
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 更大一堆球
 
-// let boxes = new CGE.Object3D();
-// boxes.name = '更大一堆球';
-// mainScene.addChild(boxes);
+let boxes = new CGE.Object3D();
+boxes.name = '更大一堆球';
+mainScene.addChild(boxes);
 
-// for (let i = 0; i < 20; i++) {
-//     for (let j = 0; j < 20; j++) {
-//         for (let k = 0; k < 20; k++) {
-//             let skyboxMesh = new CGE.Mesh();
+for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 10; j++) {
+        for (let k = 0; k < 10; k++) {
+            let skyboxMesh = new CGE.Mesh();
 
-//             skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);
-//             skyboxMesh.setScale(5, 5, 5);
-//             skyboxMesh.setGeometry(geo);
-//             skyboxMesh.setMaterial(standMat);
+            skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);
+            skyboxMesh.setScale(5, 5, 5);
+            skyboxMesh.setGeometry(geo);
+            skyboxMesh.setMaterial(standMat);
 
-//             boxes.addChild(skyboxMesh);
-//         }
-//     }
-// }
+            boxes.addChild(skyboxMesh);
+        }
+    }
+}
 
 // 以上 box组
 ///////////////////////////////////////////////////////////////////////////////////////

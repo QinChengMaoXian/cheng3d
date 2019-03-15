@@ -59,7 +59,7 @@ import skybox_frag from './libs/skybox_frag_glsl';
 import blend_frag from './libs/blend_frag_glsl';
 import depth_vert from './libs/depth_vert_glsl';
 import depth_frag from './libs/depth_frag_glsl';
-import esm_blur_frag from './libs/esm_blur_glsl';
+import log_blur_frag from './libs/log_blur_glsl';
 
 export const shaders = {
     'fullscreen': {
@@ -151,8 +151,8 @@ export const shaders = {
         frag: repStr(depth_frag),
     },
 
-    'esm_blur': {
+    'log_blur': {
         vert: repStr(fullscreen_vert),
-        frag: repStr(esm_blur_frag),
+        frag: repStr(log_blur_frag),
     },
 }

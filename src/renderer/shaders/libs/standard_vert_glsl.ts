@@ -8,8 +8,12 @@ varying vec2 v_uv;
 varying vec3 v_worldPos;
 varying vec3 v_viewPos;
 varying vec3 v_normal;
-varying vec3 v_tangent;
-varying vec3 v_binormal;
+
+#ifdef NORMAL_MAP
+    varying vec3 v_tangent;
+    varying vec3 v_binormal;
+#endif
+
 varying float v_depth;
 
 uniform vec4 u_uvOffset;
@@ -35,10 +39,10 @@ uniform vec4 u_cameraRange;
 
 #endif
 
-#ifdef SHADOW_MAP
-    uniform mat4 u_depthMat;
-    varying vec3 v_depth3;  
-#endif
+// #ifdef SHADOW_MAP
+//     uniform mat4 u_depthMat;
+//     varying vec3 v_depth3;  
+// #endif
 
 void main()
 {
@@ -47,18 +51,21 @@ void main()
     vec4 worldPos = u_mMat * a_position;
     v_worldPos = worldPos.xyz;
 
-    v_tangent = normalize((u_mMat * vec4(a_tangent, 0.0)).xyz);
+    #ifdef NORMAL_MAP
+        v_tangent = normalize((u_mMat * vec4(a_tangent, 0.0)).xyz);
+        v_binormal = cross(v_tangent, v_normal);
+    #endif
     v_normal = normalize((u_mITMat * vec4(a_normal, 0.0)).xyz);
-    v_binormal = cross(v_tangent, v_normal);
 
     v_viewPos = (u_mvMat * a_position).xyz;
 
     vec4 pos = u_mvpMat * a_position;
     v_depth = pos.w * u_cameraRange.y;
-    #ifdef SHADOW_MAP
-        vec4 depthVec = u_depthMat * vec4(v_worldPos, 1.0);
-        v_depth3 = depthVec.xyz * 0.5 + 0.5;
-    #endif
+
+    // #ifdef SHADOW_MAP
+    //     vec4 depthVec = u_depthMat * vec4(v_worldPos, 1.0);
+    //     v_depth3 = depthVec.xyz * 0.5 + 0.5;
+    // #endif
 
     #ifdef DIRECTION_SHADOW_LIGHT
         for (int i = 0; i < DIRECTION_SHADOW_LIGHT; i++) {

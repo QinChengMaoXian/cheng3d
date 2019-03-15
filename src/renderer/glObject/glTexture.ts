@@ -1,5 +1,4 @@
 import { glObject } from './glObject'
-import { Texture } from '../../graphics/Texture';
 
 export class glTexture extends glObject {
     /** 纹理索引的cache */

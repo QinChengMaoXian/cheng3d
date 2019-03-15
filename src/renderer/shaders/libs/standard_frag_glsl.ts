@@ -13,10 +13,10 @@ varying vec3 v_worldPos;
     uniform sampler2D u_normalMap;
 #endif
 
-#ifdef SHADOW_MAP
-    varying vec3 v_depth3;
-    uniform sampler2D u_depthMap;
-#endif
+// #ifdef SHADOW_MAP
+//     varying vec3 v_depth3;
+//     uniform sampler2D u_depthMap;
+// #endif
 
 #ifdef DIRECTION_SHADOW_LIGHT
     uniform vec3 u_directionShadowDirs[DIRECTION_SHADOW_LIGHT];
