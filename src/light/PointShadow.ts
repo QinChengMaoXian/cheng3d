@@ -15,6 +15,8 @@ export class PointShadow extends Shadow {
 
     public far: number;
 
+    public pcf: boolean = false;
+
     constructor() {
         super();
     }
@@ -26,7 +28,7 @@ export class PointShadow extends Shadow {
         return tex;
     }
 
-    public init(size: number = 512) {
+    public init(size: number = 128) {
         this._size = size;
         let tex = this._depthTex;
         if (!tex) {

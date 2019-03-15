@@ -422,6 +422,18 @@ export class Material extends Base {
         }
     }
 
+    public setPointShadowPCF(b: boolean[]) {
+        if (b) {
+            for (let i = 0, l = b.length; i < l; i++) {
+                if (b[i]) {
+                    this._addMacro(`POINT_SHADOW_PCF_${i}`);
+                } else {
+                    this._removeMacro(`POINT_SHADOW_PCF_${i}`);
+                }
+            }
+        }
+    }
+
     public setPointShadowLights(num: number, pos: any, colors: any, ranges: any, texs: Texture[]) {
         if (num <= 0) {
             this._removeMacro('POINT_SHADOW_LIGHT');

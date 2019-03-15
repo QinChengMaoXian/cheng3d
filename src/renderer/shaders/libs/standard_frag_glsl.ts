@@ -205,11 +205,79 @@ void main()
             vec3 d3 = v_worldPos - pos;
             float d = length(d3);
             d3 /= d;
-            float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], vec3(d3.x, d3.z, -d3.y)));
-            // d *= u_pointRanges[0].y;
+            d3 = vec3(d3.x, d3.z, -d3.y);
 
-            float shadow = d - 0.5 > z ? 0.0 : 1.0;
-            shadow = d > u_pointRanges[0].x ? 1.0 : shadow;
+            float bias = max((5.0 - dot(N, -d3)), 2.0);
+            float shadow = 0.0;
+
+            #ifndef POINT_SHADOW_PCF_0
+                
+                float diskRadius = (1.0 + (d * u_pointRanges[0].y)) * 0.005;// / 25.0;
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        for (int k = 0; k < 2; k++) {
+                            vec3 bbi = vec3( i == 0 ? 1.0: -1.0 ,  j == 0 ? 1.0: -1.0 ,  k == 0 ? 1.0: -1.0 ) * diskRadius;
+                            float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], d3 + bbi));
+                            float sh = d - bias > z ? 0.0 : 1.0;
+                            shadow += d > u_pointRanges[0].x ? 1.0 : sh;
+                        }
+                    }
+                }
+
+                for (int j = 0; j < 2; j++) {
+                    for (int k = 0; k < 2; k++) {
+                        vec3 bbi = vec3( 0,  j == 0 ? 1.0: -1.0 ,  k == 0 ? 1.0: -1.0 ) * diskRadius;
+                        float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], d3 + bbi));
+                        float sh = d - bias > z ? 0.0 : 1.0;
+                        shadow += d > u_pointRanges[0].x ? 1.0 : sh;
+                    }
+                }
+
+                for (int j = 0; j < 2; j++) {
+                    for (int k = 0; k < 2; k++) {
+                        vec3 bbi = vec3( k == 0 ? 1.0: -1.0,   j == 0 ? 1.0: -1.0 ,0   ) * diskRadius;
+                        float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], d3 + bbi));
+                        float sh = d - bias > z ? 0.0 : 1.0;
+                        shadow += d > u_pointRanges[0].x ? 1.0 : sh;
+                    }
+                }
+
+                for (int j = 0; j < 2; j++) {
+                    for (int k = 0; k < 2; k++) {
+                        vec3 bbi = vec3( j == 0 ? 1.0: -1.0 , 0,   k == 0 ? 1.0: -1.0 ) * diskRadius;
+                        float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], d3 + bbi));
+                        float sh = d - bias > z ? 0.0 : 1.0;
+                        shadow += d > u_pointRanges[0].x ? 1.0 : sh;
+                    }
+                }
+
+                shadow /= 20.0;
+            #else
+                float z = u_pointRanges[0].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[0], d3));
+                shadow = d - bias > z ? 0.0 : 1.0;
+                shadow = d > u_pointRanges[0].x ? 1.0 : shadow;
+            #endif
+            
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(pos - v_worldPos), color) * shadow;
+        }
+        #endif
+
+        #if POINT_SHADOW_LIGHT > 1
+        {
+            const int index = 1;
+            vec3 pos = u_pointShadowPos[1];
+            vec4 color = u_pointShadowColors[1];
+            vec3 d3 = v_worldPos - pos;
+            float d = length(d3);
+            d3 /= d;
+            d3 = vec3(d3.x, d3.z, -d3.y);
+
+            float bias = max((5.0 - dot(N, -d3)), 2.0);
+            float shadow = 0.0;
+
+            float z = u_pointRanges[1].x * decodeRGBA2Float(textureCube(u_pointShadowMaps[index], d3));
+            shadow = d - bias > z ? 0.0 : 1.0;
+            shadow = d > u_pointRanges[1].x ? 1.0 : shadow;
 
             lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(pos - v_worldPos), color) * shadow;
         }

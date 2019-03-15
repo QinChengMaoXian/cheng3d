@@ -206,8 +206,6 @@ cubeTexture.setFilter(CGE.LINEAR_MIPMAP_LINEAR, CGE.LINEAR);
 
 // cubeTexture = CGE.TextureCube.Black;
 
-let lutTexture = CGE.Texture2D.BrdfLUT;
-
 let diffTex = new CGE.Texture2D;
 diffTex.setUrl(brdf_basecolor, CGE.Texture2D.White);
 diffTex.setMipmap(true);
@@ -268,7 +266,6 @@ for (let ix = 0; ix <= 7; ix++) {
 
         obj3D.addChild(mesh);
     }
-
 } 
 
 // 以上 Brdf球体阵列
@@ -297,24 +294,24 @@ mainScene.addChild(skyboxMesh);
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 更大一堆球
 
-let boxes = new CGE.Object3D();
-boxes.name = '更大一堆球';
-mainScene.addChild(boxes);
+// let boxes = new CGE.Object3D();
+// boxes.name = '更大一堆球';
+// mainScene.addChild(boxes);
 
-for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 10; j++) {
-        for (let k = 0; k < 10; k++) {
-            let skyboxMesh = new CGE.Mesh();
+// for (let i = 0; i < 10; i++) {
+//     for (let j = 0; j < 10; j++) {
+//         for (let k = 0; k < 10; k++) {
+//             let skyboxMesh = new CGE.Mesh();
 
-            skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);
-            skyboxMesh.setScale(5, 5, 5);
-            skyboxMesh.setGeometry(geo);
-            skyboxMesh.setMaterial(standMat);
+//             skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);
+//             skyboxMesh.setScale(5, 5, 5);
+//             skyboxMesh.setGeometry(geo);
+//             skyboxMesh.setMaterial(standMat);
 
-            boxes.addChild(skyboxMesh);
-        }
-    }
-}
+//             boxes.addChild(skyboxMesh);
+//         }
+//     }
+// }
 
 // 以上 box组
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -340,11 +337,20 @@ for(let i = 0; i < 1; i++) {
 
 for(let i = 0; i < 1; i++) {
     let p = new CGE.PointLight();
-    p.setColor(1, 1, 1);
+    p.setColor(1, 10, 1);
     p.setPosition(150, -30, 80);
     p.enableShadow();
     mainScene.addChild(p);
     window['ppp'] = p;
+}
+
+{
+    let p = new CGE.PointLight();
+    p.setColor(10, 1, 1);
+    p.setPosition(150, 30, 80);
+    p.enableShadow();
+    mainScene.addChild(p);
+    window['ppp2'] = p;
 }
 
 // 以上 光源测试

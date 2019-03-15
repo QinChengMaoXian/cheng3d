@@ -12,7 +12,7 @@ import { Texture } from '../graphics/Texture';
 import { Texture2D } from '../graphics/Texture2D';
 import { TextureCube } from '../graphics/TextureCube';
 import { Geometry } from '../graphics/Geometry';
-import { ScreenGeometry, SphereGeometry } from '../util/GeometryUtil';
+import { ScreenGeometry } from '../util/GeometryUtil';
 
 import { RTLocation } from '../graphics/GraphicsTypes';
 import { FullScreenMaterial } from '../material/FullScreenMaterial';
@@ -30,143 +30,20 @@ import { Event } from '../core/Event';
 import { PostEffectsPipeline } from './pipeline/PostEffectsPipeline';
 import { PEType, PEBase } from './postEffect/PEBase';
 import { WebGLSupports } from './WebGLSupports';
-import { DeferredShadingMaterial } from '../material/DeferredShadingMaterial';
-import { Light, LightType } from '../light/Light';
-import { PointLight } from '../light/PointLight';
+import { Light } from '../light/Light';
 import { glTexture } from './glObject/glTexture';
 import { WebGLStateCache } from './WebGLStateCache';
 import { RenderBase } from '../graphics/RenderBase';
 import { Matrix4 } from '../math/Matrix4';
 import { Box } from '../math/Box';
-import { Shadow } from '../light/Shadow';
 import { RenderCulling } from '../util/RenderCulling';
 import { ShadowMapPipeline } from './pipeline/ShadowMapPipeline';
 import { DeferredPipeline } from './pipeline/DeferredPipeline';
-import { DirectionLight } from '../light/DirectionLight';
-import { SpotLight } from '../light/SpotLight';
-import { DirectionShadow } from '../light/DirectionShadow';
-
+import { LightDatasCache } from '../util/LightDatasCache';
 
 export interface RenderArgs{
     frustumCamera?: Camera;
 }
-
-interface lightData {
-    pos?: { data: Float32Array }, 
-    dir?: { data: Float32Array }, 
-    colors: { data: Float32Array }, 
-    mats?: { data: Float32Array },
-    ranges?: { data: Float32Array },
-    textures?: Texture[],
-}
-
-export class LightDatasCache {
-
-    protected _dirs: Map<number, lightData> = new Map();
-    protected _points: Map<number, lightData> = new Map();
-    protected _spots: Map<number, lightData> = new Map();
-
-    protected _shadowDirs: Map<number, lightData> = new Map();
-    protected _shadowPoints: Map<number, lightData> = new Map();
-    protected _shadowSpots: Map<number, lightData> = new Map();
-
-    protected _getDir(num: number, isShadow: boolean) {
-        let dirs = isShadow ? this._shadowDirs : this._dirs;
-
-        let obj = dirs.get(num);
-        if (obj) {
-            return obj;
-        }
-        obj = {
-            dir: { data: new Float32Array(num * 3) },
-            colors: { data: new Float32Array(num * 4) }
-        }
-        if (isShadow) {
-            obj.textures = new Array(num);
-            obj.mats = { data: new Float32Array(num * 16) };
-        }
-        dirs.set(num, obj);
-
-        return obj;
-    }
-
-    protected _getPoint(num: number, isShadow: boolean) {
-        let points = isShadow ? this._shadowPoints: this._points;
-
-        let obj = points.get(num);
-        if (obj) {
-            return obj;
-        }
-        obj = {
-            pos: { data: new Float32Array(num * 3) },
-            colors: { data: new Float32Array(num * 4) }
-        }
-        if (isShadow) {
-            obj.textures = new Array(num);
-            obj.ranges = { data: new Float32Array(num * 2) };
-        }
-        points.set(num, obj);
-
-        return obj;
-    }
-
-    public _getSpot(num: number, isShadow: boolean) {
-        let spots = isShadow ? this._shadowSpots : this._spots;
-
-        let obj = spots.get(num);
-        if (obj) {
-            return obj;
-        }
-        obj = {
-            pos: { data: new Float32Array(num * 3) },
-            dir: { data: new Float32Array(num * 4) },
-            colors: { data: new Float32Array(num * 4) }
-        }
-        if (isShadow) {
-            obj.textures = new Array(num);
-            obj.mats = { data: new Float32Array(num * 16) };
-            obj.ranges = { data: new Float32Array(num * 2) };
-        }
-        spots.set(num, obj);
-
-        return obj;
-    }
-
-    public getDir(num: number) {
-        return this._getDir(num, false);
-    }
-    public getShadowDir(num: number) {
-        return this._getDir(num, true);
-    }
-
-    
-    public getPoint(num: number) {
-        return this._getPoint(num, false);
-    }
-
-    public getShadowPoint(num: number) {
-        return this._getPoint(num, true);
-    }
-
-
-    public getSpot(num: number) {
-        return this._getSpot(num, false);
-    }
-
-    public getShadowSpot(num: number) {
-        return this._getSpot(num, true);
-    }
-}
-
-// const lights = {
-//     dirD: { data: new Float32Array(3) },
-//     dirC: { data: new Float32Array(3) },
-//     pointP: { data: new Float32Array(3) },
-//     pointC: { data: new Float32Array(3) },
-//     spotP: { data: new Float32Array(3) },
-//     spotD: { data: new Float32Array(3) },
-//     spotC: { data: new Float32Array(3) },
-// } 
 
 /**
  * webgl 1.0 渲染器；
@@ -632,9 +509,6 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         if (shadows) {
             if (shadows.d > 0) {
                 let dData = this._lightDatasCache.getShadowDir(shadows.d);
-                // mat.setDepthMap(dData.textures[0]);
-                // mat.setDepthMatData(dData.mats);
-                // mat.enableShadow();
                 mat.setDirShadowLights(shadows.d, dData.dir, dData.colors, dData.mats, dData.textures);
             } else {
                 mat.setDirShadowLights(0, null, null, null, null);
@@ -782,6 +656,25 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
     }
 
+    protected _renderShadows(scene: Object3D, camera: Camera) {
+        let renderCulling = this._renderCulling;
+
+        for (let i = 0, l = renderCulling.dirShadowLightSize; i < l; i++) {
+            let d = renderCulling.dirShadowLights[i];
+            this._renderShadow(scene, d, renderCulling.visibleBox, camera);
+        }
+
+        for (let i = 0, l = renderCulling.spotShadowLightSize; i < l; i++) {
+            let s = renderCulling.spotShadowLights[i];
+            this._renderShadow(scene, s, renderCulling.visibleBox, camera);
+        }
+
+        for (let i = 0, l = renderCulling.pointShadowLightSize; i < l; i++) {
+            let p = renderCulling.pointShadowLights[i];
+            this._renderShadow(scene, p, renderCulling.visibleBox, camera);
+        }
+    }
+
     /**
      * 渲染场景的总入口
      * TODO：这里将会通过判定是否存在camera或者是否存在frame分离。
@@ -817,127 +710,15 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         }
 
         if (!frame) {
+            renderCulling.culling(scene, mat4, this._deferredRendering, false);
+            this._renderShadows(scene, camera);
+            this._lightDatasCache.updateDatasFromCulling(renderCulling);
+            
             if (this._deferredRendering) {
                 // 延迟渲染流程走这里，注意，没有优化光源。
-                renderCulling.culling(scene, mat4, true, false);
                 this._deferredPipeling.render(renderCulling, camera, this._defFrame);
             } else {
                 // 正常渲染走这条，注意，没有优化光源
-                renderCulling.culling(scene, mat4, false, false);
-
-                const lightDatasCache = this._lightDatasCache;
-                
-                let pData: Float32Array;
-                let dData: Float32Array;
-                let cData: Float32Array;
-                let texs: Texture[];
-                
-                let rData: Float32Array;
-                let mData: Float32Array;
-
-                // light shadow
-                if (renderCulling.dirShadowLightSize > 0) {
-                    let dirShadows = renderCulling.dirShadowLights;
-                    let dirShadowDatas = lightDatasCache.getShadowDir(renderCulling.dirShadowLightSize);
-                    dData = dirShadowDatas.dir.data;
-                    cData = dirShadowDatas.colors.data;
-                    texs = dirShadowDatas.textures;
-                    mData = dirShadowDatas.mats.data;
-                    for (let i = 0, l = renderCulling.dirShadowLightSize; i < l; i++) {
-                        let d = dirShadows[i];
-                        this._renderShadow(scene, d, renderCulling.visibleBox, camera);
-                        dData.set(d.dir.v, i * 3);
-                        cData.set(d.color.v, i * 4);
-                        mData.set(d.shadow.matrix.data, i * 16);
-                        texs[i] = d.shadow.depthTex;
-                    }
-                }
-
-                if (renderCulling.spotShadowLightSize > 0) {
-                    let spotShadows = renderCulling.spotShadowLights;
-                    let spotShadowDatas = lightDatasCache.getShadowSpot(renderCulling.spotShadowLightSize);
-                    dData = spotShadowDatas.dir.data;
-                    pData = spotShadowDatas.pos.data;
-                    cData = spotShadowDatas.colors.data;
-                    rData = spotShadowDatas.ranges.data;
-                    mData = spotShadowDatas.mats.data;
-                    texs = spotShadowDatas.textures;
-                    for (let i = 0, l = renderCulling.spotShadowLightSize; i < l; i++) {
-                        let s = spotShadows[i];
-                        let ss = s.shadow;
-                        this._renderShadow(scene, s, renderCulling.visibleBox, camera);
-                        dData.set(s.dir.v, i * 4);
-                        dData[i * 4 + 3] = Math.cos(s.angle);
-                        pData.set(s.pos.v, i * 3);
-                        cData.set(s.color.v, i * 4);
-                        mData.set(ss.matrix.data, i * 16);
-                        rData[i * 2] = ss.far;
-                        rData[i * 2 + 1] = 1.0 / ss.far;
-                        texs[i] = ss.depthTex;
-                    }
-                }
-
-                if (renderCulling.pointShadowLightSize > 0) {
-                    let pointShadows = renderCulling.pointShadowLights;
-                    let pointShadowDatas = lightDatasCache.getShadowPoint(renderCulling.pointShadowLightSize);
-                    pData = pointShadowDatas.pos.data;
-                    cData = pointShadowDatas.colors.data;
-                    rData = pointShadowDatas.ranges.data;
-                    texs = pointShadowDatas.textures;
-
-                    for (let i = 0, l = renderCulling.pointShadowLightSize; i < l; i++) {
-                        let p = pointShadows[i];
-                        let ps = p.shadow;
-                        this._renderShadow(scene, p, renderCulling.visibleBox, camera);
-                        pData.set(p.pos.v, i * 3);
-                        cData.set(p.color.v, i * 4);
-                        let dd = ps.far * Math.sqrt(3.0);
-                        rData[i * 2] = dd;
-                        rData[i * 2 + 1] = 1.0 / dd;
-                        texs[i] = ps.depthTex;
-                    }
-                }
-
-                // light
-
-                let pointLights = renderCulling.pointLights;
-                let dirLights = renderCulling.dirLights;
-                let spotLights = renderCulling.spotLights;
-
-                let dirDatas = lightDatasCache.getDir(renderCulling.dirLightSize);
-                let pointDatas = lightDatasCache.getPoint(renderCulling.pointLightSize);
-                let spotDatas = lightDatasCache.getSpot(renderCulling.spotLightSize);
-
-                dData = dirDatas.dir.data;
-                cData = dirDatas.colors.data;
-                
-                for (let i = 0, l = renderCulling.dirLightSize; i < l; i++) {
-                    let d = dirLights[i];
-                    dData.set(d.dir.v, i * 3);
-                    cData.set(d.color.v, i * 4);
-                }
-
-                pData = pointDatas.pos.data;
-                cData = pointDatas.colors.data;
-
-                for (let i = 0, l = renderCulling.pointLightSize; i < l; i++) {
-                    let p = pointLights[i];
-                    pData.set(p.pos.v, i * 3);
-                    cData.set(p.color.v, i * 4);
-                }
-
-                pData = spotDatas.pos.data;
-                dData = spotDatas.dir.data;
-                cData = spotDatas.colors.data;
-
-                for (let i = 0, l = renderCulling.spotLightSize; i < l; i++) {
-                    let s = spotLights[i];
-                    pData.set(s.pos.v, i * 3);
-                    dData.set(s.dir.v, i * 4);
-                    dData[i * 4 + 3] = Math.cos(s.angle);
-                    cData.set(s.color.v, i * 4);
-                }
-
                 this.useCamera(this._defCamera);
                 this.useFrame(this._defFrame, this._defFrameState);
 
@@ -963,6 +744,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             this._defMat.setDiffuseMap(<Texture2D>targetFrame.getTextureFromType(RTLocation.COLOR).tex);
             this._renderMesh(this._defMesh);
             this.exchangeFrame();
+
         } else {
             this.useFrame(frame);
             this.useCamera(camera);
@@ -1137,6 +919,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this._shaderCache.removeShader(glProg);
     }
 
+    /**
+     * 获取默认的frame状态
+     */
     public getDefFrameState(): FrameState {
         return this._defFrameState;
     }
