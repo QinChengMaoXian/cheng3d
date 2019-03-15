@@ -326,7 +326,7 @@ for(let i = 0; i < 4; i++) {
 
 for(let i = 0; i < 1; i++) {
     let p = new CGE.SpotLight();
-    p.setColor(1, 1, 1);
+    p.setColor(10, 10, 10);
     p.setPosition(20, 20, 100);
     p.setDir(-1, 1, 1);
     p.angle = 0.5 * Math.PI * 0.5;
@@ -335,18 +335,18 @@ for(let i = 0; i < 1; i++) {
     window['sss'] = p;
 }
 
-for(let i = 0; i < 1; i++) {
-    let p = new CGE.PointLight();
-    p.setColor(1, 10, 1);
-    p.setPosition(150, -30, 80);
-    p.enableShadow();
-    mainScene.addChild(p);
-    window['ppp'] = p;
-}
+//{
+//     let p = new CGE.PointLight();
+//     p.setColor(1, 1, 1);
+//     p.setPosition(150, -30, 80);
+//     p.enableShadow();
+//     mainScene.addChild(p);
+//     window['ppp'] = p;
+// }
 
 {
     let p = new CGE.PointLight();
-    p.setColor(10, 1, 1);
+    p.setColor(1, 1, 1);
     p.setPosition(150, 30, 80);
     p.enableShadow();
     mainScene.addChild(p);

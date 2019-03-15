@@ -75,7 +75,7 @@ export class LightDatasCache {
         if (isShadow) {
             obj.textures = new Array(num);
             obj.mats = { data: new Float32Array(num * 16) };
-            obj.ranges = { data: new Float32Array(num * 2) };
+            obj.ranges = { data: new Float32Array(num * 4) };
         }
         spots.set(num, obj);
 
@@ -126,8 +126,9 @@ export class LightDatasCache {
                 pData.set(s.pos.v, i * 3);
                 cData.set(s.color.v, i * 4);
                 mData.set(ss.matrix.data, i * 16);
-                rData[i * 2] = ss.far;
-                rData[i * 2 + 1] = 1.0 / ss.far;
+                rData[i * 4] = ss.far;
+                rData[i * 4 + 1] = 1.0 / ss.far;
+                rData[i * 4 + 2] = rData[i * 4 + 3] = 1.0 / ss.size;
                 texs[i] = ss.depthTex;
             }
         }
