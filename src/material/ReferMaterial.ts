@@ -53,7 +53,7 @@ export class ReferMaterial extends Material {
     public setUVOffset(sx: number, sy: number, ox: number, oy: number) {
         let v = super.getProperty(ShaderConst.uvOffset);
         if (v) {
-            v.data.set([arguments])
+            v.v.set([arguments])
         } else {
             this.setProperty(ShaderConst.uvOffset, new Vector4(sx, sy, ox, oy));
         }

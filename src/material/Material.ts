@@ -9,6 +9,7 @@ import { Stencil } from '../graphics/Stencil';
 import { AlphaType, FaceType } from '../graphics/GraphicsTypes';
 import { ShaderConst as s } from '../graphics/ShaderConst';
 import { Matrix4 } from '../math/Matrix4';
+import { Vector4 } from '../math/Vector4';
 
 /**
  * 材质基类 
@@ -46,6 +47,9 @@ export class Material extends Base {
     private _properties: Map<string | number, any>;
     /** 宏数组 */
     private _macros: {[key: string]: number};
+
+    /** uv偏移量 */
+    protected _uvOffset: Vector4;
 
     /** 特征值 */
     private _key: string;
@@ -252,10 +256,6 @@ export class Material extends Base {
         return this._depthFunc || CGE.LESS;
     }
 
-    public canLighting() {
-        return false;
-    }
-
     protected clearProperties() {
         this._properties.clear();
     }
@@ -331,15 +331,23 @@ export class Material extends Base {
         this.setProperty(s.depthMat, mat);
     }
 
-    public enableShadow() {
-        this._addMacro('SHADOW_MAP');
+    public setNormalMap(texture: Texture2D) {
+        if (!this.supportNormalMap) return;
+        if (texture && texture !== Texture2D.Normal) {
+            this._addMacro('NORMAL_MAP');
+            this.setTexture(s.normalMap, texture);
+        }
     }
 
-    public disableShadow() {
-        this._removeMacro('SHADOW_MAP');
+    public removeNormalMap() {
+        if (!this.supportNormalMap) return;
+        this._removeMacro('NORMAL_MAP');
+        this.removeTexture(s.normalMap);
     }
 
     public setPointLights(num: number, pos: any, colors: any) {
+        if (!this.supportLighting) return;
+
         if (num <= 0) {
             this._removeMacro('POINT_LIGHT');
             this.removeProperty('u_pointPos');
@@ -353,6 +361,8 @@ export class Material extends Base {
     }
 
     public setDirLights(num: number, dir: any, colors: any) {
+        if (!this.supportLighting) return;
+
         if (num <= 0) {
             this._removeMacro('DIRECTION_LIGHT');
             this.removeProperty('u_directionDirs');
@@ -366,6 +376,8 @@ export class Material extends Base {
     }
 
     public setSpotLights(num: number, pos: any, dir: any, colors: any) {
+        if (!this.supportLighting) return;
+
         if (num <= 0) {
             this._removeMacro('SPOT_LIGHT');
             this.removeProperty('u_spotPos');
@@ -380,6 +392,8 @@ export class Material extends Base {
     }
 
     public setDirShadowLights(num: number, dir: any, colors: any, mats: any, texs: Texture[]) {
+        if (!this.supportShadow) return;
+
         if (num <= 0) {
             this._removeMacro('DIRECTION_SHADOW_LIGHT');
             this.removeProperty('u_directionShadowDirs');
@@ -400,6 +414,8 @@ export class Material extends Base {
     }
 
     public setSpotShadowLights(num: number, pos: any, dir: any, colors: any, ranges: any, mats: any, texs: Texture[]) {
+        if (!this.supportShadow) return;
+
         if (num <= 0) {
             this._removeMacro('SPOT_SHADOW_LIGHT');
             this.removeProperty('u_spotShadowPos');
@@ -423,6 +439,8 @@ export class Material extends Base {
     }
 
     public setPointShadowPCF(b: boolean[]) {
+        if (!this.supportShadow) return;
+
         if (b) {
             for (let i = 0, l = b.length; i < l; i++) {
                 if (b[i]) {
@@ -435,6 +453,8 @@ export class Material extends Base {
     }
 
     public setPointShadowLights(num: number, pos: any, colors: any, ranges: any, texs: Texture[]) {
+        if (!this.supportShadow) return;
+
         if (num <= 0) {
             this._removeMacro('POINT_SHADOW_LIGHT');
             this.removeProperty('u_pointShadowPos');
@@ -453,6 +473,22 @@ export class Material extends Base {
         }
     }
 
+    // 材质是否支持法线贴图
+    public get supportNormalMap(): boolean {
+        return false;
+    }
+
+    // 材质是否支持阴影
+    public get supportShadow(): boolean {
+        return false;
+    }
+
+    // 材质是否支持光照
+    public get supportLighting(): boolean {
+        return false;
+    }
+
+    // 材质是否支持延迟渲染
     public get supportDeferred(): boolean {
         return false;
     }

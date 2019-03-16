@@ -3,16 +3,18 @@ import { GLMAT_EPSILON } from '../core/Base';
 import { Vector3 } from './Vector3';
 import { Quaternion } from './Quaternion';
 
-
 export class Matrix4 {
+
+    private static _float32Data = new Float32Array(16);
+
     static pubTemp: Matrix4 = new Matrix4;
     static readonly unitMat4: Matrix4 = new Matrix4;
 
-    public m: Float64Array;
+    public m: Float32Array;
     // public _data: Float32Array;
     constructor() {
         // this._data = new Float32Array(16);
-        this.m = new Float64Array([
+        this.m = new Float32Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -464,9 +466,15 @@ export class Matrix4 {
         return this;
     }
 
+    /**
+     * 请勿对通过data获取的float32Array赋值。
+     * 修改数值请使用mat.m。
+     */
     public get data() {
         // this._data.set(this.m);
+        // this._data.set(this.m);
         return this.m;
+        // return this.m;
     }
 
     public static multiply(l: Matrix4, r: Matrix4, out: Matrix4) {

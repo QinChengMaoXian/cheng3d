@@ -15,12 +15,8 @@ let cartoon_emission = './res/bronya_emission.jpg';
 let cartoon_obj = './res/bronya.obj';
 
 let brdf_basecolor = './resources/brdfTest/rustediron2_basecolor.jpg';
-// let brdf_metallic = './resources/brdfTest/rustediron2_metallic.png';
 let brdf_normal = './resources/brdfTest/rustediron2_normal.jpg';
-// let brdf_roughness = './resources/brdfTest/rustediron2_roughness.png';
 let brdf_specular = './resources/brdfTest/rustediron2_specular.jpg'
-
-let env_lut = './resources/envLUT.png'
 
 window['cge'] = CGE;
 
@@ -326,7 +322,7 @@ for(let i = 0; i < 4; i++) {
 
 for(let i = 0; i < 1; i++) {
     let p = new CGE.SpotLight();
-    p.setColor(10, 10, 10);
+    p.setColor(1, 1, 1);
     p.setPosition(20, 20, 100);
     p.setDir(-1, 1, 1);
     p.angle = 0.5 * Math.PI * 0.5;
@@ -335,14 +331,14 @@ for(let i = 0; i < 1; i++) {
     window['sss'] = p;
 }
 
-//{
-//     let p = new CGE.PointLight();
-//     p.setColor(1, 1, 1);
-//     p.setPosition(150, -30, 80);
-//     p.enableShadow();
-//     mainScene.addChild(p);
-//     window['ppp'] = p;
-// }
+{
+    let p = new CGE.PointLight();
+    p.setColor(1, 1, 1);
+    p.setPosition(150, -30, 80);
+    p.enableShadow();
+    mainScene.addChild(p);
+    window['ppp'] = p;
+}
 
 {
     let p = new CGE.PointLight();
@@ -513,8 +509,6 @@ import {
     teapotTangents,
     teapotIndices,
 } from './teapot';
-import { Sprite } from './src/ui/Sprite';
-import { BOOL_VEC3 } from './src/CGE';
 
 let teapotGeometry = new CGE.Geometry();
 teapotGeometry.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, teapotPositions);
@@ -681,7 +675,7 @@ triMesh.setPosition(0, 0, -2500);
 // 以下 卡通渲染测试 
 // 
 // let cartoonMat = new CGE.CartoonMaterial(cartoon_color, cartoon_light, cartoon_emission);
-// objLoader.load(cartoon_obj).then(mesh => {
+// new CGE.OBJLoader().load(cartoon_obj).then(mesh => {
 //     mesh.setMaterial(cartoonMat);
 //     mesh.setScale(0.4, 0.4, 0.4);
 //     mesh.setRotateAt(new CGE.Quaternion().setAxisAngle(new CGE.Vector3(0, 0, 1), Math.PI));

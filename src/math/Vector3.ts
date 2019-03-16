@@ -3,6 +3,8 @@ import { Matrix4 } from "./Matrix4";
 import { ObjectPool } from "../util/ObjectPool";
 
 export class Vector3 {
+    // private static _float32Data = new Float32Array(3);
+
     public static readonly Zero: Vector3 = new Vector3(0, 0, 0);
     public static readonly ZUp: Vector3 = new Vector3(0, 0, 1);
     public static readonly One: Vector3 = new Vector3(1, 1, 1);

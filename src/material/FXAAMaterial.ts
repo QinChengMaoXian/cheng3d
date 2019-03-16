@@ -1,13 +1,14 @@
 import { Material } from "./Material";
 import { Texture2D } from "../graphics/Texture2D";
 import { ShaderConst } from "../graphics/ShaderConst";
+import { Vector2 } from "../math/Vector2";
 
 export class FXAAMaterial extends Material {
-    protected _data: { data: Float32Array };
+    protected _data: Vector2;
     constructor(texture?: Texture2D) {
         super();
 
-        this._data = { data: new Float32Array([1.0, 1.0]) };
+        this._data = new Vector2(1.0, 1.0);
         this.setProperty(ShaderConst.pixelSize, this._data);
 
         if (texture) {
@@ -29,9 +30,8 @@ export class FXAAMaterial extends Material {
         }
     }
 
-    public setPixelSize(x, y) {
-        this._data.data[0] = x;
-        this._data.data[1] = y;
+    public setPixelSize(x: number, y: number) {
+        this._data.set(x, y);
     }
 
     get type() {

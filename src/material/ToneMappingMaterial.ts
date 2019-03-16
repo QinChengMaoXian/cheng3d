@@ -1,19 +1,20 @@
 import { Material } from "./Material";
 import { Texture2D } from "../graphics/Texture2D";
 import { ShaderConst } from "../graphics/ShaderConst";
+import { Vector2 } from "../math/Vector2";
 
 export class ToneMappingMaterial extends Material {
 
-    protected _lumPCT: { data: Float32Array };
-    protected _pixelSize: { data: Float32Array };
+    protected _lumPCT: Vector2;
+    protected _pixelSize: Vector2;
 
     constructor() {
         super();
 
-        this._pixelSize = { data: new Float32Array([1.0, 1.0]) };
+        this._pixelSize = new Vector2;
         this.setProperty(ShaderConst.pixelSize, this._pixelSize);
 
-        this._lumPCT = { data: new Float32Array([1.0, 1.0]) };
+        this._lumPCT = new Vector2;
         this.setProperty(ShaderConst.lumPCT, this._lumPCT);
 
         this.setTexture(ShaderConst.aoMap, Texture2D.White);
@@ -35,12 +36,12 @@ export class ToneMappingMaterial extends Material {
         this.setTexture(ShaderConst.aoMap, texture);
     }
 
-    public setPixelSize(x, y) {
-        this._pixelSize.data.set([x, y]);
+    public setPixelSize(x: number, y: number) {
+        this._pixelSize.set(x, y);
     }
 
     public setLumPCT(p: number) {
-        this._lumPCT.data[0] = p;
+        this._lumPCT.x = p;
     }
 
     public get type(): string {

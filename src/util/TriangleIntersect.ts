@@ -7,9 +7,9 @@ let a: number[][] = [[0,0,0], [0,0,0], [0,0,0]];
 
 function get_vector4_det(v1: Vector3, v2: Vector3, v3: Vector3, v4: Vector3): number {
 	for (let i = 0; i != 3; ++i ) {
-		a[0][i] = v1.data[i] - v4.data[i];
-		a[1][i] = v2.data[i] - v4.data[i];
-		a[2][i] = v3.data[i] - v4.data[i];
+		a[0][i] = v1.v[i] - v4.v[i];
+		a[1][i] = v2.v[i] - v4.v[i];
+		a[2][i] = v3.v[i] - v4.v[i];
 	}
  
 	return a[0][0] * a[1][1] * a[2][2] 
@@ -63,24 +63,24 @@ function segments_intersert(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y): boolean {
 
 function line_triangle_intersert_inSamePlane(tri: Triangle, v1: Vector3, v2: Vector3, i0 = 0, i1 = 1): boolean {
 
-    let d1 = v1.data;
-    let d2 = v2.data;
-    let d3 = tri.point1.data;
-    let d4 = tri.point2.data;
+    let d1 = v1.v;
+    let d2 = v2.v;
+    let d3 = tri.point1.v;
+    let d4 = tri.point2.v;
 
     if (segments_intersert(d1[i0], d1[i1], d2[i0], d2[i1], d3[i0], d3[i1], d4[i0], d4[i1])) {
         return true;
     }
 
-    d3 = tri.point2.data;
-    d4 = tri.point3.data;
+    d3 = tri.point2.v;
+    d4 = tri.point3.v;
 
     if (segments_intersert(d1[i0], d1[i1], d2[i0], d2[i1], d3[i0], d3[i1], d4[i0], d4[i1])) {
         return true;
     }
 
-    d3 = tri.point1.data;
-    d4 = tri.point3.data;
+    d3 = tri.point1.v;
+    d4 = tri.point3.v;
 
     if (segments_intersert(d1[i0], d1[i1], d2[i0], d2[i1], d3[i0], d3[i1], d4[i0], d4[i1])) {
         return true;

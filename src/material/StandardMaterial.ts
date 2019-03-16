@@ -4,7 +4,6 @@ import { Texture2D } from '../graphics/Texture2D';
 import { Vector4 } from '../math/Vector4';
 import { Vector3 } from '../math/Vector3';
 import { TextureCube } from '../graphics/TextureCube';
-import { Matrix4 } from '../math/Matrix4';
 
 export class StandardMaterial extends Material {
 
@@ -43,15 +42,6 @@ export class StandardMaterial extends Material {
         this.setTexture(s.diffuseMap, texture);
     }
 
-    public setNormalMap(texture: Texture2D) {
-        if (texture && texture !== Texture2D.Normal) {
-            this._addMacro('NORMAL_MAP');
-        } else {
-            this._removeMacro('NORMAL_MAP');
-        }
-        this.setTexture(s.normalMap, texture);
-    }
-
     public setIrradianceMap(texCube: TextureCube) {
         this.setTexture(s.irradianceMap, texCube);
     }
@@ -80,11 +70,15 @@ export class StandardMaterial extends Material {
         this._uvOffset.set(sx, sy, ox, oy);
     }
 
-    public setDepthMap(tex: Texture2D) {
-        this.setTexture(s.depthMap, tex);
+    public get supportNormalMap(): boolean {
+        return true;
     }
 
-    public canLighting() {
+    public get supportShadow(): boolean {
+        return true;
+    }
+
+    public get supportLighting(): boolean {
         return true;
     }
 

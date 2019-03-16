@@ -7,49 +7,13 @@ varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 v_worldPos;
 
+#include <ShadowMapDefine>
+#include <LightingDefine>
+
 #ifdef NORMAL_MAP
     varying vec3 v_tangent;
     varying vec3 v_binormal;
     uniform sampler2D u_normalMap;
-#endif
-
-#ifdef DIRECTION_SHADOW_LIGHT
-    uniform vec3 u_directionShadowDirs[DIRECTION_SHADOW_LIGHT];
-    uniform vec4 u_directionShadowColors[DIRECTION_SHADOW_LIGHT];
-    uniform sampler2D u_directionShadowMaps[DIRECTION_SHADOW_LIGHT];
-    varying vec3 u_directionDepths[DIRECTION_SHADOW_LIGHT];  
-#endif
-
-#ifdef DIRECTION_LIGHT
-    uniform vec3 u_directionDirs[DIRECTION_LIGHT];
-    uniform vec4 u_directionColors[DIRECTION_LIGHT];
-#endif
-
-#ifdef POINT_SHADOW_LIGHT
-    uniform vec3 u_pointShadowPos[POINT_SHADOW_LIGHT];
-    uniform vec4 u_pointShadowColors[POINT_SHADOW_LIGHT];
-    uniform samplerCube u_pointShadowMaps[POINT_SHADOW_LIGHT];
-    uniform vec2 u_pointRanges[POINT_SHADOW_LIGHT];
-#endif
-
-#ifdef POINT_LIGHT
-    uniform vec3 u_pointPos[POINT_LIGHT];
-    uniform vec4 u_pointColors[POINT_LIGHT];
-#endif
-
-#ifdef SPOT_SHADOW_LIGHT
-    uniform vec3 u_spotShadowPos[SPOT_SHADOW_LIGHT];
-    uniform vec4 u_spotShadowDirs[SPOT_SHADOW_LIGHT];
-    uniform vec4 u_spotShadowColors[SPOT_SHADOW_LIGHT];
-    uniform sampler2D u_spotShadowMaps[SPOT_SHADOW_LIGHT];
-    uniform mat4 u_spotMats[SPOT_SHADOW_LIGHT];
-    uniform vec4 u_spotRanges[SPOT_SHADOW_LIGHT];     
-#endif
-
-#ifdef SPOT_LIGHT
-    uniform vec3 u_spotPos[SPOT_LIGHT];
-    uniform vec4 u_spotDirs[SPOT_LIGHT];
-    uniform vec4 u_spotColors[SPOT_LIGHT];
 #endif
 
 #ifdef ALPHA_TEST
@@ -66,18 +30,15 @@ uniform samplerCube u_prefilterMap;
 
 const float PI = 3.14159265359;
 const float inv_PI = 1.0 / PI;
+
 float dot_plus(vec3 v1, vec3 v2)
 {
     return max(dot(v1, v2), 0.0);
 }
 
-// uniform sampler2D u_testMaps[4];
-
 uniform vec3 u_specular;
 uniform vec3 u_cameraPos;
 uniform vec4 u_baseColor;
-
-uniform vec3 u_lightDir;
 
 #include <distributionGGX>
 #include <geometrySmith>
@@ -132,7 +93,7 @@ void main()
         }
     #endif
 
-    vec4 spec = pow(texture2D(u_roughnessMap, v_uv), vec4(1.0));
+    vec4 spec = texture2D(u_roughnessMap, v_uv);
     
     float roughness = spec.r * u_specular.r;
     float metallic = spec.g * u_specular.g;
@@ -154,9 +115,7 @@ void main()
 
     vec3 V = normalize(u_cameraPos - v_worldPos);
 
-    float NdotV = dot_plus(N, V); 
-
-    vec3 L = normalize(u_lightDir.xyz);
+    float NdotV = dot_plus(N, V);
 
     vec3 lo = vec3(0.0);
 
@@ -190,46 +149,29 @@ void main()
     #ifdef POINT_SHADOW_LIGHT
         #if POINT_SHADOW_LIGHT > 0
         {
-            vec3 pos = u_pointShadowPos[0];
-            vec4 color = u_pointShadowColors[0];
-            vec3 d3 = v_worldPos - pos;
-            float d = length(d3);
-            d3 /= d;
-            d3 = vec3(d3.x, d3.z, -d3.y);
-
-            vec3 L = normalize(pos - v_worldPos);
-            float bias = max(5.0 * (1.0 - dot(N, L)), 2.0);
-            float shadow = 0.0;
-
             #define POINT_MAP_INDEX 0
             #ifndef POINT_SHADOW_PCF_0
+                #define POINT_SHADOW_PCF
+            #endif
             #include<PointShadowCalc>
+            #ifndef POINT_SHADOW_PCF_0
+                #undef POINT_SHADOW_PCF
             #endif
             #undef POINT_MAP_INDEX
-            
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, L, color) * shadow;
         }
         #endif
 
         #if POINT_SHADOW_LIGHT > 1
         {
-            vec3 pos = u_pointShadowPos[1];
-            vec4 color = u_pointShadowColors[1];
-            vec3 d3 = v_worldPos - pos;
-            float d = length(d3);
-            d3 /= d;
-            d3 = vec3(d3.x, d3.z, -d3.y);
-
-            float bias = max((5.0 - dot(N, -d3)), 2.0);
-            float shadow = 0.0;
-
             #define POINT_MAP_INDEX 1
-            #ifndef POINT_SHADOW_PCF_1
+            #ifndef POINT_SHADOW_PCF_0
+                #define POINT_SHADOW_PCF
+            #endif
             #include<PointShadowCalc>
+            #ifndef POINT_SHADOW_PCF_0
+                #undef POINT_SHADOW_PCF
             #endif
             #undef POINT_MAP_INDEX
-
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(pos - v_worldPos), color) * shadow;
         }
         #endif
     #endif

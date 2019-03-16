@@ -3,6 +3,7 @@ import * as decode from './mods/decode';
 import * as tone from './mods/toneMapping';
 import * as shadow from './mods/shadow';
 import * as brdf from './mods/brdf';
+import * as lighting from './mods/lighting';
 
 export const mods = {};
 
@@ -17,6 +18,7 @@ addToModes(decode);
 addToModes(shadow);
 addToModes(brdf);
 addToModes(tone);
+addToModes(lighting);
 
 const reg = /#include\s*<([a-zA-Z0-9_./]+)>/;
 

@@ -4,12 +4,13 @@ import { ShaderConst } from "../graphics/ShaderConst";
 import { Vector3 } from "../math/Vector3";
 
 import * as CGE from '../graphics/RendererParameter';
-import { Loader } from "../io/Loader";
+import { Vector4 } from "../math/Vector4";
+import { Vector2 } from "../math/Vector2";
 
 export class SSAOMaterial extends Material {
 
-    protected _pixelSize: { data: Float32Array };
-    protected _multiUsing: { data: Float32Array };
+    protected _pixelSize: Vector2;
+    protected _multiUsing: Vector4;
     protected _samples: { data: Float32Array };
 
     protected _sampleNum: number = 64;
@@ -17,10 +18,10 @@ export class SSAOMaterial extends Material {
     constructor() {
         super();
 
-        this._pixelSize = { data: new Float32Array([1.0, 1.0]) };
+        this._pixelSize = new Vector2(1, 1);
         this.setProperty(ShaderConst.pixelSize, this._pixelSize);
 
-        this._multiUsing = { data: new Float32Array([1.0, 1.0, 1.0, 1.0]) };
+        this._multiUsing = new Vector4(1, 1, 1, 1);
         this.setProperty(ShaderConst.multiUsing, this._multiUsing);
 
         this.createSampleData(16);
@@ -60,7 +61,7 @@ export class SSAOMaterial extends Material {
     }
 
     public setAsptRtoTanHfFov(x: number, y: number, z: number, w: number) {
-        this._multiUsing.data.set(arguments);
+        this._multiUsing.set(x, y, z, w);
     }
 
     public setNormalTexture(tex: Texture2D) {
@@ -73,10 +74,8 @@ export class SSAOMaterial extends Material {
         }
     }
 
-    public setPixelSize(x, y) {
-        let d = this._pixelSize.data;
-        d[0] = x;
-        d[1] = y;
+    public setPixelSize(x: number, y: number) {
+        this._pixelSize.set(x, y);
     }
 
     get type() {

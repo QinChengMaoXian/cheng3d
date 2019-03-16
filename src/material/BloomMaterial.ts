@@ -1,15 +1,16 @@
 import { Material } from "./Material";
 import { Texture2D } from "../graphics/Texture2D";
 import { ShaderConst } from "../graphics/ShaderConst";
+import { Vector2 } from "../math/Vector2";
 
 export class BloomMaterial extends Material {
 
-    protected _lumPCT: { data: Float32Array };
+    protected _lumPCT: Vector2
 
     constructor() {
         super();
 
-        this._lumPCT = { data: new Float32Array([0.35, 1.0]) };
+        this._lumPCT = new Vector2;
         this.setProperty(ShaderConst.lumPCT, this._lumPCT);
     }
 
@@ -22,7 +23,7 @@ export class BloomMaterial extends Material {
     }
 
     public setLumPCT(p: number) {
-        this._lumPCT.data[0] = p;
+        this._lumPCT.x = p;
     }
 
     public get type(): string {

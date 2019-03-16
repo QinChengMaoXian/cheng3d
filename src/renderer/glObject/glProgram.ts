@@ -282,12 +282,13 @@ export class glProgram extends glObject {
                 }
                 default:                            data = material.getProperty(uniformType); break;
             }
-            if (data.data.length === 16) {
-                f32.set(data.data);
-                glprog.setUniformData(gl, type, location, f32);
-            } else {
-                glprog.setUniformData(gl, type, location, data.data);
-            }
+            glprog.setUniformData(gl, type, location, data.data);
+            // if (data.data.length === 16) {
+            //     f32.set(data.data);
+            //     glprog.setUniformData(gl, type, location, f32);
+            // } else {
+            //     
+            // }
         });
     }
 

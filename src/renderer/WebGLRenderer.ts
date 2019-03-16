@@ -439,7 +439,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         let stateCache = this._stateCache;
         let clearBit = 0;
 
-        stateCache.setViewport(gl, frameState.viewport.data);
+        stateCache.setViewport(gl, frameState.viewport.v);
 
         if (!frameState.needClear) {
             return;
@@ -447,7 +447,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         if (frameState.isClearColor) {
             clearBit = clearBit | gl.COLOR_BUFFER_BIT;
-            stateCache.setClearColor(gl, frameState.clearColor.data);
+            stateCache.setClearColor(gl, frameState.clearColor.v);
         }
 
         frameState.isClearDepth
@@ -713,7 +713,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             renderCulling.culling(scene, mat4, this._deferredRendering, false);
             this._renderShadows(scene, camera);
             this._lightDatasCache.updateDatasFromCulling(renderCulling);
-            
+
             if (this._deferredRendering) {
                 // 延迟渲染流程走这里，注意，没有优化光源。
                 this._deferredPipeling.render(renderCulling, camera, this._defFrame);

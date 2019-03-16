@@ -1,4 +1,7 @@
 export class Vector4 {
+
+    // private static _float32Data = new Float32Array(4);
+
     public static readonly Zero: Vector4 = new Vector4();
     public static readonly One: Vector4 = new Vector4(1,1,1,1);
 
@@ -102,7 +105,9 @@ export class Vector4 {
         return this.v[3];
     }
 
-    public get data() {
+    public get data(): any {
+        // Vector4._float32Data.set(this.v);
+        // return Vector4._float32Data;
         return this.v;
     }
 

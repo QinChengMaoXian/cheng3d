@@ -6,8 +6,11 @@ precision mediump float;
 
 varying vec2 v_uv;
 varying vec3 v_normal;
-varying vec3 v_tangent;
-varying vec3 v_binormal;
+
+#ifdef NORMAL_MAP
+    varying vec3 v_tangent;
+    varying vec3 v_binormal;
+#endif
 
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_normalMap;
@@ -38,7 +41,7 @@ void main()
         }
     #endif
 
-    vec4 spec = pow(texture2D(u_roughnessMap, v_uv), vec4(1.0));
+    vec4 spec = texture2D(u_roughnessMap, v_uv);
     
     float roughness = spec.r * u_specular.r;
     float metallic = spec.g * u_specular.g;
@@ -46,8 +49,13 @@ void main()
 
     vec3 albedo = baseColor.xyz;
 
-    vec3 normal = texture2D(u_normalMap, v_uv).xyz * 2.0 - 1.0;
-    normal = normalize(normal.x * v_tangent + normal.y * v_binormal + normal.z * v_normal);
+    
+    #ifdef NORMAL_MAP
+        vec3 normal = texture2D(u_normalMap, v_uv).xyz * 2.0 - 1.0;
+        normal = normalize(normal.x * v_tangent + normal.y * v_binormal + normal.z * v_normal);
+    #else 
+        vec3 normal = v_normal;
+    #endif
     
     // normal = (u_vMat * vec4(normal, 0.0)).xyz;
 

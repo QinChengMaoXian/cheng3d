@@ -82,7 +82,7 @@ export class WebGLStateCache {
         gl.frontFace(this.frontFace);
     }
 
-    setViewport(gl: WebGLRenderingContext, viewport: number[] | Float32Array) {
+    setViewport(gl: WebGLRenderingContext, viewport: number[] | Float32Array | Float64Array) {
         let vp = this.viewport;
         for (let i = 0; i < 4; i++) {
             if (vp[i] !== viewport[i]) {
@@ -95,7 +95,7 @@ export class WebGLStateCache {
         }        
     }
 
-    setClearColor(gl: WebGLRenderingContext, color: number[] | Float32Array) {
+    setClearColor(gl: WebGLRenderingContext, color: number[] | Float32Array | Float64Array) {
         let vp = this.clearColor;
         for (let i = 0; i < 4; i++) {
             if (vp[i] !== color[i]) {
