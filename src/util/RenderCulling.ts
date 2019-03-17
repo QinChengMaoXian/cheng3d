@@ -9,6 +9,25 @@ import { AABB } from "../bounding/AABB";
 import { DirectionLight } from "../light/DirectionLight";
 import { PointLight } from "../light/PointLight";
 import { SpotLight } from "../light/SpotLight";
+import { Vector3 } from "../math/Vector3";
+import { Plane } from "../math/Plane";
+import { ObjectPool } from "./ObjectPool";
+
+export class Object3DProxy<T> {
+    obj: T;
+    distance: number;
+}
+
+enum SortType {
+    None = 0,
+    Positive,
+    Inveried,
+}
+
+type MeshProxy = Object3DProxy<Mesh>;
+type DirLightProxy = Object3DProxy<DirectionLight>;
+type PointLightProxy = Object3DProxy<PointLight>;
+type SpotLightProxy = Object3DProxy<SpotLight>;
 
 /**
  * 渲染剔除
@@ -16,40 +35,47 @@ import { SpotLight } from "../light/SpotLight";
  */
 export class RenderCulling {
 
+    protected _objPool: ObjectPool<any> = new ObjectPool<any>(Object3DProxy, 32);
+    // protected _directionPool: ObjectPool<DirLightProxy> = new ObjectPool<DirLightProxy>(Object3DProxy, 4);
+    // protected _pointPool: ObjectPool<PointLightProxy> = new ObjectPool<PointLightProxy>(Object3DProxy, 4);
+    // protected _spotPool: ObjectPool<SpotLightProxy> = new ObjectPool<SpotLightProxy>(Object3DProxy, 4);
+
     public frustum: Frustum = new Frustum();
 
-    public opacities: Mesh[] = new Array(64);
+    public opacities: MeshProxy[] = new Array(64);
     public opacitySize: number = 0;
 
-    public noDeferOpacities: Mesh[] = new Array(8);
+    public noDeferOpacities: MeshProxy[] = new Array(8);
     public noDeferOpacitySize: number;
 
-    public alphaTests: Mesh[] = new Array(16);
+    public alphaTests: MeshProxy[] = new Array(16);
     public alphaTestSize: number = 0;
 
-    public noDeferAlphaTests: Mesh[] = new Array(4);
+    public noDeferAlphaTests: MeshProxy[] = new Array(4);
     public noDeferAlphaTestSize: number = 0;
 
-    public alphaBlends: Mesh[] = new Array(16);
+    public alphaBlends: MeshProxy[] = new Array(16);
     public alphaBlendSize: number = 0;
 
-    public dirLights: DirectionLight[] = new Array(4);
+    public dirLights: DirLightProxy[] = new Array(4);
     public dirLightSize: number = 0;
 
-    public dirShadowLights: DirectionLight[] = new Array(2);
+    public dirShadowLights: DirLightProxy[] = new Array(2);
     public dirShadowLightSize: number = 0;
 
-    public pointLights: PointLight[] = new Array(4);
+    public pointLights: PointLightProxy[] = new Array(4);
     public pointLightSize: number = 0;
 
-    public pointShadowLights: PointLight[] = new Array(2);
+    public pointShadowLights: PointLightProxy[] = new Array(2);
     public pointShadowLightSize: number = 0;
 
-    public spotLights: SpotLight[] = new Array(4);
+    public spotLights: SpotLightProxy[] = new Array(4);
     public spotLightSize: number = 0;
 
-    public spotShadowLights: SpotLight[] = new Array(2);
+    public spotShadowLights:SpotLightProxy[] = new Array(2);
     public spotShadowLightSize: number = 0;
+
+    public basePlane: Plane;
 
     public visibleBox: Box = new Box();
 
@@ -60,6 +86,7 @@ export class RenderCulling {
     public culling(scene: Object3D, mat4: Matrix4, isDefer: boolean, isShadow: boolean) {
 
         this.frustum.setFromMatrix(mat4);
+        this.basePlane = this.frustum.getPlane(4);
 
         this.opacitySize = 
         this.noDeferOpacitySize =
@@ -78,21 +105,54 @@ export class RenderCulling {
 
         this._cutObject3D(scene, scene.visible, isDefer, isShadow);
 
-        this._clearTail(this.opacities, this.opacitySize);
-        this._clearTail(this.noDeferOpacities, this.noDeferOpacitySize);
-        this._clearTail(this.alphaTests, this.alphaTestSize);
-        this._clearTail(this.noDeferAlphaTests, this.noDeferAlphaTestSize);
-        this._clearTail(this.alphaBlends, this.alphaBlendSize);
-        this._clearTail(this.dirLights, this.dirLightSize);
-        this._clearTail(this.dirShadowLights, this.dirShadowLightSize);
-        this._clearTail(this.pointLights, this.pointLightSize);
-        this._clearTail(this.pointShadowLights, this.pointShadowLightSize);
-        this._clearTail(this.spotLights, this.spotLightSize);
-        this._clearTail(this.spotShadowLights, this.spotShadowLightSize);
+        this._postCulling(this.opacities, this.opacitySize, SortType.Positive);
+        this._postCulling(this.noDeferOpacities, this.noDeferOpacitySize, SortType.Positive);
+        this._postCulling(this.alphaTests, this.alphaTestSize, SortType.Positive);
+        this._postCulling(this.noDeferAlphaTests, this.noDeferAlphaTestSize, SortType.Positive);
+        this._postCulling(this.alphaBlends, this.alphaBlendSize, SortType.Inveried);
+        this._postCulling(this.dirLights, this.dirLightSize);
+        this._postCulling(this.dirShadowLights, this.dirShadowLightSize);
+        this._postCulling(this.pointLights, this.pointLightSize);
+        this._postCulling(this.pointShadowLights, this.pointShadowLightSize);
+        this._postCulling(this.spotLights, this.spotLightSize);
+        this._postCulling(this.spotShadowLights, this.spotShadowLightSize);
     }
 
-    protected _clearTail(ar: any[], i: number) {
-        ar.fill(null, i);
+    protected _postCulling(ar: Object3DProxy<any>[], size: number, sorting: SortType = SortType.None) {
+        this._clearTail(ar, size);
+        if (sorting === SortType.Positive) {
+            this._sortObjects(ar, false);
+        } else if (sorting === SortType.Inveried) {
+            this._sortObjects(ar, true);
+        }
+    }
+
+    protected _clearTail(ar: Object3DProxy<any>[], size: number) {
+        for (let i = size, l = ar.length; i < l; i++) {
+            if (ar[i]) {
+                this._objPool.recovery(ar[i]);
+                ar[i].obj = null;
+                ar[i] = null;
+            } else {
+                break;
+            }
+        }
+    }
+
+    protected _sortObjects(list: Object3DProxy<any>[], inv: boolean = false) {
+        if (inv) {
+            list.sort((a, b) => {
+                if (!b) return -1;
+                if (!a) return 1;
+                return a.distance - b.distance;
+            })
+        } else {
+            list.sort((a, b) => {
+                if (!b) return -1;
+                if (!a) return 1;
+                return b.distance - a.distance;
+            })
+        }
     }
 
     protected _cutObject3D(obj: Object3D, isRendering: boolean, isDefer: boolean, isShadow: boolean) {
@@ -108,6 +168,16 @@ export class RenderCulling {
         for (let i = 0; i < l; i++) {
             this._cutObject3D(children[i], display, isDefer, isShadow);
         }
+    }
+
+    protected _setObjToArray(ar: Object3DProxy<any>[], obj: Object3D, idx: number) {
+        let proxy = ar[idx];
+        if (!proxy) {
+            proxy = this._objPool.create();
+            ar[idx] = proxy;
+        }
+        proxy.obj = obj;
+        proxy.distance = this.basePlane.distanceToPoint(obj.getPosition());
     }
 
     protected _cutMesh(mesh: Mesh, isDefer: boolean, isShadow: boolean) {
@@ -139,18 +209,18 @@ export class RenderCulling {
         }
         
         if (mat.alphaBlend) {
-            this.alphaBlends[this.alphaBlendSize++] = mesh;
+            this._setObjToArray(this.alphaBlends, mesh, this.alphaBlendSize++);
         } else if (mat.alphaTest) {
             if (isDefer && !mat.supportDeferred) {
-                this.noDeferAlphaTests[this.noDeferAlphaTestSize++] = mesh;
+                this._setObjToArray(this.noDeferAlphaTests, mesh, this.noDeferAlphaTestSize++);
             } else {
-                this.alphaTests[this.alphaTestSize++] = mesh;
+                this._setObjToArray(this.alphaTests, mesh, this.alphaTestSize++);
             }
         } else {
             if (isDefer && !mat.supportDeferred) {
-                this.noDeferOpacities[this.noDeferOpacitySize++] = mesh;
+                this._setObjToArray(this.noDeferOpacities, mesh, this.noDeferOpacitySize++);
             } else {
-                this.opacities[this.opacitySize++] = mesh;
+                this._setObjToArray(this.opacities, mesh, this.opacitySize++);
             }
         }
     }
@@ -160,32 +230,27 @@ export class RenderCulling {
         switch (light.type) {
             case LightType.Direction:
                 if(light.shadow && light.shadow.enalbed) {
-                    this.dirShadowLights[this.dirShadowLightSize++] = <DirectionLight>light;
+                    this._setObjToArray(this.dirShadowLights, light, this.dirShadowLightSize++);
                 } else {
-                    this.dirLights[this.dirLightSize++] =  <DirectionLight>light;
+                    this._setObjToArray(this.dirLights, light, this.dirLightSize++);
                 }
                 break;
             
             case LightType.Spot:
                 if(light.shadow && light.shadow.enalbed) {
-                    this.spotShadowLights[this.spotShadowLightSize++] = <SpotLight>light;
+                    this._setObjToArray(this.spotShadowLights, light, this.spotShadowLightSize++);
                 } else {
-                    this.spotLights[this.spotLightSize++] = <SpotLight>light;
+                    this._setObjToArray(this.spotLights, light, this.spotLightSize++);
                 }
                 break;
 
             case LightType.Point:
                 if(light.shadow && light.shadow.enalbed) {
-                    this.pointShadowLights[this.pointShadowLightSize++] = <PointLight>light;
+                    this._setObjToArray(this.pointShadowLights, light, this.pointShadowLightSize++);
                 } else {
-                    this.pointLights[this.pointLightSize++] = <PointLight>light;
+                    this._setObjToArray(this.pointLights, light, this.pointLightSize++);
                 }
                 break;
-
-            default:
-                break;
         }
-        
-
     }
 }

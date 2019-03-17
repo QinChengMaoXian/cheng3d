@@ -10,6 +10,7 @@ import { Logger } from '../core/Logger';
 import { RenderBase } from '../graphics/RenderBase';
 import { Material } from '../material/Material';
 import { FrameState } from '../graphics/FrameState';
+import { Object3DProxy } from '../util/RenderCulling';
 
 export class Renderer extends Base {
 
@@ -41,6 +42,7 @@ export class Renderer extends Base {
 export interface IRenderer {
 
     renderScene(scene: Object3D, camera: Camera, frame?: Frame);
+    directRenderOrderedList(meshes: Object3DProxy<Mesh>[], size: number, material?: Material);
     directRenderList(meshes: Mesh[], size: number, material?: Material);
     directRenderMesh(mesh: Mesh, material?: Material);
     

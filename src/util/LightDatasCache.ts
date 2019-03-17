@@ -101,7 +101,7 @@ export class LightDatasCache {
             texs = dirShadowDatas.textures;
             mData = dirShadowDatas.mats.data;
             for (let i = 0, l = renderCulling.dirShadowLightSize; i < l; i++) {
-                let d = dirShadows[i];
+                let d = dirShadows[i].obj;
                 dData.set(d.dir.v, i * 3);
                 cData.set(d.color.v, i * 4);
                 mData.set(d.shadow.matrix.data, i * 16);
@@ -119,7 +119,7 @@ export class LightDatasCache {
             mData = spotShadowDatas.mats.data;
             texs = spotShadowDatas.textures;
             for (let i = 0, l = renderCulling.spotShadowLightSize; i < l; i++) {
-                let s = spotShadows[i];
+                let s = spotShadows[i].obj;
                 let ss = s.shadow;
                 dData.set(s.dir.v, i * 4);
                 dData[i * 4 + 3] = Math.cos(s.angle);
@@ -142,7 +142,7 @@ export class LightDatasCache {
             texs = pointShadowDatas.textures;
 
             for (let i = 0, l = renderCulling.pointShadowLightSize; i < l; i++) {
-                let p = pointShadows[i];
+                let p = pointShadows[i].obj;
                 let ps = p.shadow;
                 pData.set(p.pos.v, i * 3);
                 cData.set(p.color.v, i * 4);
@@ -167,7 +167,7 @@ export class LightDatasCache {
         cData = dirDatas.colors.data;
         
         for (let i = 0, l = renderCulling.dirLightSize; i < l; i++) {
-            let d = dirLights[i];
+            let d = dirLights[i].obj;
             dData.set(d.dir.v, i * 3);
             cData.set(d.color.v, i * 4);
         }
@@ -176,7 +176,7 @@ export class LightDatasCache {
         cData = pointDatas.colors.data;
 
         for (let i = 0, l = renderCulling.pointLightSize; i < l; i++) {
-            let p = pointLights[i];
+            let p = pointLights[i].obj;
             pData.set(p.pos.v, i * 3);
             cData.set(p.color.v, i * 4);
         }
@@ -186,7 +186,7 @@ export class LightDatasCache {
         cData = spotDatas.colors.data;
 
         for (let i = 0, l = renderCulling.spotLightSize; i < l; i++) {
-            let s = spotLights[i];
+            let s = spotLights[i].obj;
             pData.set(s.pos.v, i * 3);
             dData.set(s.dir.v, i * 4);
             dData[i * 4 + 3] = Math.cos(s.angle);

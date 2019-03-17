@@ -119,8 +119,8 @@ export class DeferredPipeline {
         renderer.useCamera(camera);
         renderer.useFrame(gFrame);
 
-        renderer.directRenderList(culling.opacities, culling.opacitySize);
-        renderer.directRenderList(culling.alphaTests, culling.alphaTestSize);
+        renderer.directRenderOrderedList(culling.opacities, culling.opacitySize);
+        renderer.directRenderOrderedList(culling.alphaTests, culling.alphaTestSize);
 
         let depthTex = targetFrame.getDepthStencilTexture();
         targetFrame.setDepthStencil(gFrame.getDepthStencilTexture());
@@ -137,12 +137,12 @@ export class DeferredPipeline {
         let mat = this._pointLightMat;
 
         mat.setPixelSize(ps_x, ps_y);
-        
+
         let l = culling.pointLightSize;
         let lightsList = culling.pointLights;
 
         for (let i = 0; i < l; i++) {
-            let pl = lightsList[i] as PointLight;
+            let pl = lightsList[i].obj;
             let r = pl.radius;
             mat.setLightPos(pl.getPosition());  
             mesh.setScale(r, r, r);
@@ -151,9 +151,9 @@ export class DeferredPipeline {
             renderer.directRenderMesh(mesh);
         }
 
-        renderer.directRenderList(culling.noDeferOpacities, culling.noDeferOpacitySize);
-        renderer.directRenderList(culling.noDeferAlphaTests, culling.noDeferAlphaTestSize);
-        renderer.directRenderList(culling.alphaBlends, culling.alphaBlendSize);
+        renderer.directRenderOrderedList(culling.noDeferOpacities, culling.noDeferOpacitySize);
+        renderer.directRenderOrderedList(culling.noDeferAlphaTests, culling.noDeferAlphaTestSize);
+        renderer.directRenderOrderedList(culling.alphaBlends, culling.alphaBlendSize);
     }
 
     public get gFrame() {

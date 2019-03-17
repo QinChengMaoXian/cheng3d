@@ -76,7 +76,7 @@ float calcShadow(vec3 depth3, float z) {
     if (any(lessThan(depth3.xy, vec2(0.0))) || any(greaterThan(depth3.xy, vec2(1.0)))) {
         shadow = 1.0;
     } else {
-        shadow = clamp(exp((z - d) * 300.0), 0.0, 1.0);
+        shadow = clamp(exp((z - d + 0.0005) * 300.0), 0.0, 1.0);
     }
     return (d > 1.0 || d < 0.0) ? 1.0 : shadow;
 }

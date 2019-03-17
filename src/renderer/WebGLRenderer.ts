@@ -36,7 +36,7 @@ import { WebGLStateCache } from './WebGLStateCache';
 import { RenderBase } from '../graphics/RenderBase';
 import { Matrix4 } from '../math/Matrix4';
 import { Box } from '../math/Box';
-import { RenderCulling } from '../util/RenderCulling';
+import { RenderCulling, Object3DProxy } from '../util/RenderCulling';
 import { ShadowMapPipeline } from './pipeline/ShadowMapPipeline';
 import { DeferredPipeline } from './pipeline/DeferredPipeline';
 import { LightDatasCache } from '../util/LightDatasCache';
@@ -633,6 +633,10 @@ export class WebGLRenderer extends Renderer implements IRenderer {
         this._renderList(meshes, size, material);
     }
 
+    public directRenderOrderedList(meshes: Object3DProxy<Mesh>[], size: number, material?: Material) {
+        this._renderOrderedList(meshes, size, material);
+    }
+
     /**
      * 直接渲染一个Mesh，到当前的Frame
      * @param meshes 
@@ -641,6 +645,12 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      */
     public directRenderMesh(mesh: Mesh, material?: Material) {
         this._renderMesh(mesh, material, null);
+    }
+
+    protected _renderOrderedList(renderList: Object3DProxy<Mesh>[], length: number, forceMat?: Material, shadows?: any, lights?: any) {
+        for (let i = 0; i < length; i++) {
+            this._renderMesh(renderList[i].obj, forceMat, shadows, lights);
+        }
     }
 
     /**
@@ -661,17 +671,17 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         for (let i = 0, l = renderCulling.dirShadowLightSize; i < l; i++) {
             let d = renderCulling.dirShadowLights[i];
-            this._renderShadow(scene, d, renderCulling.visibleBox, camera);
+            this._renderShadow(scene, d.obj, renderCulling.visibleBox, camera);
         }
 
         for (let i = 0, l = renderCulling.spotShadowLightSize; i < l; i++) {
             let s = renderCulling.spotShadowLights[i];
-            this._renderShadow(scene, s, renderCulling.visibleBox, camera);
+            this._renderShadow(scene, s.obj, renderCulling.visibleBox, camera);
         }
 
         for (let i = 0, l = renderCulling.pointShadowLightSize; i < l; i++) {
             let p = renderCulling.pointShadowLights[i];
-            this._renderShadow(scene, p, renderCulling.visibleBox, camera);
+            this._renderShadow(scene, p.obj, renderCulling.visibleBox, camera);
         }
     }
 
@@ -725,9 +735,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
                 let shadowLightNum = {d: renderCulling.dirShadowLightSize, p: renderCulling.pointShadowLightSize, s: renderCulling.spotShadowLightSize};
                 let lightNum = {d: renderCulling.dirLightSize, p: renderCulling.pointLightSize, s: renderCulling.spotLightSize};
 
-                this._renderList(renderCulling.opacities, renderCulling.opacitySize, null, shadowLightNum, lightNum);
-                this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadowLightNum, lightNum);
-                this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadowLightNum, lightNum);
+                this._renderOrderedList(renderCulling.opacities, renderCulling.opacitySize, null, shadowLightNum, lightNum);
+                this._renderOrderedList(renderCulling.alphaTests, renderCulling.alphaTestSize, null, shadowLightNum, lightNum);
+                this._renderOrderedList(renderCulling.alphaBlends, renderCulling.alphaBlendSize, null, shadowLightNum, lightNum);
             }
 
             this.useCamera(this._defCamera);
@@ -749,9 +759,9 @@ export class WebGLRenderer extends Renderer implements IRenderer {
             this.useFrame(frame);
             this.useCamera(camera);
             renderCulling.culling(scene, mat4, true, false);
-            this._renderList(renderCulling.opacities, renderCulling.opacitySize);
-            this._renderList(renderCulling.alphaTests, renderCulling.alphaTestSize);
-            this._renderList(renderCulling.alphaBlends, renderCulling.alphaBlendSize);
+            this._renderOrderedList(renderCulling.opacities, renderCulling.opacitySize);
+            this._renderOrderedList(renderCulling.alphaTests, renderCulling.alphaTestSize);
+            this._renderOrderedList(renderCulling.alphaBlends, renderCulling.alphaBlendSize);
         }
     }
 

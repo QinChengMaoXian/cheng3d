@@ -9,10 +9,10 @@ varying vec3 v_worldPos;
 varying vec3 v_viewPos;
 varying vec3 v_normal;
 
-#ifdef NORMAL_MAP
+// #ifdef NORMAL_MAP
     varying vec3 v_tangent;
     varying vec3 v_binormal;
-#endif
+// #endif
 
 varying float v_depth;
 
@@ -51,10 +51,10 @@ void main()
     vec4 worldPos = u_mMat * a_position;
     v_worldPos = worldPos.xyz;
 
-    #ifdef NORMAL_MAP
+    // #ifdef NORMAL_MAP
         v_tangent = normalize((u_mMat * vec4(a_tangent, 0.0)).xyz);
         v_binormal = cross(v_tangent, v_normal);
-    #endif
+    // #endif
     v_normal = normalize((u_mITMat * vec4(a_normal, 0.0)).xyz);
 
     v_viewPos = (u_mvMat * a_position).xyz;

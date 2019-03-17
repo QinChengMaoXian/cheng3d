@@ -36,7 +36,7 @@ void main()
 
     float d0 = decodeRGBA2Float(texture2D(u_diffuseMap, v_uv)) * z;
 
-    float color = 1.0;
+    float color = 0.398943;
 
     #ifdef KERNEL_RADIUS
         for (int i = 0; i < KERNEL_RADIUS; i++) 

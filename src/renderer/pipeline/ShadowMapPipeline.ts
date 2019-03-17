@@ -185,7 +185,7 @@ export class ShadowMapPipeline {
         renderer.useCamera(camera);
         renderer.useFrame(frame);
 
-        renderer.directRenderList(culling.opacities, culling.opacitySize, material);
+        renderer.directRenderOrderedList(culling.opacities, culling.opacitySize, material);
 
         Vector3.pool.recovery(boxCenter);
 
@@ -253,7 +253,7 @@ export class ShadowMapPipeline {
         renderer.useCamera(camera);
         renderer.useFrame(frame);
 
-        renderer.directRenderList(culling.opacities, culling.opacitySize, material);
+        renderer.directRenderOrderedList(culling.opacities, culling.opacitySize, material);
 
         Vector3.pool.recovery(boxCenter);
 
@@ -319,7 +319,7 @@ export class ShadowMapPipeline {
             renderer.useCamera(camera);
             renderer.useFrame(frame);
 
-            renderer.directRenderList(culling.opacities, culling.opacitySize, material);
+            renderer.directRenderOrderedList(culling.opacities, culling.opacitySize, material);
         }
     }
 

@@ -294,9 +294,9 @@ mainScene.addChild(skyboxMesh);
 // boxes.name = '更大一堆球';
 // mainScene.addChild(boxes);
 
-// for (let i = 0; i < 10; i++) {
-//     for (let j = 0; j < 10; j++) {
-//         for (let k = 0; k < 10; k++) {
+// for (let i = 0; i < 5; i++) {
+//     for (let j = 0; j < 5; j++) {
+//         for (let k = 0; k < 5; k++) {
 //             let skyboxMesh = new CGE.Mesh();
 
 //             skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);
@@ -315,39 +315,41 @@ mainScene.addChild(skyboxMesh);
 
 for(let i = 0; i < 4; i++) {
     let p = new CGE.PointLight();
-    p.setColor(Math.random() * 50 + 50, Math.random() * 50 + 50, Math.random() * 50 + 50);
+    p.setColor(Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5);
     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
     mainScene.addChild(p);
 }
 
-for(let i = 0; i < 1; i++) {
-    let p = new CGE.SpotLight();
-    p.setColor(1, 1, 1);
-    p.setPosition(20, 20, 100);
-    p.setDir(-1, 1, 1);
-    p.angle = 0.5 * Math.PI * 0.5;
-    p.enableShadow();
-    mainScene.addChild(p);
-    window['sss'] = p;
-}
+app.getScene().getMainLight().enableShadow();
 
-{
-    let p = new CGE.PointLight();
-    p.setColor(1, 1, 1);
-    p.setPosition(150, -30, 80);
-    p.enableShadow();
-    mainScene.addChild(p);
-    window['ppp'] = p;
-}
+// {
+//     let p = new CGE.SpotLight();
+//     p.setColor(1, 1, 1);
+//     p.setPosition(20, 20, 100);
+//     p.setDir(-1, 1, 1);
+//     p.angle = 0.5 * Math.PI * 0.5;
+//     p.enableShadow();
+//     mainScene.addChild(p);
+//     window['sss'] = p;
+// }
 
-{
-    let p = new CGE.PointLight();
-    p.setColor(1, 1, 1);
-    p.setPosition(150, 30, 80);
-    p.enableShadow();
-    mainScene.addChild(p);
-    window['ppp2'] = p;
-}
+// {
+//     let p = new CGE.PointLight();
+//     p.setColor(1, 1, 1);
+//     p.setPosition(150, -30, 80);
+//     p.enableShadow();
+//     mainScene.addChild(p);
+//     window['ppp'] = p;
+// }
+
+// {
+//     let p = new CGE.PointLight();
+//     p.setColor(1, 1, 1);
+//     p.setPosition(150, 30, 80);
+//     p.enableShadow();
+//     mainScene.addChild(p);
+//     window['ppp2'] = p;
+// }
 
 // 以上 光源测试
 ///////////////////////////////////////////////////////////////////////////////////////

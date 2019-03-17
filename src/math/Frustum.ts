@@ -98,6 +98,10 @@ export class Frustum {
 
     }
 
+    public getPlane(idx: number) {
+        return this._planes[idx];
+    }
+
     public copy(frustum: Frustum) {
         let selfPlanes = this._planes;
         let orderPlanes = frustum._planes;
