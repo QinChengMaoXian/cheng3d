@@ -5,7 +5,7 @@ import { Vector2 } from "../math/Vector2";
 
 export class DownSample4Material extends Material {
 
-    protected _pixelSize: { data: Float32Array };
+    protected _pixelSize: Vector2;
 
     constructor() {
         super();
@@ -19,7 +19,7 @@ export class DownSample4Material extends Material {
     }
 
     public setPixelSize(x: number, y: number) {
-        this.setPixelSize(x, y);
+        this._pixelSize.set(x, y);
     }
 
     public get type(): string {

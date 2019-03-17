@@ -8,13 +8,14 @@ export class SpotLight extends Light implements ILight {
 
     protected _dir: Vector3 = new Vector3();
     protected _angle: number = 0.0;
-    protected _radius: number = 1000.0;
+    protected _radius: number;
     
     protected _shadow: SpotShadow;
 
     constructor() {
         super();
         this._bounding = new AABB();
+        this.setFactor(0.9375);
     }
 
     public setDir(x:number, y: number, z: number) {
@@ -41,11 +42,16 @@ export class SpotLight extends Light implements ILight {
 
     public setColor(r: number, g: number, b: number) {
         super.setColor(r, g, b);
-        let lum = Light.LumFactor.dot(this._color);
+        // let lum = Light.LumFactor.dot(this._color);
         // 这里计算亮度衰减到1 / 256的时的半径;
         // this._radius = Math.sqrt(lum) * 16.0;
     }
     
+    public setFactor(v: number) {
+        this.color.w = Math.min(v, 1.0);
+        this._radius = Math.sqrt(1.0 / (1.0 - v));
+    }
+
     protected _updateBounding() {
         let angle = this._angle;
         let bounding = this._bounding as AABB;

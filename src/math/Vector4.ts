@@ -11,7 +11,7 @@ export class Vector4 {
         this.v = new Float32Array([x, y, z, w]);
     }
 
-    public set(x, y, z, w) {
+    public set(x: number, y: number, z: number, w: number) {
         this.v[0] = x;
         this.v[1] = y;
         this.v[2] = z;

@@ -506,6 +506,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
 
         let mat = forceMaterial || mesh.getMaterial();
 
+        // TODO: 找地方放灯光
         if (shadows) {
             if (shadows.d > 0) {
                 let dData = this._lightDatasCache.getShadowDir(shadows.d);

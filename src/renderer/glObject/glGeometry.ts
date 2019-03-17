@@ -17,10 +17,11 @@ export class glGeometry extends glObject {
         super();
     }
 
-    public bindVbo(gl: WebGLRenderingContext, glProgram: glProgram, geometry: Geometry) {
-        if (glGeometry._curr === this) {
+    public bindVbo(gl: WebGLRenderingContext, glprog: glProgram, geometry: Geometry) {
+        if (glGeometry._curr === this && !glProgram.curUpdated) {
             return;
         }
+        glProgram.curUpdated = false;
         glGeometry._curr = this;
 
         let glGeo: glGeometry = this;
@@ -33,7 +34,7 @@ export class glGeometry extends glObject {
             let binded = false
             let attributes = buffer.getAttributes();
             attributes.forEach( attribute => {
-                let location = glProgram.getAttribLocation(attribute.attribType);
+                let location = glprog.getAttribLocation(attribute.attribType);
                 if (location === undefined || location === -1) {
                     return;
                 } else {

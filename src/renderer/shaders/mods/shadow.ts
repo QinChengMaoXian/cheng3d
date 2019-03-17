@@ -152,6 +152,8 @@ export const PointShadowCalc = `
         shadow = d > u_pointRanges[POINT_MAP_INDEX].x ? 1.0 : shadow;
     #endif
 
-    lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, L, color) * shadow;
+    float factor = max(1.0 - (1.0 - color.w) * (d * d), 0.0);
+    // float factor = max(1.0 - (1.0 - color.w) * dot(d3, d3), 0.0);
+    lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, L, color) * factor * shadow;
 `;
 

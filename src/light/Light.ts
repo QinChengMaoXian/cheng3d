@@ -33,7 +33,7 @@ export class Light extends Object3D {
 
     public setColor(r: number, g: number, b: number) {
         const color = this._color;
-        color.set(r, g, b, 1);
+        color.set(r, g, b, color.w);
     }
 
     public enableShadow() {

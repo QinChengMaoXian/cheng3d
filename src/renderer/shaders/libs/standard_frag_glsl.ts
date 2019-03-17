@@ -181,7 +181,9 @@ void main()
             vec3 pos = u_pointPos[i];
             vec4 color = u_pointColors[i];
             vec3 d3 = pos - v_worldPos;
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(d3), color) / dot(d3, d3);
+            float d3len = length(d3);
+            float factor = max(1.0 - (1.0 - color.w) * (d3len * d3len), 0.0);
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, normalize(d3), color) * factor;
         }
     #endif
 
@@ -214,7 +216,8 @@ void main()
             shadow /= 9.0;
 
             float ag = step(dir.w, dot(dir.xyz, L));
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, L, color) * ag * shadow;   
+            float factor = max(1.0 - (1.0 - color.w) * dot(d3, d3), 0.0);
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, L, color) * factor * ag * shadow;   
         }
         #endif
         #if SPOT_SHADOW_LIGHT > 1
@@ -229,7 +232,8 @@ void main()
             vec3 d3 = pos - v_worldPos;
             vec3 d3_norm = normalize(d3);
             float ag = step(dir.w, dot(dir.xyz, d3_norm));
-            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, d3_norm, color) / dot(d3, d3) * ag;
+            float factor = max(1.0 - (1.0 - color.w) * dot(d3, d3), 0.0);
+            lo += directionLight(NdotV, roughness, metallic, albedo, F0, N, V, d3_norm, color)  * factor * ag;
         }
     #endif
 

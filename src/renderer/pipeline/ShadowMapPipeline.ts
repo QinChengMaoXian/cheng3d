@@ -232,7 +232,7 @@ export class ShadowMapPipeline {
         mat4.lookAt(boxCenter, dir, Vector3.ZUp);
 
         let far = light.radius;
-        let near = 1;
+        let near = light.radius / 2000.0;
 
         camera.setPositionAt(light.getPosition());
         camera.lookAt(vec3.copy(light.getPosition()).subAt(dir));
@@ -295,7 +295,7 @@ export class ShadowMapPipeline {
         let pos = light.pos;
 
         let far = light.radius;
-        let near = 1;
+        let near = light.radius / 2000.0;
 
         let renderer = this._renderer;
 

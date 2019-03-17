@@ -35,6 +35,7 @@ export interface ITexUniform {
 export class glProgram extends glObject {
 
     private static _curr;
+    public static curUpdated = false;
 
     public static vMatrix  = new Matrix4();
     public static pMatrix  = new Matrix4();
@@ -179,6 +180,7 @@ export class glProgram extends glObject {
         if (glProgram._curr !== this) {
             gl.useProgram(this._program);
             glProgram._curr = this;
+            glProgram.curUpdated = true;
         }
     }
 

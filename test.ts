@@ -317,30 +317,33 @@ for(let i = 0; i < 4; i++) {
     let p = new CGE.PointLight();
     p.setColor(Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5);
     p.setPosition(Math.random() * 100 - 50, Math.random() * 100 - 50, 0);
+    p.setFactor(0.999);
     mainScene.addChild(p);
 }
 
-app.getScene().getMainLight().enableShadow();
+// app.getScene().getMainLight().enableShadow();
 
-// {
-//     let p = new CGE.SpotLight();
-//     p.setColor(1, 1, 1);
-//     p.setPosition(20, 20, 100);
-//     p.setDir(-1, 1, 1);
-//     p.angle = 0.5 * Math.PI * 0.5;
-//     p.enableShadow();
-//     mainScene.addChild(p);
-//     window['sss'] = p;
-// }
+{
+    let p = new CGE.SpotLight();
+    p.setColor(1, 4, 1);
+    p.setPosition(20, 20, 20);
+    p.setDir(-1, 1, 1);
+    p.angle = 0.5 * Math.PI * 0.5;
+    p.enableShadow();
+    p.setFactor(0.9999);
+    mainScene.addChild(p);
+    window['sss'] = p;
+}
 
-// {
-//     let p = new CGE.PointLight();
-//     p.setColor(1, 1, 1);
-//     p.setPosition(150, -30, 80);
-//     p.enableShadow();
-//     mainScene.addChild(p);
-//     window['ppp'] = p;
-// }
+{
+    let p = new CGE.PointLight();
+    p.setColor(4, 0, 0);
+    p.setPosition(150, -30, 20);
+    p.enableShadow();
+    p.setFactor(0.9999);
+    mainScene.addChild(p);
+    window['ppp'] = p;
+}
 
 // {
 //     let p = new CGE.PointLight();
