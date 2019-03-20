@@ -249,7 +249,8 @@ void main()
     R = vec3(R.x, R.z, -R.y);
 
     vec2 envBRDF  = texture2D(u_brdfLUTMap, vec2(NdotV, roughness)).rg;
-    vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb;  
+    vec3 prefilteredColor = textureCubeLodEXT(u_prefilterMap, R, roughness * 8.0).rgb; 
+    // vec3 prefilteredColor = textureCube(u_prefilterMap, R).rgb * (1.0 - roughness) + irradiance * roughness;
     vec3 specular = prefilteredColor * (F_s * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD_a * diffuse + specular) * ao;
 

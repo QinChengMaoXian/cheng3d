@@ -1,0 +1,50 @@
+<html>
+
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<title>cheng3d_test</title>
+<style type="text/css">
+body {margin:0;}
+
+</style>
+</head>
+
+<body>
+<!-- <script type="text/javascript" src="./dist/root.bundle.js"></script> -->
+<!--<script type="text/javascript" src="./root.bundle.js"></script>-->
+<!--<script src="http://127.0.0.1:9090/static/dist/bundle.js"></script>-->
+<!-- <p id = "fps" style="position:absolute; user-select:none; color:aliceblue">fps:10</p> -->
+<script type="text/javascript" src="../libs/bundle.js"></script>
+<script type="text/javascript">
+    var app = new CGE.Application();
+    app.init(CGE.Platform.width, CGE.Platform.height);
+
+    var renderer = app.getRenderer();
+    renderer.enableDepthTest();
+    document.body.appendChild(renderer.getCanvas());
+    renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
+
+    let camera = app.getCamera();
+    camera.setPosition(-10, 10, 10);
+
+    window.onresize = function() {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        app.setSize(width, height);
+    };
+
+    app.start();
+
+    var geo = new CGE.SphereGeometry(1, 32, 32);
+    var mat = new CGE.StandardMaterial();
+    
+    var mesh = new CGE.Mesh();
+    mesh.setGeometry(geo);
+    mesh.setMaterial(mat);
+
+    app.getScene().addChild(mesh);
+
+</script>
+
+</body>
+</html>

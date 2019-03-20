@@ -294,9 +294,9 @@ mainScene.addChild(skyboxMesh);
 // boxes.name = '更大一堆球';
 // mainScene.addChild(boxes);
 
-// for (let i = 0; i < 5; i++) {
-//     for (let j = 0; j < 5; j++) {
-//         for (let k = 0; k < 5; k++) {
+// for (let i = 0; i < 10; i++) {
+//     for (let j = 0; j < 10; j++) {
+//         for (let k = 0; k < 10; k++) {
 //             let skyboxMesh = new CGE.Mesh();
 
 //             skyboxMesh.setPosition((i - 4) * 15, (j - 4) * 15, k * 15 + 10);

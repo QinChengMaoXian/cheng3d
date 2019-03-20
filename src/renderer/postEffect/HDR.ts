@@ -43,7 +43,7 @@ export class HDR extends PEBase {
     protected _downTo32Frame: Frame;
     protected _downTo32Frame2: Frame;
     protected _downTo8Frame: Frame;
-    // protected _downTo2Frame: Frame;
+    protected _downTo2Frame: Frame;
 
     protected _downTo1Frame: Frame[];
     protected _downTo1Idx: number = 0;
@@ -119,11 +119,11 @@ export class HDR extends PEBase {
         frame.getState().clearColor.set(0, 0, 0, 0);
         frame.getState().needClear = false;
 
-        // this._downTo2Frame = new Frame();
-        // frame = this._downTo2Frame;
-        // frame.setSize(2, 2);
-        // frame.addTexture(RTLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
-        // frame.getState().clearColor.set(0, 0, 0, 0);
+        this._downTo2Frame = new Frame();
+        frame = this._downTo2Frame;
+        frame.setSize(2, 2);
+        frame.addTexture(RTLocation.COLOR, CGE.RGB, CGE.FLOAT, CGE.NEAREST, CGE.NEAREST);
+        frame.getState().clearColor.set(0, 0, 0, 0);
 
         this._downTo1Frame = []
         frame = new Frame();
@@ -231,7 +231,7 @@ export class HDR extends PEBase {
         const downTo32Frame = this._downTo32Frame;
         const downTo32Frame2 = this._downTo32Frame2;
         const downTo8Frame = this._downTo8Frame;
-        // const downTo2Frame = this._downTo2Frame;
+        const downTo2Frame = this._downTo2Frame;
 
         const downTo1Src = this.src1Frame;
         const downTo1Dst = this.dst1Frame;
@@ -269,17 +269,17 @@ export class HDR extends PEBase {
         pipe.renderPass(sampleMesh, downTo8Frame);
 
         // 降到2x2
-        // tex2D = <Texture2D>(downTo8Frame.getTextureFromType(RTLocation.COLOR).tex);
-        // down4Mat.setSrcTexture(tex2D);
-        // down4Mat.setPixelSize(1.0 / 8.0, 1.0 / 8.0);
-        // pipe.renderPass(sampleMesh, downTo2Frame);
+        tex2D = <Texture2D>(downTo8Frame.getTextureFromType(RTLocation.COLOR).tex);
+        down4Mat.setSrcTexture(tex2D);
+        down4Mat.setPixelSize(1.0 / 8.0, 1.0 / 8.0);
+        pipe.renderPass(sampleMesh, downTo2Frame);
 
         // 降至 到1x1 对Linear的贴图，采4个像素的中心, 参数中包括前一个1px;
-        tex2D = <Texture2D>(downTo8Frame.getTextureFromType(RTLocation.COLOR).tex);
+        tex2D = <Texture2D>(downTo2Frame.getTextureFromType(RTLocation.COLOR).tex);
         downTo1Mat.setSrcTexture(tex2D);
         tex2D = <Texture2D>(downTo1Src.getTextureFromType(RTLocation.COLOR).tex);
         downTo1Mat.setLumTexture(tex2D)
-        downTo1Mat.setPixelSize(1.0 / 2.0, 1.0 / 2.0); 
+        downTo1Mat.setPixelSize(1.0 / 4.0, 1.0 / 4.0); 
         downTo1Mat.setLumPCT(Math.min(deltaTime / this._adaptationTime, 1.0));
         pipe.renderPass(downTo1Mesh, downTo1Dst);
 
