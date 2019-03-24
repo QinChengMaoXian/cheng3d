@@ -10,13 +10,27 @@ interface Image2D {
 }
 
 export class Loader {
+    private static _baseUrl: string = '';
+
     private static _imgsMap: Map<string, Image2D> = new Map();
     private static _loadedMap: Map<string, any> = new Map();
 
     private static _loadList: Map<string, XMLHttpRequestResponseType> = new Map();
     private static _xmlRequests = [new XMLHttpRequest(), new XMLHttpRequest(), new XMLHttpRequest(), new XMLHttpRequest(), new XMLHttpRequest()];
 
+    static setBaseUrl(url: string) {
+        Loader._baseUrl = url
+    }
+
+    static join(url: string) {
+        if (url.indexOf(Loader._baseUrl) === 0) {
+            return url;
+        }
+        return Loader._baseUrl + url;
+    }
+
     static loadImage(url: string, func?): HTMLImageElement {
+        let path = Loader.join(url);
         let obj = this._imgsMap.get(url);
         if (obj) {
             obj.count++;
@@ -25,29 +39,30 @@ export class Loader {
         }
 
         let img = new Image();
-        this._imgsMap.set(url, {count: 1, image: img});
+        this._imgsMap.set(path, {count: 1, image: img});
         img.onload = () => {
             func && func();
         };
         img.onerror = () => {
             Logger.error(img.baseURI, 'can not loaded');
         }
-        img.src = url;
+        img.src = path;
         return img;
     }
 
     static removeImage(url: string) {
-        let obj = this._imgsMap.get(url);
+        let path = Loader.join(url);
+        let obj = this._imgsMap.get(path);
         if (obj) {
             obj.count--;
             if (obj.count === 0) {
-                this._imgsMap.delete(url);
+                this._imgsMap.delete(path);
             }
         }
     }
 
     static loadUrl(url: string, type: XMLHttpRequestResponseType = 'text') {
-        return this._XMLHttpRequest(url, type)
+        return this._XMLHttpRequest(Loader.join(url), type)
             .then(xmlHttpResponse => {
                 return xmlHttpResponse;
             })
@@ -56,7 +71,7 @@ export class Loader {
 
     static loadUrls(urls, callback) {
         const promises = urls.map(({url, type}) => {
-            return this._XMLHttpRequest(url, type)
+            return this._XMLHttpRequest(Loader.join(url), type)
             .then(xmlHttpResponse => {
                 return xmlHttpResponse;
             })
@@ -97,15 +112,16 @@ export class Loader {
     }
 
     protected static _XMLHttpRequest(url: string, type: XMLHttpRequestResponseType) {
-        let data = this._loadedMap.get(url);
+        let path = Loader.join(url);
+        let data = this._loadedMap.get(path);
         if (data) {
             return Promise.resolve(data);
         }
 
-        this._loadList.set(url, type);
+        this._loadList.set(path, type);
 
         return new Promise((resolve, reject) => {
-            events.once(url, this, resolve);
+            events.once(path, this, resolve);
             this._disposeLoad();
         });        
     }

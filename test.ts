@@ -9,16 +9,18 @@ import * as CGE from './src/CGE'
 // let test_ddn = './res/spnza_bricks_a_ddn.jpg';
 // let test_spec = './res/spnza_bricks_a_spec.png';
 
-let cartoon_color = './res/bronya_color.png';
-let cartoon_light = './res/bronya_lightmap.jpg';
-let cartoon_emission = './res/bronya_emission.jpg';
-let cartoon_obj = './res/bronya.obj';
+// let cartoon_color = './res/bronya_color.png';
+// let cartoon_light = './res/bronya_lightmap.jpg';
+// let cartoon_emission = './res/bronya_emission.jpg';
+// let cartoon_obj = './res/bronya.obj';
 
-let brdf_basecolor = './resources/brdfTest/rustediron2_basecolor.jpg';
-let brdf_normal = './resources/brdfTest/rustediron2_normal.jpg';
-let brdf_specular = './resources/brdfTest/rustediron2_specular.jpg'
+let brdf_basecolor = 'brdfTest/rustediron2_basecolor.jpg';
+let brdf_normal = 'brdfTest/rustediron2_normal.jpg';
+let brdf_specular = 'brdfTest/rustediron2_specular.jpg'
 
 window['cge'] = CGE;
+
+CGE.Loader.setBaseUrl('./resources/');
 
 // import { Main } from './projects/kamihikouki/main';
 
@@ -189,12 +191,12 @@ let func = () => {
 }
 
 cubeTexture.setTexture2ds(
-    createTexture2DFromImage('./resources/skybox/px.jpg', func),
-    createTexture2DFromImage('./resources/skybox/nx.jpg', func),
-    createTexture2DFromImage('./resources/skybox/py.jpg', func),
-    createTexture2DFromImage('./resources/skybox/ny.jpg', func),
-    createTexture2DFromImage('./resources/skybox/pz.jpg', func),
-    createTexture2DFromImage('./resources/skybox/nz.jpg', func)
+    createTexture2DFromImage('skybox/px.jpg', func),
+    createTexture2DFromImage('skybox/nx.jpg', func),
+    createTexture2DFromImage('skybox/py.jpg', func),
+    createTexture2DFromImage('skybox/ny.jpg', func),
+    createTexture2DFromImage('skybox/pz.jpg', func),
+    createTexture2DFromImage('skybox/nz.jpg', func)
 );
 
 cubeTexture.setMipmap(true);
@@ -400,7 +402,7 @@ let gltfCallback = (event, object) => {
 // })
 
 let gltfTest = new CGE.GltfLoader();
-gltfTest.load('./resources/Cesium_Man/Cesium_Man.gltf', gltfCallback);
+gltfTest.load('Cesium_Man/Cesium_Man.gltf', gltfCallback);
 
 // 以上 gltf 加载测试
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -666,7 +668,7 @@ triGeo.setDrawParameter(vertexd.length / 3);
 // triTexture.setImageUrl(color_diff);
 // triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
 // triTexture.setMipmap(true);
-let triMaterial = new CGE.DiffuseMaterial('./resources/color.jpg');
+let triMaterial = new CGE.DiffuseMaterial('color.jpg');
 
 let triMesh = new CGE.Mesh();
 triMesh.setGeometry(triGeo);

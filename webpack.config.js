@@ -1,11 +1,10 @@
 // 'use strict';
 var path = require("path");
-var DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
 
 module.exports = {
   mode: 'development',
   entry: {
-    app: ['./test.ts'],
+    app: ['./src/CGE.ts'],
   },
   output: {
     path: path.resolve(__dirname, "build"),

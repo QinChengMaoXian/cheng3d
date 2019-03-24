@@ -2,7 +2,7 @@ import { Material } from './Material';
 import { ShaderConst } from '../graphics/ShaderConst';
 import { Vector4 } from '../math/Vector4';
 
-export class ColorMatrial extends Material {
+export class ColorMaterial extends Material {
     protected _diffuseMap;
     protected _baseColor: Vector4 = new Vector4();
     constructor(diffuse) {

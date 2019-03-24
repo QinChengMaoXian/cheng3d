@@ -12,6 +12,14 @@ export class Vector3 {
     public static pubTemp: Vector3 = new Vector3();
     public static pool = new ObjectPool<Vector3>(Vector3, 6);
 
+    public static getPubTemp(): Vector3 {
+        return Vector3.pool.create()
+    }
+    
+    public static recoveryPubTemp(v: Vector3) {
+        Vector3.pool.recovery(v);
+    }
+
     public v: Float32Array;
 
     constructor(x: number = 0, y: number = 0, z: number = 0) {
@@ -124,6 +132,17 @@ export class Vector3 {
     public lengthSquare(): number {
         let v = this.v;
         return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+    }
+
+    public distanceToSquare(vec: Vector3): number {
+        let x = vec.x - this.x,
+            y = vec.y - this.y,
+            z = vec.z - this.z;
+        return x * x + y * y + z * z;
+    }
+    
+    public distanceTo(vec: Vector3): number {
+        return Math.sqrt(this.distanceToSquare(vec));
     }
 
     public normalize(): Vector3 {

@@ -27,6 +27,7 @@ export { SphereBounding } from './bounding/SphereBounding';
 
 export { Material } from './material/Material';
 export { DiffuseMaterial } from './material/DiffuseMaterial';
+export { ColorMaterial } from './material/ColorMaterial';
 export { StandardMaterial } from './material/StandardMaterial';
 export { CartoonMaterial } from './material/CartoonMaterial';
 export { SkyboxMaterial } from './material/SkyboxMaterial';

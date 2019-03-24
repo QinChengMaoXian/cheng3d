@@ -16,6 +16,8 @@ body {margin:0;}
 <!-- <p id = "fps" style="position:absolute; user-select:none; color:aliceblue">fps:10</p> -->
 <script type="text/javascript" src="../libs/bundle.js"></script>
 <script type="text/javascript">
+    CGE.Loader.setBaseUrl('../assets/')
+
     var app = new CGE.Application();
     app.init(CGE.Platform.width, CGE.Platform.height);
 
@@ -25,7 +27,7 @@ body {margin:0;}
     renderer.setClearColor(1.0, 0.5, 0.5, 1.0);
 
     let camera = app.getCamera();
-    camera.setPosition(-10, 10, 10);
+    camera.setPosition(3, 0, 0);
 
     window.onresize = function() {
         let width = window.innerWidth;

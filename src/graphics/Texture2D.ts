@@ -40,7 +40,7 @@ export class Texture2D extends Texture {
     public static get BrdfLUT(): Texture2D {
         if (!Texture2D._BrdfLUT) {
             let tex = new Texture2D;
-            tex.setUrl('./resources/envLUT.png');
+            tex.setUrl('envLUT.png');
             Texture2D._BrdfLUT = tex;
         }
         return Texture2D._BrdfLUT;

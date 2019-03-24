@@ -17,8 +17,8 @@ export class StandardMaterial extends Material {
         roughness: Texture2D = Texture2D.White, 
         metallic: Texture2D = Texture2D.White, 
         ao: Texture2D = Texture2D.White,
-        irradiance: TextureCube = TextureCube.White,
-        prefilter: TextureCube = TextureCube.White) {
+        irradiance: TextureCube = TextureCube.Black,
+        prefilter: TextureCube = TextureCube.Black) {
 
         super();
 

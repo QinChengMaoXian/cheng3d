@@ -1,6 +1,8 @@
 import { Vector4 } from './Vector4'
 import { Vector3 } from './Vector3'
 
+const tempVec3: Vector3 = new Vector3;
+
 export class Quaternion extends Vector4 {
     public static readonly Zero: Quaternion = new Quaternion();
 
@@ -43,7 +45,7 @@ export class Quaternion extends Vector4 {
         let v2 = vec2.clone().normalize();
         let dot = v1.dot(v2);
         if (dot < -0.999999) {
-            let tmpvec3 = Vector3.pool.create();
+            let tmpvec3 = tempVec3;
             tmpvec3.set(1,0,0).crossAt(v1);
             if (tmpvec3.lengthSquare() < 0.000000001) {
                 tmpvec3.set(0,1,0).crossAt(v2);

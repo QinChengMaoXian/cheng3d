@@ -4,6 +4,7 @@ import { Box } from "./Box";
 import { Vector3 } from "./Vector3";
 import { Sphere } from "./Sphere";
 
+const tempVec3 = new Vector3
 /**
  * 平头截体
  */
@@ -48,27 +49,7 @@ export class Frustum {
         return this;
     }
 
-    public intersectBox(box: Box) {
-        const p = Vector3.pubTemp;
-
-        const planes = this._planes;
-        const max = box.max;
-        const min = box.min;
-
-        for (let i = 0; i < 6; i++) {
-            let plane = planes[i];
-            let normal = plane.normal;
-            p.x = normal.x > 0 ? max.x : min.x;
-            p.y = normal.y > 0 ? max.y : min.y;
-            p.z = normal.z > 0 ? max.z : min.z;
-
-            if (plane.distanceToPoint(p) < 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    public intersectBox(box: Box) { return false }
 
     public intersectSphere(sphere: Sphere) {
         const planes = this._planes;
@@ -111,3 +92,25 @@ export class Frustum {
         return this;
     }
 }
+
+Frustum.prototype.intersectBox = function() {
+    const p = new Vector3()
+    return function(box: Box) {
+        const planes = this._planes;
+        const max = box.max;
+        const min = box.min;
+
+        for (let i = 0; i < 6; i++) {
+            let plane = planes[i];
+            let normal = plane.normal;
+            p.x = normal.x > 0 ? max.x : min.x;
+            p.y = normal.y > 0 ? max.y : min.y;
+            p.z = normal.z > 0 ? max.z : min.z;
+
+            if (plane.distanceToPoint(p) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+}()
