@@ -4,7 +4,7 @@ var path = require("path");
 module.exports = {
   mode: 'development',
   entry: {
-    app: ['./src/CGE.ts'],
+    app: ['./test.ts'],
   },
   output: {
     path: path.resolve(__dirname, "build"),

@@ -3,10 +3,12 @@ import { Matrix4 } from '../math/Matrix4';
 import { Quaternion } from '../math/Quaternion';
 import { Object3D } from './Object3D';
 
-export class Camera extends Object3D {
-    public static readonly Orthographic = 0;
-    public static readonly Perspective = 1;
+export enum CameraType {
+    Orthographic = 0,
+    Perspective = 1,
+}
 
+export class Camera extends Object3D {
     protected _far: number;
     protected _near: number;
     protected _left: number;
@@ -15,32 +17,33 @@ export class Camera extends Object3D {
     protected _top: number;
     protected _fovy: number;
     protected _aspect: number;
-    protected _mode: number = Camera.Perspective;
-    protected _projection = new Matrix4();
-    protected _viewProjection = new Matrix4();
+    protected _type: CameraType = CameraType.Perspective;
     protected _center = new Vector3();
     protected _up = new Vector3(0, 0, 1);
     protected _projectionFunc: Function;
+
+    protected _projection = new Matrix4();
+    protected _viewProjection = new Matrix4();
+
+    protected _matrixInverse: Matrix4 = new Matrix4();
+    protected _projectionInverse: Matrix4 = new Matrix4();
 
     constructor(width?: number, height?: number, _fovy?: number, _near?: number, _far?: number) {
         super();
         let w = (width || 800) * 0.5;
         let h = (height || 600) * 0.5;
-        Object.assign(this, {
-            _far: _far || 2000.0,
-            _near: _near || 1.0,
-            _left: -w, 
-            _right: w, 
-            _bottom: h, 
-            _top: -h,
-            _fovy: _fovy || Math.PI / 3,
-            _aspect: w / h,
-            _mode: Camera.Perspective,
-            _projection: new Matrix4(),
-            _center: new Vector3(),
-            _up: new Vector3(0, 0, 1),
-            _projectionFunc: this._makePerspectiveMatrix.bind(this)
-        });
+        this._far = _far || 2000.0;
+        this._near = _near || 1.0;
+        this._left = -w; 
+        this._right = w; 
+        this._bottom = h; 
+        this._top = -h;
+        this._fovy = _fovy || Math.PI / 3;
+        this._aspect = w / h;
+        this._projection = new Matrix4();
+        this._center = new Vector3();
+        this._up = new Vector3(0, 0, 1);
+        this._projectionFunc = this._makePerspectiveMatrix.bind(this);
         this._resetUp();
     }
 
@@ -52,7 +55,7 @@ export class Camera extends Object3D {
         this._up = rightAxis.cross(forward).normalize();
     }
 
-    update(delta: number) {
+    public update(delta: number) {
         this._update();
     }
 
@@ -66,13 +69,14 @@ export class Camera extends Object3D {
     }
 
     protected _makeMatrix() {
+        // super._makeMatrix(true);
         this._update();
         return this._matrix;
     }
 
-    enableOrthographicMode(_left?, _right?, _bottom?, _top?, _near?, _far?) {
+    public enableOrthographicMode(_left?: number, _right?: number, _bottom?: number, _top?: number, _near?: number, _far?: number) {
         this._projectionFunc = this._makeOrthographicMatrix;
-        this._mode = Camera.Orthographic;
+        this._type = CameraType.Orthographic
         this._left = _left || this._left;
         this._right = _right || this._right;
         this._bottom = _bottom || this._bottom;
@@ -82,9 +86,9 @@ export class Camera extends Object3D {
         this.resize(_right - _left, _bottom - _top);
     }
 
-    enablePerspectiveMode(_fovy, _aspect, _near, _far) {
+    public enablePerspectiveMode(_fovy?: number, _aspect?: number, _near?: number, _far?: number) {
         this._projectionFunc = this._makePerspectiveMatrix;
-        this._mode = Camera.Perspective;
+        this._type = CameraType.Perspective
         this._fovy = _fovy || this._fovy;
         this._aspect = _aspect || this._aspect;
         let height = Math.abs(this._bottom - this._top);
@@ -94,52 +98,62 @@ export class Camera extends Object3D {
         this.resize(width, height);
     }
 
-    get mode() {
-        return this._mode;
-    }
-
-    makeProjectionMatrix() {
+    public makeProjectionMatrix() {
         this._projectionFunc();
     }
 
     protected _makeOrthographicMatrix() {
         this._projection.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far);
+        this._makeProjectionInverseMatrix();
     }
 
     protected _makePerspectiveMatrix() {
         this._projection.perspective(this._fovy, this._aspect, this._near, this._far);
+        this._makeProjectionInverseMatrix();
     }
 
-    getProjectionMatrix() {
+    protected _makeProjectionInverseMatrix() {
+        this._projectionInverse.getInvert(this._projection);
+    }
+
+    public getProjectionMatrix() {
         return this._projection;
     }
 
-    makeViewProjectionMatrix() {
+    public makeViewProjectionMatrix() {
         let mat4 = this._viewProjection
         mat4.copy(this._projection);
         mat4.applyMatrix4(this._matrix);
     }
 
-    getViewProjectionMatrix() {
+    public getViewProjectionMatrix() {
         return this._viewProjection;
     }
 
-    makeMatrix() {
+    public getViewInverseMatrix() {
+        return this._matrixInverse;
+    }
+
+    public getProjectionInverseMatrix() {
+        return this._projectionInverse;
+    }
+
+    public makeMatrix() {
         this.lookAt(this._center);
     }
 
-    applyMatrix4(mat4) {
+    public applyMatrix4(mat4: Matrix4) {
         this._position.applyMatrix4(mat4);
         this._center.applyMatrix4(mat4);
         this._up.applyMatrix4(mat4);
     }
 
-    setUp(_up) {
-        this._up.copy(_up);
+    public setUp(up: Vector3) {
+        this._up.copy(up);
         this.enableUpdateMat();
     }
 
-    lookAt(center) {
+    public lookAt(center: Vector3) {
         if (center) {
             this._center.copy(center);
             this._resetUp();
@@ -147,11 +161,12 @@ export class Camera extends Object3D {
         }
     }
 
-    _updateMatrix() {
+    protected _updateMatrix() {
         this._matrix.lookAt(this._position, this._center, this._up);
+        this._matrixInverse.getInvert(this._matrix);
     }
 
-    resize(width, height) {
+    public resize(width: number, height: number) {
         let xCenter = (this._right - this._left) * 0.5 + this._left;
         let yCenter = (this._bottom - this._top) * 0.5 + this._top;
         let halfWidth = width * 0.5;
@@ -165,47 +180,51 @@ export class Camera extends Object3D {
         this._update();
     }
 
-    forwardStep(delta) {
+    public forwardStep(delta: number) {
         let dir = this._center.clone().subAt(this._position).normalize().mul(delta);
         this._addPosCenter(dir);
     }
 
-    horizontalStep(delta) {
+    public horizontalStep(delta: number) {
         let dir = this._center.clone().subAt(this._position).cross(this._up).normalize().mul(delta);
         this._addPosCenter(dir);
     }
 
-    verticalStep(delta) {
+    public verticalStep(delta: number) {
         this._center.z += delta;
         this._position.z += delta;
         this.enableUpdateMat();
     }
 
-    _addPosCenter(dir) {
+    protected _addPosCenter(dir: Vector3) {
         this._position.addAt(dir);
         this._center.addAt(dir);
         this.enableUpdateMat();
     }
 
-    _rotateView(axis, rad) {
+    protected _rotateView(axis: Vector3, rad: number) {
         let quat = new Quaternion();
         quat.setAxisAngle(axis, -rad);
         let temp = this._center.clone().subAt(this._position)
         let length = temp.length();
         let dir = temp.normalize();
-
+        this._rotate.multiply(quat);
         dir.applyQuaternion(quat);
         this._center = this._position.clone().addAt(dir.mul(length));
         this._up.applyQuaternion(quat);   
     }
 
-    rotateViewFromForward(movementX, movementY) {
+    public rotateViewFromForward(movementX: number, movementY: number) {
         // enhance this.
         this._rotateView(new Vector3(0,0,1), movementX);
         let forward = this._center.clone().subAt(this._position).normalize();
         let rightAxis = forward.cross(this._up.clone().normalize());
         this._rotateView(rightAxis, movementY);
         this.enableUpdateMat();
+    }
+
+    get type() {
+        return this._type;
     }
 
     get fovy() {

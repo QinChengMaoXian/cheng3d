@@ -9,7 +9,7 @@ import { Matrix4 } from '../../math/Matrix4';
 
 import { Mesh } from '../../object/Mesh';
 
-import { Camera } from '../../object/Camera';
+import { Camera, CameraType } from '../../object/Camera';
 import { glTexture } from './glTexture';
 import { RepRemoveSquareBrackets } from '../../util/Util';
 import { Renderer } from '../Renderer';
@@ -40,6 +40,9 @@ export class glProgram extends glObject {
     public static vMatrix  = new Matrix4();
     public static pMatrix  = new Matrix4();
     public static vpMatrix = new Matrix4();
+    public static vIMatrix = new Matrix4();
+    public static pIMatrix = new Matrix4();
+    public static vpIMatrix = new Matrix4();
 
     public static lightColor: Vector4 = new Vector4();
     public static lightDir: Vector3 = new Vector3();
@@ -232,6 +235,9 @@ export class glProgram extends glObject {
         let vMat = glProgram.vMatrix;
         let pMat = glProgram.pMatrix;
         let vpMat = glProgram.vpMatrix;
+        let vIMat = glProgram.vIMatrix;
+        let pIMat = glProgram.pIMatrix;
+        let vpIMat = glProgram.vpIMatrix;
 
         let MVMatrix = undefined;
         let getMVMatrix = function() {
@@ -263,10 +269,10 @@ export class glProgram extends glObject {
                 case ShaderConst.mMat:              data = worldMatrix; break;
                 case ShaderConst.mITMat:            data = tempMatrix.copy(worldMatrix).invertTranspose(); break;
                 case ShaderConst.vMat:              data = vMat; break;
-                case ShaderConst.vIMat:             data = tempMatrix.copy(vMat).invert(); break;
+                case ShaderConst.vIMat:             data = vIMat; break;
                 case ShaderConst.pMat:              data = pMat; break;
-                case ShaderConst.pIMat:             data = tempMatrix.copy(pMat).invert(); break;
-                case ShaderConst.vpIMat:            data = tempMatrix.copy(vpMat).invert(); break;
+                case ShaderConst.pIMat:             data = pIMat; break;
+                case ShaderConst.vpIMat:            data = vpIMat; break;
                 case ShaderConst.vpMat:             data = getVPMatrix(); break;
                 case ShaderConst.mvpMat:            data = getMVPMatrix(); break;
                 case ShaderConst.mvMat:             data = getMVMatrix(); break;
@@ -274,7 +280,7 @@ export class glProgram extends glObject {
                 case ShaderConst.lightColor:        data = glProgram.lightColor; break;
                 case ShaderConst.lightDir:          data = glProgram.lightDir; break;
                 case ShaderConst.cameraRange: {
-                    if (camera.mode === Camera.Orthographic) {
+                    if (camera.type === CameraType.Orthographic) {
                         f4.set([1.0, 1.0, 1.0, 1.0]);
                     } else {
                         f4.set([camera.far, 1.0 / camera.far, camera.aspect, Math.tan(camera.fovy * 0.5)]);

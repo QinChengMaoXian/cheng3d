@@ -1,6 +1,7 @@
 import { Object3D } from "./Object3D";
 import { Geometry } from "../graphics/Geometry";
 import { Material } from "../material/Material";
+import { Raycaster, IntersectObject } from "../util/RayCaster";
 
 export class Mesh extends Object3D {
     protected _geometry: Geometry;
@@ -51,6 +52,10 @@ export class Mesh extends Object3D {
             this._bounding = bounding.clone();
             this._bounding.applyMatrix(this._matrix);
         }
+    }
+
+    public raycast(raycaster: Raycaster, intersects?: IntersectObject[]) {
+
     }
 
     public get isMesh(): boolean {

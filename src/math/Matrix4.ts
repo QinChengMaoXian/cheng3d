@@ -130,7 +130,11 @@ export class Matrix4 {
     }
 
     public invert() {
-        let m = this.m;
+        return this.getInvert(this);
+    }
+
+    public getInvert(mat4: Matrix4) {
+        let m = mat4.m;
         let a00 = m[0], a01 = m[1], a02 = m[2], a03 = m[3],
             a10 = m[4], a11 = m[5], a12 = m[6], a13 = m[7],
             a20 = m[8], a21 = m[9], a22 = m[10], a23 = m[11],
@@ -155,7 +159,7 @@ export class Matrix4 {
             return null; 
         }
         det = 1.0 / det;
-
+        m = this.m;
         m[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
         m[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
         m[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
@@ -186,6 +190,10 @@ export class Matrix4 {
 
     public premultiply(matrix: Matrix4) {
         return Matrix4.multiply(matrix, this, this);
+    }
+
+    public multiplyBy(l: Matrix4, r: Matrix4) {
+        return Matrix4.multiply(l, r, this);
     }
 
     public applyMatrix4(matrix) {

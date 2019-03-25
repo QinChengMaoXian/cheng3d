@@ -4,6 +4,7 @@ import { Matrix4 } from '../math/Matrix4';
 import { Bounding } from '../bounding/Bounding'
 import { Base } from '../core/Base';
 import { Event } from '../core/Event';
+import { Raycaster, IntersectObject } from '../util/RayCaster';
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
@@ -215,6 +216,10 @@ export class Object3D extends Base {
 
     public get isScene(): boolean {
         return false;
+    }
+
+    public raycast(raycaster: Raycaster, intersects?: IntersectObject[]) {
+
     }
 
     // TODO

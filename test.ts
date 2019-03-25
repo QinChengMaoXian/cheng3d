@@ -607,13 +607,13 @@ window['tri2'] = tri2;
 
 // let results = [];
 
-let t1p1 = tri1.point1;
-let t1p2 = tri1.point2;
-let t1p3 = tri1.point3;
+let t1p1 = tri1.p1;
+let t1p2 = tri1.p2;
+let t1p3 = tri1.p3;
 
-let t2p1 = tri2.point1;
-let t2p2 = tri2.point2;
-let t2p3 = tri2.point3;
+let t2p1 = tri2.p1;
+let t2p2 = tri2.p2;
+let t2p3 = tri2.p3;
 
 let uvd = new Float32Array(tri_num * tri_num * tri_num * 12);
 
@@ -690,6 +690,17 @@ triMesh.setPosition(0, 0, -2500);
 // });
 // 以上 卡通渲染测试 
 ///////////////////////////////////////////////////////////////////////////////////////
-// app启用
+// 以下 射线检测测试 
+
+let raycaster = new CGE.Raycaster();
+let vec2 = new CGE.Vector2(0, 0);
+
+window['getRay'] = function() {
+    raycaster.setFromCamera(vec2, camera);
+    return raycaster.ray;
+}
+
+// 以上 射线检测测试 
+///////////////////////////////////////////////////////////////////////////////////////
 
 

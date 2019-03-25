@@ -34,9 +34,9 @@ function on_segment(p1x, p1y, p2x, p2y, px, py): boolean {
 }
 
 function get_central_point(centralPoint: Vector3, tri: Triangle) {
-	centralPoint.x = (tri.point1.x + tri.point2.x + tri.point3.x);
-	centralPoint.y = (tri.point1.y + tri.point2.y + tri.point3.y);
-	centralPoint.z = (tri.point1.z + tri.point2.z + tri.point3.z);
+	centralPoint.x = (tri.p1.x + tri.p2.x + tri.p3.x);
+	centralPoint.y = (tri.p1.y + tri.p2.y + tri.p3.y);
+	centralPoint.z = (tri.p1.z + tri.p2.z + tri.p3.z);
 }
 
 function segments_intersert(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y): boolean {
@@ -65,22 +65,22 @@ function line_triangle_intersert_inSamePlane(tri: Triangle, v1: Vector3, v2: Vec
 
     let d1 = v1.v;
     let d2 = v2.v;
-    let d3 = tri.point1.v;
-    let d4 = tri.point2.v;
+    let d3 = tri.p1.v;
+    let d4 = tri.p2.v;
 
     if (segments_intersert(d1[i0], d1[i1], d2[i0], d2[i1], d3[i0], d3[i1], d4[i0], d4[i1])) {
         return true;
     }
 
-    d3 = tri.point2.v;
-    d4 = tri.point3.v;
+    d3 = tri.p2.v;
+    d4 = tri.p3.v;
 
     if (segments_intersert(d1[i0], d1[i1], d2[i0], d2[i1], d3[i0], d3[i1], d4[i0], d4[i1])) {
         return true;
     }
 
-    d3 = tri.point1.v;
-    d4 = tri.point3.v;
+    d3 = tri.p1.v;
+    d4 = tri.p3.v;
 
     if (segments_intersert(d1[i0], d1[i1], d2[i0], d2[i1], d3[i0], d3[i1], d4[i0], d4[i1])) {
         return true;
@@ -90,9 +90,9 @@ function line_triangle_intersert_inSamePlane(tri: Triangle, v1: Vector3, v2: Vec
 }
 
 function is_point_within_triangle_3(tri: Triangle, vec: Vector3) {
-    let v0 = Vector3.pool.create().subBy(tri.point3, tri.point1).mul(3);
-    let v1 = Vector3.pool.create().subBy(tri.point2, tri.point1).mul(3);
-    let v2 = Vector3.pool.create().copy(tri.point1).negate().mul(3).addAt(vec);
+    let v0 = Vector3.pool.create().subBy(tri.p3, tri.p1).mul(3);
+    let v1 = Vector3.pool.create().subBy(tri.p2, tri.p1).mul(3);
+    let v2 = Vector3.pool.create().copy(tri.p1).negate().mul(3).addAt(vec);
 
     let dot00 = v0.dot(v0);
     let dot01 = v0.dot(v1);
@@ -121,8 +121,8 @@ function is_point_within_triangle_3(tri: Triangle, vec: Vector3) {
 }
 
 function triangle_intersert_inSamePlane(tri1: Triangle, tri2: Triangle): boolean {
-    let v1 = Vector3.pool.create().subBy(tri1.point2, tri1.point1);
-    let v2 = Vector3.pool.create().subBy(tri1.point3, tri1.point2);
+    let v1 = Vector3.pool.create().subBy(tri1.p2, tri1.p1);
+    let v2 = Vector3.pool.create().subBy(tri1.p3, tri1.p2);
     let d = Vector3.pool.create().crossBy(v1, v2);
 
     let i0 = 0, i1 = 1;
@@ -138,32 +138,32 @@ function triangle_intersert_inSamePlane(tri1: Triangle, tri2: Triangle): boolean
     Vector3.pool.recovery(v2);
     Vector3.pool.recovery(d);
 
-    if (line_triangle_intersert_inSamePlane(tri2, tri1.point1, tri1.point2, i0, i1)) {
+    if (line_triangle_intersert_inSamePlane(tri2, tri1.p1, tri1.p2, i0, i1)) {
 		return true;
-	} else if (line_triangle_intersert_inSamePlane(tri2, tri1.point2, tri1.point3, i0, i1)) {
+	} else if (line_triangle_intersert_inSamePlane(tri2, tri1.p2, tri1.p3, i0, i1)) {
 		return true;
-	} else if (line_triangle_intersert_inSamePlane(tri2, tri1.point1, tri1.point3, i0, i1)) {
+	} else if (line_triangle_intersert_inSamePlane(tri2, tri1.p1, tri1.p3, i0, i1)) {
 		return true;
 	} else {
-        let centralPoint1 = Vector3.pool.create();
-        let centralPoint2 = Vector3.pool.create();
+        let centralp1 = Vector3.pool.create();
+        let centralp2 = Vector3.pool.create();
 
-        get_central_point(centralPoint1, tri1);
-        get_central_point(centralPoint2, tri2);
+        get_central_point(centralp1, tri1);
+        get_central_point(centralp2, tri2);
 
-        let result = is_point_within_triangle_3(tri2, centralPoint1) || is_point_within_triangle_3(tri1, centralPoint2);
+        let result = is_point_within_triangle_3(tri2, centralp1) || is_point_within_triangle_3(tri1, centralp2);
 
-        Vector3.pool.recovery(centralPoint1);
-        Vector3.pool.recovery(centralPoint2);
+        Vector3.pool.recovery(centralp1);
+        Vector3.pool.recovery(centralp2);
 
         return result;
     }
 }
 
 function is_point_within_triangle(tri: Triangle, vec: Vector3) {
-    let v0 = Vector3.pool.create().subBy(tri.point3, tri.point1);
-    let v1 = Vector3.pool.create().subBy(tri.point2, tri.point1);
-    let v2 = Vector3.pool.create().subBy(vec, tri.point1);
+    let v0 = Vector3.pool.create().subBy(tri.p3, tri.p1);
+    let v1 = Vector3.pool.create().subBy(tri.p2, tri.p1);
+    let v2 = Vector3.pool.create().subBy(vec, tri.p1);
 
     let dot00 = v0.dot(v0);
     let dot01 = v0.dot(v1);
@@ -195,8 +195,8 @@ let nums = new Float32Array(9);
 
 export function triangleIntersect(tri1: Triangle, tri2: Triangle): boolean {
 
-    let tri1_a = tri1.point1, tri1_b = tri1.point2, tri1_c = tri1.point3;
-    let tri2_a = tri2.point1, tri2_b = tri2.point2, tri2_c = tri2.point3;
+    let tri1_a = tri1.p1, tri1_b = tri1.p2, tri1_c = tri1.p3;
+    let tri2_a = tri2.p1, tri2_b = tri2.p2, tri2_c = tri2.p3;
 
     nums[0] = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_a);
     nums[1] = get_vector4_det(tri1_a, tri1_b, tri1_c, tri2_b);

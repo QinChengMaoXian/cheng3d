@@ -1,6 +1,7 @@
 import { Quaternion } from "./Quaternion";
 import { Matrix4 } from "./Matrix4";
 import { ObjectPool } from "../util/ObjectPool";
+import { Camera } from "../object/Camera";
 
 export class Vector3 {
     // private static _float32Data = new Float32Array(3);
@@ -15,7 +16,7 @@ export class Vector3 {
     public static getPubTemp(): Vector3 {
         return Vector3.pool.create()
     }
-    
+
     public static recoveryPubTemp(v: Vector3) {
         Vector3.pool.recovery(v);
     }
@@ -99,7 +100,7 @@ export class Vector3 {
     }
 
     /**
-     * Will change this;
+     * Will change self;
      */
     public crossBy(a: Vector3, b: Vector3) {
         let ax = a.x, ay = a.y, az = a.z,
@@ -111,7 +112,7 @@ export class Vector3 {
     }
 
     /**
-     * Will new a Vector3, not change this;
+     * Will new a Vector3, not change self;
      * @param vec3 
      */
     public cross(vec3: Vector3): Vector3 {
@@ -119,7 +120,7 @@ export class Vector3 {
     }
 
     /**
-     * Will change this;
+     * Will change self;
      */
     public crossAt(vec3: Vector3): Vector3 {
         return this.crossBy(this, vec3);
@@ -140,7 +141,7 @@ export class Vector3 {
             z = vec.z - this.z;
         return x * x + y * y + z * z;
     }
-    
+
     public distanceTo(vec: Vector3): number {
         return Math.sqrt(this.distanceToSquare(vec));
     }
@@ -152,6 +153,22 @@ export class Vector3 {
         this.v[0] *= length_inverse;
         this.v[1] *= length_inverse;
         this.v[2] *= length_inverse;
+        return this;
+    }
+
+    public project(camera: Camera) {
+        return this.applyMatrix4(camera.getViewInverseMatrix()).applyMatrix4(camera.getProjectionMatrix());
+    }
+
+    public unproject(camera: Camera) {
+        return this.applyMatrix4(camera.getProjectionInverseMatrix()).applyMatrix4(camera.getMatrix())
+    }
+
+    public setFromMatrix4Position(matrix: Matrix4): Vector3 {
+        const m = matrix.m;
+        this.x = m[12];
+        this.y = m[13];
+        this.z = m[14];
         return this;
     }
 
@@ -184,6 +201,18 @@ export class Vector3 {
         return this;
     }
 
+    public transformDirection(matrix: Matrix4) {
+        const v = this.v;
+        const x = v[0], y = v[1], z = v[2];
+        const m = matrix.m;
+
+        v[0] = m[0] * x + m[4] * y + m[8] * z;
+        v[0] = m[1] * x + m[5] * y + m[9] * z;
+        v[0] = m[2] * x + m[6] * y + m[10] * z;
+
+        return this.normalize();
+    }
+
     public clone(): Vector3 {
         let vec = new Vector3();
         vec.v.set(this.v);
@@ -205,6 +234,31 @@ export class Vector3 {
 
     public gequal(vec3: Vector3): boolean {
         return this.v[0] >= vec3.x && this.v[1] >= vec3.y && this.v[2] >= vec3.z;
+    }
+
+    public min(vec: Vector3) {
+        let sv = this.v;
+        let mv = vec.v;
+        sv[0] = Math.min(sv[0], mv[0]);
+        sv[1] = Math.min(sv[1], mv[1]);
+        sv[2] = Math.min(sv[2], mv[2]);
+        return this;
+    }
+
+    public max(vec: Vector3) {
+        let sv = this.v;
+        let mv = vec.v;
+        sv[0] = Math.max(sv[0], mv[0]);
+        sv[1] = Math.max(sv[1], mv[1]);
+        sv[2] = Math.max(sv[2], mv[2]);
+        return this;
+    }
+
+    public clamp(min: Vector3, max: Vector3) {
+        this.x = Math.max(min.x, Math.min(max.x, this.x));
+        this.y = Math.max(min.y, Math.min(max.y, this.y));
+        this.z = Math.max(min.z, Math.min(max.z, this.z));
+        return this;
     }
 
     public set x(value: number) {
@@ -233,31 +287,6 @@ export class Vector3 {
 
     public get data() {
         return this.v;
-    }
-
-    public min(vec: Vector3) {
-        let sv = this.v;
-        let mv = vec.v;
-        sv[0] = Math.min(sv[0], mv[0]);
-        sv[1] = Math.min(sv[1], mv[1]);
-        sv[2] = Math.min(sv[2], mv[2]);
-        return this;
-    }
-
-    public max(vec: Vector3) {
-        let sv = this.v;
-        let mv = vec.v;
-        sv[0] = Math.max(sv[0], mv[0]);
-        sv[1] = Math.max(sv[1], mv[1]);
-        sv[2] = Math.max(sv[2], mv[2]);
-        return this;
-    }
-
-    public clamp(min: Vector3, max: Vector3) {
-        this.x = Math.max(min.x, Math.min(max.x, this.x));
-        this.y = Math.max(min.y, Math.min(max.y, this.y));
-        this.z = Math.max(min.z, Math.min(max.z, this.z));
-        return this;
     }
 
     public toJson() {

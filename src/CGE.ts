@@ -6,6 +6,7 @@ export { Logger } from './core/Logger';
 
 export * from './core/Static';
 
+export { Vector2 } from './math/Vector2';
 export { Vector3 } from './math/Vector3';
 export { Vector4 } from './math/Vector4';
 export { Quaternion } from './math/Quaternion';
@@ -63,6 +64,7 @@ export { OBJLoader } from './extensions/ObjLoader';
 
 export { Loader } from './io/Loader';
 
+export { Raycaster } from './util/RayCaster';
 export { triangleIntersect } from './util/TriangleIntersect';
 
 export { Renderer, IRenderer } from './renderer/Renderer';

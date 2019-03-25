@@ -4,7 +4,6 @@ import { Box } from "./Box";
 import { Vector3 } from "./Vector3";
 import { Sphere } from "./Sphere";
 
-const tempVec3 = new Vector3
 /**
  * 平头截体
  */

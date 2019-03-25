@@ -1,7 +1,6 @@
 import { Vector4 } from './Vector4'
 import { Vector3 } from './Vector3'
-
-const tempVec3: Vector3 = new Vector3;
+import { Matrix4 } from './Matrix4';
 
 export class Quaternion extends Vector4 {
     public static readonly Zero: Quaternion = new Quaternion();
@@ -30,7 +29,7 @@ export class Quaternion extends Vector4 {
         return this;
     }
 
-    public setAxisAngle(axis: Vector3, rad) {
+    public setAxisAngle(axis: Vector3, rad: number) {
         rad = rad * 0.5;
         let s = Math.sin(rad);
         this.v[0] = s * axis.x;
@@ -40,35 +39,8 @@ export class Quaternion extends Vector4 {
         return this;
     }
 
-    public rotationTo(vec1, vec2) {
-        let v1 = vec1.clone().normalize();
-        let v2 = vec2.clone().normalize();
-        let dot = v1.dot(v2);
-        if (dot < -0.999999) {
-            let tmpvec3 = tempVec3;
-            tmpvec3.set(1,0,0).crossAt(v1);
-            if (tmpvec3.lengthSquare() < 0.000000001) {
-                tmpvec3.set(0,1,0).crossAt(v2);
-            }
-            tmpvec3.normalize();
-            this.setAxisAngle(tmpvec3, Math.PI);
-            Vector3.pool.recovery(tmpvec3);
-            return this;
-        } else if (dot > 0.999999) {
-            this.v[0] = 0;
-            this.v[1] = 0;
-            this.v[2] = 0;
-            this.v[3] = 1;
-            return this;
-        } else {
-            let tmpvec3 = v1.clone().cross(v2);
-            this.v[0] = tmpvec3.x;
-            this.v[1] = tmpvec3.y;
-            this.v[2] = tmpvec3.z;
-            this.v[3] = 1 + dot;
-            this.normalize();
-            return this;
-        }
+    public rotationTo(vec1: Vector3, vec2: Vector3) {
+        return this;
     }
 
     public invert() {
@@ -86,7 +58,7 @@ export class Quaternion extends Vector4 {
         return this;
     }
 
-    public setFromRotationMatrix(mat4) {
+    public setFromRotationMatrix(mat4: Matrix4) {
         // copy for THREE.js same function;
         let te = mat4.m,
 
@@ -139,11 +111,42 @@ export class Quaternion extends Vector4 {
     }
 
     public clone() {
-        let vec4 = new Quaternion();
-        vec4.x = this.v[0];
-        vec4.y = this.v[1];
-        vec4.z = this.v[2];
-        vec4.w = this.v[3];
-        return vec4;
+        let quat = new Quaternion();
+        quat.setAt(this);
+        return quat;
     }
 }
+
+Quaternion.prototype.rotationTo = function() {
+    let v1 = new Vector3()
+    let v2 = new Vector3()
+    let v = new Vector3()
+    return function(vec1: Vector3, vec2: Vector3) {
+        v1.copy(vec1).normalize()
+        v2.copy(vec2).normalize()
+        let dot = v1.dot(v2);
+        if (dot < -0.999999) {
+            v.set(1,0,0).crossAt(v1);
+            if (v.lengthSquare() < 0.000000001) {
+                v.set(0,1,0).crossAt(v2);
+            }
+            v.normalize();
+            this.setAxisAngle(v, Math.PI);
+            return this;
+        } else if (dot > 0.999999) {
+            this.v[0] = 0;
+            this.v[1] = 0;
+            this.v[2] = 0;
+            this.v[3] = 1;
+            return this;
+        } else {
+            v.crossBy(v1, v2);
+            this.v[0] = v.x;
+            this.v[1] = v.y;
+            this.v[2] = v.z;
+            this.v[3] = 1 + dot;
+            this.normalize();
+            return this;
+        }
+    }
+}();
