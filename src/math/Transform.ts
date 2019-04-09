@@ -73,7 +73,7 @@ export class Transform {
     }
 
     public applyMatrix4(mat4) {
-        this._matrix.applyMatrix4(mat4);
+        this._matrix.premultiply(mat4);
         this.decompose();
     }
 

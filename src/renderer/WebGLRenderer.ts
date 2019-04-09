@@ -587,7 +587,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      */
     public useCamera(camera: Camera) {
         if (camera) {
-            glProgram.vMatrix.copy(camera.getMatrix());
+            glProgram.vMatrix.copy(camera.getViewMatrix());
             glProgram.pMatrix.copy(camera.getProjectionMatrix());
             glProgram.vpMatrix.copy(camera.getViewProjectionMatrix());
             glProgram.vIMatrix.copy(camera.getViewInverseMatrix());

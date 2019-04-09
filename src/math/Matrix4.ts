@@ -200,43 +200,9 @@ export class Matrix4 {
         return this.multiply(matrix);
     }
 
-    public lookAt(eye: Vector3, center: Vector3, up: Vector3) {
-        let vec_z = eye.clone().subAt(center);
-        vec_z.normalize();
+    public lookAtR(eye: Vector3, center: Vector3, up: Vector3) { return this }
 
-        let vec_x = up.cross(vec_z);
-        vec_x.normalize();
-
-        let vec_y = vec_z.cross(vec_x);
-        vec_y.normalize();
-
-        let m = this.m;
-
-        m[0] = vec_x.x;
-        m[1] = vec_y.x;
-        m[2] = vec_z.x;
-        m[3] = 0;
-        m[4] = vec_x.y;
-        m[5] = vec_y.y;
-        m[6] = vec_z.y;
-        m[7] = 0;
-        m[8] = vec_x.z;
-        m[9] = vec_y.z;
-        m[10] = vec_z.z;
-        m[11] = 0;
-        m[12] = 0;//-(x0 * eyex + x1 * eyey + x2 * eyez);
-        m[13] = 0;//-(y0 * eyex + y1 * eyey + y2 * eyez);
-        m[14] = 0;//-(z0 * eyex + z1 * eyey + z2 * eyez);
-        m[15] = 1;
-
-        let vec3 = Vector3.pubTemp.copy(eye).applyMatrix4(this);
-
-        m[12] = -vec3.x;
-        m[13] = -vec3.y;
-        m[14] = -vec3.z;
-
-        return this;
-    }
+    public lookAt(eye: Vector3, center: Vector3, up: Vector3) { return this; }
 
     public perspective(fovy, aspect, near, far) {
         let f = 1.0 / Math.tan(fovy / 2), 
@@ -252,7 +218,7 @@ export class Matrix4 {
         m[7] = 0;
         m[8] = 0;
         m[9] = 0;
-        m[10] = (far + near) * nf;
+        m[10] = (far + near)     * nf;
         m[11] = -1;
         m[12] = 0;
         m[13] = 0;
@@ -463,6 +429,8 @@ export class Matrix4 {
         return this;
     }
 
+    public extractRotation(m: Matrix4) { return this }
+
     public clone() {
         let mat4 = new Matrix4();
         mat4.m.set(this.m);
@@ -520,3 +488,110 @@ export class Matrix4 {
         return out;
     }
 }
+
+Matrix4.prototype.extractRotation = function() {
+    const v1 = new Vector3();
+    return function(m: Matrix4) {
+        const tm = m.m;
+        const mm = this.m;
+
+        const scaleX = 1 / v1.setFromMatrixColumn( m, 0 ).length();
+		const scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
+        const scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
+        
+        tm[ 0 ] = mm[ 0 ] * scaleX;
+        tm[ 1 ] = mm[ 1 ] * scaleX;
+        tm[ 2 ] = mm[ 2 ] * scaleX;
+        tm[ 3 ] = 0;
+
+        tm[ 4 ] = mm[ 4 ] * scaleY;
+        tm[ 5 ] = mm[ 5 ] * scaleY;
+        tm[ 6 ] = mm[ 6 ] * scaleY;
+        tm[ 7 ] = 0;
+
+        tm[ 8 ] = mm[ 8 ] * scaleZ;
+        tm[ 9 ] = mm[ 9 ] * scaleZ;
+        tm[ 10 ] = mm[ 10 ] * scaleZ;
+        tm[ 11 ] = 0;
+
+        tm[ 12 ] = 0;
+        tm[ 13 ] = 0;
+        tm[ 14 ] = 0;
+        tm[ 15 ] = 1;
+
+        return this
+    }
+}()
+
+/**
+ * 仅仅生成旋转矩阵
+ */
+Matrix4.prototype.lookAtR = function() {
+    const vec_x = new Vector3()
+    const vec_y = new Vector3()
+    const vec_z = new Vector3()
+
+    return function(eye: Vector3, center: Vector3, up: Vector3) {
+
+        vec_z.copy(eye.subAt(center)).normalize();
+        vec_x.crossBy(up, vec_z).normalize()
+        vec_y.crossBy(vec_z, vec_x).normalize()
+
+        let m = this.m;
+
+        m[0] = vec_x.x;
+        m[1] = vec_x.y;
+        m[2] = vec_x.z;
+        
+        m[4] = vec_y.x;
+        m[5] = vec_y.y;
+        m[6] = vec_y.z;
+        
+        m[8] = vec_z.x;
+        m[9] = vec_z.y;
+        m[10] = vec_z.z;
+        
+        m[3] = m[7] = m[11] = m[12] = m[13] = m[14] = 0;
+        m[15] = 1;
+
+        return this;
+    }
+}()
+
+/**
+ * 生成view矩阵
+ */
+Matrix4.prototype.lookAt = function() {
+    const vec_x = new Vector3()
+    const vec_y = new Vector3()
+    const vec_z = new Vector3()
+
+    return function(eye: Vector3, center: Vector3, up: Vector3) {
+
+        vec_z.copy(eye).subAt(center).normalize();
+        vec_x.crossBy(up, vec_z).normalize()
+        vec_y.crossBy(vec_z, vec_x).normalize()
+
+        let m = this.m;
+
+        // 正交矩阵的逆矩阵等于转置矩阵
+        m[0] = vec_x.x;
+        m[1] = vec_y.x;
+        m[2] = vec_z.x;
+        m[3] = 0;
+        m[4] = vec_x.y;
+        m[5] = vec_y.y;
+        m[6] = vec_z.y;
+        m[7] = 0;
+        m[8] = vec_x.z;
+        m[9] = vec_y.z;
+        m[10] = vec_z.z;
+        m[11] = 0;
+        m[12] = -vec_x.dot(eye);
+        m[13] = -vec_y.dot(eye);
+        m[14] = -vec_z.dot(eye);
+        m[15] = 1;
+
+        return this;
+    }
+}()

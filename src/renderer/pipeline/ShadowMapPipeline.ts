@@ -133,8 +133,7 @@ export class ShadowMapPipeline {
         boxCenter.copy(vmax).subAt(vmin).mul(0.5).addAt(vmin);
         let mat4 = Matrix4.pubTemp;
         vec3.copy(boxCenter).addAt(dir);
-
-        mat4.lookAt(boxCenter, dir, Vector3.ZUp);
+        mat4.lookAt(boxCenter, vec3, Vector3.ZUp);
 
         let box = Box.pubTemp;
         box.reset();
@@ -226,10 +225,10 @@ export class ShadowMapPipeline {
         let boxCenter = Vector3.pool.create();
         let vec3 = Vector3.pubTemp;
 
-        let mat4 = Matrix4.pubTemp;
-        vec3.copy(boxCenter).addAt(dir);
+        // let mat4 = Matrix4.pubTemp;
+        // vec3.copy(boxCenter).addAt(dir);
 
-        mat4.lookAt(boxCenter, dir, Vector3.ZUp);
+        // mat4.lookAt(boxCenter, vec3, Vector3.ZUp);
 
         let far = light.radius;
         let near = light.radius / 2000.0;

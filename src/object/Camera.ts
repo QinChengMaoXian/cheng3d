@@ -40,9 +40,6 @@ export class Camera extends Object3D {
         this._top = -h;
         this._fovy = _fovy || Math.PI / 3;
         this._aspect = w / h;
-        this._projection = new Matrix4();
-        this._center = new Vector3();
-        this._up = new Vector3(0, 0, 1);
         this._projectionFunc = this._makePerspectiveMatrix.bind(this);
         this._resetUp();
     }
@@ -61,7 +58,8 @@ export class Camera extends Object3D {
 
     protected _update() {
         if (this._needsUpdate) {
-            this._updateMatrix();
+            this.lookAt(this._center, this._up);
+            this._matrixInverse.getInvert(this._matrix);
             this.makeProjectionMatrix();
             this.makeViewProjectionMatrix();
             this._needsUpdate = false;
@@ -69,8 +67,8 @@ export class Camera extends Object3D {
     }
 
     protected _makeMatrix() {
-        // super._makeMatrix(true);
-        this._update();
+        super._makeMatrix(true);
+        // this._update();
         return this._matrix;
     }
 
@@ -120,27 +118,34 @@ export class Camera extends Object3D {
         return this._projection;
     }
 
+    // 写法
     public makeViewProjectionMatrix() {
         let mat4 = this._viewProjection
         mat4.copy(this._projection);
-        mat4.applyMatrix4(this._matrix);
+        mat4.multiply(this.getViewMatrix());
     }
 
     public getViewProjectionMatrix() {
         return this._viewProjection;
     }
 
-    public getViewInverseMatrix() {
+    public getViewMatrix() {
         return this._matrixInverse;
+        // return this._matrix
+    }
+
+    public getViewInverseMatrix() {
+        return this._matrix
+        // return this._matrixInverse;
     }
 
     public getProjectionInverseMatrix() {
         return this._projectionInverse;
     }
 
-    public makeMatrix() {
-        this.lookAt(this._center);
-    }
+    // public makeMatrix() {
+    //     this.lookAt(this._center);
+    // }
 
     public applyMatrix4(mat4: Matrix4) {
         this._position.applyMatrix4(mat4);
@@ -153,16 +158,18 @@ export class Camera extends Object3D {
         this.enableUpdateMat();
     }
 
-    public lookAt(center: Vector3) {
+    public lookAt(center: Vector3, up?: Vector3) {
+        super.lookAt(center, up);
         if (center) {
             this._center.copy(center);
-            this._resetUp();
-            this.enableUpdateMat();
+            // this._resetUp();
+            // this.enableUpdateMat();
         }
     }
 
     protected _updateMatrix() {
-        this._matrix.lookAt(this._position, this._center, this._up);
+        // this._matrix.lookAt(this._position, this._center, this._up);
+        this.lookAt(this._center, this._up);
         this._matrixInverse.getInvert(this._matrix);
     }
 
@@ -208,10 +215,11 @@ export class Camera extends Object3D {
         let temp = this._center.clone().subAt(this._position)
         let length = temp.length();
         let dir = temp.normalize();
-        this._rotate.multiply(quat);
+        // this._rotate.multiply(quat);
         dir.applyQuaternion(quat);
         this._center = this._position.clone().addAt(dir.mul(length));
         this._up.applyQuaternion(quat);   
+        this.lookAt(this._center, this._up);
     }
 
     public rotateViewFromForward(movementX: number, movementY: number) {
@@ -242,4 +250,9 @@ export class Camera extends Object3D {
     get near() {
         return this._near;
     }
+
+    public get isCamera(): boolean {
+        return true;
+    }
+
 }

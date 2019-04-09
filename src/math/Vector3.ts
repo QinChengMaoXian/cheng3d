@@ -261,6 +261,17 @@ export class Vector3 {
         return this;
     }
 
+    public setFromArray(array: ArrayLike<number>, offset: number = 0) {
+		this.x = array[ offset ];
+		this.y = array[ offset + 1 ];
+		this.z = array[ offset + 2 ];
+		return this;
+    }
+
+    public setFromMatrixColumn(m: Matrix4, index: number) {
+        return this.setFromArray(m.m, index * 4);
+    }
+
     public set x(value: number) {
         this.v[0] = value;
     }

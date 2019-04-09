@@ -116,7 +116,7 @@ export class Sprite extends Object3D {
      */
     public checkPick(x: number, y: number) {
         let pmat = this._parent ? this._parent.getMatrix() : Matrix4.unitMat4;
-        let mat = Matrix4.pubTemp.copy(this._matrix).applyMatrix4(pmat);
+        let mat = Matrix4.pubTemp.copy(this._matrix).multiply(pmat);
         mat.invert();
         let vec = new Vector3(x, y, 0);
         vec.applyMatrix4(mat);

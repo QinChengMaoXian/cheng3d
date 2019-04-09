@@ -2,10 +2,13 @@ import { Ray } from "../math/Ray";
 import { Vector3 } from "../math/Vector3";
 import { Vector2 } from "../math/Vector2";
 import { Camera, CameraType } from "../object/Camera";
+import { Matrix4 } from "../math/Matrix4";
 
 export interface IntersectObject {
 
 }
+
+const vpImat = new Matrix4
 
 /**
  * 射线检测类型
@@ -44,8 +47,9 @@ export class Raycaster {
     setFromCamera(coords: Vector2, camera: Camera) {
         const ray = this.ray;
         if (camera.type === CameraType.Perspective) {
-            ray.origin.setFromMatrix4Position(camera.getMatrix()); // copy(camera.getPosition()); //
-            ray.dir.set(coords.x, coords.y, 0.5).unproject(camera).subAt(ray.origin).normalize();
+            ray.origin.copy(camera.getPosition()); // copy(camera.getPosition()); //
+            vpImat.copy(camera.getViewProjectionMatrix()).invert()
+            ray.dir.set(coords.x, coords.y, 0.5).applyMatrix4(vpImat).subAt(ray.origin).normalize()
         } else if (camera.type === CameraType.Orthographic) {
             ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera);
             ray.dir.set(0, 0, -1).transformDirection(camera.getMatrix());

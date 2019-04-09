@@ -60,6 +60,8 @@ export class Object3D extends Base {
         }
     }
 
+    public lookAt(v: Vector3, up?: Vector3) { return }
+    
     public setPositionAt(position: Vector3) {
         this._position.set(position.x, position.y, position.z);
         this.enableUpdateMat();
@@ -103,7 +105,6 @@ export class Object3D extends Base {
     }
 
     public getMatrix() {
-        this._makeMatrix();
         return this._matrix;
     }
 
@@ -206,6 +207,10 @@ export class Object3D extends Base {
         return 
     }
 
+    public get isCamera(): boolean {
+        return false;
+    }
+
     public get isLight(): boolean {
         return false;
     }
@@ -243,3 +248,30 @@ export class Object3D extends Base {
 
     }
 }
+
+Object3D.prototype.lookAt = function () {
+    const q1 = new Quaternion();
+    const m1 = new Matrix4();
+    const target = new Vector3();
+    const position = new Vector3();
+
+    return function (v: Vector3, up?: Vector3) {
+        const parent = this._parent;
+        this._makeMatrix(true);
+        target.copy(v);
+        position.setFromMatrix4Position(this._matrix);
+        if (this.isCamera || this.isLight) {
+            m1.lookAtR(position, target, up || Vector3.ZUp);
+        } else {
+            m1.lookAtR(target, position, up || Vector3.ZUp);
+        }
+        this._rotate.setFromRotationMatrix(m1);
+        if (parent) {
+            m1.extractRotation(parent.getMatrix());
+            q1.setFromRotationMatrix(m1);
+            this._rotate.premultiply(q1.invert());
+        }
+        this.enableUpdateMat()
+    }
+}()
+
