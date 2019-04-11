@@ -309,8 +309,7 @@ export class ShadowMapPipeline {
             vec.copy(pos).addAt(vecs.target);
 
             camera.setPositionAt(pos);
-            camera.lookAt(vec);
-            camera.setUp(vecs.up);
+            camera.lookAt(vec, vecs.up);
             camera.update(0);
 
             culling.culling(scene, camera.getViewProjectionMatrix(), false, true);
