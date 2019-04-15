@@ -157,14 +157,14 @@ export class Vector3 {
     }
 
     public project(camera: Camera) {
-        return this.applyMatrix4(camera.getViewInverseMatrix()).applyMatrix4(camera.getProjectionMatrix());
+        return this.applyMatrix4(camera.getViewMatrix()).applyMatrix4(camera.getProjectionMatrix());
     }
 
     public unproject(camera: Camera) {
-        return this.applyMatrix4(camera.getProjectionInverseMatrix()).applyMatrix4(camera.getMatrix())
+        return this.applyMatrix4(camera.getProjectionInverseMatrix()).applyMatrix4(camera.getViewInverseMatrix())
     }
 
-    public setFromMatrix4Position(matrix: Matrix4): Vector3 {
+    public setFromMatrixPosition(matrix: Matrix4): Vector3 {
         const m = matrix.m;
         this.x = m[12];
         this.y = m[13];
@@ -207,8 +207,8 @@ export class Vector3 {
         const m = matrix.m;
 
         v[0] = m[0] * x + m[4] * y + m[8] * z;
-        v[0] = m[1] * x + m[5] * y + m[9] * z;
-        v[0] = m[2] * x + m[6] * y + m[10] * z;
+        v[1] = m[1] * x + m[5] * y + m[9] * z;
+        v[2] = m[2] * x + m[6] * y + m[10] * z;
 
         return this.normalize();
     }

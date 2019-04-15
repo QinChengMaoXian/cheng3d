@@ -697,6 +697,7 @@ let vec2 = new CGE.Vector2(0, 0);
 
 window['getRay'] = function() {
     raycaster.setFromCamera(vec2, camera);
+    console.log(raycaster.intersectObject(mainScene, [], true));
     return raycaster.ray;
 }
 

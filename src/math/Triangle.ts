@@ -19,6 +19,10 @@ export class Triangle {
         }
     }
 
+    public computeNormal(target?: Vector3) {
+        
+    }
+
     public intersectTriangle(triangle: Triangle) {
         return triangleIntersect(this, triangle);
     }

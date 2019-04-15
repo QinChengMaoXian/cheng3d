@@ -131,21 +131,15 @@ export class Camera extends Object3D {
 
     public getViewMatrix() {
         return this._matrixInverse;
-        // return this._matrix
     }
 
     public getViewInverseMatrix() {
         return this._matrix
-        // return this._matrixInverse;
     }
 
     public getProjectionInverseMatrix() {
         return this._projectionInverse;
     }
-
-    // public makeMatrix() {
-    //     this.lookAt(this._center);
-    // }
 
     public applyMatrix4(mat4: Matrix4) {
         this._position.applyMatrix4(mat4);
@@ -162,13 +156,19 @@ export class Camera extends Object3D {
         super.lookAt(center, up);
         if (center) {
             this._center.copy(center);
-            // this._resetUp();
-            // this.enableUpdateMat();
         }
     }
 
+    public getWorldDir(out?: Vector3) {
+        if (!out) {
+            out = new Vector3();
+        }
+        this._makeMatrix();
+        const m = this._matrix.m;
+        return out.set(-m[8], -m[9], -m[10]).normalize()
+    }
+
     protected _updateMatrix() {
-        // this._matrix.lookAt(this._position, this._center, this._up);
         this.lookAt(this._center, this._up);
         this._matrixInverse.getInvert(this._matrix);
     }
@@ -218,7 +218,7 @@ export class Camera extends Object3D {
         // this._rotate.multiply(quat);
         dir.applyQuaternion(quat);
         this._center = this._position.clone().addAt(dir.mul(length));
-        this._up.applyQuaternion(quat);   
+        // this._up.applyQuaternion(quat);   
         this.lookAt(this._center, this._up);
     }
 
@@ -254,5 +254,4 @@ export class Camera extends Object3D {
     public get isCamera(): boolean {
         return true;
     }
-
 }

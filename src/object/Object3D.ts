@@ -223,9 +223,7 @@ export class Object3D extends Base {
         return false;
     }
 
-    public raycast(raycaster: Raycaster, intersects?: IntersectObject[]) {
-
-    }
+    public raycast(raycaster: Raycaster, intersects?: IntersectObject[]) {}
 
     // TODO
     public toJson(obj?) {
@@ -259,7 +257,7 @@ Object3D.prototype.lookAt = function () {
         const parent = this._parent;
         this._makeMatrix(true);
         target.copy(v);
-        position.setFromMatrix4Position(this._matrix);
+        position.setFromMatrixPosition(this._matrix);
         if (this.isCamera || this.isLight) {
             m1.lookAtR(position, target, up || Vector3.ZUp);
         } else {

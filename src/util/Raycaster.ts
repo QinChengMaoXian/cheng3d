@@ -3,9 +3,12 @@ import { Vector3 } from "../math/Vector3";
 import { Vector2 } from "../math/Vector2";
 import { Camera, CameraType } from "../object/Camera";
 import { Matrix4 } from "../math/Matrix4";
+import { Object3D } from "../object/Object3D";
 
 export interface IntersectObject {
-
+    target: Vector3;
+    normal: Vector3;
+    object: Object3D;
 }
 
 const vpImat = new Matrix4
@@ -35,8 +38,27 @@ export class Raycaster {
      * @param origin 
      * @param dir 
      */
-    setRay(origin: Vector3, dir: Vector3) {
+    public setRay(origin: Vector3, dir: Vector3) {
         this.ray.set(origin, dir);
+    }
+
+    /**
+     * 
+     * @param object 
+     * @param recursive 
+     */
+    public intersectObject(object: Object3D, intersects: IntersectObject[] = [], recursive: boolean = true) {
+        if (object.visible === false) {
+            return intersects;
+        }
+        object.raycast(this, intersects);
+        if (recursive) {
+            const children = object.getChildren();
+            for (let i = 0, l = children.length; i < l; i++) {
+                this.intersectObject(children[i], intersects, recursive);
+            }
+        }
+        return intersects;
     }
 
     /**
@@ -44,12 +66,13 @@ export class Raycaster {
      * @param coords 
      * @param camera 
      */
-    setFromCamera(coords: Vector2, camera: Camera) {
+    public setFromCamera(coords: Vector2, camera: Camera) {
         const ray = this.ray;
         if (camera.type === CameraType.Perspective) {
-            ray.origin.copy(camera.getPosition()); // copy(camera.getPosition()); //
-            vpImat.copy(camera.getViewProjectionMatrix()).invert()
-            ray.dir.set(coords.x, coords.y, 0.5).applyMatrix4(vpImat).subAt(ray.origin).normalize()
+            // camera.getViewInverseMatrix()
+            ray.origin.setFromMatrixPosition(camera.getMatrix());//.copy(camera.getPosition()); // copy(camera.getPosition()); //
+            vpImat.copy(camera.getViewProjectionMatrix()).invert();
+            ray.dir.set(coords.x, coords.y, 0.5).applyMatrix4(vpImat).subAt(ray.origin).normalize();
         } else if (camera.type === CameraType.Orthographic) {
             ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera);
             ray.dir.set(0, 0, -1).transformDirection(camera.getMatrix());

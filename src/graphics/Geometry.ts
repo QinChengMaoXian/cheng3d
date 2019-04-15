@@ -6,8 +6,14 @@ import { Bounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB'
 import { Vector3 } from '../math/Vector3';
 
+export interface DrawParameter {
+    mode: number;
+    count: number;
+    offset: number;
+}
+
 export class Geometry extends GraphicsObject {
-    protected _drawParameter = undefined;
+    protected _drawParameter: DrawParameter = undefined;
     protected _display: boolean = true;
     protected _bounding: Bounding;
     protected _buffers: Buffer[] = []; 

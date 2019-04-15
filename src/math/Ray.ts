@@ -144,7 +144,7 @@ export class Ray {
      * @param backfaceCulling 
      * @param target 
      */
-    public intersectTriangle(triangle: Triangle, backfaceCulling: boolean, target?: Vector3) { return }
+    public intersectTriangle(triangle: Triangle, backfaceCulling: boolean, target?: Vector3): boolean { return false; }
 
     /**
      * 拷贝

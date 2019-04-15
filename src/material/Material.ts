@@ -17,7 +17,7 @@ import { Vector4 } from '../math/Vector4';
 export class Material extends Base {
     protected _shader: Shader = new Shader;
 
-    /** 剔除面模式 CGE.ZERO为不剔除 TODO：变量名容易混淆 */
+    /** 剔除面模式 CGE.ZERO为不剔除 TODO：变量名容易混淆应该叫做cullMode */
     protected _faceMode: number;
     /** 反转面方向 */
     protected _flipFace: boolean;
