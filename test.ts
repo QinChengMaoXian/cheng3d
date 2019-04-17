@@ -695,6 +695,12 @@ triMesh.setPosition(0, 0, -2500);
 let raycaster = new CGE.Raycaster();
 let vec2 = new CGE.Vector2(0, 0);
 
+stage.on(CGE.Event.CLICK, this, (e: CGE.Event) => {
+    vec2.set(e.stageX / renderer.getWidth() * 2 - 1, (1 - e.stageY / renderer.getHeight()) * 2 - 1);
+    raycaster.setFromCamera(vec2, camera);
+    console.log(raycaster.intersectObject(mainScene, [], true));
+});
+
 window['getRay'] = function() {
     raycaster.setFromCamera(vec2, camera);
     console.log(raycaster.intersectObject(mainScene, [], true));

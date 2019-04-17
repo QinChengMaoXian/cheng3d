@@ -4,6 +4,7 @@ import { Vector2 } from "../math/Vector2";
 import { Camera, CameraType } from "../object/Camera";
 import { Matrix4 } from "../math/Matrix4";
 import { Object3D } from "../object/Object3D";
+import { Logger } from "../core/Logger";
 
 export interface IntersectObject {
     target: Vector3;
@@ -74,6 +75,7 @@ export class Raycaster {
             vpImat.copy(camera.getViewProjectionMatrix()).invert();
             ray.dir.set(coords.x, coords.y, 0.5).applyMatrix4(vpImat).subAt(ray.origin).normalize();
         } else if (camera.type === CameraType.Orthographic) {
+            Logger.warn('通过正交相机设置射线暂时有问题');
             ray.origin.set(coords.x, coords.y, (camera.near + camera.far) / (camera.near - camera.far)).unproject(camera);
             ray.dir.set(0, 0, -1).transformDirection(camera.getMatrix());
         }
