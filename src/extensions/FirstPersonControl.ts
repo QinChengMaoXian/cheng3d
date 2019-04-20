@@ -34,13 +34,6 @@ export class FirstPersonControl {
         this._verticalObj = new Object3D();
 
         this._horizontalObj.addChild(this._verticalObj);
-        
-        // let parent = camera.getParent();
-        // if (parent) {
-        //     parent.addChild(this._horizontalObj);
-        // }
-
-        // this._verticalObj.addChild(camera);
 
         this.init();
     }
@@ -118,65 +111,6 @@ export class FirstPersonControl {
     }
 
     protected _onKeyUp(e: Event) {
-        const camera = this._camera;
-        const timer = this._timer;
-        switch (e.key) {
-            case 'w':
-            case 's':
-                timer.remove(camera, camera.forwardStep);
-                break;
-    
-            case 'a':
-            case 'd':
-                timer.remove(camera, camera.horizontalStep);
-                break;
-    
-            case 'q':
-            case 'e':
-                timer.remove(camera, camera.verticalStep);
-                break;
-    
-            default:
-                break;
-        }
-    }
-
-
-    protected _onKeyDown2(e: Event) {
-        const camera = this._camera;
-        const timer = this._timer;
-        const _d = this.moveDelta;
-        switch (e.key) {
-            case 'w':
-                timer.frameLoop(1, camera, camera.forwardStep, [_d]);
-                break;
-        
-            case 's':
-                timer.frameLoop(1, camera, camera.forwardStep, [-_d]);
-                break;
-    
-            case 'a':
-                timer.frameLoop(1, camera, camera.horizontalStep, [-_d]);
-                break;
-            
-            case 'd':
-                timer.frameLoop(1, camera, camera.horizontalStep, [_d]);
-                break;
-    
-            case 'q':
-                timer.frameLoop(1, camera, camera.verticalStep, [-_d]);
-                break;
-    
-            case 'e':
-                timer.frameLoop(1, camera, camera.verticalStep, [_d]);
-                break;
-    
-            default:
-                break;
-        }
-    }
-
-    protected _onKeyUp2(e: Event) {
         const camera = this._camera;
         const timer = this._timer;
         switch (e.key) {

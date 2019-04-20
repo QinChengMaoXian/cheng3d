@@ -8,6 +8,8 @@ export enum CameraType {
     Perspective = 1,
 }
 
+const tempVec = new Vector3();
+
 /**
  * 默认的相机类型
  * 两种模式，正交投影与透视投影
@@ -122,13 +124,6 @@ export class Camera extends Object3D {
         return this._projectionInverse;
     }
 
-    public lookAt(center: Vector3, up?: Vector3) {
-        super.lookAt(center, up);
-        if (center) {
-            // this._center.copy(center);
-        }
-    }
-
     public getWorldDir(out?: Vector3) {
         if (!out) {
             out = new Vector3();
@@ -153,11 +148,16 @@ export class Camera extends Object3D {
     }
 
     public forwardStep(delta: number) {
-        
+        this.getWorldDir(tempVec);
+        tempVec.mul(delta);
+        this._addPosCenter(tempVec)
     }
 
     public horizontalStep(delta: number) {
-
+        this.getWorldDir(tempVec);
+        tempVec.mul(delta);
+        tempVec.crossAt(Vector3.ZUp);
+        this._addPosCenter(tempVec)
     }
 
     public verticalStep(delta: number) {
