@@ -40,14 +40,14 @@ export class Object3D extends Base {
         this._needsUpdate = true;
     }
 
-    protected _update(delta: number) {
+    protected _update(delta: number, update: boolean) {
 
     }
 
     public update(delta: number, parentUpdate: boolean = false) {
         let isUpdate = this._needsUpdate || parentUpdate;
-        this._update(delta);
-        this._makeMatrix(parentUpdate);
+        this._makeMatrix(isUpdate);
+        this._update(delta, isUpdate);
         
         let l = this._children.length;
         let children = this._children;

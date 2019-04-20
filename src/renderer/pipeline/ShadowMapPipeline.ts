@@ -167,8 +167,8 @@ export class ShadowMapPipeline {
 
         // camera.resize(range * 2, range * 2);
         camera.setPositionAt(light.getPosition());
-        camera.lookAt(vec3.copy(light.getPosition()).subAt(dir));
-        camera.setUp(Vector3.ZUp);
+        camera.lookAt(vec3.copy(light.getPosition()).subAt(dir), Vector3.ZUp);
+        // camera.setUp(Vector3.ZUp);
         camera.enableOrthographicMode(-range, range, -range, range, near, far);
         camera.update(0);
 
@@ -234,8 +234,8 @@ export class ShadowMapPipeline {
         let near = light.radius / 2000.0;
 
         camera.setPositionAt(light.getPosition());
-        camera.lookAt(vec3.copy(light.getPosition()).subAt(dir));
-        camera.setUp(Vector3.ZUp);
+        camera.lookAt(vec3.copy(light.getPosition()).subAt(dir), Vector3.ZUp);
+        // camera.setUp(Vector3.ZUp);
         camera.enablePerspectiveMode(light.angle * 2, 1.0, near, far);
         camera.update(0);
 

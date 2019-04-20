@@ -17,16 +17,27 @@ export class Quaternion extends Vector4 {
         return this;
     }
 
-    public multiply(quat) {
-        let ax = this.v[0], ay = this.v[1], az = this.v[2], aw = this.v[3],
-            bx = quat.x, by = quat.y, bz = quat.z, bw = quat.w;
-
-        this.v[0] = ax * bw + aw * bx + ay * bz - az * by;
-        this.v[1] = ay * bw + aw * by + az * bx - ax * bz;
-        this.v[2] = az * bw + aw * bz + ax * by - ay * bx;
-        this.v[3] = aw * bw - ax * bx - ay * by - az * bz;
-
+    public multiply(quat: Quaternion) {
+        Quaternion.multiply(this, quat, this);
         return this;
+    }
+
+    public premultiply(quat: Quaternion) {
+        Quaternion.multiply(quat, this, this);
+        return this;
+    }
+
+    public static multiply(q1: Quaternion, q2: Quaternion, o: Quaternion) {
+        let v = q1.v;
+        let ax = v[0], ay = v[1], az = v[2], aw = v[3];
+        v = q2.v;
+        let bx = v[0], by = v[1], bz = v[2], bw = v[3];
+
+        v = o.v;
+        v[0] = ax * bw + aw * bx + ay * bz - az * by;
+        v[1] = ay * bw + aw * by + az * bx - ax * bz;
+        v[2] = az * bw + aw * bz + ax * by - ay * bx;
+        v[3] = aw * bw - ax * bx - ay * by - az * bz;
     }
 
     public setAxisAngle(axis: Vector3, rad: number) {

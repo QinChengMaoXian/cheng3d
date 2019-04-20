@@ -261,7 +261,7 @@ for(let i = 0; i < 4; i++) {
     p.setPosition(20, 20, 20);
     p.setDir(-1, 1, 1);
     p.angle = 0.5 * Math.PI * 0.5;
-    p.enableShadow();
+    // p.enableShadow();
     p.setFactor(0.9999);
     mainScene.addChild(p);
     window['sss'] = p;
@@ -271,7 +271,7 @@ for(let i = 0; i < 4; i++) {
     let p = new CGE.PointLight();
     p.setColor(4, 0, 0);
     p.setPosition(150, -30, 20);
-    p.enableShadow();
+    // p.enableShadow();
     p.setFactor(0.9999);
     mainScene.addChild(p);
     window['ppp'] = p;

@@ -23,8 +23,6 @@ export class Camera extends Object3D {
     protected _fovy: number;
     protected _aspect: number;
     protected _type: CameraType = CameraType.Perspective;
-    protected _center = new Vector3();
-    protected _up = new Vector3(0, 0, 1);
     protected _projectionFunc: Function;
 
     protected _projection = new Matrix4();
@@ -46,35 +44,14 @@ export class Camera extends Object3D {
         this._fovy = _fovy || Math.PI / 3;
         this._aspect = w / h;
         this._projectionFunc = this._makePerspectiveMatrix.bind(this);
-        this._resetUp();
     }
 
-    protected _resetUp() {
-        let forward = this._center.clone().subAt(this._position).normalize();
-        let rightAxis = forward.cross(this._up.clone().normalize());
-        if (forward.equal(rightAxis)) 
-            return;
-        this._up = rightAxis.cross(forward).normalize();
-    }
-
-    public update(delta: number) {
-        this._update();
-    }
-
-    protected _update() {
-        if (this._needsUpdate) {
-            this.lookAt(this._center, this._up);
+    protected _update(delta: number, isUpdate: boolean) {
+        if (isUpdate) {
             this._matrixInverse.getInvert(this._matrix);
             this.makeProjectionMatrix();
             this.makeViewProjectionMatrix();
-            this._needsUpdate = false;
         }
-    }
-
-    protected _makeMatrix() {
-        super._makeMatrix(true);
-        // this._update();
-        return this._matrix;
     }
 
     public enableOrthographicMode(_left?: number, _right?: number, _bottom?: number, _top?: number, _near?: number, _far?: number) {
@@ -145,25 +122,10 @@ export class Camera extends Object3D {
         return this._projectionInverse;
     }
 
-    public applyMatrix4(mat4: Matrix4) {
-        this._position.applyMatrix4(mat4);
-        this._center.applyMatrix4(mat4);
-        this._up.applyMatrix4(mat4);
-    }
-
-    /**
-     * 设置‘上’的方向。不是setup
-     * @param up 
-     */
-    public setUp(up: Vector3) {
-        this._up.copy(up);
-        this.enableUpdateMat();
-    }
-
     public lookAt(center: Vector3, up?: Vector3) {
         super.lookAt(center, up);
         if (center) {
-            this._center.copy(center);
+            // this._center.copy(center);
         }
     }
 
@@ -174,11 +136,6 @@ export class Camera extends Object3D {
         this._makeMatrix();
         const m = this._matrix.m;
         return out.set(-m[8], -m[9], -m[10]).normalize()
-    }
-
-    protected _updateMatrix() {
-        this.lookAt(this._center, this._up);
-        this._matrixInverse.getInvert(this._matrix);
     }
 
     public resize(width: number, height: number) {
@@ -192,34 +149,27 @@ export class Camera extends Object3D {
         this._bottom = yCenter + halfHeight;
         this._aspect = width / height;
         this._needsUpdate = true;
-        this._update();
+        this.update(0, true);
     }
 
     public forwardStep(delta: number) {
-        let dir = this._center.clone().subAt(this._position).normalize().mul(delta);
-        this._addPosCenter(dir);
+        
     }
 
     public horizontalStep(delta: number) {
-        let dir = this._center.clone().subAt(this._position).cross(this._up).normalize().mul(delta);
-        this._addPosCenter(dir);
+
     }
 
     public verticalStep(delta: number) {
-        this._center.z += delta;
+        // this._center.z += delta;
         this._position.z += delta;
         this.enableUpdateMat();
     }
 
     protected _addPosCenter(dir: Vector3) {
         this._position.addAt(dir);
-        this._center.addAt(dir);
         this.enableUpdateMat();
     }
-
-    public _rotateView(axis: Vector3, rad: number) { }
-
-    public rotateViewFromForward(movementX: number, movementY: number) { }
 
     get type() {
         return this._type;
@@ -245,30 +195,3 @@ export class Camera extends Object3D {
         return true;
     }
 }
-
-Camera.prototype._rotateView = function() {
-    const quat = new Quaternion();
-    const temp = new Vector3();
-    return function(axis: Vector3, rad: number) {
-        quat.setAxisAngle(axis, -rad);
-        temp.copy(this._center).subAt(this._position)
-        let length = temp.length();
-        temp.normalize();
-        temp.applyQuaternion(quat);
-        this._center = temp.mul(length).addAt(this._position); 
-        this.lookAt(this._center, this._up);
-    }
-}();
-
-Camera.prototype.rotateViewFromForward = function() {
-    const vec = new Vector3();
-    const temp = new Vector3();
-    return function(movementX: number, movementY: number) {
-        vec.set(0, 0, 1);
-        this._rotateView(vec, movementX);
-        let forward = temp.copy(this._center).subAt(this._position).normalize();
-        let rightAxis = forward.cross(vec.copy(this._up).normalize());
-        this._rotateView(rightAxis, movementY);
-        this.enableUpdateMat();
-    }
-}();

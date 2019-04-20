@@ -85,7 +85,7 @@ export class Event extends Base {
 
         if (e instanceof MouseEvent) {
             this._x = e.offsetX;
-            this._y = e.offsetX;
+            this._y = e.offsetY;
             this._movementX = e.movementX;
             this._movementY = e.movementY;
             this._setType(e.type);

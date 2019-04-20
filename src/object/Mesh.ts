@@ -122,7 +122,7 @@ Mesh.prototype.raycast = function() {
         })
 
         ray.copy(raycaster.ray);
-        ray.applyMatrix4(invMat.copy(this._matrix).invert());
+        ray.applyMatrix4(invMat.getInvert(this._matrix));
 
         const idxbuf = geo.getIndexBuffer();
 
