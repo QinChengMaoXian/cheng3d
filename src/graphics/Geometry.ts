@@ -6,8 +6,18 @@ import { Bounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB'
 import { Vector3 } from '../math/Vector3';
 
+export enum DrawMode {
+    POINTS = CGE.POINTS,
+    LINES = CGE.LINES,
+    LINE_LOOP = CGE.LINE_LOOP,
+    LINE_STRIP = CGE.LINE_STRIP,
+    TRIANGLES = CGE.TRIANGLES,
+    TRIANGLE_STRIP = CGE.TRIANGLE_STRIP,
+    TRIANGLE_FAN = CGE.TRIANGLE_FAN,
+}
+
 export interface DrawParameter {
-    mode: number;
+    mode: DrawMode;
     count: number;
     offset: number;
 }
@@ -71,7 +81,7 @@ export class Geometry extends GraphicsObject {
         return this._indexBuffer;
     }
 
-    public setDrawParameter(count, mode?, offset?) {
+    public setDrawParameter(count: number, mode: DrawMode = CGE.TRIANGLES, offset: number = 0) {
         this._drawParameter = {
             mode: mode || CGE.TRIANGLES,
             count: count || 0,

@@ -175,12 +175,12 @@ export class Application extends EventDispatcher {
     private _addEventListener(key: string, listener: any) {
         let canvas = this._renderer.getCanvas();
         let document = Platform.document();
-        document.addEventListener(key, listener);
-        // if (key.indexOf('key') > -1) {
-        //     document.addEventListener(key, listener);
-        // } else {
-        //     canvas.addEventListener(key, listener);
-        // }
+        // document.addEventListener(key, listener);
+        if (key.indexOf('key') > -1) {
+            document.addEventListener(key, listener);
+        } else {
+            canvas.addEventListener(key, listener);
+        }
         this._listenersMap.set(key, listener);
     }
 
@@ -200,6 +200,8 @@ export class Application extends EventDispatcher {
         this._addEventListener('touchend', this._onTouchEnd.bind(this));
         this._addEventListener('touchcancel', this._onTouchCancel.bind(this));
 
+        this._addEventListener('blur', this._onBlur.bind(this));
+
         let document = Platform.document();
 
         document.addEventListener('keydown', this._onKeyboardEvent.bind(this));
@@ -214,6 +216,7 @@ export class Application extends EventDispatcher {
         let canvas = this._renderer.getCanvas();
         let document = Platform.document();
         this._listenersMap.forEach((listener: any, key: string) => {
+            // document.removeEventListener(key, listener);
             if (key.indexOf('key') > -1) {
                 document.removeEventListener(key, listener);
             } else {
@@ -221,6 +224,13 @@ export class Application extends EventDispatcher {
             }
         });
         this._listenersMap.clear();
+    }
+
+    /**
+     * 全局丢失焦点
+     */
+    private _onBlur() {
+        console.log('全局丢失焦点');
     }
 
     /**

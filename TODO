@@ -1,5 +1,7 @@
 # TODO List
 # Shadowed spot light and point light lum attenuation
 # Animation
+# Raycaster to line and point
+# UI render
 # Mesh componentized
 # WebGL 2.0 support

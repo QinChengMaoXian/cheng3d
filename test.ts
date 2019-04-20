@@ -71,7 +71,11 @@ window.onerror = function(event) {
     noError = false;
 }
 
-// 应用启动
+window.onblur = function() { 
+    app.event(CGE.Event.ON_BLUR);
+}
+
+// 应用启动 
 app.start();
 
 // stage.addChild(spr);
@@ -96,82 +100,13 @@ app.start();
 
 // 以上：初始化与参数设置
 ///////////////////////////////////////////////////////////////////////////
-// 以下 鼠标与键盘控制主相机，TODO以下的代码需要封装在相机控制类中。
-let _d = 2;
-let timer = app.getTimer();
-let cameraRotate = (e: CGE.Event) => {
-    let del = 0.005;
-    let moveX = e.movementX * del;
-    let moveY = e.movementY * del;
-    camera.rotateViewFromForward(moveX, moveY);
-}
+// 以下：第一人称相机控制。
 
-stage.on(CGE.Event.KEY_DOWN, this, (e: CGE.Event) => {
-    switch (e.key) {
-        case 'w':
-            timer.frameLoop(1, camera, camera.forwardStep, [_d]);
-            break;
-    
-        case 's':
-            timer.frameLoop(1, camera, camera.forwardStep, [-_d]);
-            break;
+let fpc = new CGE.FirstPersonControl(camera, stage, app.getTimer());
 
-        case 'a':
-            timer.frameLoop(1, camera, camera.horizontalStep, [-_d]);
-            break;
-        
-        case 'd':
-            timer.frameLoop(1, camera, camera.horizontalStep, [_d]);
-            break;
-
-        case 'q':
-            timer.frameLoop(1, camera, camera.verticalStep, [-_d]);
-            break;
-
-        case 'e':
-            timer.frameLoop(1, camera, camera.verticalStep, [_d]);
-            break;
-
-        default:
-            break;
-    }
-});
-
-stage.on(CGE.Event.KEY_UP, this, (e: CGE.Event) => {
-    switch (e.key) {
-        case 'w':
-        case 's':
-            timer.remove(camera, camera.forwardStep);
-            break;
-
-        case 'a':
-        case 'd':
-            timer.remove(camera, camera.horizontalStep);
-            break;
-
-        case 'q':
-        case 'e':
-            timer.remove(camera, camera.verticalStep);
-            break;
-
-        default:
-            break;
-    }
-});
-
-stage.on(CGE.Event.MOUSE_DOWN, this, (e: Event) => {
-    stage.on(CGE.Event.MOUSE_MOVE, this, cameraRotate);
-});
-
-stage.on(CGE.Event.MOUSE_UP, this, (e: Event) => {
-    stage.off(CGE.Event.MOUSE_MOVE, this, cameraRotate);
-});
-
-window.onblur = function() { 
-    timer.remove(camera, camera.forwardStep);
-    timer.remove(camera, camera.horizontalStep);
-    timer.remove(camera, camera.verticalStep);
-}
+app.on(CGE.Event.ON_BLUR, this, () => {
+    fpc.cancel();
+})
 
 // 以上 相机控制代码块结束
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -487,7 +422,6 @@ mesh.setScale(20, 20, 1);
 mesh.setGeometry(planeVertexGeometry);
 mesh.setMaterial(planeMat);
 planes.addChild(mesh);
-
 
 mesh = new CGE.Mesh();
 mesh.setPosition(10, 10, 15);

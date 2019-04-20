@@ -62,6 +62,8 @@ export { ColladaLoader } from './extensions/ColladaLoader';
 export { GltfLoader } from './extensions/GltfLoader';
 export { OBJLoader } from './extensions/ObjLoader';
 
+export { FirstPersonControl } from './extensions/FirstPersonControl'; 
+
 export { Loader } from './io/Loader';
 
 export { Raycaster } from './util/RayCaster';

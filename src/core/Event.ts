@@ -84,8 +84,8 @@ export class Event extends Base {
         super();
 
         if (e instanceof MouseEvent) {
-            this._x = e.clientX;
-            this._y = e.clientY;
+            this._x = e.offsetX;
+            this._y = e.offsetX;
             this._movementX = e.movementX;
             this._movementY = e.movementY;
             this._setType(e.type);
