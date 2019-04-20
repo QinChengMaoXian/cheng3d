@@ -123,8 +123,6 @@ Mesh.prototype.raycast = function() {
 
         ray.copy(raycaster.ray);
         ray.applyMatrix4(invMat.copy(this._matrix).invert());
-        
-        const drawParam = geo.getDrawParameter();
 
         const idxbuf = geo.getIndexBuffer();
 
@@ -132,6 +130,7 @@ Mesh.prototype.raycast = function() {
 
         const offset = posAttrib.offset / posData.BYTES_PER_ELEMENT;
         const num = (posbuf.getStride() / posData.BYTES_PER_ELEMENT) || posAttrib.num;
+        const thrNum = posAttrib.num > 2;
 
         if (idxbuf) {
             const idxData = idxbuf.getData();
@@ -147,9 +146,9 @@ Mesh.prototype.raycast = function() {
                     idx2 = temp;
                 }
 
-                triangle.p1.set(posData[idx0], posData[idx0 + 1], posData[idx0 + 2]);
-                triangle.p2.set(posData[idx1], posData[idx1 + 1], posData[idx1 + 2]);   
-                triangle.p3.set(posData[idx2], posData[idx2 + 1], posData[idx2 + 2]); 
+                triangle.p1.set(posData[idx0], posData[idx0 + 1], thrNum ? posData[idx0 + 2] : 0);
+                triangle.p2.set(posData[idx1], posData[idx1 + 1], thrNum ? posData[idx1 + 2] : 0);   
+                triangle.p3.set(posData[idx2], posData[idx2 + 1], thrNum ? posData[idx2 + 2] : 0); 
 
                 if(ray.intersectTriangle(triangle, backCulling, target)) {
                     triangle.computeNormal(normal);
