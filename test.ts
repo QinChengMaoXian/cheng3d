@@ -71,9 +71,6 @@ window.onerror = function(event) {
     noError = false;
 }
 
-window.onblur = function() { 
-    app.event(CGE.Event.ON_BLUR);
-}
 
 // 应用启动 
 app.start();
@@ -95,8 +92,6 @@ app.start();
 // spr.on(CGE.Event.MOUSE_OUT, this, (e: CGE.Event) => {
 //     console.log('spr on mouse out');
 // });
-
-
 
 // 以上：初始化与参数设置
 ///////////////////////////////////////////////////////////////////////////

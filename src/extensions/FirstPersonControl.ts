@@ -30,6 +30,8 @@ export class FirstPersonControl {
 
         sprite.on(Event.MOUSE_DOWN, this, this._onMouseDown);
         sprite.on(Event.MOUSE_UP, this, this._onMouseUp);
+
+        sprite.on(Event.ON_BLUR, this, this.cancel);
     }
 
     /**

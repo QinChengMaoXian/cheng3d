@@ -171,4 +171,13 @@ export class Sprite extends Object3D {
         vec.applyMatrix4(mat);
         return new Point2(vec.x, vec.y)
     }
+
+    public globalEvent(key: string, e?: Event) {
+        let children = this._children;
+        let l = children.length;
+        for (let i = 0 ; i < l; i++) {
+            (<Sprite>children[i]).globalEvent(key, e);
+        }
+        this.event(key, [e]);
+    }
 }

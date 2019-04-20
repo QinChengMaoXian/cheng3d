@@ -54,14 +54,14 @@ export function Check2DPointInPoly(pt: IPoint2D, poly: IPoint2D[]): boolean {
 }
 
 /**
-     * 计算顶点切线
-     * 
-     * @param posData 顶点位置数组
-     * @param uvData 顶点uv数组
-     * @param normalData 顶点法线数组
-     * @param indexData 元素索引数组
-     * @returns 切线数组
-     */
+ * 计算顶点切线
+ * 
+ * @param posData 顶点位置数组
+ * @param uvData 顶点uv数组
+ * @param normalData 顶点法线数组
+ * @param indexData 元素索引数组
+ * @returns 切线数组
+ */
 export function calcTangent(posData: number[], uvData: number[], normalData: number[], indexData: number[]): number[] {
     let numVertices: number = posData.length / 3;
     let numIndices: number = indexData.length;

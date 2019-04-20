@@ -9,6 +9,11 @@ import { Event } from "../core/Event";
 import { EventDispatcher } from "../core/EventDispatcher";
 import { Sprite } from "../ui/Sprite";
 
+interface ListenerData {
+    target: any;
+    func: any;
+}
+
 /**
  * 中心控制类
  * 控制renderer,scene,uistage初始化。
@@ -40,7 +45,7 @@ export class Application extends EventDispatcher {
     /** 默认相机对象 */
     protected _camera: Camera;
     /** 监听系统环境事件的缓存 */
-    protected _listenersMap: Map<string, any>;
+    protected _listenersMap: Map<string, ListenerData>;
     /** 动画循环的引用 */
     private _loopBindThis;
 
@@ -176,12 +181,18 @@ export class Application extends EventDispatcher {
         let canvas = this._renderer.getCanvas();
         let document = Platform.document();
         // document.addEventListener(key, listener);
+        let target;
         if (key.indexOf('key') > -1) {
+            target = document;
             document.addEventListener(key, listener);
         } else {
+            target = canvas;
             canvas.addEventListener(key, listener);
         }
-        this._listenersMap.set(key, listener);
+        this._listenersMap.set(key, {
+            target: target,
+            func: listener
+        });
     }
 
     /**
@@ -200,28 +211,25 @@ export class Application extends EventDispatcher {
         this._addEventListener('touchend', this._onTouchEnd.bind(this));
         this._addEventListener('touchcancel', this._onTouchCancel.bind(this));
 
-        this._addEventListener('blur', this._onBlur.bind(this));
+        this._addEventListener('keydown', this._onKeyboardEvent.bind(this));
+        this._addEventListener('keypress', this._onKeyboardEvent.bind(this));
+        this._addEventListener('keyup', this._onKeyboardEvent.bind(this));
 
-        let document = Platform.document();
+        let blurFunc = this._onBlur.bind(this);
 
-        document.addEventListener('keydown', this._onKeyboardEvent.bind(this));
-        document.addEventListener('keypress', this._onKeyboardEvent.bind(this));
-        document.addEventListener('keyup', this._onKeyboardEvent.bind(this));
+        window.addEventListener('blur', blurFunc);
+        this._listenersMap.set('blur', {
+            target: window,
+            func: blurFunc
+        });
     }
 
     /**
      * 移除所有的系统监听
      */
     private _removeEventListeners() {
-        let canvas = this._renderer.getCanvas();
-        let document = Platform.document();
-        this._listenersMap.forEach((listener: any, key: string) => {
-            // document.removeEventListener(key, listener);
-            if (key.indexOf('key') > -1) {
-                document.removeEventListener(key, listener);
-            } else {
-                canvas.removeEventListener(key, listener);
-            }
+        this._listenersMap.forEach((listener: ListenerData, key: string) => {
+            listener.target.removeEventListener(key, listener.func);
         });
         this._listenersMap.clear();
     }
@@ -230,7 +238,16 @@ export class Application extends EventDispatcher {
      * 全局丢失焦点
      */
     private _onBlur() {
-        console.log('全局丢失焦点');
+        this._globalEvent(Event.ON_BLUR);
+    }
+
+    /**
+     * 全局事件
+     * @param key
+     * @param e 
+     */
+    private _globalEvent(key: string, e?: Event) {
+        this._stage.globalEvent(key, e);
     }
 
     /**
