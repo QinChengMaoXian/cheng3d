@@ -77,6 +77,13 @@ export { FXAA } from './renderer/postEffect/FXAA';
 
 export { Application } from './app/Application';
 
+export { FrameBase }from './animation/frame/FrameBase'
+export { VectorFrame }from './animation/frame/VectorFrame'
+export { TrackBase } from './animation/track/TrackBase'
+export { VectorTrack } from './animation/track/VectorTrack'
+export { AnimationClip } from './animation/AnimationClip';
+export { Animater } from './animation/Animater';
+
 export { Platform } from './platform/Platform';
 
 export { Sprite } from './ui/Sprite';

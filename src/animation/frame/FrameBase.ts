@@ -1,5 +1,10 @@
+/**
+ * 动画的一帧的数据
+ */
 export class FrameBase {
-    constructor() {
-        
+    public time: number;
+
+    constructor(location:number) {
+        this.time = location;
     }
 }

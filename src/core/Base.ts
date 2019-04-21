@@ -18,11 +18,11 @@ export class Base extends EventDispatcher {
         return this._uuid;
     }
 
-    public update(delta) {
+    public update(delta: number) {
 
     }
 
-    public toJson(obj?) {
+    public toJson(obj?: any) {
         const result:any = obj || {};
         result.uuid = this._uuid;
         result.name = this.name;

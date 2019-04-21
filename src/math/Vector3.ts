@@ -268,6 +268,13 @@ export class Vector3 {
 		return this;
     }
 
+    public lerp(l: Vector3, r: Vector3, pct: number) {
+        Vector3.lerp(l, r, pct, this);
+        return this;
+    }
+
+    public static lerp(l: Vector3, r: Vector3, pct: number, o?: Vector3): Vector3 { return null; }
+
     public setFromMatrixColumn(m: Matrix4, index: number) {
         return this.setFromArray(m.m, index * 4);
     }
@@ -314,3 +321,15 @@ export class Vector3 {
         this.z = obj.z;
     }
 }
+
+Vector3.lerp = function() {
+    const temp = new Vector3();
+
+    return function(l: Vector3, r: Vector3, pct: number, o?: Vector3) {
+        if (!o) {
+            o = new Vector3();
+        }
+        o.copy(l).mul(1.0 - pct).addAt(temp.copy(r).mul(pct));
+        return o;
+    }
+}()

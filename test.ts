@@ -99,10 +99,6 @@ app.start();
 
 let fpc = new CGE.FirstPersonControl(camera, stage, app.getTimer());
 
-app.on(CGE.Event.ON_BLUR, this, () => {
-    fpc.cancel();
-})
-
 // 以上 相机控制代码块结束
 ///////////////////////////////////////////////////////////////////////////////////////
 // 下 Brdf 球体阵列
@@ -637,6 +633,35 @@ window['getRay'] = function() {
 }
 
 // 以上 射线检测测试 
+///////////////////////////////////////////////////////////////////////////////////////
+// 以下 动画测试
+
+
+
+
+
+let vecTrack = new CGE.VectorTrack('pos', 30, true);
+
+vecTrack.addVectorByFrame(0, new CGE.Vector3(10, 10, 10));
+vecTrack.addVectorByFrame(10, new CGE.Vector3(10, 20, 10));
+vecTrack.addVectorByFrame(20, new CGE.Vector3(10, 30, 10));
+vecTrack.addVectorByFrame(30, new CGE.Vector3(10, 40, 10));
+vecTrack.addVectorByFrame(40, new CGE.Vector3(10, 30, 10));
+vecTrack.addVectorByFrame(50, new CGE.Vector3(10, 20, 10));
+vecTrack.addVectorByFrame(60, new CGE.Vector3(10, 10, 10));
+
+
+let aniClip = new CGE.AnimationClip('test');
+aniClip.addTrack(vecTrack);
+
+let animater = new CGE.Animater(teapotMesh);
+animater.addAnimationClip(aniClip);
+
+teapotMesh.animater = animater;
+animater.play('test');
+
+
+// 以上 动画测试
 ///////////////////////////////////////////////////////////////////////////////////////
 
 

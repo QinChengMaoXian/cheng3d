@@ -5,6 +5,7 @@ import { Bounding } from '../bounding/Bounding'
 import { Base } from '../core/Base';
 import { Event } from '../core/Event';
 import { Raycaster, IntersectObject } from '../util/RayCaster';
+import { Animater } from '../animation/Animater';
 
 export class Object3D extends Base {
     protected _position: Vector3 = new Vector3();
@@ -19,6 +20,8 @@ export class Object3D extends Base {
 
     protected _needsUpdate: boolean = true;
     protected _bounding: Bounding;
+
+    protected _animater: Animater;
 
     constructor() {
         super();
@@ -45,6 +48,10 @@ export class Object3D extends Base {
     }
 
     public update(delta: number, parentUpdate: boolean = false) {
+        if (this._animater) {
+            this._animater.update(delta);
+        }
+
         let isUpdate = this._needsUpdate || parentUpdate;
         this._makeMatrix(isUpdate);
         this._update(delta, isUpdate);
@@ -221,6 +228,14 @@ export class Object3D extends Base {
 
     public get isScene(): boolean {
         return false;
+    }
+
+    public get animater() {
+        return this._animater;
+    }
+
+    public set animater(ani: Animater) {
+        this._animater = ani;
     }
 
     public raycast(raycaster: Raycaster, intersects?: IntersectObject[]) {}
