@@ -5,6 +5,7 @@ import { AABB } from './AABB';
 import { SphereBounding } from './SphereBounding';
 
 import { Matrix4 } from '../math/Matrix4';
+import { Ray } from '../math/Ray';
 
 export enum BoundingType {
     TYPE_SPHERE = 0,
@@ -39,6 +40,10 @@ export class Bounding {
 
     public clone(): Bounding {
         return null;
+    }
+
+    public intersectRay(ray: Ray) {
+        return true;
     }
 
     private static _obb1Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];

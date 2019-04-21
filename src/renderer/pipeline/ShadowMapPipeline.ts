@@ -16,8 +16,6 @@ import { LogBlurMaterial } from "../../material/LogBlurMaterial";
 import { Mesh } from "../../object/Mesh";
 import { ScreenGeometry } from "../../util/GeometryUtil";
 import { Texture2D } from '../../graphics/Texture2D';
-import { GaussianBlurMaterial } from '../../material/GaussianBlurMaterial';
-import { DownSample4Material } from '../../material/DownSample4Material';
 import { PointLight } from '../../light/PointLight';
 import { CubeVectors } from '../../graphics/TextureCube';
 

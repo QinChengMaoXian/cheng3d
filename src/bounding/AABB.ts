@@ -4,6 +4,7 @@ import { SphereBounding } from './SphereBounding';
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
 import { Box } from '../math/Box';
+import { Ray } from '../math/Ray';
 
 export class AABB extends Bounding {
     protected _box: Box = new Box();
@@ -14,6 +15,10 @@ export class AABB extends Bounding {
 
     public applyMatrix(mat: Matrix4) {
         this._box.applyMatrix(mat);
+    }
+
+    public intersectRay(ray: Ray) {
+        return ray.isIntersectBox(this._box);
     }
 
     public intersect(bounding: Bounding) {

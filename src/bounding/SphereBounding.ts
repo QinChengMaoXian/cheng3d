@@ -4,6 +4,7 @@ import { OBB } from './OBB'
 import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
 import { Sphere } from '../math/Sphere';
+import { Ray } from '../math/Ray';
 
 export class SphereBounding extends Bounding {
     protected _sphere: Sphere = new Sphere();
@@ -19,6 +20,10 @@ export class SphereBounding extends Bounding {
 
     public applyMatrix(mat: Matrix4) {
         this._sphere.applyMatrix(mat);
+    }
+    
+    public intersectRay(ray: Ray) {
+        return ray.isInstersectSphere(this._sphere);
     }
 
     public intersect(bounding: Bounding) {

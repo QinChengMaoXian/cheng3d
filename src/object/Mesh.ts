@@ -98,6 +98,10 @@ Mesh.prototype.raycast = function() {
             return;
         }
 
+        if (this._bounding && (!this._bounding.intersectRay(raycaster.ray))) {
+            return;
+        }
+
         let backCulling = true;
         if (!cullmode || cullmode === CGE.ZERO) {
             backCulling = false;
