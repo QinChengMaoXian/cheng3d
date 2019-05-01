@@ -97,7 +97,7 @@ export class VectorTrack extends TrackBase {
             }
         }
 
-        if (i === 0) {
+        if (0 === i) {
             target.setPositionAt((frames[i]).vector);
         } else {
             const begin = frames[i-1];

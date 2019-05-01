@@ -173,11 +173,7 @@ export class ShadowMapPipeline {
         shadow.matrix.copy(camera.getViewProjectionMatrix());
 
         culling.culling(scene, camera.getViewProjectionMatrix(), false, true);
-
-        // frame.setSize(shadow.size, shadow.size);
-        // frame.setTexture2D(RTLocation.COLOR, shadow.depthTex);
-        // frame.addTexture(RTLocation.COLOR, CGE.RGBA, CGE.UNSIGNED_BYTE, CGE.NEAREST, CGE.NEAREST);
-
+        
         let renderer = this._renderer;
         renderer.useCamera(camera);
         renderer.useFrame(frame);

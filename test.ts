@@ -257,20 +257,22 @@ for(let i = 0; i < 4; i++) {
     p.setPosition(20, 20, 20);
     p.setDir(-1, 1, 1);
     p.angle = 0.5 * Math.PI * 0.5;
-    // p.enableShadow();
+    p.enableShadow();
     p.setFactor(0.9999);
     mainScene.addChild(p);
     window['sss'] = p;
 }
-
+let pl;
 {
+
     let p = new CGE.PointLight();
     p.setColor(4, 0, 0);
-    p.setPosition(150, -30, 20);
-    // p.enableShadow();
+    p.setPosition(150, -30, 50);
+    p.enableShadow();
     p.setFactor(0.9999);
     mainScene.addChild(p);
     window['ppp'] = p;
+    pl = p;
 }
 
 // {
@@ -620,44 +622,57 @@ triMesh.setPosition(0, 0, -2500);
 let raycaster = new CGE.Raycaster();
 let vec2 = new CGE.Vector2(0, 0);
 
+let obj: CGE.Object3D = null;
+let color: CGE.Vector4 = new CGE.Vector4();
+
 stage.on(CGE.Event.CLICK, this, (e: CGE.Event) => {
     vec2.set(e.stageX / renderer.getWidth() * 2 - 1, (1 - e.stageY / renderer.getHeight()) * 2 - 1);
     raycaster.setFromCamera(vec2, camera);
-    console.log(raycaster.intersectObject(mainScene, [], true));
-});
+    let result = raycaster.intersectObject(mainScene, [], true);
 
-window['getRay'] = function() {
-    raycaster.setFromCamera(vec2, camera);
-    console.log(raycaster.intersectObject(mainScene, [], true));
-    return raycaster.ray;
-}
+    if (obj instanceof CGE.Mesh) {
+        const mat = obj.getMaterial();
+        if (mat instanceof CGE.StandardMaterial) {
+            mat.setBaseColor(color.x, color.y, color.z, color.w);
+        }
+    }
+
+    if (result[0]) {
+        let mesh = result[0].object;
+        if (mesh instanceof CGE.Mesh) {
+            const mat = mesh.getMaterial();
+            if (mat instanceof CGE.StandardMaterial) {
+                color.copy(mat.getBaseColor())
+                mat.setBaseColor(1, 0.5, 0.5, 1);
+                obj = mesh;
+            }
+        }
+    }
+
+    console.log(result);
+});
 
 // 以上 射线检测测试 
 ///////////////////////////////////////////////////////////////////////////////////////
 // 以下 动画测试
 
-
-
-
-
 let vecTrack = new CGE.VectorTrack('pos', 30, true);
 
-vecTrack.addVectorByFrame(0, new CGE.Vector3(10, 10, 10));
-vecTrack.addVectorByFrame(10, new CGE.Vector3(10, 20, 10));
-vecTrack.addVectorByFrame(20, new CGE.Vector3(10, 30, 10));
-vecTrack.addVectorByFrame(30, new CGE.Vector3(10, 40, 10));
-vecTrack.addVectorByFrame(40, new CGE.Vector3(10, 30, 10));
-vecTrack.addVectorByFrame(50, new CGE.Vector3(10, 20, 10));
-vecTrack.addVectorByFrame(60, new CGE.Vector3(10, 10, 10));
-
+vecTrack.addVectorByFrame(0, new CGE.Vector3(10, 10, 50));
+vecTrack.addVectorByFrame(10, new CGE.Vector3(10, 20, 50));
+vecTrack.addVectorByFrame(20, new CGE.Vector3(10, 30, 50));
+vecTrack.addVectorByFrame(30, new CGE.Vector3(10, 40, 50));
+vecTrack.addVectorByFrame(40, new CGE.Vector3(10, 30, 50));
+vecTrack.addVectorByFrame(50, new CGE.Vector3(10, 20, 50));
+vecTrack.addVectorByFrame(60, new CGE.Vector3(10, 10, 50));
 
 let aniClip = new CGE.AnimationClip('test');
 aniClip.addTrack(vecTrack);
 
-let animater = new CGE.Animater(teapotMesh);
+let animater = new CGE.Animater(pl);
 animater.addAnimationClip(aniClip);
 
-teapotMesh.animater = animater;
+pl.animater = animater;
 animater.play('test');
 
 

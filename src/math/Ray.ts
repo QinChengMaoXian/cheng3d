@@ -6,7 +6,7 @@ import { Matrix4 } from './Matrix4';
 
 /**
  * 射线类型
- * 函数实体只有一个return的方法，真正的实现接在Ray的下面。
+ * https://github.com/mrdoob/three.js/blob/dev/src/math/Ray.js
  */
 export class Ray {
 
@@ -232,7 +232,7 @@ Ray.prototype.instersectSphere = function () {
 }();
 
 /**
- * http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+ * https://github.com/mrdoob/three.js/blob/dev/src/math/Ray.js
  */
 Ray.prototype.intersectTriangle = function () {
     const diff = new Vector3
@@ -283,7 +283,7 @@ Ray.prototype.intersectTriangle = function () {
             return false;
         }
 
-        // b1+b2 > 1, no intersection TODO: what is 1 ?
+        // b1+b2 > 1, no intersection
         if (DdQxE2 + DdE1xQ > DdN) {
             return false;
         }

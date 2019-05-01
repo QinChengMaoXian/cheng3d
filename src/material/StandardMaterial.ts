@@ -57,6 +57,10 @@ export class StandardMaterial extends Material {
     public setBaseColor(r: number, g: number, b: number, a: number) {
         this._baseColor.set(r,g,b,a);
     }
+
+    public getBaseColor() {
+        return this._baseColor;
+    }
  
     public clone() {
         

@@ -3,6 +3,9 @@ var path = require("path");
 
 module.exports = {
   mode: 'development',
+  devServer: {
+    host: '0.0.0.0'
+  },
   entry: {
     app: ['./test.ts'],
   },

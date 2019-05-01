@@ -473,6 +473,14 @@ export class Material extends Base {
         }
     }
 
+    public setBaseColor(r: number, g: number, b: number, a: number) {
+
+    }
+
+    public getBaseColor(): Vector4 {
+        return null
+    }
+
     // 材质是否支持法线贴图
     public get supportNormalMap(): boolean {
         return false;

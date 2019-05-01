@@ -1,5 +1,5 @@
 import { Object3D } from "./Object3D";
-import { Geometry } from "../graphics/Geometry";
+import { Geometry, DrawMode } from "../graphics/Geometry";
 import { Material } from "../material/Material";
 import { Raycaster, IntersectObject } from "../util/RayCaster";
 import * as CGE from '../graphics/RendererParameter';
@@ -136,52 +136,63 @@ Mesh.prototype.raycast = function() {
         const num = (posbuf.getStride() / posData.BYTES_PER_ELEMENT) || posAttrib.num;
         const thrNum = posAttrib.num > 2;
 
-        if (idxbuf) {
-            const idxData = idxbuf.getData();
+        const drawMode = geo.getDrawParameter().mode;
 
-            for (let i = 0, l = idxData.length; i < l; i += 3) {
-                let idx0 = idxData[i] * num + offset;
-                let idx1 = idxData[i + 1] * num + offset;
-                let idx2 = idxData[i + 2] * num + offset;
-
-                if(backSide) {
-                    let temp = idx1;
-                    idx1 = idx2;
-                    idx2 = temp;
+        // 默认三角形
+        if (drawMode === DrawMode.TRIANGLES) {
+            if (idxbuf) {
+                const idxData = idxbuf.getData();
+    
+                for (let i = 0, l = idxData.length; i < l; i += 3) {
+                    let idx0 = idxData[i] * num + offset;
+                    let idx1 = idxData[i + 1] * num + offset;
+                    let idx2 = idxData[i + 2] * num + offset;
+    
+                    if(backSide) {
+                        let temp = idx1;
+                        idx1 = idx2;
+                        idx2 = temp;
+                    }
+    
+                    triangle.p1.set(posData[idx0], posData[idx0 + 1], thrNum ? posData[idx0 + 2] : 0);
+                    triangle.p2.set(posData[idx1], posData[idx1 + 1], thrNum ? posData[idx1 + 2] : 0);   
+                    triangle.p3.set(posData[idx2], posData[idx2 + 1], thrNum ? posData[idx2 + 2] : 0); 
+    
+                    if(ray.intersectTriangle(triangle, backCulling, target)) {
+                        triangle.computeNormal(normal);
+                        target.applyMatrix4(this._matrix)
+                        intersects.push({
+                            target: target.clone(),
+                            normal: normal.clone(),
+                            object: this,
+                            distance: target.distanceToSquare(raycaster.ray.origin),
+                        })
+                    }
                 }
-
-                triangle.p1.set(posData[idx0], posData[idx0 + 1], thrNum ? posData[idx0 + 2] : 0);
-                triangle.p2.set(posData[idx1], posData[idx1 + 1], thrNum ? posData[idx1 + 2] : 0);   
-                triangle.p3.set(posData[idx2], posData[idx2 + 1], thrNum ? posData[idx2 + 2] : 0); 
-
-                if(ray.intersectTriangle(triangle, backCulling, target)) {
-                    triangle.computeNormal(normal);
-                    intersects.push({
-                        target: target.clone().applyMatrix4(this._matrix),
-                        normal: normal.clone(),
-                        object: this
-                    })
+            } else {
+                for (let i = 0, l = posData.length / num; i < l; i += 3 * num) {
+    
+                    let idx = i + offset;
+                    triangle.p1.set(posData[idx], posData[idx + 1], posData[idx + 2]);
+                    idx = backSide ? (i + 2 * num + offset) : (i + num + offset);
+                    triangle.p2.set(posData[idx], posData[idx + 1], posData[idx + 2]);
+                    idx = backSide ? (i + num + offset) : (i + 2 * num + offset);
+                    triangle.p3.set(posData[idx], posData[idx + 1], posData[idx + 2]);
+    
+                    if(ray.intersectTriangle(triangle, backCulling, target)) {
+                        triangle.computeNormal(normal);
+                        target.applyMatrix4(this._matrix)
+                        intersects.push({
+                            target: target.clone(),
+                            normal: normal.clone(),
+                            object: this,
+                            distance: target.distanceToSquare(raycaster.ray.origin),
+                        })
+                    }
                 }
-            }
-        } else {
-            for (let i = 0, l = posData.length / num; i < l; i += 3 * num) {
-
-                let idx = i + offset;
-                triangle.p1.set(posData[idx], posData[idx + 1], posData[idx + 2]);
-                idx = backSide ? (i + 2 * num + offset) : (i + num + offset);
-                triangle.p2.set(posData[idx], posData[idx + 1], posData[idx + 2]);
-                idx = backSide ? (i + num + offset) : (i + 2 * num + offset);
-                triangle.p3.set(posData[idx], posData[idx + 1], posData[idx + 2]);
-
-                if(ray.intersectTriangle(triangle, backCulling, target)) {
-                    triangle.computeNormal(normal);
-                    intersects.push({
-                        target: target.clone().applyMatrix4(this._matrix),
-                        normal: normal.clone(),
-                        object: this
-                    })
-                }
-            }
+            } //if (idxbuf) {
+        } else if (drawMode === DrawMode.LINES) {
+            
         }
     }
 }();

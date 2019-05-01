@@ -10,6 +10,7 @@ export interface IntersectObject {
     target: Vector3;
     normal: Vector3;
     object: Object3D;
+    distance: number;
 }
 
 const vpImat = new Matrix4
@@ -43,12 +44,7 @@ export class Raycaster {
         this.ray.set(origin, dir);
     }
 
-    /**
-     * 
-     * @param object 
-     * @param recursive 
-     */
-    public intersectObject(object: Object3D, intersects: IntersectObject[] = [], recursive: boolean = true) {
+    protected _intersectObject(object: Object3D, intersects: IntersectObject[] = [], recursive: boolean = true) {
         if (object.visible === false) {
             return intersects;
         }
@@ -56,9 +52,24 @@ export class Raycaster {
         if (recursive) {
             const children = object.getChildren();
             for (let i = 0, l = children.length; i < l; i++) {
-                this.intersectObject(children[i], intersects, recursive);
+                this._intersectObject(children[i], intersects, recursive);
             }
         }
+        return intersects;
+    }
+
+    /**
+     * 
+     * @param object 
+     * @param recursive 
+     */
+    public intersectObject(object: Object3D, intersects: IntersectObject[] = [], recursive: boolean = true) {
+        this._intersectObject(object, intersects, recursive);
+
+        intersects.sort((a, b) => {
+            return a.distance - b.distance;
+        })
+
         return intersects;
     }
 
