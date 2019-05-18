@@ -638,7 +638,7 @@ stage.on(CGE.Event.CLICK, this, (e: CGE.Event) => {
             const mat = mesh.getMaterial();
             if (mat instanceof CGE.StandardMaterial) {
                 color.copy(mat.getBaseColor())
-                mat.setBaseColor(1, 0.5, 0.5, 1);
+                mat.setBaseColor(1, 0.5, 0.5, color.w);
                 obj = mesh;
             }
         }

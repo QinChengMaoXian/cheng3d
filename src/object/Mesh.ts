@@ -81,7 +81,10 @@ Mesh.prototype.raycast = function() {
     const invMat: Matrix4 = new Matrix4();
     const ray: Ray = new Ray();
 
-    const triangle: Triangle = new Triangle();
+    // const triangle: Triangle = new Triangle();
+    const p1: Vector3 = new Vector3();
+    const p2: Vector3 = new Vector3();
+    const p3: Vector3 = new Vector3();
     const target: Vector3 = new Vector3();
     const normal: Vector3 = new Vector3();
 
@@ -154,12 +157,12 @@ Mesh.prototype.raycast = function() {
                         idx2 = temp;
                     }
     
-                    triangle.p1.set(posData[idx0], posData[idx0 + 1], thrNum ? posData[idx0 + 2] : 0);
-                    triangle.p2.set(posData[idx1], posData[idx1 + 1], thrNum ? posData[idx1 + 2] : 0);   
-                    triangle.p3.set(posData[idx2], posData[idx2 + 1], thrNum ? posData[idx2 + 2] : 0); 
+                    p1.set(posData[idx0], posData[idx0 + 1], thrNum ? posData[idx0 + 2] : 0);
+                    p2.set(posData[idx1], posData[idx1 + 1], thrNum ? posData[idx1 + 2] : 0);   
+                    p3.set(posData[idx2], posData[idx2 + 1], thrNum ? posData[idx2 + 2] : 0); 
     
-                    if(ray.intersectTriangle(triangle, backCulling, target)) {
-                        triangle.computeNormal(normal);
+                    if(ray.intersectTriangle(p1, p2, p3, backCulling, target)) {
+                        // triangle.computeNormal(normal);
                         target.applyMatrix4(this._matrix);
                         let distance = target.distanceTo(raycaster.ray.origin);
                         if (distance < raycaster.near || distance > raycaster.far) {
@@ -177,14 +180,14 @@ Mesh.prototype.raycast = function() {
                 for (let i = 0, l = posData.length / num; i < l; i += 3 * num) {
     
                     let idx = i + offset;
-                    triangle.p1.set(posData[idx], posData[idx + 1], posData[idx + 2]);
+                    p1.set(posData[idx], posData[idx + 1], posData[idx + 2]);
                     idx = backSide ? (i + 2 * num + offset) : (i + num + offset);
-                    triangle.p2.set(posData[idx], posData[idx + 1], posData[idx + 2]);
+                    p2.set(posData[idx], posData[idx + 1], posData[idx + 2]);
                     idx = backSide ? (i + num + offset) : (i + 2 * num + offset);
-                    triangle.p3.set(posData[idx], posData[idx + 1], posData[idx + 2]);
+                    p3.set(posData[idx], posData[idx + 1], posData[idx + 2]);
     
-                    if(ray.intersectTriangle(triangle, backCulling, target)) {
-                        triangle.computeNormal(normal);
+                    if(ray.intersectTriangle(p1, p2, p3, backCulling, target)) {
+                        // triangle.computeNormal(normal);
                         target.applyMatrix4(this._matrix)
                         let distance = target.distanceTo(raycaster.ray.origin);
                         if (distance < raycaster.near || distance > raycaster.far) {

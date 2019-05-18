@@ -19,6 +19,7 @@ const vpImat = new Matrix4
  * 射线检测类型
  */
 export class Raycaster {
+
     /**
      * 射线对象
      */
@@ -28,6 +29,7 @@ export class Raycaster {
      * 远距离
      */
     public far: number = Number.MAX_VALUE;
+
     /**
      * 近距离
      */
@@ -98,8 +100,7 @@ export class Raycaster {
         this.near = camera.near;
         this.far = camera.far;
         if (camera.type === CameraType.Perspective) {
-            // camera.getViewInverseMatrix()
-            ray.origin.setFromMatrixPosition(camera.getMatrix());//.copy(camera.getPosition()); // copy(camera.getPosition()); //
+            ray.origin.setFromMatrixPosition(camera.getMatrix());
             vpImat.copy(camera.getViewProjectionMatrix()).invert();
             ray.dir.set(coords.x, coords.y, 0.5).applyMatrix4(vpImat).subAt(ray.origin).normalize();
         } else if (camera.type === CameraType.Orthographic) {

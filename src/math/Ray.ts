@@ -144,7 +144,7 @@ export class Ray {
      * @param backfaceCulling 
      * @param target 
      */
-    public intersectTriangle(triangle: Triangle, backfaceCulling: boolean, target?: Vector3): boolean { return false; }
+    public intersectTriangle(a: Vector3, b: Vector3, c: Vector3, backfaceCulling: boolean, target?: Vector3): boolean { return false; }
 
     /**
      * 拷贝
@@ -240,10 +240,7 @@ Ray.prototype.intersectTriangle = function () {
     const edge2 = new Vector3
     const normal = new Vector3
 
-    return function (triangle: Triangle, backfaceCulling: boolean, target?: Vector3) {
-        const a = triangle.p1;
-        const b = triangle.p2;
-        const c = triangle.p3
+    return function (a: Vector3, b: Vector3, c: Vector3, backfaceCulling: boolean, target?: Vector3) {
 
         edge1.copy(b).subAt(a);
         edge2.copy(c).subAt(a);

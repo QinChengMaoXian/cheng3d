@@ -105,6 +105,38 @@ export class Vector4 {
         return this.v[3];
     }
 
+    public set r(value: number) {
+        this.v[0] = value;
+    }
+
+    public get r() {
+        return this.v[0];
+    }
+
+    public set g(value: number) {
+        this.v[1] = value;
+    }
+    
+    public get g() {
+        return this.v[1];
+    }
+
+    public set b(value: number) {
+        this.v[2] = value;
+    }
+    
+    public get b() {
+        return this.v[2];
+    }
+
+    public set a(value: number) {
+        this.v[3] = value;
+    }
+
+    public get a() {
+        return this.v[3];
+    }
+
     public get data(): any {
         // Vector4._float32Data.set(this.v);
         // return Vector4._float32Data;

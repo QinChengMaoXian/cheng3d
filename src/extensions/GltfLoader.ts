@@ -12,6 +12,7 @@ import { Logger } from '../core/Logger';
 
 import { base64decode } from '../util/Base64'
 
+
 export class GltfLoader {
     constructor(public url?:string, callback?:any) {
         if (url) {

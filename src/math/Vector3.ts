@@ -303,6 +303,30 @@ export class Vector3 {
         return this.v[2];
     }
 
+    public set r(value: number) {
+        this.v[0] = value;
+    }
+
+    public get r() {
+        return this.v[0];
+    }
+
+    public set g(value: number) {
+        this.v[1] = value;
+    }
+
+    public get g() {
+        return this.v[1];
+    }
+
+    public set b(value: number) {
+        this.v[2] = value;
+    }
+
+    public get b() {
+        return this.v[2];
+    }
+
     public get data() {
         return this.v;
     }

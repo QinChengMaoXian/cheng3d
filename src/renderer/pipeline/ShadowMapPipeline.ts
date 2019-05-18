@@ -173,7 +173,7 @@ export class ShadowMapPipeline {
         shadow.matrix.copy(camera.getViewProjectionMatrix());
 
         culling.culling(scene, camera.getViewProjectionMatrix(), false, true);
-        
+
         let renderer = this._renderer;
         renderer.useCamera(camera);
         renderer.useFrame(frame);
@@ -314,5 +314,4 @@ export class ShadowMapPipeline {
             renderer.directRenderOrderedList(culling.opacities, culling.opacitySize, material);
         }
     }
-
 }
