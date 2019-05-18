@@ -97,11 +97,11 @@ export class FirstPersonControl {
                 timer.frameLoop(1, camera, camera.horizontalStep, [_d]);
                 break;
     
-            case 'q':
+            case 'e':
                 timer.frameLoop(1, camera, camera.verticalStep, [-_d]);
                 break;
     
-            case 'e':
+            case 'q':
                 timer.frameLoop(1, camera, camera.verticalStep, [_d]);
                 break;
     

@@ -19,10 +19,19 @@ const vpImat = new Matrix4
  * 射线检测类型
  */
 export class Raycaster {
+    /**
+     * 射线对象
+     */
     public ray: Ray
 
-    public far: number;
-    public near: number;
+    /**
+     * 远距离
+     */
+    public far: number = Number.MAX_VALUE;
+    /**
+     * 近距离
+     */
+    public near: number = 0;
 
     constructor(ray?: Ray, near: number = 0, far: number = Infinity) {
         if (ray) {
@@ -44,6 +53,12 @@ export class Raycaster {
         this.ray.set(origin, dir);
     }
 
+    /**
+     * 与物体相交的私有方法
+     * @param object 
+     * @param intersects 
+     * @param recursive 
+     */
     protected _intersectObject(object: Object3D, intersects: IntersectObject[] = [], recursive: boolean = true) {
         if (object.visible === false) {
             return intersects;
@@ -59,7 +74,7 @@ export class Raycaster {
     }
 
     /**
-     * 
+     * 与object相交
      * @param object 
      * @param recursive 
      */
@@ -80,6 +95,8 @@ export class Raycaster {
      */
     public setFromCamera(coords: Vector2, camera: Camera) {
         const ray = this.ray;
+        this.near = camera.near;
+        this.far = camera.far;
         if (camera.type === CameraType.Perspective) {
             // camera.getViewInverseMatrix()
             ray.origin.setFromMatrixPosition(camera.getMatrix());//.copy(camera.getPosition()); // copy(camera.getPosition()); //

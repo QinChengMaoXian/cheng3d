@@ -324,11 +324,6 @@ let gltfCallback = (event, object) => {
     }
 }
 
-
-// CGE.Loader.loadImage('').then(img => {
-
-// })
-
 let gltfTest = new CGE.GltfLoader();
 gltfTest.load('Cesium_Man/Cesium_Man.gltf', gltfCallback);
 

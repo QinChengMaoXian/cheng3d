@@ -160,12 +160,16 @@ Mesh.prototype.raycast = function() {
     
                     if(ray.intersectTriangle(triangle, backCulling, target)) {
                         triangle.computeNormal(normal);
-                        target.applyMatrix4(this._matrix)
+                        target.applyMatrix4(this._matrix);
+                        let distance = target.distanceTo(raycaster.ray.origin);
+                        if (distance < raycaster.near || distance > raycaster.far) {
+                            continue
+                        }
                         intersects.push({
                             target: target.clone(),
                             normal: normal.clone(),
                             object: this,
-                            distance: target.distanceToSquare(raycaster.ray.origin),
+                            distance: distance
                         })
                     }
                 }
@@ -182,17 +186,21 @@ Mesh.prototype.raycast = function() {
                     if(ray.intersectTriangle(triangle, backCulling, target)) {
                         triangle.computeNormal(normal);
                         target.applyMatrix4(this._matrix)
+                        let distance = target.distanceTo(raycaster.ray.origin);
+                        if (distance < raycaster.near || distance > raycaster.far) {
+                            continue
+                        }
                         intersects.push({
                             target: target.clone(),
                             normal: normal.clone(),
                             object: this,
-                            distance: target.distanceToSquare(raycaster.ray.origin),
+                            distance: distance,
                         })
                     }
                 }
             } //if (idxbuf) {
         } else if (drawMode === DrawMode.LINES) {
-            
+
         }
     }
 }();

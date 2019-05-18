@@ -29,7 +29,7 @@ export class Renderer extends Base {
 
     constructor() {
         super();
-        if (Renderer.Renderers.length < 1) {
+        if (Renderer.Renderers.length < 4) {
             Renderer.Renderers.push(this);
         } else {
             Logger.error('Too many renderer instance');
