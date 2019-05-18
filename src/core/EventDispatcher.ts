@@ -32,11 +32,11 @@ export class EventDispatcher {
                 if (handler.caller === celler && handler.method === method) {
                     handlers.splice(i, 1);
                     l = handlers.length;
+                    handler.clear();
+                    handler = null;
                 } else {
                     i++;
                 }
-                handler.clear();
-                handler = null;
             }
             if (handlers.length === 0) {
                 events.delete(type);
@@ -74,7 +74,7 @@ export class EventDispatcher {
             let l = handlers.length;
             for (let i = 0; i < l; i++) {
                 let handler = handlers[i];
-                return handler.runWith(args);
+                handler.runWith(args);
             }
         }
     }
