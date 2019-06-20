@@ -32,6 +32,7 @@ type SpotLightProxy = Object3DProxy<SpotLight>;
 /**
  * 渲染剔除
  * TODO想办法优化这一对东西；
+ * 还是算了放弃吧，优化毛线啊。
  */
 export class RenderCulling {
 

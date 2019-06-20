@@ -6,6 +6,9 @@ import { Bounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB'
 import { Vector3 } from '../math/Vector3';
 
+/**
+ * 绘制模式
+ */
 export enum DrawMode {
     POINTS = CGE.POINTS,
     LINES = CGE.LINES,
@@ -16,6 +19,9 @@ export enum DrawMode {
     TRIANGLE_FAN = CGE.TRIANGLE_FAN,
 }
 
+/**
+ * 绘制参数
+ */
 export interface DrawParameter {
     mode: DrawMode;
     count: number;
@@ -29,7 +35,13 @@ export class Geometry extends GraphicsObject {
     protected _buffers: Buffer[] = []; 
     protected _indexBuffer: Buffer;
 
+    /**
+     * position Attribute的引用，用于快速get position结构
+     */
     protected _posAttrib: Attribute;
+    /**
+     * position Buffer的引用，用于快速get position数据
+     */
     protected _posBuffer: Buffer;
 
     constructor() {

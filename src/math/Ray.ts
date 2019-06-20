@@ -47,6 +47,15 @@ export class Ray {
     }
 
     /**
+     * 射线到线段的距离的平方
+     * @param v1 
+     * @param v2 
+     * @param optionalPointOnRay 
+     * @param optionalPointOnSegment 
+     */
+    public distanceSqToSegment(v1: Vector3, v2: Vector3, optionalPointOnRay?: Vector3, optionalPointOnSegment?: Vector3): number { return }
+
+    /**
      * 射线到点的距离平方
      * @param point 
      */
@@ -192,6 +201,95 @@ Ray.prototype.isIntersectBox = function () {
         return (this as Ray).intersectBox(box, v) !== null;
     }
 }();
+
+Ray.prototype.distanceSqToSegment = function() {
+
+    const segCenter = new Vector3();
+	const segDir = new Vector3();
+	const diff = new Vector3();
+
+    return function(v0: Vector3, v1: Vector3, optionalPointOnRay?: Vector3, optionalPointOnSegment?: Vector3) {
+        // from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+        // It returns the min distance between the ray and the segment
+        // defined by v0 and v1
+        // It can also set two optional targets :
+        // - The closest point on the ray
+        // - The closest point on the segment
+        segCenter.copy(v0).addAt(v1).mul(0.5);
+        segDir.copy(v1).subAt(v0).normalize();
+        diff.copy(this.origin).subAt(segCenter);
+
+        let segExtent = v0.distanceTo(v1) * 0.5;
+        let a01 = -this.direction.dot(segDir);
+        let b0 = diff.dot(this.direction);
+        let b1 = -diff.dot(segDir);
+        let c = diff.lengthSquare();
+        let det = Math.abs(1 - a01 * a01);
+        let s0, s1, sqrDist, extDet;
+
+        if (det > 0) {
+            // The ray and segment are not parallel.
+            s0 = a01 * b1 - b0;
+            s1 = a01 * b0 - b1;
+            extDet = segExtent * det;
+
+            if (s0 >= 0) {
+                if (s1 >= - extDet) {
+                    if (s1 <= extDet) {
+                        // region 0
+                        // Minimum at interior points of ray and segment.
+                        let invDet = 1 / det;
+                        s0 *= invDet;
+                        s1 *= invDet;
+                        sqrDist = s0 * (s0 + a01 * s1 + 2 * b0) + s1 * (a01 * s0 + s1 + 2 * b1) + c;
+                    } else {
+                        // region 1
+                        s1 = segExtent;
+                        s0 = Math.max(0, -(a01 * s1 + b0));
+                        sqrDist = -s0 * s0 + s1 * (s1 + 2 * b1) + c;
+                    }
+                } else {
+                    // region 5
+                    s1 = -segExtent;
+                    s0 = Math.max(0, -(a01 * s1 + b0));
+                    sqrDist = -s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+                }
+            } else {
+                if (s1 <= - extDet) {
+                    // region 4
+                    s0 = Math.max(0, -(-a01 * segExtent + b0));
+                    s1 = (s0 > 0) ? -segExtent : Math.min( Math.max(-segExtent, -b1), segExtent);
+                    sqrDist = -s0 * s0 + s1 * (s1 + 2 * b1) + c;
+                } else if (s1 <= extDet) {
+                    // region 3
+                    s0 = 0;
+                    s1 = Math.min(Math.max(-segExtent, -b1), segExtent);
+                    sqrDist = s1 * (s1 + 2 * b1) + c;
+                } else {
+                    // region 2
+                    s0 = Math.max(0, -(a01 * segExtent + b0));
+                    s1 = (s0 > 0) ? segExtent : Math.min(Math.max(-segExtent, -b1), segExtent);
+                    sqrDist = -s0 * s0 + s1 * (s1 + 2 * b1) + c;
+                }
+            }
+        } else {
+            // Ray and segment are parallel.
+            s1 = (a01 > 0) ? -segExtent : segExtent;
+            s0 = Math.max(0, -(a01 * s1 + b0));
+            sqrDist = -s0 * s0 + s1 * (s1 + 2 * b1) + c;
+        }
+
+        if (optionalPointOnRay) {
+            optionalPointOnRay.copy(this.direction).mul(s0).addAt(this.origin);
+        }
+
+        if (optionalPointOnSegment) {
+            optionalPointOnSegment.copy(segDir).mul(s1).addAt(segCenter);
+        }
+
+        return sqrDist;
+    }
+}()
 
 Ray.prototype.distanceSqToPoint = function () {
     const v = new Vector3
