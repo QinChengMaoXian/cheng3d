@@ -1,4 +1,4 @@
-import { Bounding, BoundingType } from './Bounding';
+import { Bounding, BoundingType, IBounding } from './Bounding';
 import { AABB } from './AABB';
 import { OBB } from './OBB'
 import { Vector3 } from '../math/Vector3';
@@ -6,11 +6,11 @@ import { Matrix4 } from '../math/Matrix4';
 import { Sphere } from '../math/Sphere';
 import { Ray } from '../math/Ray';
 
-export class SphereBounding extends Bounding {
+export class SphereBounding implements IBounding {
     protected _sphere: Sphere = new Sphere();
 
     constructor() {
-        super();
+        // super();
     }
 
     public setFrom(sb: SphereBounding, mat: Matrix4) {
@@ -26,7 +26,7 @@ export class SphereBounding extends Bounding {
         return ray.isInstersectSphere(this._sphere);
     }
 
-    public intersect(bounding: Bounding) {
+    public intersect(bounding: IBounding) {
         const type = bounding.getType();
         switch(type) {
             case BoundingType.TYPE_SPHERE:
@@ -34,7 +34,7 @@ export class SphereBounding extends Bounding {
             case BoundingType.TYPE_AABB:
                 return Bounding.intersectSphereToAABB(this, <AABB>bounding);
             case BoundingType.TYPE_OBB:
-                return Bounding.intersectSphereToOBB(this, <OBB>bounding);
+                return Bounding.intersectSphereToOBB(this, <any>bounding);
             default:
                 return false;
         }

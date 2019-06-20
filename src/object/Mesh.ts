@@ -53,7 +53,7 @@ export class Mesh extends Object3D {
             return;
         }
         if (this._bounding && this._bounding.getType() === bounding.getType()) {
-            this._bounding.copy(bounding);
+            (<any>this._bounding).copy(bounding);
             this._bounding.applyMatrix(this._matrix);
         } else {
             this._bounding = bounding.clone();

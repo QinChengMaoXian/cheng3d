@@ -1,7 +1,7 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Matrix4 } from '../math/Matrix4';
-import { Bounding } from '../bounding/Bounding'
+import { Bounding, IBounding } from '../bounding/Bounding'
 import { Base } from '../core/Base';
 import { Event } from '../core/Event';
 import { Raycaster, IntersectObject } from '../util/RayCaster';
@@ -19,7 +19,7 @@ export class Object3D extends Base {
     protected _children: Object3D[] = [];
 
     protected _needsUpdate: boolean = true;
-    protected _bounding: Bounding;
+    protected _bounding: IBounding;
 
     protected _animater: Animater;
 

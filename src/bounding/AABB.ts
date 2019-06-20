@@ -1,4 +1,4 @@
-import { Bounding, BoundingType } from './Bounding';
+import { Bounding, BoundingType, IBounding } from './Bounding';
 import { OBB } from './OBB';
 import { SphereBounding } from './SphereBounding';
 import { Vector3 } from '../math/Vector3';
@@ -6,11 +6,11 @@ import { Matrix4 } from '../math/Matrix4';
 import { Box } from '../math/Box';
 import { Ray } from '../math/Ray';
 
-export class AABB extends Bounding {
+export class AABB implements IBounding {
     protected _box: Box = new Box();
 
     constructor() {
-        super();
+        // super();
     }
 
     public applyMatrix(mat: Matrix4) {
@@ -21,7 +21,7 @@ export class AABB extends Bounding {
         return ray.isIntersectBox(this._box);
     }
 
-    public intersect(bounding: Bounding) {
+    public intersect(bounding: IBounding) {
         const type = bounding.getType();
         switch(type) {
             case BoundingType.TYPE_SPHERE:

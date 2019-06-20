@@ -2,7 +2,7 @@ import * as CGE from './RendererParameter';
 import { GraphicsObject } from './GraphicsObject';
 import { ShaderConst } from './ShaderConst';
 import { Attribute, Buffer } from './Buffer';
-import { Bounding } from '../bounding/Bounding';
+import { Bounding, IBounding } from '../bounding/Bounding';
 import { AABB } from '../bounding/AABB'
 import { Vector3 } from '../math/Vector3';
 
@@ -31,7 +31,7 @@ export interface DrawParameter {
 export class Geometry extends GraphicsObject {
     protected _drawParameter: DrawParameter = undefined;
     protected _display: boolean = true;
-    protected _bounding: Bounding;
+    protected _bounding: IBounding;
     protected _buffers: Buffer[] = []; 
     protected _indexBuffer: Buffer;
 

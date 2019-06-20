@@ -13,39 +13,18 @@ export enum BoundingType {
     TYPE_OBB = 2,
 }
 
+export interface IBounding {
+    applyMatrix(mat: Matrix4)
+    getType()
+    intersect(bounding: IBounding)
+    clone(): IBounding
+    intersectRay(ray: Ray)
+}
+
 /**
  * 包围盒基类
  */
 export class Bounding {
-   
-    constructor() {
-        
-    }
-
-    public applyMatrix(mat: Matrix4) {
-
-    }
-
-    public getType() {
-        return -1;
-    }
-
-    public intersect(bounding: Bounding) {
-        return false;
-    }
-
-    public copy(bounding: Bounding) {
-
-    }
-
-    public clone(): Bounding {
-        return null;
-    }
-
-    public intersectRay(ray: Ray) {
-        return true;
-    }
-
     private static _obb1Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];
     private static _obb2Pos: Vector3[] = [new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3()];
 
