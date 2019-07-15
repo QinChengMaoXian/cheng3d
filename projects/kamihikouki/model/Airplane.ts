@@ -5,6 +5,7 @@ export class Airplane {
 
     protected _dir: CGE.Vector3;
     protected _up: CGE.Vector3;
+    protected _position: CGE.Vector3;
 
     protected _type: number = 1;
 
@@ -30,6 +31,8 @@ export class Airplane {
 
         this._dir = new CGE.Vector3(0, 0.01, 0);
         this._up = new CGE.Vector3(0, 0, 1);
+
+        this._position = new CGE.Vector3(0, 0, 0);
     }
 
     public getView() {

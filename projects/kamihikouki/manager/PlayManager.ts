@@ -20,6 +20,10 @@ export class PlayManager {
 
     }
 
+    public update() {
+        
+    }
+
     public checkPoint() {
 
     } 

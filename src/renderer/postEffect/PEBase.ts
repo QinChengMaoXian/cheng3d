@@ -6,6 +6,7 @@ export enum PEType {
     FXAA,
     SSAO,
     HDR,
+    SSR,
 }
 
 export enum PEOrder {
@@ -13,6 +14,7 @@ export enum PEOrder {
     AA,
     HDR,
     AO,
+    SSR,
 }
 
 export enum PEReqType {

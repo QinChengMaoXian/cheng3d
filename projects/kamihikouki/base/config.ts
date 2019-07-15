@@ -2,6 +2,6 @@ export interface Config{
     defaultSpeed: number,
 }
 
-export const config: Config = {
+export const defaultConfig: Config = {
     defaultSpeed: 1,
 }

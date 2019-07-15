@@ -844,7 +844,7 @@ export class WebGLRenderer extends Renderer implements IRenderer {
      */
     public get defCamera() {
         return this._defCamera;
-    }
+    } 
 
     /**
      * 根据后处理管线需求与延迟渲染，更新默认帧缓冲的结构。
