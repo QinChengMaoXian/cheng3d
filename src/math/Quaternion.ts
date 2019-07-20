@@ -73,9 +73,9 @@ export class Quaternion extends Vector4 {
         // copy for THREE.js same function;
         let te = mat4.m,
 
-            m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
-            m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
-            m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
+            m11 = te[0], m12 = te[4], m13 = te[8],
+            m21 = te[1], m22 = te[5], m23 = te[9],
+            m31 = te[2], m32 = te[6], m33 = te[10],
 
             trace = m11 + m22 + m33,
             s;

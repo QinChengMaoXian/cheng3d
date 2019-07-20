@@ -13,8 +13,8 @@ export enum PEOrder {
     None,
     AA,
     HDR,
-    AO,
     SSR,
+    AO,
 }
 
 export enum PEReqType {

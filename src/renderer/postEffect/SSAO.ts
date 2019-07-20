@@ -9,7 +9,6 @@ import { PostEffectsPipeline } from "../pipeline/PostEffectsPipeline";
 import { IRenderer } from "../Renderer";
 import * as CGE from '../../graphics/RendererParameter';
 import { Vector4 } from "../../math/Vector4";
-import { ShaderConst } from "../../graphics/ShaderConst";
 import { BlendAOMaterial } from "../../material/BlendAOMaterial";
 
 /**

@@ -316,10 +316,10 @@ export class Matrix4 {
     public determinant () {
         var te = this.m;
 
-        var n11 = te[ 0 ], n12 = te[ 4 ], n13 = te[ 8 ], n14 = te[ 12 ];
-        var n21 = te[ 1 ], n22 = te[ 5 ], n23 = te[ 9 ], n24 = te[ 13 ];
-        var n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ], n34 = te[ 14 ];
-        var n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
+        var n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
+        var n21 = te[1], n22 = te[5], n23 = te[9], n24 = te[13];
+        var n31 = te[2], n32 = te[6], n33 = te[10], n34 = te[14];
+        var n41 = te[3], n42 = te[7], n43 = te[11], n44 = te[15];
 
         //TODO: make this more efficient
         // copy from THREE.js;
@@ -370,52 +370,6 @@ export class Matrix4 {
     }
 
     public decompose(position: Vector3, quaternion: Quaternion, scale: Vector3) {
-        let vector = new Vector3();
-        let matrix = new Matrix4();
-
-        let te = this.m;
-
-        let sx = vector.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-        let sy = vector.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-        let sz = vector.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
-
-        // if determine is negative, we need to invert one scale
-        var det = this.determinant();
-        if ( det < 0 ) {
-            sx = - sx;
-        }
-
-        position.x = te[ 12 ];
-        position.y = te[ 13 ];
-        position.z = te[ 14 ];
-
-        // scale the rotation part
-
-        matrix.m.set( this.m ); 
-        // at this point matrix is incomplete so we can't use .copy()
-
-        var invSX = 1 / sx;
-        var invSY = 1 / sy;
-        var invSZ = 1 / sz;
-
-        matrix.m[ 0 ] *= invSX;
-        matrix.m[ 1 ] *= invSX;
-        matrix.m[ 2 ] *= invSX;
-
-        matrix.m[ 4 ] *= invSY;
-        matrix.m[ 5 ] *= invSY;
-        matrix.m[ 6 ] *= invSY;
-
-        matrix.m[ 8 ] *= invSZ;
-        matrix.m[ 9 ] *= invSZ;
-        matrix.m[ 10 ] *= invSZ;
-
-        quaternion.setFromRotationMatrix( matrix );
-
-        scale.x = sx;
-        scale.y = sy;
-        scale.z = sz;
-
         return this;
     }
 
@@ -489,6 +443,57 @@ export class Matrix4 {
     }
 }
 
+Matrix4.prototype.decompose = function() {
+    const vector = new Vector3();
+    const matrix = new Matrix4();
+    return function(position: Vector3, quaternion: Quaternion, scale: Vector3) {
+        let te = this.m;
+
+        let sx = vector.set(te[0], te[1], te[2 ] ).length();
+        let sy = vector.set(te[4], te[5], te[6 ] ).length();
+        let sz = vector.set(te[8], te[9], te[10 ] ).length();
+
+        // if determine is negative, we need to invert one scale
+        var det = this.determinant();
+        if ( det < 0 ) {
+            sx = - sx;
+        }
+
+        position.x = te[12];
+        position.y = te[13];
+        position.z = te[14];
+
+        // scale the rotation part
+
+        matrix.m.set( this.m ); 
+        // at this point matrix is incomplete so we can't use .copy()
+
+        var invSX = 1 / sx;
+        var invSY = 1 / sy;
+        var invSZ = 1 / sz;
+
+        matrix.m[0] *= invSX;
+        matrix.m[1] *= invSX;
+        matrix.m[2] *= invSX;
+
+        matrix.m[4] *= invSY;
+        matrix.m[5] *= invSY;
+        matrix.m[6] *= invSY;
+
+        matrix.m[8] *= invSZ;
+        matrix.m[9] *= invSZ;
+        matrix.m[10] *= invSZ;
+
+        quaternion.setFromRotationMatrix( matrix );
+
+        scale.x = sx;
+        scale.y = sy;
+        scale.z = sz;
+
+        return this;
+    }
+}()
+
 Matrix4.prototype.extractRotation = function() {
     const v1 = new Vector3();
     return function(m: Matrix4) {
@@ -499,25 +504,25 @@ Matrix4.prototype.extractRotation = function() {
 		const scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
         const scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
         
-        tm[ 0 ] = mm[ 0 ] * scaleX;
-        tm[ 1 ] = mm[ 1 ] * scaleX;
-        tm[ 2 ] = mm[ 2 ] * scaleX;
-        tm[ 3 ] = 0;
+        tm[0] = mm[0] * scaleX;
+        tm[1] = mm[1] * scaleX;
+        tm[2] = mm[2] * scaleX;
+        tm[3] = 0;
 
-        tm[ 4 ] = mm[ 4 ] * scaleY;
-        tm[ 5 ] = mm[ 5 ] * scaleY;
-        tm[ 6 ] = mm[ 6 ] * scaleY;
-        tm[ 7 ] = 0;
+        tm[4] = mm[4] * scaleY;
+        tm[5] = mm[5] * scaleY;
+        tm[6] = mm[6] * scaleY;
+        tm[7] = 0;
 
-        tm[ 8 ] = mm[ 8 ] * scaleZ;
-        tm[ 9 ] = mm[ 9 ] * scaleZ;
-        tm[ 10 ] = mm[ 10 ] * scaleZ;
-        tm[ 11 ] = 0;
+        tm[8] = mm[8] * scaleZ;
+        tm[9] = mm[9] * scaleZ;
+        tm[10] = mm[10] * scaleZ;
+        tm[11] = 0;
 
-        tm[ 12 ] = 0;
-        tm[ 13 ] = 0;
-        tm[ 14 ] = 0;
-        tm[ 15 ] = 1;
+        tm[12] = 0;
+        tm[13] = 0;
+        tm[14] = 0;
+        tm[15] = 1;
 
         return this
     }

@@ -149,6 +149,7 @@ export class Material extends Base {
         this._faceMode = v;
     }
 
+    /** 剔除面模式 CGE.ZERO为不剔除 TODO：变量名容易混淆应该叫做cullMode */
     public get faceMode() {
         return this._faceMode || CGE.BACK;
     }

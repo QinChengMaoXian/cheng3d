@@ -11,9 +11,9 @@ export enum CameraType {
 const tempVec = new Vector3();
 
 /**
- * 默认的相机类型
+ * 常规的相机类型
  * 两种模式，正交投影与透视投影
- * 临时的box相机暂时用6个透视代替
+ * 注意：临时的box相机暂时用6个透视代替
  */
 export class Camera extends Object3D {
     protected _far: number;
