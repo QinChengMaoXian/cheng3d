@@ -55,6 +55,7 @@ export { Component } from './object/Component';
 export { Entity } from './object/Entity';
 export { Mesh } from './object/Mesh';
 export { ComponentType } from './object/ObjectType';
+export { LineSegment } from './object/LineSegment';
 
 export { Scene } from './object/Scene';
 
