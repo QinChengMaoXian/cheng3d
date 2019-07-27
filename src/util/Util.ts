@@ -62,7 +62,7 @@ export function Check2DPointInPoly(pt: IPoint2D, poly: IPoint2D[]): boolean {
  * @param indexData 元素索引数组
  * @returns 切线数组
  */
-export function calcTangent(posData: number[], uvData: number[], normalData: number[], indexData: number[]): number[] {
+export function calcTangent(posData: number[] | ArrayLike<any>, uvData: number[] | ArrayLike<any>, normalData: number[] | ArrayLike<any>, indexData: number[] | ArrayLike<any>): number[] {
     let numVertices: number = posData.length / 3;
     let numIndices: number = indexData.length;
 

@@ -66,6 +66,7 @@ export { FirstPersonControl } from './extensions/FirstPersonControl';
 
 export { Loader } from './io/Loader';
 
+export { calcTangent } from './util/Util'
 export { Raycaster } from './util/RayCaster';
 export { triangleIntersect } from './util/TriangleIntersect';
 

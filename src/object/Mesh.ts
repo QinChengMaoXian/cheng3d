@@ -81,10 +81,10 @@ Mesh.prototype.raycast = function() {
     const invMat: Matrix4 = new Matrix4();
     const ray: Ray = new Ray();
 
-    // const triangle: Triangle = new Triangle();
-    const p1: Vector3 = new Vector3();
-    const p2: Vector3 = new Vector3();
-    const p3: Vector3 = new Vector3();
+    const triangle: Triangle = new Triangle();
+    const p1: Vector3 = triangle.p1;
+    const p2: Vector3 = triangle.p2;
+    const p3: Vector3 = triangle.p3;
     const target: Vector3 = new Vector3();
     const normal: Vector3 = new Vector3();
 
@@ -162,7 +162,7 @@ Mesh.prototype.raycast = function() {
                     p3.set(posData[idx2], posData[idx2 + 1], thrNum ? posData[idx2 + 2] : 0); 
     
                     if(ray.intersectTriangle(p1, p2, p3, backCulling, target)) {
-                        // triangle.computeNormal(normal);
+                        triangle.computeNormal(normal);
                         target.applyMatrix4(this._matrix);
                         let distance = target.distanceTo(raycaster.ray.origin);
                         if (distance < raycaster.near || distance > raycaster.far) {
@@ -177,7 +177,7 @@ Mesh.prototype.raycast = function() {
                     }
                 }
             } else {
-                for (let i = 0, l = posData.length / num; i < l; i += 3 * num) {
+                for (let i = 0, l = posData.length; i < l; i += 3 * num) {
     
                     let idx = i + offset;
                     p1.set(posData[idx], posData[idx + 1], posData[idx + 2]);
@@ -187,8 +187,8 @@ Mesh.prototype.raycast = function() {
                     p3.set(posData[idx], posData[idx + 1], posData[idx + 2]);
     
                     if(ray.intersectTriangle(p1, p2, p3, backCulling, target)) {
-                        // triangle.computeNormal(normal);
-                        target.applyMatrix4(this._matrix)
+                        triangle.computeNormal(normal);
+                        target.applyMatrix4(this._matrix);
                         let distance = target.distanceTo(raycaster.ray.origin);
                         if (distance < raycaster.near || distance > raycaster.far) {
                             continue

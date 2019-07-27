@@ -59,13 +59,17 @@ export class WebGLSupports {
         this._instanceArrays = gl.getExtension('ANGLE_instanced_arrays');
         this._elementIdxUint = gl.getExtension("OES_element_index_uint");
 
-        // this.drawArraysInstanced = this._instanceArrays.drawArraysInstancedANGLE.bind(this._instanceArrays);
+        if (this._instanceArrays) {
+            this.drawArraysInstanced = this._instanceArrays.drawArraysInstancedANGLE.bind(this._instanceArrays);
+        }
     }
 
-    public drawBuffers(buffers: number[]) {};
+    public drawBuffers(buffers: number[]) {
+        this._drawBuffers
+    };
 
     public drawArraysInstanced(mode: number, first: number, count: number, primcount: number) {
-        // this._instanceArrays.drawArraysInstancedANGLE
+        
     }
 
     public setWebGL2(v: boolean) {

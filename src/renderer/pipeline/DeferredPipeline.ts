@@ -147,6 +147,7 @@ export class DeferredPipeline {
             mat.setLightPos(pl.getPosition());  
             mesh.setScale(r, r, r);
             mesh.setPositionAt(pl.getPosition());
+            mesh.update(0, true)
             glProgram.lightColor.copy(pl.color);
             renderer.directRenderMesh(mesh);
         }

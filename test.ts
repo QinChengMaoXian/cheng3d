@@ -482,6 +482,7 @@ teapotMesh.name = '水壶2';
 mainScene.addChild(teapotMesh);
 
 
+const baseColorMat = new CGE.ColorMaterial(new CGE.Vector4(0.5, 1.0, 0.5, 1.0));
 standMat = new CGE.StandardMaterial(diffTex, normTex, specTex, specTex, specTex);
 standMat.setIrradianceMap(cubeTexture);
 standMat.setPrefilterMap(cubeTexture);
@@ -494,7 +495,7 @@ teapotMesh = new CGE.Mesh();
 teapotMesh.setScale(2, 2, 2);
 teapotMesh.setPosition(100, 100, 0);
 teapotMesh.setGeometry(teapotGeometry);
-teapotMesh.setMaterial(standMat);
+teapotMesh.setMaterial(baseColorMat);
 teapotMesh.name = '水壶3';
 mainScene.addChild(teapotMesh);
 
@@ -507,6 +508,9 @@ let tri_num = 20;
 let half_num = tri_num / 2;
 
 let vertexd = new Float32Array(tri_num * tri_num * tri_num * 18);
+let normald = [];
+
+let tri1 = new CGE.Triangle();
 
 for (let k = 0; k < tri_num; k++) {
     for (let j = 0; j < tri_num; j++) {
@@ -521,7 +525,7 @@ for (let k = 0; k < tri_num; k++) {
     }
 }
 
-let tri1 = new CGE.Triangle();
+tri1 = new CGE.Triangle();
 let tri2 = new CGE.Triangle();
 
 window['tri1'] = tri1;
@@ -543,6 +547,8 @@ let startTime = Date.now();
 
 let le = tri_num * tri_num * tri_num;
 
+let normalVec = new CGE.Vector3()
+
 for (let i = 0; i < le; i++) {
     let index = i * 18;
 
@@ -550,9 +556,21 @@ for (let i = 0; i < le; i++) {
     t1p2.set(vertexd[index + 3], vertexd[index + 4], vertexd[index + 5]);
     t1p3.set(vertexd[index + 6], vertexd[index + 7], vertexd[index + 8]);
 
+    tri1.computeNormal(normalVec)
+
+    normald.push(normalVec.x, normalVec.y, normalVec.z)
+    normald.push(normalVec.x, normalVec.y, normalVec.z)
+    normald.push(normalVec.x, normalVec.y, normalVec.z)
+
     t2p1.set(vertexd[index + 9], vertexd[index + 10], vertexd[index + 11]);
     t2p2.set(vertexd[index + 12], vertexd[index + 13], vertexd[index + 14]);
     t2p3.set(vertexd[index + 15], vertexd[index + 16], vertexd[index + 17]);
+
+    tri2.computeNormal(normalVec)
+
+    normald.push(normalVec.x, normalVec.y, normalVec.z)
+    normald.push(normalVec.x, normalVec.y, normalVec.z)
+    normald.push(normalVec.x, normalVec.y, normalVec.z)
 
     let result = CGE.triangleIntersect(tri1, tri2);
 
@@ -574,23 +592,38 @@ for (let i = 0; i < le; i++) {
 
 let endTime = Date.now(); 
 
+let index = []
+
+for (let i = 0, l = vertexd.length / 3; i < l; i++) {
+    index.push(i);
+}
+
 // console.log(startTime, endTime, endTime - startTime);
 
 // console.log(uvd);
 
 // console.log(results);
 
+const td = CGE.calcTangent(vertexd, uvd, normald, index);
+
 let triGeo = new CGE.Geometry();
 triGeo.addSingleAttribute('Position', CGE.ShaderConst.position, 3, CGE.FLOAT, vertexd);
 triGeo.addSingleAttribute('UV', CGE.ShaderConst.texcoord, 2, CGE.FLOAT, uvd);
+triGeo.addSingleAttribute('Normal', CGE.ShaderConst.normal, 3, CGE.FLOAT, new Float32Array(normald));
+triGeo.addSingleAttribute('Tangent', CGE.ShaderConst.tangent, 3, CGE.FLOAT, new Float32Array(td));
+
 // triGeo.setIndexData(indexd);
 triGeo.setDrawParameter(vertexd.length / 3);
+triGeo.buildBounding();
+let triTexture = new CGE.Texture2D();
+triTexture.setUrl('color.jpg');
+triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
+triTexture.setMipmap(true);
 
-// let triTexture = new CGE.Texture2D();
-// triTexture.setImageUrl(color_diff);
-// triTexture.setFilter(CGE.LINEAR, CGE.LINEAR);
-// triTexture.setMipmap(true);
-let triMaterial = new CGE.DiffuseMaterial('color.jpg');
+let triMaterial = new CGE.StandardMaterial(triTexture);
+
+triMaterial.setIrradianceMap(cubeTexture);
+triMaterial.setPrefilterMap(cubeTexture);
 
 let triMesh = new CGE.Mesh();
 triMesh.setGeometry(triGeo);
@@ -670,6 +703,14 @@ animater.addAnimationClip(aniClip);
 pl.animater = animater;
 animater.play('test');
 
+let lightGeo = new CGE.SphereGeometry(1, 32, 32);
+let baseMaterial = new CGE.ColorMaterial(new CGE.Vector4(1.0, 1.0, 0.0, 1.0));
+
+let lightMesh = new CGE.Mesh()
+lightMesh.setGeometry(lightGeo);
+lightMesh.setMaterial(baseMaterial);
+
+pl.addChild(lightMesh);
 
 // 以上 动画测试
 ///////////////////////////////////////////////////////////////////////////////////////
